@@ -1,0 +1,3 @@
+class TNode {
+  public:
+};
