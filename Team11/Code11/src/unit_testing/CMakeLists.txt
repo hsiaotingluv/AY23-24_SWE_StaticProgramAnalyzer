@@ -3,4 +3,8 @@ file(GLOB headers "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h" "${CMAKE_CURRENT_SOURCE_
 add_executable(unit_testing ${srcs})
 
 target_link_libraries(unit_testing spa)
-
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Building unit_testing with AddressSanitizer")
+    target_compile_options(unit_testing PRIVATE -fsanitize=address)
+    target_link_options(unit_testing PRIVATE -fsanitize=address)
+endif()

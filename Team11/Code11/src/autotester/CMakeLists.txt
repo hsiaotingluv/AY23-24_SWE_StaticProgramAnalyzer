@@ -3,6 +3,12 @@ add_executable(autotester ${srcs})
 target_include_directories(autotester PUBLIC include)
 target_link_libraries(autotester spa ${AUTOTESTER_LIBRARIES})
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Building autotester with AddressSanitizer")
+    target_compile_options(autotester PRIVATE -fsanitize=address)
+    target_link_options(autotester PRIVATE -fsanitize=address)
+endif()
+
 if(NOT WIN32)
     target_link_libraries(autotester pthread)
     target_link_options(autotester PRIVATE -no-pie)
