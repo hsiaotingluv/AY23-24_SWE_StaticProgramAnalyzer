@@ -1,12 +1,5 @@
-#include "PKB.h"
-
-#include <cstdio>
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "TNode.h"
+#include "pkb/PKB.h"
+#include "sp/TNode.h"
 
 auto PKB::setProcToAST(PROC p, TNode *r) -> int {
     return 0;
