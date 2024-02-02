@@ -1,16 +1,20 @@
-cmake_minimum_required (VERSION 3.20.2)
-project (SPA)
+cmake_minimum_required(VERSION 3.20.2)
+project(SPA)
 
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
-message (STATUS "${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}")
+message(STATUS "${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}")
+
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-    message(FATAL_ERROR "In-source builds are forbidden.")
+  message(FATAL_ERROR "In-source builds are forbidden.")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+  message(STATUS "No build type selected, default to Release")
+  set(CMAKE_BUILD_TYPE Release)
+else()
+  message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
 if(NOT MSVC)
@@ -25,10 +29,11 @@ set(AUTOTESTER_ROOT "${CMAKE_CURRENT_LIST_DIR}/lib/autotester/${CMAKE_SYSTEM_PRO
 
 list(APPEND CMAKE_PREFIX_PATH "${AUTOTESTER_ROOT}")
 find_package(autotester REQUIRED)
-include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")#include catch.hpp
+include_directories("${CMAKE_CURRENT_LIST_DIR}/lib") # include catch.hpp
 
 add_subdirectory(src/spa)
 add_subdirectory(src/autotester)
-#add_subdirectory(src/autotester_gui)
+
+# add_subdirectory(src/autotester_gui)
 add_subdirectory(src/unit_testing)
 add_subdirectory(src/integration_testing)
