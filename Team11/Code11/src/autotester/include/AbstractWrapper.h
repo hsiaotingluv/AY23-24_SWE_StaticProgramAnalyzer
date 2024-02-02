@@ -1,7 +1,4 @@
-#ifndef ABSTRACTWRAPPER_H
-#define ABSTRACTWRAPPER_H
-
-#include <iostream>
+#pragma once
 #include <list>
 #include <string>
 
@@ -17,16 +14,14 @@ class AbstractWrapper {
 class WrapperFactory {
   public:
     // static method for creating a wrapper
-    static AbstractWrapper *createWrapper();
+    static auto createWrapper() -> AbstractWrapper *;
 
   private:
     // the following three will prevent the creation of WrapperFactory objects
     WrapperFactory();
     WrapperFactory(const WrapperFactory &);
-    WrapperFactory &operator=(const WrapperFactory &);
+    auto operator=(const WrapperFactory &) -> WrapperFactory &;
 
     // the Wrapper object
     static AbstractWrapper *wrapper;
 };
-
-#endif
