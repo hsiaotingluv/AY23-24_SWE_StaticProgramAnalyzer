@@ -12,8 +12,8 @@ class TestWrapper : public AbstractWrapper {
     TestWrapper() = default;
 
     // method for parsing the SIMPLE source
-     void parse(std::string filename) override;
+    void parse(std::string filename) override;
 
     // method for evaluating a query
-     void evaluate(std::string query, std::list<std::string> &results) override;
+    void evaluate(std::string query, std::list<std::string> &results) override;
 };
