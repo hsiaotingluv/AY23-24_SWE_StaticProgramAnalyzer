@@ -1,0 +1,25 @@
+@startuml
+!define RECTANGLE component
+
+RECTANGLE SourceProcessor {
+}
+
+RECTANGLE Tokenizer {
+}
+
+RECTANGLE Parser {
+}
+
+
+package "AST Visitors" {
+  [DesignExtractor]
+  [EntityExtractor]
+  [AbstractionExtractor]
+}
+
+SourceProcessor --> Tokenizer : Tokenize Source Code
+SourceProcessor --> Parser : Parse Tokens
+SourceProcessor --> DesignExtractor : Extracted by
+DesignExtractor --> EntityExtractor : Extract Entities
+DesignExtractor --> AbstractionExtractor : Extract Abstractions
+@enduml
