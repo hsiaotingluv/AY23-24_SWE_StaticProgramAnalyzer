@@ -14,4 +14,3 @@ class ParentStore {
 
     bool HasParentRelation(const StatementNumber &stmt_1, const StatementNumber &stmt_2);
 };
-

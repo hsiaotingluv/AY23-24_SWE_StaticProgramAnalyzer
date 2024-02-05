@@ -14,4 +14,3 @@ class FollowsStore {
 
     bool HasFollowsRelation(const StatementNumber &stmt1, const StatementNumber &stmt2);
 };
-
