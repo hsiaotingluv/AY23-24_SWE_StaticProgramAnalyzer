@@ -8,4 +8,5 @@ void FollowsStore::AddFollowsRelation(const StatementNumber &stmt1, const Statem
 }
 
 bool FollowsStore::HasFollowsRelation(const StatementNumber &stmt1, const StatementNumber &stmt2) {
+    return true;
 }
