@@ -1,4 +1,4 @@
-#include "pkb/ParentStore.h"
+#include "pkb/Stores/ParentStore.h"
 
 ParentStore::ParentStore() = default;
 

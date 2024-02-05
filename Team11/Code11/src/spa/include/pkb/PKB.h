@@ -1,19 +1,24 @@
 #pragma once
 
-#include <cstdio>
-#include <iostream>
-#include <string>
-#include <vector>
-
-using PROC = short;
-
-class TNode;
-
-class VarTable; // no need to #include "VarTable.h" as all I need is pointer
+#include "pkb/Stores/EntityStore.h"
+#include "pkb/Stores/FollowsStore.h"
+#include "pkb/Stores/ParentStore.h"
+#include <memory>
 
 class PKB {
   public:
-    static VarTable *varTable;
-    static auto setProcToAST(PROC p, TNode *r) -> int;
-    static auto getRootAST(PROC p) -> TNode *;
+    PKB();
+
+    ~PKB();
+
+  private:
+    std::shared_ptr<EntityStore> entity_store;
+//    std::shared_ptr<StatementStore> statement_store;
+//    std::shared_ptr<FollowsStore> follows_store;
+//    std::shared_ptr<ParentStore> parent_store;
+//    std::shared_ptr<ModifiesStore> modifies_store;
+//    std::shared_ptr<UsesStore> uses_store;
+
+    friend class ReadFacade;
+    friend class WriteFacade;
 };

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PkbTypes.h"
+#include "pkb/CommonTypes.h"
 
 class ParentStore {
-    public:
-        typedef PkbTypes::STATEMENT_NUMBER StatementNumber;
+  public:
+    typedef CommonTypes::STATEMENT_NUMBER StatementNumber;
 
     ParentStore();
 
@@ -13,6 +13,5 @@ class ParentStore {
     void AddParentRelation(const StatementNumber &stmt_1, const StatementNumber &stmt_2);
 
     bool HasParentRelation(const StatementNumber &stmt_1, const StatementNumber &stmt_2);
-
 };
 

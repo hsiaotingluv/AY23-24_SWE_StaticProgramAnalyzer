@@ -1,4 +1,4 @@
-#include "pkb/FollowsStore.h"
+#include "pkb/Stores/FollowsStore.h"
 
 FollowsStore::FollowsStore() = default;
 

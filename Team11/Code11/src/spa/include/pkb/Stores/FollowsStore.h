@@ -1,10 +1,10 @@
 #pragma once
 
-#include "PkbTypes.h"
+#include "pkb/CommonTypes.h"
 
 class FollowsStore {
-    public:
-        typedef PkbTypes::STATEMENT_NUMBER StatementNumber;
+  public:
+    typedef CommonTypes::STATEMENT_NUMBER StatementNumber;
 
     FollowsStore();
 

@@ -1,17 +1,12 @@
 #include "pkb/PKB.h"
-#include "sp/TNode.h"
 
-//auto PKB::setProcToAST(PROC p, TNode *r) -> int {
-//    return 0;
-//}
-//
-//auto PKB::getRootAST(PROC p) -> TNode * {
-//    return nullptr;
-//}
-
-Pkb::Pkb() {
-    follows_store_ = std::make_shared<FollowsStore>();
-    parent_store_ = std::make_shared<ParentStore>();
+PKB::PKB() {
+    entity_store = std::make_shared<EntityStore>();
+//    statement_store = std::make_shared<StatementStore>();
+//    follows_store = std::make_shared<FollowsStore>();
+//    parent_store = std::make_shared<ParentStore>();
+//    modifies_store = std::make_shared<ModifiesStore>();
+//    uses_store = std::make_shared<UsesStore>();
 }
 
-Pkb::~Pkb() = default;
+PKB::~PKB() = default;
