@@ -1,0 +1,18 @@
+@startuml
+!define RECTANGLE component
+
+RECTANGLE PKB {
+}
+
+RECTANGLE Stores {
+}
+
+package "Interface" {
+  [WriteFacade]
+  [ReadFacade]
+}
+
+PKB --> WriteFacade
+PKB --> ReadFacade
+Stores --> PKB
+@enduml
