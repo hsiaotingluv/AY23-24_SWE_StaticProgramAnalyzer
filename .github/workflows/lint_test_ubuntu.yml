@@ -1,10 +1,10 @@
-name: Lint cpp/h files
+name: "Ubuntu: Lint cpp/h files and test"
 
-on: [ push ]
+on: [push]
 
 jobs:
   run-linters:
-    name: run linters
+    name: Run linters
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +20,7 @@ jobs:
           mkdir build
           cd build
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
-          make -j4 
+          make -j4
 
       - name: Upload integration test
         uses: actions/upload-artifact@v4
@@ -42,9 +42,9 @@ jobs:
         with:
           style: file
           version: 16
-          repo-root: 'Team11/Code11'
-          database: 'build/compile_commands.json'
-          ignore: 'build | lib | cmake | src/autotester_gui'
+          repo-root: "Team11/Code11"
+          database: "build/compile_commands.json"
+          ignore: "build | lib | cmake | src/autotester_gui"
           step-summary: true
 
       - name: Check linter status
