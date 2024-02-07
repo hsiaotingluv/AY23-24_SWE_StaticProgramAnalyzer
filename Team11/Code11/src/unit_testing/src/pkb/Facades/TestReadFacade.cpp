@@ -7,8 +7,8 @@ TEST_CASE("Simple Entity Test") {
     SECTION("Procedure Test") {
         PKB pkb = PKB();
 
-        auto *readFacade = new ReadFacade(pkb);
-        auto *writeFacade = new WriteFacade(pkb);
+        auto readFacade = std::make_unique<ReadFacade>(pkb);
+        auto writeFacade = std::make_unique<WriteFacade>(pkb);
 
         ReadFacade::Procedure procedure1 = "procedure1";
 
