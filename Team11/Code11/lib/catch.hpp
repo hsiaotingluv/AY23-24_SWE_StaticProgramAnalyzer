@@ -241,7 +241,7 @@ namespace Catch {
 #if defined(_MSC_VER)
 
 // Universal Windows platform does not support SEH
-// Or console colours (or console at all...)
+// LOr console colours (or console at all...)
 #  if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #    define CATCH_CONFIG_COLOUR_NONE
 #  else
@@ -10879,7 +10879,7 @@ namespace Catch {
         { SIGABRT, "SIGABRT - Abort (abnormal termination) signal" }
     };
 
-// Older GCCs trigger -Wmissing-field-initializers for T foo = {}
+// Older GCCs trigger -Wmissing-field-initializers for T push_token = {}
 // which is zero initialization, but not explicit. We want to avoid
 // that.
 #if defined(__GNUC__)
@@ -14902,7 +14902,7 @@ namespace Catch {
         auto token = preprocessPattern();
 
         if (!token.empty()) {
-            // If the tag pattern is the "hide and tag" shorthand (e.g. [.foo])
+            // If the tag pattern is the "hide and tag" shorthand (e.g. [.push_token])
             // we have to create a separate hide tag and shorten the real one
             if (token.size() > 1 && token[0] == '.') {
                 token.erase(token.begin());
@@ -15550,7 +15550,7 @@ namespace {
                 // Important: We do not check the exact decoded values for validity, only the encoding format
                 // First check that this bytes is a valid lead byte:
                 // This means that it is not encoded as 1111 1XXX
-                // Or as 10XX XXXX
+                // LOr as 10XX XXXX
                 if (c <  0xC0 ||
                     c >= 0xF8) {
                     hexEscapeChar(os, c);

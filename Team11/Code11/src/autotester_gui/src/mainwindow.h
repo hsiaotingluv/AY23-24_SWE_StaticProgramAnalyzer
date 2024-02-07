@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "GUIWrapper.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -12,7 +13,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
   public slots:
@@ -20,8 +21,8 @@ class MainWindow : public QMainWindow {
     void btnRun_clicked();
 
   private:
-    Ui::MainWindow *ui;
-    GUIWrapper *wrapper;
+    Ui::MainWindow* ui;
+    GUIWrapper* wrapper;
 };
 
 #endif // MAINWINDOW_H

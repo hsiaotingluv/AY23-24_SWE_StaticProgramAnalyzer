@@ -1,0 +1,75 @@
+@startuml common_tokenizer
+' Tokenzer Interface
+' Tokenizer takes in a string and returns a TokenizerOutput
+interface Tokenizer {
+    # tokenize_string(input: string, token: string, token_type: TokenType): TokenizerOutput
+    # one_of(input: string, begin: TokeniserIterator, end: TokeniserIterator): TokenizerOutput
+    # all_of(input: string, begin: TokeniserIterator, end: TokeniserIterator): TokenizerOutput
+    # zero_or_more(input: string, tokenizer: Tokenizer, token_type: TokenType): TokenizerOutput
+
+    +tokenize(text: string): TokenizerOutput
+}
+
+
+' INTEGER
+Tokenizer <|.. ZeroTokenizer
+Tokenizer <|.. NotZeroDigitTokenizer
+Tokenizer <|.. DigitTokenizer
+Tokenizer <|.. SomeDigitTokenizer
+Tokenizer <|.. NoLeadingZeroTokenizer
+Tokenizer <|.. IntegerTokenizer
+
+IntegerTokenizer --> NoLeadingZeroTokenizer
+IntegerTokenizer --> ZeroTokenizer
+
+NoLeadingZeroTokenizer --> NotZeroDigitTokenizer
+NoLeadingZeroTokenizer --> SomeDigitTokenizer
+
+SomeDigitTokenizer --> DigitTokenizer
+
+DigitTokenizer --> NotZeroDigitTokenizer
+DigitTokenizer --> ZeroTokenizer
+
+' STRING
+Tokenizer <|.. LetterTokenizer
+Tokenizer <|.. DigitOrLetterTokenizer
+Tokenizer <|.. SomeDigitOrLetterTokenizer
+Tokenizer <|.. StringTokenizer
+
+StringTokenizer --> LetterTokenizer
+StringTokenizer --> SomeDigitOrLetterTokenizer
+
+SomeDigitOrLetterTokenizer --> DigitOrLetterTokenizer
+
+DigitOrLetterTokenizer --> LetterTokenizer
+
+' BINOP
+Tokenizer <|.. AddTokenizer
+Tokenizer <|.. SubTokenizer
+Tokenizer <|.. MulTokenizer
+Tokenizer <|.. DivTokenizer
+Tokenizer <|.. ModTokenizer
+Tokenizer <|.. BinopTokenizer
+
+BinopTokenizer --> AddTokenizer
+BinopTokenizer --> SubTokenizer
+BinopTokenizer --> MulTokenizer
+BinopTokenizer --> DivTokenizer
+BinopTokenizer --> ModTokenizer
+
+' DELIMITER
+Tokenizer <|.. LParenTokenizer
+Tokenizer <|.. RParenTokenizer
+Tokenizer <|.. SemicolonTokenizer
+
+' JUNK
+Tokenizer <|.. WhitespaceTokenizer
+Tokenizer <|.. NewlineTokenizer
+Tokenizer <|.. JunkTokenizer
+
+JunkTokenizer --> WhitespaceTokenizer
+JunkTokenizer --> NewlineTokenizer
+
+
+
+@enduml

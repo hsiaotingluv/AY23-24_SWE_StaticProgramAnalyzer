@@ -1,0 +1,23 @@
+@startuml common_tokenizer
+' Tokenzer Interface
+' Tokenizer takes in a string and returns a TokenizerOutput
+interface Tokenizer {
+    +tokenize(text: string): TokenizerOutput
+}
+
+Tokenizer <|.. QueryProcessingSystemTokenizer
+Tokenizer <|.. IntegerTokenizer
+Tokenizer <|.. BinopTokenizer
+Tokenizer <|.. StringTokenizer
+Tokenizer <|.. JunkTokenizer
+Tokenizer <|.. WildcardTokenizer
+Tokenizer <|.. QPSDelimiterTokenizer
+
+QueryProcessingSystemTokenizer --> IntegerTokenizer
+QueryProcessingSystemTokenizer --> BinopTokenizer
+QueryProcessingSystemTokenizer --> StringTokenizer
+QueryProcessingSystemTokenizer --> JunkTokenizer
+QueryProcessingSystemTokenizer --> WildcardTokenizer
+QueryProcessingSystemTokenizer --> QPSDelimiterTokenizer
+
+@enduml

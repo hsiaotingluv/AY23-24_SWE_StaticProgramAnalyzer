@@ -15,5 +15,5 @@ class TestWrapper : public AbstractWrapper {
     void parse(std::string filename) override;
 
     // method for evaluating a query
-    void evaluate(std::string query, std::list<std::string> &results) override;
+    void evaluate(std::string query, std::list<std::string>& results) override;
 };

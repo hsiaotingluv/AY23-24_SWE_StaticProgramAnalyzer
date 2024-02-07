@@ -2,7 +2,7 @@
 
 #include <QtWidgets>
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent) {
+CodeEditor::CodeEditor(QWidget* parent) : QPlainTextEdit(parent) {
     lineNumberArea = new LineNumberArea(this);
 
     connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
@@ -30,7 +30,7 @@ void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */) {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
+void CodeEditor::updateLineNumberArea(const QRect& rect, int dy) {
     if (dy)
         lineNumberArea->scroll(0, dy);
     else
@@ -40,7 +40,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy) {
         updateLineNumberAreaWidth(0);
 }
 
-void CodeEditor::resizeEvent(QResizeEvent *e) {
+void CodeEditor::resizeEvent(QResizeEvent* e) {
     QPlainTextEdit::resizeEvent(e);
 
     QRect cr = contentsRect();
@@ -65,7 +65,7 @@ void CodeEditor::highlightCurrentLine() {
     setExtraSelections(extraSelections);
 }
 
-void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event) {
+void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent* event) {
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), Qt::lightGray);
 
