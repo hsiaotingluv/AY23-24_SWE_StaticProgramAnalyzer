@@ -19,7 +19,7 @@ auto TokenizerRunner::apply_tokeniser(std::string input, bool debug) const -> st
         } else {
             const auto& [res_success, rest] = res.value();
             input = rest;
-            if (res_success.T != TokenType::Whitespace && res_success.T != TokenType::Newline) {
+            if (res_success.T != TokenType::Junk) {
                 push_token(debug, result, res_success);
             }
         }

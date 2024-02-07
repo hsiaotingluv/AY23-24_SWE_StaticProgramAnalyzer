@@ -1,6 +1,6 @@
 name: Lint cpp/h files
 
-on: [push]
+on: [ push ]
 
 jobs:
   run-linters:
@@ -28,6 +28,12 @@ jobs:
           name: integration_testing
           path: Team11/Code11/build/src/integration_testing/integration_testing
 
+      - name: Upload unit test
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit_testing
+          path: Team11/Code11/build/src/unit_testing/unit_testing
+
       - name: Run linters
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
@@ -40,12 +46,28 @@ jobs:
           database: 'build/compile_commands.json'
           ignore: 'build | lib | cmake | src/autotester_gui'
           step-summary: true
-          
+
       - name: Check linter status
         if: steps.linter.outputs.clang-format-checks-failed > 0
         run: echo "Some files failed the linting checks!" && exit 1
 
-  run-testing:
+  run-unit-testing:
+    name: Run Unit Testing
+    runs-on: ubuntu-latest
+    needs: run-linters
+
+    steps:
+      - name: Download unit testing from linters
+        uses: actions/download-artifact@v4
+        with:
+          name: unit_testing
+
+      - name: Run Unit Test
+        run: |
+          chmod +x unit_testing
+          ./unit_testing
+
+  run-integration-testing:
     name: Run Integration Testing
     runs-on: ubuntu-latest
     needs: run-linters

@@ -19,8 +19,7 @@ enum class TokenType {
     Semicolon,
 
     // Junk
-    Whitespace,
-    Newline,
+    Junk,
 
     // ============= QPS specifics Token ==============
     // QPS Delimiter

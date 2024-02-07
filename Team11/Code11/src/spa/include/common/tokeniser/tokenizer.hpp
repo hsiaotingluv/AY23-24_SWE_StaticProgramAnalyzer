@@ -19,7 +19,13 @@ struct Token {
 
     friend std::ostream& operator<<(std::ostream& os, const Token& token) {
         auto enum_counter = static_cast<int>(token.T);
-        os << "Token(" << (token.T == TokenType::Newline ? "\\n" : token.content) << ") - " << enum_counter;
+        if (token.content == "\t") {
+            os << "Token(\\t) - " << enum_counter;
+        } else if (token.content == "\n") {
+            os << "Token(\\n) - " << enum_counter;
+        } else {
+            os << "Token(" << token.content << ") - " << enum_counter;
+        }
         return os;
     };
 };
