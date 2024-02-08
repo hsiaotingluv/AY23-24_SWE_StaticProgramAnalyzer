@@ -15,7 +15,7 @@ C++ Standard | C++17
 
 No additional instructions required.
 
-# Team Members
+## Team Members
 
 Name | Email | Development OS/Toolchain
 -:|:-|-|
