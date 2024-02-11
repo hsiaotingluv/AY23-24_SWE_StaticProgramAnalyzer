@@ -33,7 +33,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = constant_parser.parse(it, tokens.end());
-        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<VarNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }
@@ -45,7 +45,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = factor_parser.parse(it, tokens.end());
-        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<VarNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }
@@ -78,7 +78,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = factor_parser.parse(it, tokens.end());
-        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<VarNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }

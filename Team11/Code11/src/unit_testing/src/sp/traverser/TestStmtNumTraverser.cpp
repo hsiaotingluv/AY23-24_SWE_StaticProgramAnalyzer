@@ -2,20 +2,13 @@
 #pragma ide diagnostic ignored "bugprone-suspicious-missing-comma"
 #include "catch.hpp"
 
-#include "sp/annotator/stmt_num_annotator.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/ast/statement_ast.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-
+#include "sp/traverser/stmt_num_traverser.hpp"
+#include "sp/traverser/traverser.hpp"
 #include <vector>
-
-class DummyAnnotator : public sp::Annotator {
-  public:
-    auto annotate(std::shared_ptr<sp::AstNode> ast) -> std::shared_ptr<sp::AstNode> override {
-        return ast;
-    }
-};
 
 auto is_stmt_node(const std::shared_ptr<sp::AstNode>& node) -> bool {
     return (dynamic_cast<sp::StatementNode*>(node.get()) != nullptr);
@@ -71,12 +64,11 @@ auto print_stmt_num(const std::shared_ptr<sp::AstNode>& node) -> void {
     }
 }
 
-TEST_CASE("Test Statement Number Annotator") {
+TEST_CASE("Test Statement Number Traverser") {
     auto tokenizer_runner = tokenizer::TokenizerRunner{std::make_unique<sp::SourceProcessorTokenizer>(), true};
     auto parser = std::make_shared<sp::ProgramParser>();
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, std::make_shared<DummyAnnotator>()};
-
-    const auto stmt_num_annotator = std::make_shared<sp::StmtNumAnnotator>();
+    std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>()};
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -117,12 +109,11 @@ TEST_CASE("Test Statement Number Annotator") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-        auto ast = sp.parse(input);
-        ast = stmt_num_annotator->annotate(ast);
+        auto ast = sp.process(input);
         REQUIRE(require_stmt_num_populated(ast));
 
         const auto expected_output = std::vector<std::string>{
-            "AssignmentNode(NameNode(flag), ConstantNode(0))",
+            "AssignmentNode(VarNode(flag), ConstantNode(0))",
             "CallNode(computeCentroid)",
             "CallNode(printResults)",
             "ReadNode(x)",
@@ -131,27 +122,27 @@ TEST_CASE("Test Statement Number Annotator") {
             "PrintNode(cenX)",
             "PrintNode(cenY)",
             "PrintNode(normSq)",
-            "AssignmentNode(NameNode(count), ConstantNode(0))",
-            "AssignmentNode(NameNode(cenX), ConstantNode(0))",
-            "AssignmentNode(NameNode(cenY), ConstantNode(0))",
+            "AssignmentNode(VarNode(count), ConstantNode(0))",
+            "AssignmentNode(VarNode(cenX), ConstantNode(0))",
+            "AssignmentNode(VarNode(cenY), ConstantNode(0))",
             "CallNode(readPoint)",
-            "WhileNode(LogicalAndNode(NotEqualNode(NameNode(x), ConstantNode(0)), NotEqualNode(NameNode(y), "
-            "ConstantNode(0))), StatementListNode(AssignmentNode(NameNode(count), AddBinopNode(NameNode(count), "
-            "ConstantNode(1))), AssignmentNode(NameNode(cenX), AddBinopNode(NameNode(cenX), NameNode(x))), "
-            "AssignmentNode(NameNode(cenY), AddBinopNode(NameNode(cenY), NameNode(y))), CallNode(readPoint), ))",
-            "AssignmentNode(NameNode(count), AddBinopNode(NameNode(count), ConstantNode(1)))",
-            "AssignmentNode(NameNode(cenX), AddBinopNode(NameNode(cenX), NameNode(x)))",
-            "AssignmentNode(NameNode(cenY), AddBinopNode(NameNode(cenY), NameNode(y)))",
+            "WhileNode(LogicalAndNode(NotEqualNode(VarNode(x), ConstantNode(0)), NotEqualNode(VarNode(y), "
+            "ConstantNode(0))), StatementListNode(AssignmentNode(VarNode(count), AddBinopNode(VarNode(count), "
+            "ConstantNode(1))), AssignmentNode(VarNode(cenX), AddBinopNode(VarNode(cenX), VarNode(x))), "
+            "AssignmentNode(VarNode(cenY), AddBinopNode(VarNode(cenY), VarNode(y))), CallNode(readPoint), ))",
+            "AssignmentNode(VarNode(count), AddBinopNode(VarNode(count), ConstantNode(1)))",
+            "AssignmentNode(VarNode(cenX), AddBinopNode(VarNode(cenX), VarNode(x)))",
+            "AssignmentNode(VarNode(cenY), AddBinopNode(VarNode(cenY), VarNode(y)))",
             "CallNode(readPoint)",
-            "IfNode(EqualNode(NameNode(count), ConstantNode(0)), "
-            "StatementListNode(AssignmentNode(NameNode(flag), ConstantNode(1)), ), "
-            "StatementListNode(AssignmentNode(NameNode(cenX), DivBinopNode(NameNode(cenX), NameNode(count))), "
-            "AssignmentNode(NameNode(cenY), DivBinopNode(NameNode(cenY), NameNode(count))), ))",
-            "AssignmentNode(NameNode(flag), ConstantNode(1))",
-            "AssignmentNode(NameNode(cenX), DivBinopNode(NameNode(cenX), NameNode(count)))",
-            "AssignmentNode(NameNode(cenY), DivBinopNode(NameNode(cenY), NameNode(count)))",
-            "AssignmentNode(NameNode(normSq), AddBinopNode(MulBinopNode(NameNode(cenX), NameNode(cenX)), "
-            "MulBinopNode(NameNode(cenY), NameNode(cenY))))"};
+            "IfNode(EqualNode(VarNode(count), ConstantNode(0)), "
+            "StatementListNode(AssignmentNode(VarNode(flag), ConstantNode(1)), ), "
+            "StatementListNode(AssignmentNode(VarNode(cenX), DivBinopNode(VarNode(cenX), VarNode(count))), "
+            "AssignmentNode(VarNode(cenY), DivBinopNode(VarNode(cenY), VarNode(count))), ))",
+            "AssignmentNode(VarNode(flag), ConstantNode(1))",
+            "AssignmentNode(VarNode(cenX), DivBinopNode(VarNode(cenX), VarNode(count)))",
+            "AssignmentNode(VarNode(cenY), DivBinopNode(VarNode(cenY), VarNode(count)))",
+            "AssignmentNode(VarNode(normSq), AddBinopNode(MulBinopNode(VarNode(cenX), VarNode(cenX)), "
+            "MulBinopNode(VarNode(cenY), VarNode(cenY))))"};
 
         check_stmt_num(ast, 1, expected_output.begin(), expected_output.end());
     }

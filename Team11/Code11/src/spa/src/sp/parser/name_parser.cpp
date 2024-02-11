@@ -12,7 +12,7 @@ auto NameParser::parse(Iterator& token_start, const Iterator& token_end) -> std:
         throw ParsingError("Token found is not of String type");
     }
 
-    return std::make_shared<NameNode>(next_token.content);
+    return std::make_shared<VarNode>(next_token.content);
 }
 
 } // namespace sp

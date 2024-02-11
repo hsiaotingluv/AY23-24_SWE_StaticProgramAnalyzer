@@ -1,15 +1,15 @@
 #include "catch.hpp"
-#include "sp/annotator/ast_annotator.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/ast/node_type.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
+#include "sp/traverser/stmt_num_traverser.hpp"
 
 TEST_CASE("Test SP") {
     auto tokenizer_runner = tokenizer::TokenizerRunner{std::make_unique<sp::SourceProcessorTokenizer>(), true};
     auto parser = std::make_shared<sp::ProgramParser>();
-    auto annotator = std::make_shared<sp::AstAnnotator>();
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, annotator};
+    std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>()};
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -50,7 +50,7 @@ TEST_CASE("Test SP") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-        auto ast = sp.parse(input);
+        auto ast = sp.process(input);
         REQUIRE(ast->T == sp::NodeType::Program);
     }
 }

@@ -23,11 +23,11 @@ class ConstantNode : public AstNode {
     }
 };
 
-class NameNode : public AstNode {
+class VarNode : public AstNode {
   public:
     std::string name;
 
-    explicit NameNode(std::string name) : name(std::move(name)), AstNode(NodeType::Variable) {
+    explicit VarNode(std::string name) : name(std::move(name)), AstNode(NodeType::Variable) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -36,7 +36,7 @@ class NameNode : public AstNode {
 
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "NameNode(" << name << ")";
+        ss << "VarNode(" << name << ")";
         return ss;
     }
 };

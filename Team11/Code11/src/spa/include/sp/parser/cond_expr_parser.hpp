@@ -25,7 +25,7 @@ namespace sp {
  * C': (C)C''
  * C'': &&(C) | ||(C)
  *
- * Note that the construction of C' is ambiguous. In short, you can have left or right associative parse trees here.
+ * Note that the construction of C' is ambiguous. In short, you can have left or right associative process trees here.
  * We chose to make this right associative because its more convenient to implement, moreover ||, && are commutative
  * Hence both choices should contain valid semantics
  */

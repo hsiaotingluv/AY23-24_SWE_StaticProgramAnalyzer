@@ -33,7 +33,7 @@ auto StatementParser::parseStmtPrime(Parser::Iterator& token_start, const Parser
             throw ParsingError("Expecting ; in assignment but found other token");
         }
 
-        auto new_node = std::make_shared<AssignmentNode>(std::make_shared<NameNode>(prev_content), expr_tree);
+        auto new_node = std::make_shared<AssignmentNode>(std::make_shared<VarNode>(prev_content), expr_tree);
         return new_node;
     } else {
         if (prev_content == READ) {

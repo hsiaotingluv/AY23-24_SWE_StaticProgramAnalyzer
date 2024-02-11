@@ -13,7 +13,7 @@ auto StatementListParser::parse(Parser::Iterator& token_start, const Parser::Ite
     check_has_token(token_start, token_end);
     std::vector<std::shared_ptr<AstNode>> statement_nodes;
 
-    // At least parse 1 statement
+    // At least process 1 statement
     auto statement_tree = statement_parser.parse(token_start, token_end);
     statement_nodes.push_back(statement_tree);
 
