@@ -1,5 +1,7 @@
+#include "sp/parser/ast/binary_node_ast.hpp"
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/factor_ast.hpp"
 #include "sp/parser/term_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -15,7 +17,7 @@ TEST_CASE("Test SP Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ConstantNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
         REQUIRE(casted_node->integer == 123);
     }
@@ -27,7 +29,7 @@ TEST_CASE("Test SP Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<BinopNode>(node);
         REQUIRE(casted_node->T == NodeType::Mul);
         REQUIRE(casted_node->left->T == NodeType::Constant);
         REQUIRE(casted_node->right->T == NodeType::Variable);
@@ -40,10 +42,10 @@ TEST_CASE("Test SP Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<BinopNode>(node);
         REQUIRE(casted_node->T == NodeType::Mod);
 
-        auto left_node = std::static_pointer_cast<BinaryNode>(casted_node->left);
+        auto left_node = std::dynamic_pointer_cast<BinopNode>(casted_node->left);
         REQUIRE(left_node->T == NodeType::Div);
         REQUIRE(left_node->left->T == NodeType::Mul);
 
@@ -57,7 +59,7 @@ TEST_CASE("Test SP Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ConstantNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(casted_node->T == NodeType::Constant);
         REQUIRE(casted_node->integer == 123);
     }

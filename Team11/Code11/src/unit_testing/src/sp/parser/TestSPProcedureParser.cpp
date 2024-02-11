@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/procedure_ast.hpp"
 #include "sp/parser/procedure_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -15,7 +16,7 @@ TEST_CASE("Test SP Procedure Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ProcedureNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ProcedureNode>(node);
         REQUIRE(node->T == NodeType::Procedure);
         REQUIRE(casted_node->proc_name == "main");
     }
@@ -27,7 +28,7 @@ TEST_CASE("Test SP Procedure Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ProcedureNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ProcedureNode>(node);
         REQUIRE(node->T == NodeType::Procedure);
         REQUIRE(casted_node->proc_name == "print");
     }

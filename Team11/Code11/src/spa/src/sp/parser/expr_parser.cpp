@@ -1,4 +1,6 @@
 #include "sp/parser/expr_parser.hpp"
+#include "sp/parser/ast/binary_node_ast.hpp"
+#include "sp/parser/ast/null_ast.hpp"
 #include "sp/parser/term_parser.hpp"
 
 namespace sp {
@@ -14,7 +16,7 @@ auto ExprParser::parse(Parser::Iterator& token_start, const Parser::Iterator& to
     if (bottom_node->T == NodeType::EmptyString) {
         return term_tree;
     } else {
-        auto casted_node = std::static_pointer_cast<BinaryNode>(bottom_node);
+        auto casted_node = std::dynamic_pointer_cast<BinopNode>(bottom_node);
         casted_node->left = term_tree;
         return top_node;
     }
@@ -34,11 +36,11 @@ auto ExprParser::parseExprPrime(Parser::Iterator& token_start, // NOLINT(*-no-re
     case TokenType::Sub: {
         get_next_token(token_start);
 
-        std::shared_ptr<BinaryNode> new_partial_bottom;
+        std::shared_ptr<BinopNode> new_partial_bottom;
         if (next_token.T == TokenType::Add) {
-            new_partial_bottom = std::make_shared<BinaryNode>(NodeType::Add);
+            new_partial_bottom = std::make_shared<AddNode>();
         } else if (next_token.T == TokenType::Sub) {
-            new_partial_bottom = std::make_shared<BinaryNode>(NodeType::Sub);
+            new_partial_bottom = std::make_shared<SubNode>();
         }
 
         new_partial_bottom->left = nullptr;
@@ -53,7 +55,7 @@ auto ExprParser::parseExprPrime(Parser::Iterator& token_start, // NOLINT(*-no-re
             // new top
             return std::make_tuple(new_partial_bottom, new_partial_bottom);
         } else {
-            auto casted_node = std::static_pointer_cast<BinaryNode>(bottom_node);
+            auto casted_node = std::dynamic_pointer_cast<BinopNode>(bottom_node);
             casted_node->left = new_partial_bottom;
             return std::make_tuple(new_partial_bottom, top_node);
         }

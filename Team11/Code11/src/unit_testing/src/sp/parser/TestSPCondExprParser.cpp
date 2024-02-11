@@ -1,5 +1,7 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/logical_ast.hpp"
+#include "sp/parser/ast/rel_expr_ast.hpp"
 #include "sp/parser/cond_expr_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -15,7 +17,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ComparatorNode>(node);
         REQUIRE(node->T == NodeType::Lt);
         REQUIRE(casted_node->left->T == NodeType::Constant);
         REQUIRE(casted_node->right->T == NodeType::Constant);
@@ -28,7 +30,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<LogicalNotNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<LogicalNotNode>(node);
         REQUIRE(node->T == NodeType::LNot);
         REQUIRE(casted_node->cond_expr->T == NodeType::Lt);
     }
@@ -40,7 +42,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<LogicalBinaryNode>(node);
         REQUIRE(node->T == NodeType::LAnd);
         REQUIRE(casted_node->left->T == NodeType::Lt);
         REQUIRE(casted_node->right->T == NodeType::Lt);
@@ -53,7 +55,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<LogicalBinaryNode>(node);
         REQUIRE(node->T == NodeType::LOr);
         REQUIRE(casted_node->left->T == NodeType::Lt);
         REQUIRE(casted_node->right->T == NodeType::Lt);
@@ -66,7 +68,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<LogicalBinaryNode>(node);
         REQUIRE(node->T == NodeType::LOr);
         REQUIRE(casted_node->left->T == NodeType::Lt);
         REQUIRE(casted_node->right->T == NodeType::Lt);
@@ -80,7 +82,7 @@ TEST_CASE("Test SP Cond Term Parser") {
 
         auto it = tokens.cbegin();
         auto node = cond_expr_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<LogicalBinaryNode>(node);
         REQUIRE(node->T == NodeType::Lt);
     }
 

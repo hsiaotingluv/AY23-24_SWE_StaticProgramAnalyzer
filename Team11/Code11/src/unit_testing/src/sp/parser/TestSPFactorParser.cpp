@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/factor_ast.hpp"
 #include "sp/parser/constant_parser.hpp"
 #include "sp/parser/factor_parser.hpp"
 #include "sp/parser/name_parser.hpp"
@@ -20,7 +21,7 @@ TEST_CASE("Test SP Factor Parser") {
         // Note: https://stackoverflow.com/questions/27463785/cant-pass-temporary-object-as-reference
         auto it = tokens.cbegin();
         auto node = constant_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ConstantNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
         REQUIRE(casted_node->integer == 123);
     }
@@ -32,7 +33,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = constant_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }
@@ -44,7 +45,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = factor_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }
@@ -56,7 +57,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = factor_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ConstantNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
         REQUIRE(casted_node->integer == 123);
     }
@@ -77,7 +78,7 @@ TEST_CASE("Test SP Factor Parser") {
 
         auto it = tokens.cbegin();
         auto node = factor_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<NameNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<NameNode>(node);
         REQUIRE(node->T == NodeType::Variable);
         REQUIRE(casted_node->name == "whatever");
     }

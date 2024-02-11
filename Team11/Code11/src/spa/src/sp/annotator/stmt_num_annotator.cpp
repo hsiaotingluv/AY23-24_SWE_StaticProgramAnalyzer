@@ -1,5 +1,6 @@
 #include "sp/annotator/stmt_num_annotator.hpp"
 #include "sp/parser/ast/ast.hpp"
+#include "sp/parser/ast/statement_ast.hpp"
 #include <memory>
 
 namespace sp {

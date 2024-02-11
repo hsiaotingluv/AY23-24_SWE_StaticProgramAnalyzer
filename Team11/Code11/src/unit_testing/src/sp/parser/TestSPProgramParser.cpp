@@ -1,5 +1,7 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/program_ast.hpp"
+#include "sp/parser/ast/procedure_ast.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -15,7 +17,7 @@ TEST_CASE("Test SP Program Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ProgramNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ProgramNode>(node);
         REQUIRE(node->T == NodeType::Program);
         REQUIRE(casted_node->procedures[0]->T == NodeType::Procedure);
     }
@@ -44,11 +46,11 @@ TEST_CASE("Test SP Program Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ProgramNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ProgramNode>(node);
         REQUIRE(node->T == NodeType::Program);
 
         REQUIRE(casted_node->procedures[0]->T == NodeType::Procedure);
-        auto first_procedure = std::static_pointer_cast<ProcedureNode>(casted_node->procedures[0]);
+        auto first_procedure = std::dynamic_pointer_cast<ProcedureNode>(casted_node->procedures[0]);
         REQUIRE(first_procedure->proc_name == "printAscending");
         REQUIRE(it->T == TokenType::Done);
     }
@@ -97,7 +99,7 @@ TEST_CASE("Test SP Program Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<ProgramNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ProgramNode>(node);
         REQUIRE(node->T == NodeType::Program);
         REQUIRE(casted_node->procedures.size() == 4);
     }

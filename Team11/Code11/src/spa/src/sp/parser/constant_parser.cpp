@@ -1,4 +1,5 @@
 #include "sp/parser/constant_parser.hpp"
+#include "sp/parser/ast/factor_ast.hpp"
 
 namespace sp {
 

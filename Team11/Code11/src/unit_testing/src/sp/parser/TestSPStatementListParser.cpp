@@ -2,6 +2,7 @@
 #include "common/tokeniser/runner.hpp"
 #include "sp/parser/statement_list_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
+#include "sp/parser/ast/statement_list_ast.hpp"
 #include <memory>
 
 using namespace sp;
@@ -15,7 +16,7 @@ TEST_CASE("Test SP Statement List Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<StatementListNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<StatementListNode>(node);
         REQUIRE(node->T == NodeType::StmtList);
         REQUIRE(casted_node->statements[0]->T == NodeType::Read);
         REQUIRE(casted_node->statements[1]->T == NodeType::Print);
@@ -30,7 +31,7 @@ TEST_CASE("Test SP Statement List Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<StatementListNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<StatementListNode>(node);
         REQUIRE(node->T == NodeType::StmtList);
         REQUIRE(casted_node->statements[0]->T == NodeType::Read);
         REQUIRE(casted_node->statements[1]->T == NodeType::If);
@@ -44,7 +45,7 @@ TEST_CASE("Test SP Statement List Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<StatementListNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<StatementListNode>(node);
         REQUIRE(node->T == NodeType::StmtList);
         REQUIRE(casted_node->statements[0]->T == NodeType::Read);
         REQUIRE(casted_node->statements[1]->T == NodeType::While);
@@ -58,7 +59,7 @@ TEST_CASE("Test SP Statement List Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<StatementListNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<StatementListNode>(node);
         REQUIRE(node->T == NodeType::StmtList);
         REQUIRE(casted_node->statements[0]->T == NodeType::Read);
         REQUIRE(casted_node->statements[1]->T == NodeType::Assign);
@@ -71,7 +72,7 @@ TEST_CASE("Test SP Statement List Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<StatementListNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<StatementListNode>(node);
         REQUIRE(node->T == NodeType::StmtList);
         REQUIRE(casted_node->statements[0]->T == NodeType::Read);
         REQUIRE(casted_node->statements[1]->T == NodeType::Assign);

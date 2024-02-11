@@ -1,4 +1,5 @@
 #include "sp/parser/rel_expr_parser.hpp"
+#include "sp/parser/ast/rel_expr_ast.hpp"
 #include "sp/parser/ast/ast.hpp"
 
 #include <functional>

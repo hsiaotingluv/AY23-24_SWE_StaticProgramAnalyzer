@@ -1,4 +1,5 @@
 #include "sp/parser/cond_expr_parser.hpp"
+#include "sp/parser/ast/logical_ast.hpp"
 #include "sp/parser/ast/ast.hpp"
 #include <memory>
 

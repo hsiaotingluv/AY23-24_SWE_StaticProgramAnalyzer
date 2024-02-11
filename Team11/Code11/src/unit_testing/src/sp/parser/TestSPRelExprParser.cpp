@@ -1,5 +1,7 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/binary_node_ast.hpp"
+#include "sp/parser/ast/rel_expr_ast.hpp"
 #include "sp/parser/rel_expr_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -15,7 +17,7 @@ TEST_CASE("Test SP RelExpr Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ComparatorNode>(node);
         REQUIRE(node->T == NodeType::Gt);
         REQUIRE(casted_node->left->T == NodeType::Constant);
         REQUIRE(casted_node->right->T == NodeType::Constant);
@@ -28,7 +30,7 @@ TEST_CASE("Test SP RelExpr Parser") {
 
         auto it = tokens.cbegin();
         auto node = term_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::dynamic_pointer_cast<ComparatorNode>(node);
         REQUIRE(casted_node->T == NodeType::Eq);
         REQUIRE(casted_node->left->T == NodeType::Add);
         REQUIRE(casted_node->right->T == NodeType::Mod);
