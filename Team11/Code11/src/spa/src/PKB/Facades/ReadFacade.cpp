@@ -1,122 +1,296 @@
-#include "pkb/Facades/ReadFacade.h"
+#include "PKB/Facades/ReadFacade.h"
 
-ReadFacade::ReadFacade(PKB& pkb) : pkb(pkb) {
+#include <utility>
+
+ReadFacade::ReadFacade(std::shared_ptr<PKB> pkb) : pkb(std::move(pkb)) {
 }
 
-ReadFacade::~ReadFacade() = default;
+std::unordered_set<std::string> ReadFacade::getEntities() {
+    std::unordered_set<std::string> entities;
 
-ReadFacade::StringSet ReadFacade::getEntities() {
-    auto allEntities = this->getConstants();
+    auto procedures = this->pkb->entity_store->getProcedures();
+    auto vars = this->pkb->entity_store->getVariables();
+    auto consts = this->pkb->entity_store->getConstants();
 
-    allEntities.merge(this->getVariables());
-    allEntities.merge(this->getProcedures());
+    for (const Procedure& p : procedures)
+        entities.insert(p.getName());
+    for (const Variable& v : vars)
+        entities.insert(v.getName());
+    for (const Constant& c : consts)
+        entities.insert(c.getName());
 
-    return allEntities;
+    return entities;
 }
 
-ReadFacade::StringSet ReadFacade::getProcedures() {
-    return this->pkb.entity_store->getProcedures();
+std::unordered_set<std::string> ReadFacade::getProcedures() {
+    auto procedures = this->pkb->entity_store->getProcedures();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures)
+        temp.insert(p.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getVariables() {
-    return this->pkb.entity_store->getVariables();
+std::unordered_set<std::string> ReadFacade::getVariables() {
+    auto vars = this->pkb->entity_store->getVariables();
+
+    std::unordered_set<std::string> temp;
+    for (const Variable& v : vars)
+        temp.insert(v.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getConstants() {
-    return this->pkb.entity_store->getConstants();
+std::unordered_set<std::string> ReadFacade::getConstants() {
+    auto consts = this->pkb->entity_store->getConstants();
+
+    std::unordered_set<std::string> temp;
+    for (const Constant& c : consts)
+        temp.insert(c.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getStatements() {
+std::unordered_set<Statement> ReadFacade::getStatements() {
     // TODO: Replace with actual implementation for getStatements
-    return StringSet{"Statement1", "Statement2", "Statement3"};
+    return std::unordered_set<Statement>{Statement("Statement1"), Statement("Statement2"), Statement("Statement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getAssignStatements() {
+std::unordered_set<Statement> ReadFacade::getAssignStatements() {
     // TODO: Replace with actual implementation for getAssignStatements
-    return StringSet{"AssignStatement1", "AssignStatement2", "AssignStatement3"};
+    return std::unordered_set<Statement>{Statement("AssignStatement1"), Statement("AssignStatement2"),
+                                         Statement("AssignStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getIfStatements() {
+std::unordered_set<Statement> ReadFacade::getIfStatements() {
     // TODO: Replace with actual implementation for getIfStatements
-    return StringSet{"IfStatement1", "IfStatement2", "IfStatement3"};
+    return std::unordered_set<Statement>{Statement("IfStatement1"), Statement("IfStatement2"),
+                                         Statement("IfStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getWhileStatements() {
+std::unordered_set<Statement> ReadFacade::getWhileStatements() {
     // TODO: Replace with actual implementation for getWhileStatements
-    return StringSet{"WhileStatement1", "WhileStatement2", "WhileStatement3"};
+    return std::unordered_set<Statement>{Statement("WhileStatement1"), Statement("WhileStatement2"),
+                                         Statement("WhileStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getReadStatements() {
+std::unordered_set<Statement> ReadFacade::getReadStatements() {
     // TODO: Replace with actual implementation for getReadStatements
-    return StringSet{"ReadStatement1", "ReadStatement2", "ReadStatement3"};
+    return std::unordered_set<Statement>{Statement("ReadStatement1"), Statement("ReadStatement2"),
+                                         Statement("ReadStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getPrintStatements() {
+std::unordered_set<Statement> ReadFacade::getPrintStatements() {
     // TODO: Replace with actual implementation for getPrintStatements
-    return StringSet{"PrintStatement1", "PrintStatement2", "PrintStatement3"};
+    return std::unordered_set<Statement>{Statement("PrintStatement1"), Statement("PrintStatement2"),
+                                         Statement("PrintStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getCallStatements() {
+std::unordered_set<Statement> ReadFacade::getCallStatements() {
     // TODO: Replace with actual implementation for getCallStatements
-    return StringSet{"CallStatement1", "CallStatement2", "CallStatement3"};
+    return std::unordered_set<Statement>{Statement("CallStatement1"), Statement("CallStatement2"),
+                                         Statement("CallStatement3")};
 }
 
-ReadFacade::StringSet ReadFacade::getVarsModifiedByStatement(StatementNumber statement_number) {
-    // TODO: Replace with actual implementation for getVarsModifiedByStatement
-    return StringSet{"ModifiedVar1", "ModifiedVar2", "ModifiedVar3"};
+std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(std::string s) {
+    auto variables = this->pkb->modifies_store->getVarsModifiedByStatement(s);
+
+    std::unordered_set<std::string> temp;
+    for (const Variable& v : variables)
+        temp.insert(v.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getStatementsThatModifyVar(Variable variable) {
-    // TODO: Replace with actual implementation for getStatementsThatModifyVar
-    return StringSet{"Statement1", "Statement2", "Statement3"};
+std::unordered_set<std::string> ReadFacade::getStatementsThatModifyVar(std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    return this->pkb->modifies_store->getStatementsThatModifyVar(v);
 }
 
-bool ReadFacade::doesStatementModifyVar(StatementNumber statement_number, Variable variable) {
-    // TODO: Replace with actual implementation for doesStatementModifyVar
-    return true;
+bool ReadFacade::doesStatementModifyVar(const std::string& statement, std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    return this->pkb->modifies_store->doesStatementModifyVar(statement, v);
 }
 
-ReadFacade::StringSet ReadFacade::getVarsModifiedByProcedure(Procedure procedure) {
-    // TODO: Replace with actual implementation for getVarsModifiedByProcedure
-    return StringSet{"ModifiedVar1", "ModifiedVar2", "ModifiedVar3"};
+std::unordered_set<std::string> ReadFacade::getVarsModifiedByProcedure(std::string procedure) {
+    auto p = Procedure(std::move(procedure));
+
+    auto variables = this->pkb->modifies_store->getVarsModifiedByProcedure(p);
+
+    std::unordered_set<std::string> temp;
+    for (const Variable& v : variables)
+        temp.insert(v.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getProceduresThatModifyVar(Variable variable) {
-    // TODO: Replace with actual implementation for getProceduresThatModifyVar
-    return StringSet{"Procedure1", "Procedure2", "Procedure3"};
+std::unordered_set<std::string> ReadFacade::getProceduresThatModifyVar(std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    auto procedures = this->pkb->modifies_store->getProceduresThatModifyVar(v);
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures)
+        temp.insert(p.getName());
+
+    return temp;
 }
 
-bool ReadFacade::doesProcedureModifyVar(Procedure procedure, Variable variable) {
-    // TODO: Replace with actual implementation for doesProcedureModifyVar
-    return true;
+bool ReadFacade::doesProcedureModifyVar(std::string procedure, std::string variable) {
+    auto v = Variable(std::move(variable));
+    auto p = Procedure(std::move(procedure));
+
+    return this->pkb->modifies_store->doesProcedureModifyVar(p, v);
 }
 
-ReadFacade::StringSet ReadFacade::getVarsUsedByStatement(StatementNumber statement_number) {
-    // TODO: Replace with actual implementation for getVarsUsedByStatement
-    return StringSet{"UsedVar1", "UsedVar2", "UsedVar3"};
+std::unordered_set<std::string> ReadFacade::getVarsUsedByStatement(std::string s) {
+    auto variables = this->pkb->uses_store->getVarsUsedByStatement(s);
+
+    std::unordered_set<std::string> temp;
+    for (const Variable& v : variables)
+        temp.insert(v.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getStatementsThatUsesVar(Variable variable) {
-    // TODO: Replace with actual implementation for getStatementsThatUsesVar
-    return StringSet{"Statement1", "Statement2", "Statement3"};
+std::unordered_set<std::string> ReadFacade::getStatementsThatUseVar(std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    return this->pkb->uses_store->getStatementsThatUseVar(v);
 }
 
-bool ReadFacade::doesStatementUseVar(StatementNumber statement_number, Variable variable) {
-    // TODO: Replace with actual implementation for doesStatementUseVar
-    return true;
+bool ReadFacade::doesStatementUseVar(const std::string& statement, std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    return this->pkb->uses_store->doesStatementUseVar(statement, v);
 }
 
-ReadFacade::StringSet ReadFacade::getVarsUsedByProcedure(Procedure procedure) {
-    // TODO: Replace with actual implementation for getVarsUsedByProcedure
-    return StringSet{"UsedVar1", "UsedVar2", "UsedVar3"};
+std::unordered_set<std::string> ReadFacade::getVarsUsedByProcedure(std::string procedure) {
+    auto p = Procedure(std::move(procedure));
+
+    auto variables = this->pkb->uses_store->getVarsUsedByProcedure(p);
+
+    std::unordered_set<std::string> temp;
+    for (const Variable& v : variables)
+        temp.insert(v.getName());
+
+    return temp;
 }
 
-ReadFacade::StringSet ReadFacade::getProceduresThatUseVar(Variable variable) {
-    // TODO: Replace with actual implementation for getProceduresThatUseVar
-    return StringSet{"Procedure1", "Procedure2", "Procedure3"};
+std::unordered_set<std::string> ReadFacade::getProceduresThatUseVar(std::string variable) {
+    auto v = Variable(std::move(variable));
+
+    auto procedures = this->pkb->uses_store->getProceduresThatUseVar(v);
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures)
+        temp.insert(p.getName());
+
+    return temp;
 }
 
-bool ReadFacade::doesProcedureUseVar(Procedure procedure, Variable variable) {
-    // TODO: Replace with actual implementation for doesProcedureUseVar
-    return true;
+bool ReadFacade::doesProcedureUseVar(std::string procedure, std::string variable) {
+    auto v = Variable(std::move(variable));
+    auto p = Procedure(std::move(procedure));
+
+    return this->pkb->uses_store->doesProcedureUseVar(p, v);
+}
+
+std::unordered_map<std::string, std::string> ReadFacade::getAllFollows() const {
+    return this->pkb->follows_store->getAllFollows();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllFollowsKeys() const {
+    return this->pkb->follows_store->getAllFollowsKeys();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllFollowsValues() const {
+    return this->pkb->follows_store->getAllFollowsValues();
+};
+
+bool ReadFacade::hasFollows(const std::string& stmt1, const std::string& stmt2) const {
+    return this->pkb->follows_store->hasFollows(stmt1, stmt2);
+}
+
+std::string ReadFacade::getFollowsFollowing(const std::string& s) const {
+    return this->pkb->follows_store->getFollowsFollowing(s);
+}
+
+std::string ReadFacade::getFollowsBy(const std::string& s) const {
+    return this->pkb->follows_store->getFollowsBy(s);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllFollowsStar() const {
+    return this->pkb->follows_store->getAllFollowsStar();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllFollowsStarKeys() const {
+    return this->pkb->follows_store->getAllFollowsStarKeys();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllFollowsStarValues() const {
+    return this->pkb->follows_store->getAllFollowsStarValues();
+};
+
+bool ReadFacade::hasFollowsStars(const std::string& stmt1, const std::string& stmt2) const {
+    return this->pkb->follows_store->hasFollowsStars(stmt1, stmt2);
+}
+
+std::unordered_set<std::string> ReadFacade::getFollowsStarsFollowing(const std::string& stmt) const {
+    return this->pkb->follows_store->getFollowsStarsFollowing(stmt);
+}
+
+std::unordered_set<std::string> ReadFacade::getFollowsStarsBy(const std::string& stmt) const {
+    return this->pkb->follows_store->getFollowsStarsBy(stmt);
+}
+
+bool ReadFacade::hasParent(const std::string& parent, const std::string& child) const {
+    return this->pkb->parent_store->hasParent(parent, child);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllParent() const {
+    return this->pkb->parent_store->getAllParent();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllParentKeys() const {
+    return this->pkb->parent_store->getAllParentKeys();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllParentValues() const {
+    return this->pkb->parent_store->getAllParentValues();
+};
+
+std::unordered_set<std::string> ReadFacade::getParentChildren(const std::string& parent) const {
+    return this->pkb->parent_store->getParentChildren(parent);
+}
+
+std::string ReadFacade::getParent(const std::string& child) const {
+    return this->pkb->parent_store->getParent(child);
+}
+
+bool ReadFacade::hasParentStar(const std::string& parent, const std::string& child) const {
+    return this->pkb->parent_store->hasParentStar(parent, child);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllParentStar() const {
+    return this->pkb->parent_store->getAllParentStar();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllParentStarKeys() const {
+    return this->pkb->parent_store->getAllParentStarKeys();
+};
+
+std::unordered_set<std::string> ReadFacade::getAllParentStarValues() const {
+    return this->pkb->parent_store->getAllParentStarValues();
+};
+
+std::unordered_set<std::string> ReadFacade::getParentStarChildren(const std::string& parent) const {
+    return this->pkb->parent_store->getParentStarChildren(parent);
+}
+
+std::unordered_set<std::string> ReadFacade::getStarParent(const std::string& child) const {
+    return this->pkb->parent_store->getStarParent(child);
 }

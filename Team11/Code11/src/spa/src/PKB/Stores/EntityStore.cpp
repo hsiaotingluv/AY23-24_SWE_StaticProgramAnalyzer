@@ -1,29 +1,27 @@
-#include "pkb/Stores/EntityStore.h"
+#include "PKB/Stores/EntityStore.h"
 
 EntityStore::EntityStore() = default;
 
-EntityStore::~EntityStore() = default;
-
-void EntityStore::addVariable(Variable& variable) {
+void EntityStore::addVariable(const Variable &variable) {
     variableSet.insert(variable);
 }
 
-void EntityStore::addProcedure(Procedure& procedure) {
+void EntityStore::addProcedure(const Procedure &procedure) {
     procedureSet.insert(procedure);
 }
 
-void EntityStore::addConstant(Constant& constant) {
+void EntityStore::addConstant(const Constant &constant) {
     constantSet.insert(constant);
 }
 
-EntityStore::ProcedureSet EntityStore::getProcedures() {
+EntityStore::ProcedureSet EntityStore::getProcedures() const {
     return procedureSet;
 }
 
-EntityStore::VariableSet EntityStore::getVariables() {
+EntityStore::VariableSet EntityStore::getVariables() const {
     return variableSet;
 }
 
-EntityStore::ConstantSet EntityStore::getConstants() {
+EntityStore::ConstantSet EntityStore::getConstants() const {
     return constantSet;
 }
