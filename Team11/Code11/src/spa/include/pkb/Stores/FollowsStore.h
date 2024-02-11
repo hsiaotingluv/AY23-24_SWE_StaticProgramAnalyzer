@@ -10,7 +10,7 @@ class FollowsStore {
 
     ~FollowsStore();
 
-    void AddFollowsRelation(const StatementNumber &stmt1, const StatementNumber &stmt2);
+    void AddFollowsRelation(const StatementNumber& stmt1, const StatementNumber& stmt2);
 
-    bool HasFollowsRelation(const StatementNumber &stmt1, const StatementNumber &stmt2);
+    bool HasFollowsRelation(const StatementNumber& stmt1, const StatementNumber& stmt2);
 };

@@ -4,6 +4,10 @@
 #include "common/tokeniser/tokenizer.hpp"
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the left parenthesis.
+ */
 class LParenTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -11,6 +15,9 @@ class LParenTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the right parenthesis.
+ */
 class RParenTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -18,6 +25,9 @@ class RParenTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the semicolon.
+ */
 class SemicolonTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {

@@ -6,6 +6,9 @@
 
 namespace tokenizer {
 
+/**
+ * @brief Tokenizer class for the Less Than operator.
+ */
 class LessThanTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -13,6 +16,9 @@ class LessThanTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Less Than Equal operator.
+ */
 class LessThanEqualTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -20,6 +26,9 @@ class LessThanEqualTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Greater Than operator.
+ */
 class GreaterThanTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -27,6 +36,9 @@ class GreaterThanTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Greater Than Equal operator.
+ */
 class GreaterThanEqualTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -34,6 +46,9 @@ class GreaterThanEqualTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Double Equal operator.
+ */
 class DoubleEqualTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -41,6 +56,9 @@ class DoubleEqualTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Not Equal operator.
+ */
 class NotEqualTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -48,6 +66,9 @@ class NotEqualTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the Single Equal (Assignment) operator.
+ */
 class AssignmentTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -55,6 +76,9 @@ class AssignmentTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for all Relational operator.
+ */
 class SPRelationalTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 7>{

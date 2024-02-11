@@ -5,6 +5,10 @@
 #include <array>
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the AND operator.
+ */
 class LAndTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -12,6 +16,9 @@ class LAndTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the OR operator.
+ */
 class LOrTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -19,6 +26,9 @@ class LOrTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the NOT operator.
+ */
 class LNotTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -26,6 +36,9 @@ class LNotTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the SourceProcessor Logical operator.
+ */
 class SPLogicalTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 3>{

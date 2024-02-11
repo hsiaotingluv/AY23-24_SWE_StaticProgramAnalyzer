@@ -10,7 +10,7 @@ class ReadFacade {
     typedef CommonTypes::VARIABLE Variable;
     typedef CommonTypes::PROCEDURE Procedure;
 
-    explicit ReadFacade(PKB &pkb);
+    explicit ReadFacade(PKB& pkb);
 
     ~ReadFacade();
 
@@ -65,5 +65,5 @@ class ReadFacade {
     bool doesProcedureUseVar(Procedure procedure, Variable variable);
 
   private:
-    PKB &pkb;
+    PKB& pkb;
 };

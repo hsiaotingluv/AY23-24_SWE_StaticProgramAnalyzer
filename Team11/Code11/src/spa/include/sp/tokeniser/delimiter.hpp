@@ -3,9 +3,13 @@
 #include "common/tokeniser/delimiter.hpp"
 #include "common/tokeniser/token_types.hpp"
 #include "common/tokeniser/tokenizer.hpp"
+
 #include <array>
 
 namespace tokenizer {
+/**
+ * @brief Tokenizer class for the left curly bracket character.
+ */
 class LCurlyTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -13,6 +17,9 @@ class LCurlyTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the right curly bracket character.
+ */
 class RCurlyTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -20,6 +27,9 @@ class RCurlyTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the SourceProcessor delimiter character.
+ */
 class SPDelimiterTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 5>{

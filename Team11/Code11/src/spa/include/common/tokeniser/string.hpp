@@ -5,6 +5,10 @@
 #include "common/tokeniser/tokenizer.hpp"
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the letter character.
+ */
 class LetterTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -16,6 +20,9 @@ class LetterTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the digit or letter character.
+ */
 class DigitOrLetterTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{
@@ -27,6 +34,9 @@ class DigitOrLetterTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for muliple numerical digits or letters.
+ */
 class SomeDigitOrLetterTokenizer : public Tokenizer {
   private:
     static inline const auto digit_tokenizer = std::make_shared<DigitOrLetterTokenizer>();
@@ -37,6 +47,9 @@ class SomeDigitOrLetterTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for all String Tokens.
+ */
 class StringTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{

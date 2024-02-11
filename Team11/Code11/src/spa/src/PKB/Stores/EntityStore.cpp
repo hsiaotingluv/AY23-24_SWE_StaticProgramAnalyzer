@@ -4,15 +4,15 @@ EntityStore::EntityStore() = default;
 
 EntityStore::~EntityStore() = default;
 
-void EntityStore::addVariable(Variable &variable) {
+void EntityStore::addVariable(Variable& variable) {
     variableSet.insert(variable);
 }
 
-void EntityStore::addProcedure(Procedure &procedure) {
+void EntityStore::addProcedure(Procedure& procedure) {
     procedureSet.insert(procedure);
 }
 
-void EntityStore::addConstant(Constant &constant) {
+void EntityStore::addConstant(Constant& constant) {
     constantSet.insert(constant);
 }
 

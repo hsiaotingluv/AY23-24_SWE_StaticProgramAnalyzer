@@ -6,6 +6,10 @@
 #include <memory>
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the integer 0.
+ */
 class ZeroTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -13,6 +17,9 @@ class ZeroTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for non-zero digit.
+ */
 class NotZeroDigitTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -24,6 +31,9 @@ class NotZeroDigitTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for a numerical digit.
+ */
 class DigitTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{
@@ -35,6 +45,9 @@ class DigitTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for muliple numerical digits.
+ */
 class SomeDigitTokenizer : public Tokenizer {
   private:
     static inline const auto digit_tokenizer = std::make_shared<DigitTokenizer>();
@@ -45,6 +58,9 @@ class SomeDigitTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the integer without leading zero.
+ */
 class NoLeadingZeroTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{
@@ -56,6 +72,9 @@ class NoLeadingZeroTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the integer.
+ */
 class IntegerTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{

@@ -14,11 +14,11 @@ class EntityStore {
 
     ~EntityStore();
 
-    void addVariable(Variable &variable);
+    void addVariable(Variable& variable);
 
-    void addProcedure(Procedure &procedure);
+    void addProcedure(Procedure& procedure);
 
-    void addConstant(Constant &constant);
+    void addConstant(Constant& constant);
 
     ProcedureSet getProcedures();
 

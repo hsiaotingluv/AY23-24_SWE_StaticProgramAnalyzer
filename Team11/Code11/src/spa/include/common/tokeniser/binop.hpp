@@ -5,6 +5,10 @@
 #include <array>
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the addition operator.
+ */
 class AddTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -12,6 +16,9 @@ class AddTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the subtraction operator.
+ */
 class SubTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -19,6 +26,9 @@ class SubTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the multiplication operator.
+ */
 class MulTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -26,6 +36,9 @@ class MulTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the division operator.
+ */
 class DivTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -33,6 +46,9 @@ class DivTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the modulus operator.
+ */
 class ModTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
@@ -40,6 +56,9 @@ class ModTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the all Binary Operators.
+ */
 class BinopTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 5>{

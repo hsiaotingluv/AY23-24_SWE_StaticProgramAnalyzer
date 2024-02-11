@@ -12,15 +12,15 @@ class WriteFacade {
     typedef CommonTypes::CONSTANT Constant;
     typedef CommonTypes::STATEMENT_TYPE StatementType;
 
-    explicit WriteFacade(PKB &pkb);
+    explicit WriteFacade(PKB& pkb);
 
     ~WriteFacade();
 
-    void addProcedure(Procedure &procedure);
+    void addProcedure(Procedure& procedure);
 
-    void addVariable(Variable &variable);
+    void addVariable(Variable& variable);
 
-    void addConstant(Constant &constant);
+    void addConstant(Constant& constant);
 
     void addStatement(StatementNumber statementNumber, StatementType statementType);
 
@@ -29,5 +29,5 @@ class WriteFacade {
     void addProcedureModifiesvar(Procedure procedure, Variable variable);
 
   private:
-    PKB &pkb;
+    PKB& pkb;
 };

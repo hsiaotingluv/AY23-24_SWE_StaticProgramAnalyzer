@@ -47,4 +47,26 @@ TEST_CASE("Test SP Tokenizer") {
             REQUIRE(result[i].T == answers[i].T);
         }
     }
+
+    SECTION("simple relational - success") {
+        const auto query = R"(x != 2)";
+
+        const auto result = tokenizer_runner.apply_tokeniser(query);
+        REQUIRE(result[0].T == TokenType::String);
+        REQUIRE(result[1].T == TokenType::NotEqual);
+        REQUIRE(result[2].T == TokenType::Integer);
+    }
+
+    SECTION("Complex Query Unknown tokens - fails") {
+        const auto query = R"(procedure computeAverage {
+                read num1^;
+                read num2;
+
+                sum = num1 | num2;
+                print sum;
+            }
+        )";
+
+        REQUIRE_THROWS(tokenizer_runner.apply_tokeniser(query));
+    }
 }

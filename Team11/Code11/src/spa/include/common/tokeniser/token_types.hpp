@@ -1,6 +1,14 @@
 #pragma once
 
 namespace tokenizer {
+/**
+ * @brief Enum class representing different token types used in the tokenizer.
+ * 
+ * The TokenType enum class defines various token types that can be encountered during tokenization.
+ * These token types include binary operators, primitive types, delimiters, junk, and specific tokens
+ * for the QPS and SP languages. Each token type is represented by a unique enumerator value.
+ * 
+ */
 enum class TokenType {
     // Binary Operator
     Add,
@@ -50,5 +58,8 @@ enum class TokenType {
     LNot,
     LAnd,
     LOr,
+
+    // Done
+    Done,
 };
 }

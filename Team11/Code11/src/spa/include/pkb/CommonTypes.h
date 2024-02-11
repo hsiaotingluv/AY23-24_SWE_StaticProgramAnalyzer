@@ -9,7 +9,5 @@ class CommonTypes {
     typedef std::string CONSTANT;
     typedef std::string STATEMENT_NUMBER;
 
-    typedef enum _ {
-        READ, PRINT, CALL, WHILE, IF, ASSIGN
-    } STATEMENT_TYPE;
+    typedef enum _ { READ, PRINT, CALL, WHILE, IF, ASSIGN } STATEMENT_TYPE;
 };

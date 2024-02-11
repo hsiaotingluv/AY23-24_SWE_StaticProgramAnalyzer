@@ -1,18 +1,19 @@
 #include "pkb/Facades/WriteFacade.h"
 
-WriteFacade::WriteFacade(PKB &pkb) : pkb(pkb) {}
+WriteFacade::WriteFacade(PKB& pkb) : pkb(pkb) {
+}
 
 WriteFacade::~WriteFacade() = default;
 
-void WriteFacade::addProcedure(Procedure &procedure) {
+void WriteFacade::addProcedure(Procedure& procedure) {
     this->pkb.entity_store->addProcedure(procedure);
 }
 
-void WriteFacade::addVariable(Variable &variable) {
+void WriteFacade::addVariable(Variable& variable) {
     this->pkb.entity_store->addVariable(variable);
 }
 
-void WriteFacade::addConstant(Constant &constant) {
+void WriteFacade::addConstant(Constant& constant) {
     this->pkb.entity_store->addConstant(constant);
 }
 

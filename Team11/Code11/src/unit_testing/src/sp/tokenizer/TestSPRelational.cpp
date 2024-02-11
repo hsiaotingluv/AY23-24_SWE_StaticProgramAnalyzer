@@ -3,7 +3,7 @@
 
 using namespace tokenizer;
 
-TEST_CASE("Test Logical Single") {
+TEST_CASE("Test Relational Single") {
     const auto sp_delimiter_tokenizer = SPRelationalTokenizer();
     SECTION("single lt success") {
         const auto result = sp_delimiter_tokenizer.tokenize("< a");
@@ -52,7 +52,7 @@ TEST_CASE("Test Logical Single") {
         const auto& [success, rest] = result.value();
         REQUIRE(success.T == TokenType::GreaterThan);
         REQUIRE(success.content == ">");
-        REQUIRE(rest == "");
+        REQUIRE(rest.empty());
     }
 
     SECTION("relational failure - conditional expression") {

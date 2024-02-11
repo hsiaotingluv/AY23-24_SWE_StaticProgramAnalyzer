@@ -6,6 +6,10 @@
 #include <array>
 
 namespace tokenizer {
+
+/**
+ * @brief Tokenizer class for the whitespace character.
+ */
 class WhitespaceTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
@@ -13,6 +17,9 @@ class WhitespaceTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the newline character.
+ */
 class NewlineTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
@@ -20,6 +27,9 @@ class NewlineTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for the tab character.
+ */
 class TabTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
@@ -27,6 +37,9 @@ class TabTokenizer : public Tokenizer {
     }
 };
 
+/**
+ * @brief Tokenizer class for all irrelevant (junk) character.
+ */
 class JunkTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 3>{

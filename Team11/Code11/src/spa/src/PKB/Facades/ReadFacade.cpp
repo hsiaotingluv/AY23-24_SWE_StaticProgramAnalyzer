@@ -1,6 +1,7 @@
 #include "pkb/Facades/ReadFacade.h"
 
-ReadFacade::ReadFacade(PKB &pkb) : pkb(pkb) {}
+ReadFacade::ReadFacade(PKB& pkb) : pkb(pkb) {
+}
 
 ReadFacade::~ReadFacade() = default;
 
@@ -13,11 +14,17 @@ ReadFacade::StringSet ReadFacade::getEntities() {
     return allEntities;
 }
 
-ReadFacade::StringSet ReadFacade::getProcedures() { return this->pkb.entity_store->getProcedures(); }
+ReadFacade::StringSet ReadFacade::getProcedures() {
+    return this->pkb.entity_store->getProcedures();
+}
 
-ReadFacade::StringSet ReadFacade::getVariables() { return this->pkb.entity_store->getVariables(); }
+ReadFacade::StringSet ReadFacade::getVariables() {
+    return this->pkb.entity_store->getVariables();
+}
 
-ReadFacade::StringSet ReadFacade::getConstants() { return this->pkb.entity_store->getConstants(); }
+ReadFacade::StringSet ReadFacade::getConstants() {
+    return this->pkb.entity_store->getConstants();
+}
 
 ReadFacade::StringSet ReadFacade::getStatements() {
     // TODO: Replace with actual implementation for getStatements

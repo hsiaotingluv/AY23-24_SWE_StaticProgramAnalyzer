@@ -22,18 +22,6 @@ jobs:
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
           make -j4
 
-      - name: Upload integration test
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration_testing
-          path: Team11/Code11/build/src/integration_testing/integration_testing
-
-      - name: Upload unit test
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit_testing
-          path: Team11/Code11/build/src/unit_testing/unit_testing
-
       - name: Run linters
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
@@ -50,6 +38,18 @@ jobs:
       - name: Check linter status
         if: steps.linter.outputs.clang-format-checks-failed > 0
         run: echo "Some files failed the linting checks!" && exit 1
+
+      - name: Upload integration test
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration_testing
+          path: Team11/Code11/build/src/integration_testing/integration_testing
+
+      - name: Upload unit test
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit_testing
+          path: Team11/Code11/build/src/unit_testing/unit_testing
 
   run-unit-testing:
     name: Run Unit Testing

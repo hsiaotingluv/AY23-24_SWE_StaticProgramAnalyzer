@@ -24,6 +24,11 @@ auto TokenizerRunner::apply_tokeniser(std::string input, bool debug) const -> st
             }
         }
     }
+
+    if (include_done) {
+        auto done_token = Token{TokenType::Done, ""};
+        result.push_back(done_token);
+    }
     return result;
 }
 
