@@ -1,8 +1,9 @@
 #pragma once
 
+#include "common/tokeniser/tokenizer.hpp"
 #include "sp/parser/ast/ast.hpp"
 #include "sp/parser/exception/parsing_error.hpp"
-#include "sp/tokeniser/tokeniser.hpp"
+
 #include <memory>
 #include <vector>
 

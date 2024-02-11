@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/ast.hpp"
 #include "sp/parser/statement_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>
@@ -54,10 +55,10 @@ TEST_CASE("Test SP Statement Parser") {
 
         auto it = tokens.cbegin();
         auto node = statement_parser.parse(it, tokens.end());
-        auto casted_node = std::static_pointer_cast<BinaryNode>(node);
+        auto casted_node = std::static_pointer_cast<AssignmentNode>(node);
         REQUIRE(node->T == NodeType::Assign);
-        REQUIRE(casted_node->left->T == NodeType::Variable);
-        REQUIRE(casted_node->right->T == NodeType::Constant);
+        REQUIRE(casted_node->variable->T == NodeType::Variable);
+        REQUIRE(casted_node->expr->T == NodeType::Constant);
     }
 
     SECTION("if statement - success") {

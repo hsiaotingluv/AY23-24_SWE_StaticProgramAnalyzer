@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 namespace sp {
 
 // List of reserved keywords

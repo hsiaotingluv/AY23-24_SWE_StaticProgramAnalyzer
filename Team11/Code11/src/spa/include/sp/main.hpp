@@ -2,6 +2,7 @@
 
 #include "common/tokeniser/runner.hpp"
 #include "common/tokeniser/tokenizer.hpp"
+#include "sp/annotator/annotator.hpp"
 #include "sp/parser/ast/ast.hpp"
 #include "sp/parser/parser.hpp"
 #include <memory>
@@ -17,10 +18,11 @@ namespace sp {
 class SourceProcessor {
     TokenizerRunner& tokenizer_runner;
     std::shared_ptr<Parser> parser;
+    std::shared_ptr<Annotator> annotator;
 
   public:
-    SourceProcessor(TokenizerRunner& tr, std::shared_ptr<Parser> parser)
-        : tokenizer_runner(tr), parser(std::move(parser)) {
+    SourceProcessor(TokenizerRunner& tr, std::shared_ptr<Parser> parser, std::shared_ptr<Annotator> annotator)
+        : tokenizer_runner(tr), parser(std::move(parser)), annotator(std::move(annotator)) {
     }
 
     auto parse(std::string& input) -> std::shared_ptr<AstNode> {

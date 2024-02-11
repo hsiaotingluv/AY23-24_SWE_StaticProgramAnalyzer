@@ -1,4 +1,5 @@
 #include "sp/parser/statement_parser.hpp"
+#include "sp/parser/ast/ast.hpp"
 #include "sp/parser/statement_keyword_const.hpp"
 #include "sp/parser/statement_list_parser.hpp"
 
@@ -30,11 +31,7 @@ auto StatementParser::parseStmtPrime(Parser::Iterator& token_start, const Parser
             throw ParsingError("Expecting ; in assignment but found other token");
         }
 
-        auto new_node = std::make_shared<BinaryNode>(NodeType::Assign);
-        new_node->right = expr_tree;
-
-        auto left_node = std::make_shared<NameNode>(prev_content);
-        new_node->left = left_node;
+        auto new_node = std::make_shared<AssignmentNode>(std::make_shared<NameNode>(prev_content), expr_tree);
         return new_node;
     } else {
         if (prev_content == READ) {

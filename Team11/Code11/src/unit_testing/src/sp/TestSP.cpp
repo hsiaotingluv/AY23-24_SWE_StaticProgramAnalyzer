@@ -1,4 +1,5 @@
 #include "catch.hpp"
+#include "sp/annotator/ast_annotator.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/ast/node_type.hpp"
 #include "sp/parser/program_parser.hpp"
@@ -7,7 +8,8 @@
 TEST_CASE("Test SP") {
     auto tokenizer_runner = tokenizer::TokenizerRunner{std::make_unique<sp::SourceProcessorTokenizer>(), true};
     auto parser = std::make_shared<sp::ProgramParser>();
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser};
+    auto annotator = std::make_shared<sp::AstAnnotator>();
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, annotator};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {

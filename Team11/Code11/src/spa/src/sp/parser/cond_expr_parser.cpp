@@ -57,7 +57,7 @@ auto CondExprParser::parseCondFirstPrime(Parser::Iterator& token_start, const Pa
     }
 
     auto right_tree = this->parseCondSecondPrime(token_start, token_end);
-    auto casted_node = std::static_pointer_cast<BinaryNode>(right_tree);
+    auto casted_node = std::dynamic_pointer_cast<LogicalBinaryNode>(right_tree);
     casted_node->left = cond_tree;
     return casted_node;
 }
@@ -82,15 +82,14 @@ auto CondExprParser::parseCondSecondPrime(Parser::Iterator& token_start, const P
             throw ParsingError("Expecting ) to parse Cond Second Prime but found other token");
         }
 
-        std::shared_ptr<BinaryNode> new_binop_node;
+        std::shared_ptr<AstNode> new_binop_node;
 
         if (next_token.T == TokenType::LOr) {
-            new_binop_node = std::make_shared<BinaryNode>(NodeType::LOr);
+            new_binop_node = std::make_shared<LogicalOrNode>(nullptr, cond_tree);
         } else if (next_token.T == TokenType::LAnd) {
-            new_binop_node = std::make_shared<BinaryNode>(NodeType::LAnd);
+            new_binop_node = std::make_shared<LogicalAndNode>(nullptr, cond_tree);
         }
 
-        new_binop_node->right = cond_tree;
         return new_binop_node;
     }
     default: {
