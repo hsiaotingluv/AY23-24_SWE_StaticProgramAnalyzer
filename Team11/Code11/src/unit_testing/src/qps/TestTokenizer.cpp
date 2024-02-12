@@ -1,10 +1,34 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
+#include "qps/tokeniser/wildcard_tokeniser.hpp"
 
 #include <memory>
 
 using namespace tokenizer;
+
+TEST_CASE("Test WildCard Tokenizer") {
+    const auto tokenizer = std::make_unique<qps::WildCardTokenizer>();
+
+    SECTION("Wildcard - success") {
+        const auto query = R"(_X)";
+        const auto maybe_success = tokenizer->tokenize(query);
+
+        REQUIRE(maybe_success.has_value());
+        const auto& [token, rest] = maybe_success.value();
+        REQUIRE(token.content == "_");
+        REQUIRE(token.T == TokenType::Wildcard);
+
+        REQUIRE(rest == "X");
+    }
+
+    SECTION("Wildcard - failure") {
+        const auto query = R"(a)";
+        const auto maybe_success = tokenizer->tokenize(query);
+
+        REQUIRE(!maybe_success.has_value());
+    }
+}
 
 TEST_CASE("Test QPS Tokenizer") {
     const auto tokenizer_runner = TokenizerRunner(std::make_unique<qps::QueryProcessingSystemTokenizer>());

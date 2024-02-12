@@ -1,19 +1,21 @@
 #pragma once
 
-#include <unordered_set>
 #include <string>
-#include <utility>
 #include <typeinfo>
+#include <unordered_set>
+#include <utility>
 
 class Entity {
   public:
-    explicit Entity(std::string name) : name(std::move(name)) {};
+    explicit Entity(std::string name) : name(std::move(name)){};
 
     bool operator==(Entity const& other) const {
         return name == other.name;
     };
 
-    [[nodiscard]] std::string getName() const { return name; }
+    [[nodiscard]] std::string getName() const {
+        return name;
+    }
 
     struct HashFunction {
         size_t operator()(Entity const& e) const {
@@ -21,10 +23,11 @@ class Entity {
         }
     };
 
-  protected:
+  private:
     std::string name;
 };
 
 namespace std {
-    template<> struct hash<Entity> : Entity::HashFunction {};
-};
+template <>
+struct hash<Entity> : Entity::HashFunction {};
+}; // namespace std

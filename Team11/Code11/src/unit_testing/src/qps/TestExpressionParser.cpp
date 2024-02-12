@@ -3,6 +3,7 @@
 #include "qps/parser/expression_parser.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
+#include <iterator>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -19,7 +20,8 @@ static const std::vector<std::tuple<std::string, std::string>> exprs = {
     {"z * 5 + x", "(((z)*(5))+(x))"},
     {"(x + z) * 5", "(((x)+(z))*(5))"},
     {"z + 2 *(v+ x)", "((z)+((2)*((v)+(x))))"},
-    {"z + 2* (v +x)", "((z)+((2)*((v)+(x))))"}};
+    {"z + 2* (v +x)", "((z)+((2)*((v)+(x))))"},
+    {"a - b    +4", "(((a)-(b))+(4))"}};
 
 TEST_CASE("Test constant") {
     const auto runner = tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
@@ -202,6 +204,29 @@ TEST_CASE("Text Expression Spec") {
         REQUIRE(rest == tokens.end());
     }
 
+    SECTION("expression spec success - wildcard2") {
+        const auto query = R"(_X)";
+        const auto tokens = runner.apply_tokeniser(query);
+        const auto result = parse_expression_spec(tokens.begin(), tokens.end());
+
+        REQUIRE(result.has_value());
+        const auto& [success, rest] = result.value();
+        REQUIRE(success.value == "_");
+        REQUIRE(rest == std::next(tokens.begin()));
+    }
+
+    SECTION("expression spec failure - wildcard3") {
+        constexpr std::array<const char* const, 2> queries = {R"(_"X))", R"(_"+"_)"};
+
+        for (const auto& query : queries) {
+            const auto tokens = runner.apply_tokeniser(query);
+            // std::cout << "query: " << query << "\n";
+            const auto result = parse_expression_spec(tokens.begin(), tokens.end());
+
+            REQUIRE_FALSE(result.has_value());
+        }
+    }
+
     SECTION("expression spec success - quoted expression") {
         for (const auto& [query, expected] : exprs) {
             const auto query2 = "\"" + query + "\"";
@@ -230,6 +255,14 @@ TEST_CASE("Text Expression Spec") {
 
     SECTION("expression spec failure - invalid expression") {
         const auto query = "42 +";
+        auto tokens = runner.apply_tokeniser(query);
+        const auto result = parse_expression_spec(tokens.begin(), tokens.end());
+
+        REQUIRE(!result.has_value());
+    }
+
+    SECTION("expression spec failure - invalid expression 2") {
+        const auto query = "42 + +";
         auto tokens = runner.apply_tokeniser(query);
         const auto result = parse_expression_spec(tokens.begin(), tokens.end());
 

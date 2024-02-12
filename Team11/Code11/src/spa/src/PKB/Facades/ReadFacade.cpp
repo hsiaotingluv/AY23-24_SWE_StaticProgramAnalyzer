@@ -12,12 +12,15 @@ std::unordered_set<std::string> ReadFacade::getEntities() {
     auto vars = this->pkb->entity_store->getVariables();
     auto consts = this->pkb->entity_store->getConstants();
 
-    for (const Procedure& p : procedures)
+    for (const Procedure& p : procedures) {
         entities.insert(p.getName());
-    for (const Variable& v : vars)
+    }
+    for (const Variable& v : vars) {
         entities.insert(v.getName());
-    for (const Constant& c : consts)
+    }
+    for (const Constant& c : consts) {
         entities.insert(c.getName());
+    }
 
     return entities;
 }
@@ -26,8 +29,9 @@ std::unordered_set<std::string> ReadFacade::getProcedures() {
     auto procedures = this->pkb->entity_store->getProcedures();
 
     std::unordered_set<std::string> temp;
-    for (const Procedure& p : procedures)
+    for (const Procedure& p : procedures) {
         temp.insert(p.getName());
+    }
 
     return temp;
 }
@@ -36,8 +40,9 @@ std::unordered_set<std::string> ReadFacade::getVariables() {
     auto vars = this->pkb->entity_store->getVariables();
 
     std::unordered_set<std::string> temp;
-    for (const Variable& v : vars)
+    for (const Variable& v : vars) {
         temp.insert(v.getName());
+    }
 
     return temp;
 }
@@ -46,8 +51,9 @@ std::unordered_set<std::string> ReadFacade::getConstants() {
     auto consts = this->pkb->entity_store->getConstants();
 
     std::unordered_set<std::string> temp;
-    for (const Constant& c : consts)
+    for (const Constant& c : consts) {
         temp.insert(c.getName());
+    }
 
     return temp;
 }
@@ -93,7 +99,7 @@ std::unordered_set<Statement> ReadFacade::getCallStatements() {
                                          Statement("CallStatement3")};
 }
 
-std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(std::string s) {
+std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(const std::string& s) {
     auto variables = this->pkb->modifies_store->getVarsModifiedByStatement(s);
 
     std::unordered_set<std::string> temp;
@@ -103,98 +109,103 @@ std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(std::stri
     return temp;
 }
 
-std::unordered_set<std::string> ReadFacade::getStatementsThatModifyVar(std::string variable) {
-    auto v = Variable(std::move(variable));
+std::unordered_set<std::string> ReadFacade::getStatementsThatModifyVar(const std::string& variable) {
+    auto v = Variable(variable);
 
     return this->pkb->modifies_store->getStatementsThatModifyVar(v);
 }
 
-bool ReadFacade::doesStatementModifyVar(const std::string& statement, std::string variable) {
-    auto v = Variable(std::move(variable));
+bool ReadFacade::doesStatementModifyVar(const std::string& statement, const std::string& variable) {
+    auto v = Variable(variable);
 
     return this->pkb->modifies_store->doesStatementModifyVar(statement, v);
 }
 
-std::unordered_set<std::string> ReadFacade::getVarsModifiedByProcedure(std::string procedure) {
-    auto p = Procedure(std::move(procedure));
+std::unordered_set<std::string> ReadFacade::getVarsModifiedByProcedure(const std::string& procedure) {
+    auto p = Procedure(procedure);
 
     auto variables = this->pkb->modifies_store->getVarsModifiedByProcedure(p);
 
     std::unordered_set<std::string> temp;
-    for (const Variable& v : variables)
+    for (const Variable& v : variables) {
         temp.insert(v.getName());
+    }
 
     return temp;
 }
 
-std::unordered_set<std::string> ReadFacade::getProceduresThatModifyVar(std::string variable) {
-    auto v = Variable(std::move(variable));
+std::unordered_set<std::string> ReadFacade::getProceduresThatModifyVar(const std::string& variable) {
+    auto v = Variable(variable);
 
     auto procedures = this->pkb->modifies_store->getProceduresThatModifyVar(v);
 
     std::unordered_set<std::string> temp;
-    for (const Procedure& p : procedures)
+    for (const Procedure& p : procedures) {
         temp.insert(p.getName());
+    }
 
     return temp;
 }
 
-bool ReadFacade::doesProcedureModifyVar(std::string procedure, std::string variable) {
-    auto v = Variable(std::move(variable));
-    auto p = Procedure(std::move(procedure));
+bool ReadFacade::doesProcedureModifyVar(const std::string& procedure, const std::string& variable) {
+    auto v = Variable(variable);
+    auto p = Procedure(procedure);
 
     return this->pkb->modifies_store->doesProcedureModifyVar(p, v);
 }
 
-std::unordered_set<std::string> ReadFacade::getVarsUsedByStatement(std::string s) {
+std::unordered_set<std::string> ReadFacade::getVarsUsedByStatement(const std::string& s) {
     auto variables = this->pkb->uses_store->getVarsUsedByStatement(s);
 
     std::unordered_set<std::string> temp;
-    for (const Variable& v : variables)
+    for (const Variable& v : variables) {
         temp.insert(v.getName());
+    }
 
     return temp;
 }
 
-std::unordered_set<std::string> ReadFacade::getStatementsThatUseVar(std::string variable) {
-    auto v = Variable(std::move(variable));
+std::unordered_set<std::string> ReadFacade::getStatementsThatUseVar(const std::string& variable) {
+    auto v = Variable(variable);
 
     return this->pkb->uses_store->getStatementsThatUseVar(v);
 }
 
-bool ReadFacade::doesStatementUseVar(const std::string& statement, std::string variable) {
-    auto v = Variable(std::move(variable));
+bool ReadFacade::doesStatementUseVar(const std::string& statement, const std::string& variable) {
+    auto v = Variable(variable);
 
     return this->pkb->uses_store->doesStatementUseVar(statement, v);
 }
 
-std::unordered_set<std::string> ReadFacade::getVarsUsedByProcedure(std::string procedure) {
-    auto p = Procedure(std::move(procedure));
+std::unordered_set<std::string> ReadFacade::getVarsUsedByProcedure(const std::string& procedure) {
+    auto p = Procedure(procedure);
 
     auto variables = this->pkb->uses_store->getVarsUsedByProcedure(p);
 
     std::unordered_set<std::string> temp;
-    for (const Variable& v : variables)
+    for (const Variable& v : variables) {
         temp.insert(v.getName());
+    }
 
     return temp;
 }
 
-std::unordered_set<std::string> ReadFacade::getProceduresThatUseVar(std::string variable) {
-    auto v = Variable(std::move(variable));
+std::unordered_set<std::string> ReadFacade::getProceduresThatUseVar(const std::string& variable) {
+    auto v = Variable(variable);
 
     auto procedures = this->pkb->uses_store->getProceduresThatUseVar(v);
 
     std::unordered_set<std::string> temp;
-    for (const Procedure& p : procedures)
+    for (const Procedure& p : procedures) {
         temp.insert(p.getName());
+    }
 
     return temp;
 }
 
-bool ReadFacade::doesProcedureUseVar(std::string procedure, std::string variable) {
-    auto v = Variable(std::move(variable));
-    auto p = Procedure(std::move(procedure));
+bool ReadFacade::doesProcedureUseVar(const std::string& procedure, const std::string& variable) {
+    auto v = Variable(variable);
+    auto p = Procedure(procedure);
 
     return this->pkb->uses_store->doesProcedureUseVar(p, v);
 }

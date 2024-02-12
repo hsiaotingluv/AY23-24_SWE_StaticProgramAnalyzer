@@ -6,9 +6,11 @@
 
 class Constant : public Entity {
   public:
-    explicit Constant(std::string name) : Entity(std::move(name)) {}
+    explicit Constant(std::string name) : Entity(std::move(name)) {
+    }
 };
 
 namespace std {
-    template<> struct hash<Constant> : Entity::HashFunction {};
-};
+template <>
+struct hash<Constant> : Entity::HashFunction {};
+}; // namespace std

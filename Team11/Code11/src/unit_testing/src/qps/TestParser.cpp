@@ -1,12 +1,15 @@
 #include "catch.hpp"
 
-#include "qps/parser/entities/clause.hpp"
-#include "qps/parser/entities/relationship.hpp"
-#include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/parser.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
+#include "qps/parser/entities/clause.hpp"
+#include "qps/parser/entities/primitives.hpp"
+#include "qps/parser/entities/relationship.hpp"
+#include "qps/parser/entities/synonym.hpp"
+
 #include <iterator>
+#include <memory>
 #include <variant>
 
 using namespace qps;
@@ -16,7 +19,7 @@ TEST_CASE("Test Declaration Parser") {
 
     SECTION("Declaration with one synonym") {
         const auto query = "procedure p;";
-        auto tokens = runner.apply_tokeniser(query);
+        const auto tokens = runner.apply_tokeniser(query);
         const auto output = parse_declarations(tokens.begin(), tokens.end());
 
         REQUIRE(output.has_value());
@@ -24,13 +27,13 @@ TEST_CASE("Test Declaration Parser") {
 
         REQUIRE(result.size() == 1);
         REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
         REQUIRE(std::distance(rest, tokens.end()) == 0);
     }
 
     SECTION("Declaration with multiple synonyms") {
         const auto query = "procedure p, q, r; Select p";
-        auto tokens = runner.apply_tokeniser(query);
+        const auto tokens = runner.apply_tokeniser(query);
         const auto output = parse_declarations(tokens.begin(), tokens.end());
 
         REQUIRE(output.has_value());
@@ -38,17 +41,17 @@ TEST_CASE("Test Declaration Parser") {
 
         REQUIRE(result.size() == 3);
         REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
         REQUIRE(std::holds_alternative<ProcSynonym>(result[1]));
-        REQUIRE(std::get<ProcSynonym>(result[1]).name == "q");
+        REQUIRE(std::get<ProcSynonym>(result[1]).get_name() == "q");
         REQUIRE(std::holds_alternative<ProcSynonym>(result[2]));
-        REQUIRE(std::get<ProcSynonym>(result[2]).name == "r");
+        REQUIRE(std::get<ProcSynonym>(result[2]).get_name() == "r");
         REQUIRE(std::distance(rest, tokens.end()) == 2);
     }
 
     SECTION("Multiple declarations") {
         const auto query = "procedure p ; variable v; Select p";
-        auto tokens = runner.apply_tokeniser(query);
+        const auto tokens = runner.apply_tokeniser(query);
         const auto output = parse_declarations(tokens.begin(), tokens.end());
 
         REQUIRE(output.has_value());
@@ -56,9 +59,9 @@ TEST_CASE("Test Declaration Parser") {
 
         REQUIRE(result.size() == 2);
         REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
         REQUIRE(std::holds_alternative<VarSynonym>(result[1]));
-        REQUIRE(std::get<VarSynonym>(result[1]).name == "v");
+        REQUIRE(std::get<VarSynonym>(result[1]).get_name() == "v");
         REQUIRE(std::distance(rest, tokens.end()) == 2);
     }
 
@@ -83,13 +86,13 @@ TEST_CASE("Test Parser") {
 
         REQUIRE(result.declared.size() == 2);
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
         REQUIRE(std::holds_alternative<RawStmtSynonym>(result.declared[1]));
-        REQUIRE(std::get<RawStmtSynonym>(result.declared[1]).name == "s");
+        REQUIRE(std::get<RawStmtSynonym>(result.declared[1]).get_name() == "s");
 
         REQUIRE(std::holds_alternative<RawStmtSynonym>(result.reference));
-        REQUIRE(std::get<RawStmtSynonym>(result.reference).name == "s");
+        REQUIRE(std::get<RawStmtSynonym>(result.reference).get_name() == "s");
     }
 
     SECTION("Query with stmt-ent relationship") {
@@ -109,26 +112,18 @@ TEST_CASE("Test Parser") {
 
         REQUIRE(result.declared.size() == 2);
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
         REQUIRE(std::holds_alternative<VarSynonym>(result.declared[1]));
-        REQUIRE(std::get<VarSynonym>(result.declared[1]).name == "v");
+        REQUIRE(std::get<VarSynonym>(result.declared[1]).get_name() == "v");
 
         REQUIRE(std::holds_alternative<VarSynonym>(result.reference));
-        REQUIRE(std::get<VarSynonym>(result.reference).name == "v");
+        REQUIRE(std::get<VarSynonym>(result.reference).get_name() == "v");
 
         REQUIRE(result.clauses.size() == 1);
-        REQUIRE(std::holds_alternative<SuchThatClause>(result.clauses[0]));
-        const auto& clause = std::get<SuchThatClause>(result.clauses[0]);
-        REQUIRE(std::holds_alternative<UsesP>(clause.rel_ref));
-        const auto& rel_ref = std::get<UsesP>(clause.rel_ref);
-        REQUIRE(std::holds_alternative<QuotedIdent>(rel_ref.ent1));
-        REQUIRE(std::get<QuotedIdent>(rel_ref.ent1) == "s");
-
-        REQUIRE(std::holds_alternative<Synonym>(rel_ref.ent2));
-        const auto& syn = std::get<Synonym>(rel_ref.ent2);
-        REQUIRE(std::holds_alternative<VarSynonym>(syn));
-        REQUIRE(std::get<VarSynonym>(syn).name == "v");
+        const std::shared_ptr<Clause> reference_clause =
+            std::make_shared<SuchThatClause>(UsesP{QuotedIdent{"s"}, VarSynonym{IDENT{"v"}}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
     SECTION("Query with ent-ent relationship 2") {
@@ -140,13 +135,13 @@ TEST_CASE("Test Parser") {
 
         REQUIRE(result.declared.size() == 2);
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
         REQUIRE(std::holds_alternative<VarSynonym>(result.declared[1]));
-        REQUIRE(std::get<VarSynonym>(result.declared[1]).name == "v");
+        REQUIRE(std::get<VarSynonym>(result.declared[1]).get_name() == "v");
 
         REQUIRE(std::holds_alternative<ProcSynonym>(result.reference));
-        REQUIRE(std::get<ProcSynonym>(result.reference).name == "p");
+        REQUIRE(std::get<ProcSynonym>(result.reference).get_name() == "p");
     }
 
     SECTION("Query with pattern clause") {
@@ -159,17 +154,15 @@ Select a pattern a ( _ , "count + 1"))";
 
         REQUIRE(result.declared.size() == 1);
         REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).name == "a");
+        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "a");
 
         REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).name == "a");
+        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "a");
 
         REQUIRE(result.clauses.size() == 1);
-        REQUIRE(std::holds_alternative<PatternClause>(result.clauses[0]));
-        const auto& clause = std::get<PatternClause>(result.clauses[0]);
-        REQUIRE(clause.assign_synonym.name == "a");
-        REQUIRE(std::holds_alternative<WildCard>(clause.ent_ref));
-        REQUIRE(clause.expression_spec.value == "((count)+(1))");
+        const std::shared_ptr<Clause> reference_clause =
+            std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, WildCard{}, ExpressionSpec{"((count)+(1))"});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
     SECTION("Query with pattern clause 2") {
@@ -181,18 +174,15 @@ Select a pattern a ( _ , "count + 1"))";
 
         REQUIRE(result.declared.size() == 1);
         REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).name == "newa");
+        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "newa");
 
         REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).name == "newa");
+        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "newa");
 
         REQUIRE(result.clauses.size() == 1);
-        REQUIRE(std::holds_alternative<PatternClause>(result.clauses[0]));
-        const auto& clause = std::get<PatternClause>(result.clauses[0]);
-        REQUIRE(clause.assign_synonym.name == "newa");
-        REQUIRE(std::holds_alternative<QuotedIdent>(clause.ent_ref));
-        REQUIRE(std::get<QuotedIdent>(clause.ent_ref) == "normSq");
-        REQUIRE(clause.expression_spec.value == "_((cenX)*(cenX))_");
+        const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
+            AssignSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{"_((cenX)*(cenX))_"});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
     SECTION("Query with such that clause and pattern clause") {
@@ -204,33 +194,21 @@ Select a pattern a ( _ , "count + 1"))";
 
         REQUIRE(result.declared.size() == 2);
         REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).name == "a");
+        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "a");
         REQUIRE(std::holds_alternative<WhileSynonym>(result.declared[1]));
-        REQUIRE(std::get<WhileSynonym>(result.declared[1]).name == "w");
+        REQUIRE(std::get<WhileSynonym>(result.declared[1]).get_name() == "w");
 
         REQUIRE(std::holds_alternative<WhileSynonym>(result.reference));
-        REQUIRE(std::get<WhileSynonym>(result.reference).name == "w");
+        REQUIRE(std::get<WhileSynonym>(result.reference).get_name() == "w");
 
         REQUIRE(result.clauses.size() == 2);
-        REQUIRE(std::holds_alternative<SuchThatClause>(result.clauses[0]));
-        const auto& such_that_clause = std::get<SuchThatClause>(result.clauses[0]);
-        REQUIRE(std::holds_alternative<ParentT>(such_that_clause.rel_ref));
-        const auto& rel_ref = std::get<ParentT>(such_that_clause.rel_ref);
-        REQUIRE(std::holds_alternative<StmtSynonym>(rel_ref.stmt1));
-        const auto syn1 = std::get<StmtSynonym>(rel_ref.stmt1);
-        REQUIRE(std::holds_alternative<WhileSynonym>(syn1));
-        REQUIRE(std::get<WhileSynonym>(syn1).name == "w");
-        REQUIRE(std::holds_alternative<StmtSynonym>(rel_ref.stmt2));
-        const auto syn2 = std::get<StmtSynonym>(rel_ref.stmt2);
-        REQUIRE(std::holds_alternative<AssignSynonym>(syn2));
-        REQUIRE(std::get<AssignSynonym>(syn2).name == "a");
+        const std::shared_ptr<Clause> reference_clause = std::make_shared<SuchThatClause>(
+            ParentT{StmtSynonym{WhileSynonym{IDENT{"w"}}}, StmtSynonym{AssignSynonym{IDENT{"a"}}}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
 
-        REQUIRE(std::holds_alternative<PatternClause>(result.clauses[1]));
-        const auto& pattern_clause = std::get<PatternClause>(result.clauses[1]);
-        REQUIRE(pattern_clause.assign_synonym.name == "a");
-        REQUIRE(std::holds_alternative<QuotedIdent>(pattern_clause.ent_ref));
-        REQUIRE(std::get<QuotedIdent>(pattern_clause.ent_ref) == "count");
-        REQUIRE(pattern_clause.expression_spec.value == "_");
+        const std::shared_ptr<Clause> reference_clause2 =
+            std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, QuotedIdent{"count"}, ExpressionSpec{"_"});
+        REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
 
     SECTION("Query with undefined synonym") {

@@ -1,6 +1,6 @@
 #include "sp/parser/rel_expr_parser.hpp"
-#include "sp/parser/ast/rel_expr_ast.hpp"
 #include "sp/parser/ast/ast.hpp"
+#include "sp/parser/ast/rel_expr_ast.hpp"
 
 #include <functional>
 #include <unordered_map>
@@ -36,27 +36,27 @@ auto RelExprParser::parseRelPrime(Parser::Iterator& token_start, const Parser::I
             std::unordered_map<TokenType, std::function<std::shared_ptr<ComparatorNode>(std::shared_ptr<AstNode>)>>{
                 {TokenType::GreaterThan,
                  [](auto&& right) {
-                     return std::make_shared<GreaterThanNode>(nullptr, std::move(right));
+                     return std::make_shared<GreaterThanNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
                 {TokenType::GreaterThanEqual,
                  [](auto&& right) {
-                     return std::make_shared<GreaterThanEqualNode>(nullptr, std::move(right));
+                     return std::make_shared<GreaterThanEqualNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
                 {TokenType::LessThan,
                  [](auto&& right) {
-                     return std::make_shared<LessThanNode>(nullptr, std::move(right));
+                     return std::make_shared<LessThanNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
                 {TokenType::LessThanEqual,
                  [](auto&& right) {
-                     return std::make_shared<LessThanEqualNode>(nullptr, std::move(right));
+                     return std::make_shared<LessThanEqualNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
                 {TokenType::DoubleEqual,
                  [](auto&& right) {
-                     return std::make_shared<EqualNode>(nullptr, std::move(right));
+                     return std::make_shared<EqualNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
                 {TokenType::NotEqual,
                  [](auto&& right) {
-                     return std::make_shared<NotEqualNode>(nullptr, std::move(right));
+                     return std::make_shared<NotEqualNode>(nullptr, std::forward<decltype(right)>(right));
                  }},
             };
 

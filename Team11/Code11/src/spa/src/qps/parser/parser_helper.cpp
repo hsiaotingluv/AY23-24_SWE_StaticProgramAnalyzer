@@ -1,5 +1,6 @@
-#include "qps/parser/parser_helper.hpp"
 #include "common/tokeniser/token_types.hpp"
+
+#include "qps/parser/parser_helper.hpp"
 #include "qps/tokeniser/binop.hpp"
 #include "qps/tokeniser/qps_delimiter.hpp"
 
@@ -37,11 +38,11 @@ auto is_stmt_ref(const Token& token) -> bool {
     return is_string(token) || is_wildcard(token) || is_integer(token);
 }
 
-auto is_keyword(const Token& token, std::string keyword) -> bool {
+auto is_keyword(const Token& token, const std::string& keyword) -> bool {
     return token.T == TokenType::String && token.content == keyword;
 }
 
-auto is(const Token& token, std::string content) -> bool {
+auto is(const Token& token, const std::string& content) -> bool {
     return token.content == content;
 }
 

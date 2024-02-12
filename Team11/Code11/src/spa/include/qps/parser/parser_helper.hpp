@@ -11,7 +11,7 @@ auto is_integer(const Token& token) -> bool;
 auto is_wildcard(const Token& token) -> bool;
 auto is_binary(const Token& token) -> bool;
 auto is_stmt_ref(const Token& token) -> bool;
-auto is_keyword(const Token& token, std::string keyword) -> bool;
+auto is_keyword(const Token& token, const std::string& keyword) -> bool;
 
 auto is(const Token& token, std::string content) -> bool;
 

@@ -1,6 +1,7 @@
 #include "qps/parser/expression_parser.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/tokeniser/binop.hpp"
+#include <optional>
 #include <tuple>
 
 namespace qps {
@@ -24,8 +25,8 @@ auto to_string(TokenType T) -> std::string {
     }
 }
 
-auto parse_expression_spec(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
     if (it == end) {
         return std::nullopt;
     }
@@ -46,19 +47,19 @@ auto parse_expression_spec(std::vector<Token>::iterator it, const std::vector<To
         // Expect expression
         const auto maybe_expr = expression(it, end);
         if (!maybe_expr) {
-            return backup;
+            return std::nullopt;
         }
-        auto [expr, new_it] = *maybe_expr;
+        auto [expr, new_it] = maybe_expr.value();
 
         // Expect right quote
         if (new_it == end || !is_close_quote(*new_it)) {
-            return backup;
+            return std::nullopt;
         }
         it = std::next(new_it);
 
         // Expect wildcard
         if (!is_wildcard(*it)) {
-            return backup;
+            return std::nullopt;
         }
         return std::make_tuple(ExpressionSpec{"_" + expr.value + "_"}, it + 1);
     } else if (is_open_quote(*it)) {
@@ -84,20 +85,20 @@ auto parse_expression_spec(std::vector<Token>::iterator it, const std::vector<To
     }
 };
 
-auto wrap_parentheses(std::string s) -> std::string {
+auto wrap_parentheses(const std::string& s) -> std::string {
     return "(" + s + ")";
 }
 
-auto constant(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto constant(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
     if (it != end && it->T == TokenType::Integer) {
         return std::make_tuple(ExpressionSpec{wrap_parentheses(it->content)}, it + 1);
     }
     return std::nullopt;
 }
 
-auto expression(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto expression(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
     // Given the left-recursive grammar, we re-write the expression as follows:
     // <expr> ::= <factor> | <expr> <binary_op> <factor>
     // We then use the operator precedence parser to parse the expressions
@@ -114,16 +115,16 @@ auto expression(std::vector<Token>::iterator it, const std::vector<Token>::itera
     return bin_op_rhs(0, lhs, new_it, end);
 }
 
-auto variable(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto variable(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
     if (it != end && it->T == TokenType::String) {
         return std::make_tuple(ExpressionSpec{wrap_parentheses(it->content)}, it + 1);
     }
     return std::nullopt;
 }
 
-auto factor(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto factor(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
     if (it == end) {
         return std::nullopt;
     }
@@ -155,9 +156,9 @@ auto factor(std::vector<Token>::iterator it, const std::vector<Token>::iterator&
     return std::make_tuple(expr, std::next(new_it));
 }
 
-auto bin_op_rhs(int min_precedence, ExpressionSpec lhs, std::vector<Token>::iterator it,
-                const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::iterator>> {
+auto bin_op_rhs(int min_precedence, ExpressionSpec lhs, std::vector<Token>::const_iterator it,
+                const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ExpressionSpec, std::vector<Token>::const_iterator>> {
 
     while (it != end) {
         // Verify that the token is a binary operator that we expect

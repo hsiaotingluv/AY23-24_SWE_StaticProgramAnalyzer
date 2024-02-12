@@ -8,5 +8,6 @@ namespace sp {
 class Traverser {
   public:
     virtual auto traverse(std::shared_ptr<AstNode> ast) -> std::shared_ptr<AstNode> = 0;
+    virtual ~Traverser() = default;
 };
 } // namespace sp

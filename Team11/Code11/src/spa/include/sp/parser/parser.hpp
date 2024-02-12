@@ -35,5 +35,6 @@ class Parser {
 
   public:
     virtual auto parse(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode> = 0;
+    virtual ~Parser() = default;
 };
 } // namespace sp

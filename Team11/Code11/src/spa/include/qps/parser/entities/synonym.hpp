@@ -32,57 +32,217 @@ struct Integer {
 };
 
 // StmtSynonym := RawStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym | AssignSynonym
-struct RawStmtSynonym {
+class RawStmtSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "stmt";
-    IDENT name;
+
+    explicit RawStmtSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit RawStmtSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
+
+    auto operator==(const RawStmtSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
 };
 
-struct ReadSynonym {
+class ReadSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "read";
-    IDENT name;
+
+    explicit ReadSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit ReadSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const ReadSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct PrintSynonym {
+class PrintSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "print";
-    IDENT name;
+
+    explicit PrintSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit PrintSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const PrintSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct CallSynonym {
+class CallSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "call";
-    IDENT name;
+
+    explicit CallSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit CallSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const CallSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct WhileSynonym {
+class WhileSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "while";
-    IDENT name;
+
+    explicit WhileSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit WhileSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const WhileSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct IfSynonym {
+class IfSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "if";
-    IDENT name;
+
+    explicit IfSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit IfSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const IfSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct AssignSynonym {
-    static constexpr auto keyword = "assign";
+class AssignSynonym {
     IDENT name;
+
+  public:
+    static constexpr auto keyword = "assign";
+
+    explicit AssignSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit AssignSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const AssignSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
 using StmtSynonym =
     std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym, AssignSynonym>;
 
-struct VarSynonym {
+class VarSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "variable";
-    IDENT name;
+
+    explicit VarSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit VarSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const VarSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct ConstSynonym {
+class ConstSynonym {
+    IDENT name;
+
+  public:
     static constexpr auto keyword = "constant";
-    IDENT name;
+
+    explicit ConstSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit ConstSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const ConstSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
-struct ProcSynonym {
-    static constexpr auto keyword = "procedure";
+class ProcSynonym {
     IDENT name;
+
+  public:
+    static constexpr auto keyword = "procedure";
+
+    explicit ProcSynonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit ProcSynonym(std::string name) : name(std::move(name)) {
+    }
+
+    auto operator==(const ProcSynonym& rhs) const -> bool {
+        return name == rhs.name;
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
 };
 
 using Synonym = std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym,
@@ -100,7 +260,21 @@ inline auto operator==(const Synonym& lhs, const Synonym& rhs) -> bool {
             using TL = std::decay_t<decltype(lhs)>;
             using TR = std::decay_t<decltype(rhs)>;
             if constexpr (std::is_same_v<TL, TR>) {
-                return lhs.name == rhs.name;
+                return lhs.get_name() == rhs.get_name();
+            } else {
+                return false;
+            }
+        },
+        lhs, rhs);
+}
+
+inline auto operator==(const StmtSynonym& lhs, const StmtSynonym& rhs) -> bool {
+    return std::visit(
+        [](auto&& lhs, auto&& rhs) {
+            using TL = std::decay_t<decltype(lhs)>;
+            using TR = std::decay_t<decltype(rhs)>;
+            if constexpr (std::is_same_v<TL, TR>) {
+                return lhs.get_name() == rhs.get_name();
             } else {
                 return false;
             }
@@ -109,52 +283,52 @@ inline auto operator==(const Synonym& lhs, const Synonym& rhs) -> bool {
 }
 
 inline auto operator<<(std::ostream& os, const RawStmtSynonym& stmt_syn) -> std::ostream& {
-    os << "RawStmtSynonym(" << stmt_syn.name << ")";
+    os << "RawStmtSynonym(" << stmt_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const ReadSynonym& read_syn) -> std::ostream& {
-    os << "ReadSynonym(" << read_syn.name << ")";
+    os << "ReadSynonym(" << read_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const PrintSynonym& print_syn) -> std::ostream& {
-    os << "PrintSynonym(" << print_syn.name << ")";
+    os << "PrintSynonym(" << print_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const CallSynonym& call_syn) -> std::ostream& {
-    os << "CallSynonym(" << call_syn.name << ")";
+    os << "CallSynonym(" << call_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const WhileSynonym& while_syn) -> std::ostream& {
-    os << "WhileSynonym(" << while_syn.name << ")";
+    os << "WhileSynonym(" << while_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const IfSynonym& if_syn) -> std::ostream& {
-    os << "IfSynonym(" << if_syn.name << ")";
+    os << "IfSynonym(" << if_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const AssignSynonym& assign_syn) -> std::ostream& {
-    os << "AssignSynonym(" << assign_syn.name << ")";
+    os << "AssignSynonym(" << assign_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const VarSynonym& var_syn) -> std::ostream& {
-    os << "VarSynonym(" << var_syn.name << ")";
+    os << "VarSynonym(" << var_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const ConstSynonym& const_syn) -> std::ostream& {
-    os << "ConstSynonym(" << const_syn.name << ")";
+    os << "ConstSynonym(" << const_syn.get_name() << ")";
     return os;
 }
 
 inline auto operator<<(std::ostream& os, const ProcSynonym& proc_syn) -> std::ostream& {
-    os << "ProcSynonym(" << proc_syn.name << ")";
+    os << "ProcSynonym(" << proc_syn.get_name() << ")";
     return os;
 }
 
@@ -174,6 +348,20 @@ using EntRef = std::variant<WildCard, Synonym, QuotedIdent>;
 using Synonyms = std::vector<Synonym>;
 
 // Helper functions
+inline auto operator==(const StmtRef& lhs, const StmtRef& rhs) -> bool {
+    return std::visit(
+        [](auto&& lhs, auto&& rhs) {
+            using TL = std::decay_t<decltype(lhs)>;
+            using TR = std::decay_t<decltype(rhs)>;
+            if constexpr (std::is_same_v<TL, TR>) {
+                return lhs == rhs;
+            } else {
+                return false;
+            }
+        },
+        lhs, rhs);
+}
+
 template <typename T>
 auto is_synonym(const T& syn) -> bool {
     return std::holds_alternative<Synonym>(syn);

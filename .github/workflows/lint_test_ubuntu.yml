@@ -1,6 +1,6 @@
 name: "Ubuntu: Lint cpp/h files and test"
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   run-linters:
@@ -13,16 +13,20 @@ jobs:
 
       - name: Setup CMake
         run: sudo apt install -y cmake
+      
+      - name: Setup Clang
+        run: sudo apt install -y llvm
 
       - name: Build cmake
         run: |
           cd Team11/Code11
           mkdir build
           cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
           make -j4
 
       - name: Run linters
+        if: ${{ github.event_name == 'push' }}
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -32,7 +36,25 @@ jobs:
           version: 16
           repo-root: "Team11/Code11"
           database: "build/compile_commands.json"
-          ignore: "build | lib | cmake | src/autotester_gui"
+          ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
+          files-changed-only: false
+          tidy-checks: "-*"
+          step-summary: true
+      
+      - name: Run linters and analyser
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter_and_analyser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          version: 16
+          repo-root: "Team11/Code11"
+          database: "build/compile_commands.json"
+          ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
+          files-changed-only: false
+          tidy-checks: "-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return"
           step-summary: true
 
       - name: Check linter status

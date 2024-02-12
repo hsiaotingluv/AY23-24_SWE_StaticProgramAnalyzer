@@ -11,7 +11,7 @@ namespace tokenizer {
  */
 class LAndTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "&&", TokenType::LAnd);
     }
 };
@@ -21,7 +21,7 @@ class LAndTokenizer : public Tokenizer {
  */
 class LOrTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "||", TokenType::LOr);
     }
 };
@@ -31,7 +31,7 @@ class LOrTokenizer : public Tokenizer {
  */
 class LNotTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "!", TokenType::LNot);
     }
 };
@@ -45,7 +45,7 @@ class SPLogicalTokenizer : public Tokenizer {
         std::make_shared<LNotTokenizer>(), std::make_shared<LOrTokenizer>(), std::make_shared<LAndTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

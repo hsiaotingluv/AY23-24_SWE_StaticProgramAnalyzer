@@ -10,7 +10,7 @@ namespace tokenizer {
  */
 class LParenTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "(", TokenType::LParen);
     }
 };
@@ -20,7 +20,7 @@ class LParenTokenizer : public Tokenizer {
  */
 class RParenTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, ")", TokenType::RParen);
     }
 };
@@ -30,7 +30,7 @@ class RParenTokenizer : public Tokenizer {
  */
 class SemicolonTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, ";", TokenType::Semicolon);
     }
 };

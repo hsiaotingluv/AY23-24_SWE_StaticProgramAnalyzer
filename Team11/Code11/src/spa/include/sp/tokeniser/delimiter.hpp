@@ -12,7 +12,7 @@ namespace tokenizer {
  */
 class LCurlyTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "{", TokenType::LCurly);
     }
 };
@@ -22,7 +22,7 @@ class LCurlyTokenizer : public Tokenizer {
  */
 class RCurlyTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "}", TokenType::RCurly);
     }
 };
@@ -37,7 +37,7 @@ class SPDelimiterTokenizer : public Tokenizer {
         std::make_shared<RCurlyTokenizer>(), std::make_shared<SemicolonTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

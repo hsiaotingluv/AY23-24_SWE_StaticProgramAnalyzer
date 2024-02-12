@@ -13,7 +13,9 @@ void UsesStore::addStatementUsesVar(const StatementNumber& s, const Variable& v)
 };
 
 bool UsesStore::doesStatementUseVar(const StatementNumber& s, const Variable& v) {
-    if (statementUsesVarStore.find(s) == statementUsesVarStore.end()) return false;
+    if (statementUsesVarStore.find(s) == statementUsesVarStore.end()) {
+        return false;
+    }
 
     auto relevantSet = statementUsesVarStore.at(s);
 
@@ -21,7 +23,9 @@ bool UsesStore::doesStatementUseVar(const StatementNumber& s, const Variable& v)
 }
 
 bool UsesStore::doesProcedureUseVar(const Procedure& p, const Variable& v) {
-    if (procedureUsesVarStore.find(p) == procedureUsesVarStore.end()) return false;
+    if (procedureUsesVarStore.find(p) == procedureUsesVarStore.end()) {
+        return false;
+    }
 
     auto relevantSet = procedureUsesVarStore.at(p);
 
@@ -29,13 +33,17 @@ bool UsesStore::doesProcedureUseVar(const Procedure& p, const Variable& v) {
 }
 
 std::unordered_set<Variable> UsesStore::getVarsUsedByStatement(const StatementNumber& s) {
-    if (statementUsesVarStore.find(s) == statementUsesVarStore.end()) return std::unordered_set<Variable>{};
+    if (statementUsesVarStore.find(s) == statementUsesVarStore.end()) {
+        return std::unordered_set<Variable>{};
+    }
 
     return statementUsesVarStore.at(s);
 };
 
 std::unordered_set<Variable> UsesStore::getVarsUsedByProcedure(const Procedure& p) {
-    if (procedureUsesVarStore.find(p) == procedureUsesVarStore.end()) return std::unordered_set<Variable>{};
+    if (procedureUsesVarStore.find(p) == procedureUsesVarStore.end()) {
+        return std::unordered_set<Variable>{};
+    }
 
     return procedureUsesVarStore.at(p);
 };
@@ -55,5 +63,3 @@ std::unordered_set<Procedure> UsesStore::getProceduresThatUseVar(const Variable&
 
     return reverseProcedureUsesVarStore.at(v);
 };
-
-

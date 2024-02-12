@@ -21,11 +21,11 @@ class StatementNode : public sp::AstNode {
         this->statement_number = statement_number;
     }
 
-    auto get_statement_number() -> uint32_t {
-        return statement_number.value();
+    [[nodiscard]] auto get_statement_number() const -> int {
+        return statement_number.value_or(-1);
     }
 
-    auto has_statement_number() -> bool {
+    [[nodiscard]] auto has_statement_number() const -> bool {
         return statement_number.has_value();
     }
 };

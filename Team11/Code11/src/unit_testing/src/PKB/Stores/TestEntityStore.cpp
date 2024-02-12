@@ -1,5 +1,5 @@
-#include <catch.hpp>
 #include "PKB/Stores/EntityStore.h"
+#include <catch.hpp>
 
 TEST_CASE("EntityStore Tests") {
     EntityStore entityStore;

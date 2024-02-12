@@ -25,6 +25,10 @@ struct Follows {
     }
 
     friend auto operator<<(std::ostream& os, const Follows& follows) -> std::ostream&;
+
+    auto operator==(const Follows& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
 };
 
 struct FollowsT {
@@ -45,6 +49,10 @@ struct FollowsT {
     }
 
     friend auto operator<<(std::ostream& os, const FollowsT& followsT) -> std::ostream&;
+
+    auto operator==(const FollowsT& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
 };
 
 struct Parent {
@@ -65,6 +73,10 @@ struct Parent {
     }
 
     friend auto operator<<(std::ostream& os, const Parent& parent) -> std::ostream&;
+
+    auto operator==(const Parent& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
 };
 
 struct ParentT {
@@ -86,6 +98,10 @@ struct ParentT {
     }
 
     friend auto operator<<(std::ostream& os, const ParentT& parentT) -> std::ostream&;
+
+    auto operator==(const ParentT& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
 };
 
 struct UsesS {
@@ -106,6 +122,10 @@ struct UsesS {
     }
 
     friend auto operator<<(std::ostream& os, const UsesS& usesS) -> std::ostream&;
+
+    auto operator==(const UsesS& other) const -> bool {
+        return stmt == other.stmt && ent == other.ent;
+    }
 };
 
 struct UsesP {
@@ -126,6 +146,10 @@ struct UsesP {
     }
 
     friend auto operator<<(std::ostream& os, const UsesP& usesP) -> std::ostream&;
+
+    auto operator==(const UsesP& other) const -> bool {
+        return ent1 == other.ent1 && ent2 == other.ent2;
+    }
 };
 
 struct ModifiesS {
@@ -146,6 +170,10 @@ struct ModifiesS {
     }
 
     friend auto operator<<(std::ostream& os, const ModifiesS& modifiesS) -> std::ostream&;
+
+    auto operator==(const ModifiesS& other) const -> bool {
+        return stmt == other.stmt && ent == other.ent;
+    }
 };
 
 struct ModifiesP {
@@ -167,7 +195,11 @@ struct ModifiesP {
     ModifiesP(EntRef ent1, EntRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
     }
 
-    friend auto operator<<(std::ostream& os, const ModifiesP& usesP) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream&;
+
+    auto operator==(const ModifiesP& other) const -> bool {
+        return ent1 == other.ent1 && ent2 == other.ent2;
+    }
 };
 
 using Relationship = std::variant<Follows, FollowsT, Parent, ParentT, UsesS, UsesP, ModifiesS, ModifiesP>;

@@ -4,15 +4,25 @@
 #include <string>
 
 namespace qps {
-struct WildCard {
+class WildCard {
+  public:
     friend auto operator<<(std::ostream& os, const WildCard& wildCard) -> std::ostream& {
         os << "_";
         return os;
     }
+
+    friend auto operator==(const WildCard& lhs, const WildCard& rhs) -> bool {
+        return true;
+    }
 };
 
-struct IDENT {
+class IDENT {
+  private:
     std::string value;
+
+  public:
+    explicit IDENT(std::string value) : value(std::move(value)) {
+    }
 
     friend auto operator<<(std::ostream& os, const IDENT& ident) -> std::ostream& {
         os << ident.value;
@@ -20,20 +30,24 @@ struct IDENT {
     }
 
     friend auto operator==(const IDENT& lhs, const IDENT& rhs) -> bool {
-        return lhs.value.compare(rhs.value) == 0;
+        return lhs.value == rhs.value;
     }
 
     friend auto operator==(const IDENT& lhs, const std::string& rhs) -> bool {
-        return lhs.value.compare(rhs) == 0;
+        return lhs.value == rhs;
     }
 
     friend auto operator==(const std::string& lhs, const IDENT& rhs) -> bool {
-        return lhs.compare(rhs.value) == 0;
+        return lhs == rhs.value;
     }
 };
 
-struct QuotedIdent {
+class QuotedIdent {
     std::string value;
+
+  public:
+    explicit QuotedIdent(std::string value) : value(std::move(value)) {
+    }
 
     friend auto operator<<(std::ostream& os, const QuotedIdent& quotedIdent) -> std::ostream& {
         os << "\"" << quotedIdent.value << "\"";
@@ -41,15 +55,15 @@ struct QuotedIdent {
     }
 
     friend auto operator==(const QuotedIdent& lhs, const QuotedIdent& rhs) -> bool {
-        return lhs.value.compare(rhs.value) == 0;
+        return lhs.value == rhs.value;
     }
 
     friend auto operator==(const QuotedIdent& lhs, const std::string& rhs) -> bool {
-        return lhs.value.compare(rhs) == 0;
+        return lhs.value == rhs;
     }
 
     friend auto operator==(const std::string& lhs, const QuotedIdent& rhs) -> bool {
-        return lhs.compare(rhs.value) == 0;
+        return lhs == rhs.value;
     }
 };
 

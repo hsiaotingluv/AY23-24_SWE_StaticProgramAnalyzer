@@ -25,22 +25,22 @@ struct ParserSuccess {
 struct Query {
     Synonyms declared;
     Synonym reference;
-    Clauses clauses;
+    std::vector<std::shared_ptr<Clause>> clauses;
 
-    Query(Synonyms declared, Synonym reference, Clauses clauses)
+    Query(Synonyms declared, Synonym reference, std::vector<std::shared_ptr<Clause>> clauses)
         : declared(std::move(declared)), reference(std::move(reference)), clauses(std::move(clauses)) {
     }
 
-    friend auto operator<<(std::ostream& os, const Query& query) -> std::ostream& {
+    auto operator<<(std::ostream& os) -> std::ostream& {
         os << "Query:\n";
         os << "\tDeclared:\n";
-        for (const auto& declared : query.declared) {
+        for (const auto& declared : declared) {
             os << "\t\t" << declared << "\n";
         }
         os << "\tReference:\n";
-        os << "\t\t" << query.reference << "\n";
+        os << "\t\t" << reference << "\n";
         os << "\tClauses:\n";
-        for (const auto& clause : query.clauses) {
+        for (const auto& clause : clauses) {
             os << "\t\t" << clause << "\n";
         }
         return os;
@@ -56,16 +56,17 @@ class QueryProcessingSystemParser {
     static auto parse(std::string query) -> std::optional<Query>;
 };
 
-auto parse_declarations(std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<Synonyms, std::vector<Token>::iterator>>;
-auto parse_reference(const Synonyms& declared, std::vector<Token>::iterator it, const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<Synonym, std::vector<Token>::iterator>>;
-auto parse_such_that_clause(const Synonyms& declared, std::vector<Token>::iterator it,
-                            const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<SuchThatClause, std::vector<Token>::iterator>>;
-auto parse_pattern_clause(const Synonyms& declared, std::vector<Token>::iterator it,
-                          const std::vector<Token>::iterator& end)
-    -> std::optional<std::tuple<PatternClause, std::vector<Token>::iterator>>;
+auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>>;
+auto parse_reference(const Synonyms& declared, std::vector<Token>::const_iterator it,
+                     const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<Synonym, std::vector<Token>::const_iterator>>;
+auto parse_such_that_clause(const Synonyms& declared, std::vector<Token>::const_iterator it,
+                            const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<std::shared_ptr<SuchThatClause>, std::vector<Token>::const_iterator>>;
+auto parse_pattern_clause(const Synonyms& declared, std::vector<Token>::const_iterator it,
+                          const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<std::shared_ptr<PatternClause>, std::vector<Token>::const_iterator>>;
 
 template <typename... T>
 struct TypeList {};

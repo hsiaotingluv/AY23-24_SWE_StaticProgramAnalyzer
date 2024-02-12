@@ -13,7 +13,9 @@ void ModifiesStore::addStatementModifiesVar(const StatementNumber& s, const Vari
 };
 
 bool ModifiesStore::doesStatementModifyVar(const StatementNumber& s, const Variable& v) {
-    if (statementModifiesVarStore.find(s) == statementModifiesVarStore.end()) return false;
+    if (statementModifiesVarStore.find(s) == statementModifiesVarStore.end()) {
+        return false;
+    }
 
     auto relevantSet = statementModifiesVarStore.at(s);
 
@@ -21,7 +23,9 @@ bool ModifiesStore::doesStatementModifyVar(const StatementNumber& s, const Varia
 }
 
 bool ModifiesStore::doesProcedureModifyVar(const Procedure& p, const Variable& v) {
-    if (procedureModifiesVarStore.find(p) == procedureModifiesVarStore.end()) return false;
+    if (procedureModifiesVarStore.find(p) == procedureModifiesVarStore.end()) {
+        return false;
+    }
 
     auto relevantSet = procedureModifiesVarStore.at(p);
 
@@ -29,13 +33,17 @@ bool ModifiesStore::doesProcedureModifyVar(const Procedure& p, const Variable& v
 }
 
 std::unordered_set<Variable> ModifiesStore::getVarsModifiedByStatement(const StatementNumber& s) {
-    if (statementModifiesVarStore.find(s) == statementModifiesVarStore.end()) return std::unordered_set<Variable>{};
+    if (statementModifiesVarStore.find(s) == statementModifiesVarStore.end()) {
+        return std::unordered_set<Variable>{};
+    }
 
     return statementModifiesVarStore.at(s);
 };
 
 std::unordered_set<Variable> ModifiesStore::getVarsModifiedByProcedure(const Procedure& p) {
-    if (procedureModifiesVarStore.find(p) == procedureModifiesVarStore.end()) return std::unordered_set<Variable>{};
+    if (procedureModifiesVarStore.find(p) == procedureModifiesVarStore.end()) {
+        return std::unordered_set<Variable>{};
+    }
 
     return procedureModifiesVarStore.at(p);
 };
@@ -55,5 +63,3 @@ std::unordered_set<Procedure> ModifiesStore::getProceduresThatModifyVar(const Va
 
     return reverseProcedureModifiesVarStore.at(v);
 };
-
-

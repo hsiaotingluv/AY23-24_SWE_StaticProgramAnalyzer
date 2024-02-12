@@ -6,6 +6,6 @@ using namespace tokenizer;
 
 class WildCardTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override;
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override;
 };
 } // namespace qps

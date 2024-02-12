@@ -11,7 +11,7 @@ namespace tokenizer {
  */
 class LessThanTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "<", TokenType::LessThan);
     }
 };
@@ -21,7 +21,7 @@ class LessThanTokenizer : public Tokenizer {
  */
 class LessThanEqualTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "<=", TokenType::LessThanEqual);
     }
 };
@@ -31,7 +31,7 @@ class LessThanEqualTokenizer : public Tokenizer {
  */
 class GreaterThanTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, ">", TokenType::GreaterThan);
     }
 };
@@ -41,7 +41,7 @@ class GreaterThanTokenizer : public Tokenizer {
  */
 class GreaterThanEqualTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, ">=", TokenType::GreaterThanEqual);
     }
 };
@@ -51,7 +51,7 @@ class GreaterThanEqualTokenizer : public Tokenizer {
  */
 class DoubleEqualTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "==", TokenType::DoubleEqual);
     }
 };
@@ -61,7 +61,7 @@ class DoubleEqualTokenizer : public Tokenizer {
  */
 class NotEqualTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "!=", TokenType::NotEqual);
     }
 };
@@ -71,7 +71,7 @@ class NotEqualTokenizer : public Tokenizer {
  */
 class AssignmentTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "=", TokenType::Assignment);
     }
 };
@@ -88,7 +88,7 @@ class SPRelationalTokenizer : public Tokenizer {
         std::make_shared<AssignmentTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

@@ -1,8 +1,8 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "sp/parser/ast/statement_list_ast.hpp"
 #include "sp/parser/statement_list_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/parser/ast/statement_list_ast.hpp"
 #include <memory>
 
 using namespace sp;

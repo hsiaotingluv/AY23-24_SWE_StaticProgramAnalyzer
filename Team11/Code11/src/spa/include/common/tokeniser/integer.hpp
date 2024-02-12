@@ -12,7 +12,7 @@ namespace tokenizer {
  */
 class ZeroTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "0", TokenType::Integer);
     }
 };
@@ -22,8 +22,8 @@ class ZeroTokenizer : public Tokenizer {
  */
 class NotZeroDigitTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
-        if (input.empty() || !std::isdigit(input[0]) || input[0] == '0') {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        if (input.empty() || std::isdigit(input[0]) == 0 || input[0] == '0') {
             return std::nullopt;
         }
 
@@ -40,7 +40,7 @@ class DigitTokenizer : public Tokenizer {
         std::make_shared<NotZeroDigitTokenizer>(), std::make_shared<ZeroTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };
@@ -53,7 +53,7 @@ class SomeDigitTokenizer : public Tokenizer {
     static inline const auto digit_tokenizer = std::make_shared<DigitTokenizer>();
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return zero_or_more(input, digit_tokenizer, TokenType::Integer);
     }
 };
@@ -67,7 +67,7 @@ class NoLeadingZeroTokenizer : public Tokenizer {
         std::make_shared<NotZeroDigitTokenizer>(), std::make_shared<SomeDigitTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return all_of(input, tokenizers.begin(), tokenizers.end());
     }
 };
@@ -81,7 +81,7 @@ class IntegerTokenizer : public Tokenizer {
         std::make_shared<NoLeadingZeroTokenizer>(), std::make_shared<ZeroTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

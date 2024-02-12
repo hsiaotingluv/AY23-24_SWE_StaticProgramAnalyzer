@@ -11,7 +11,7 @@ namespace tokenizer {
  */
 class AddTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "+", TokenType::Add);
     }
 };
@@ -21,7 +21,7 @@ class AddTokenizer : public Tokenizer {
  */
 class SubTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "-", TokenType::Sub);
     }
 };
@@ -31,7 +31,7 @@ class SubTokenizer : public Tokenizer {
  */
 class MulTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "*", TokenType::Mul);
     }
 };
@@ -41,7 +41,7 @@ class MulTokenizer : public Tokenizer {
  */
 class DivTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "/", TokenType::Div);
     }
 };
@@ -51,7 +51,7 @@ class DivTokenizer : public Tokenizer {
  */
 class ModTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "%", TokenType::Mod);
     }
 };
@@ -66,7 +66,7 @@ class BinopTokenizer : public Tokenizer {
         std::make_shared<DivTokenizer>(), std::make_shared<ModTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

@@ -20,6 +20,6 @@ class QueryProcessingSystemTokenizer : public Tokenizer {
         std::make_shared<BinopTokenizer>(),        std::make_shared<WildCardTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override;
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override;
 };
 } // namespace qps

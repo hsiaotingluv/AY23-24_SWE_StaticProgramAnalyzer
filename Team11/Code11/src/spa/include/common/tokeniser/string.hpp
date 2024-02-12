@@ -11,8 +11,8 @@ namespace tokenizer {
  */
 class LetterTokenizer : public Tokenizer {
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
-        if (input.empty() || !std::isalpha(input[0])) {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        if (input.empty() || std::isalpha(input[0]) == 0) {
             return std::nullopt;
         }
 
@@ -29,7 +29,7 @@ class DigitOrLetterTokenizer : public Tokenizer {
         std::make_shared<DigitTokenizer>(), std::make_shared<LetterTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };
@@ -42,7 +42,7 @@ class SomeDigitOrLetterTokenizer : public Tokenizer {
     static inline const auto digit_tokenizer = std::make_shared<DigitOrLetterTokenizer>();
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return zero_or_more(input, digit_tokenizer, TokenType::String);
     }
 };
@@ -56,7 +56,7 @@ class StringTokenizer : public Tokenizer {
         std::make_shared<LetterTokenizer>(), std::make_shared<SomeDigitOrLetterTokenizer>()};
 
   public:
-    [[nodiscard]] auto tokenize(const TokeniserInput &input) const -> TokeniserOutput override {
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return all_of(input, tokenizers.begin(), tokenizers.end());
     }
 };

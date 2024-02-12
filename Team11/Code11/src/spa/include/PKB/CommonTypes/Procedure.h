@@ -6,9 +6,11 @@
 
 class Procedure : public Entity {
   public:
-    explicit Procedure(std::string name) : Entity(std::move(name)) {}
+    explicit Procedure(std::string name) : Entity(std::move(name)) {
+    }
 };
 
 namespace std {
-    template<> struct hash<Procedure> : Entity::HashFunction {};
-};
+template <>
+struct hash<Procedure> : Entity::HashFunction {};
+}; // namespace std

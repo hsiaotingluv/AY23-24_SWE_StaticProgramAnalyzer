@@ -103,7 +103,6 @@ TEST_CASE("CallsStore Tests") {
         REQUIRE(starCallees.find("Utils") != starCallees.end());
         REQUIRE(starCallees.find("Logger") != starCallees.end());
         REQUIRE(starCallees.find("Main") == starCallees.end());
-
     }
 
     SECTION("Retrieving All Transitive Callers") {

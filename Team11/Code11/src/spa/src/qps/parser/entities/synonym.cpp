@@ -36,7 +36,7 @@ auto get_stmt_synonym(Synonym synonym) -> std::optional<StmtSynonym> {
         [](auto&& x) -> std::optional<StmtSynonym> {
             using T = std::decay_t<decltype(x)>;
             if constexpr (is_one_of<T, StmtSynonym>()) {
-                return T{x.name};
+                return T{x.get_name()};
             }
 
             return std::nullopt;
@@ -48,7 +48,7 @@ auto find_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::o
     const auto syn_it = std::find_if(declared_synonyms.begin(), declared_synonyms.end(), [&syn_name](auto&& x) -> bool {
         return std::visit(
             [&syn_name](const auto& decl) -> bool {
-                return decl.name == syn_name;
+                return decl.get_name() == syn_name;
             },
             x);
     });
@@ -56,7 +56,7 @@ auto find_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::o
 }
 
 auto find_stmt_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::optional<StmtSynonym> {
-    const auto maybe_syn = find_syn(declared_synonyms, syn_name);
+    const auto maybe_syn = find_syn(declared_synonyms, std::move(syn_name));
     if (!maybe_syn.has_value() || !is_stmt_synonym(maybe_syn.value())) {
         return std::nullopt;
     }

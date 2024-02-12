@@ -1,12 +1,12 @@
 #pragma once
 
-#include <unordered_set>
 #include <string>
+#include <unordered_set>
 #include <utility>
 
 class Statement {
   public:
-    explicit Statement(std::string stmt_no) : stmt_no(std::move(stmt_no)) {};
+    explicit Statement(std::string stmt_no) : stmt_no(std::move(stmt_no)){};
 
     bool operator==(Statement const& other) const {
         return stmt_no == other.stmt_no;
@@ -23,5 +23,6 @@ class Statement {
 };
 
 namespace std {
-    template<> struct hash<Statement> : Statement::HashFunction {};
-};
+template <>
+struct hash<Statement> : Statement::HashFunction {};
+}; // namespace std
