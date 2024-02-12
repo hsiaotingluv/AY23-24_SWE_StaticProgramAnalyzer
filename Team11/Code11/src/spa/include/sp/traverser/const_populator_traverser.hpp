@@ -8,7 +8,7 @@ namespace sp {
 class ConstPopulatorTraverser : public Traverser {
     std::shared_ptr<WriteFacade> write_facade;
 
-    static bool is_const_node(const std::shared_ptr<AstNode>& node);
+    static auto is_const_node(const std::shared_ptr<AstNode>& node) -> bool;
 
   public:
     explicit ConstPopulatorTraverser(std::shared_ptr<WriteFacade> write_facade)

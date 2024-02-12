@@ -65,7 +65,8 @@ auto print_stmt_num(const std::shared_ptr<sp::AstNode>& node) -> void {
 }
 
 TEST_CASE("Test Statement Number Traverser") {
-    auto tokenizer_runner = tokenizer::TokenizerRunner{std::make_unique<sp::SourceProcessorTokenizer>(), true};
+    auto tokenizer_runner =
+        std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
     std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>()};
     auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};

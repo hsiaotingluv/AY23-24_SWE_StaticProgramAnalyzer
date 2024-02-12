@@ -1,4 +1,12 @@
 #include "TestWrapper.h"
+#include "sp/main.hpp"
+
+#include "qps/evaluators/simple_evaluator.hpp"
+
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <stdexcept>
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper* WrapperFactory::wrapper = nullptr;
@@ -12,17 +20,53 @@ auto WrapperFactory::createWrapper() -> AbstractWrapper* {
 // Do not modify the following line
 volatile bool AbstractWrapper::GlobalStop = false;
 
-// method for parsing the SIMPLE source
-void TestWrapper::parse(std::string filename) {
-    // call your parser to do the parsing
-    // ...rest of your code...
+TestWrapper::TestWrapper() {
+
+    // TODO: replace the following line once PKB factory is merged
+    auto pkb = std::make_shared<PKB>();
+    readFacade = std::make_shared<ReadFacade>(pkb);
+    writeFacade = std::make_shared<WriteFacade>(pkb);
+
+    source_processor = sp::SourceProcessor::get_complete_sp(writeFacade);
+    qps_parser = std::make_shared<qps::QueryProcessingSystemParser>();
 }
 
-// method to evaluating a query
-void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
-    // call your evaluator to evaluate the query here
-    // ...code to evaluate query...
+auto TestWrapper::load_file(const std::string& filename) -> std::string {
+    auto path = std::filesystem::path{filename};
+    if (!std::filesystem::exists(path)) {
+        throw std::runtime_error("Error: File does not exist");
+    }
 
-    // store the answers to the query in the results list (it is initially empty)
-    // each result must be a string.
+    std::ifstream file{path};
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Error: Unable to open file");
+    }
+
+    return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+}
+
+void TestWrapper::parse(std::string filename) {
+    auto input = load_file(filename);
+    auto ast = source_processor->process(input);
+}
+
+void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
+    const auto maybe_query_obj = qps_parser->parse(query);
+    if (!maybe_query_obj) {
+        results.emplace_back("Error: Invalid query");
+        return;
+    }
+
+    const auto query_obj = maybe_query_obj.value();
+
+    // TODO: Remove this check once clauses are supported by evaluator
+    if (!query_obj.clauses.empty()) {
+        throw std::runtime_error("QPS: query with non-empty clause is currently not supported");
+    }
+
+    const auto query_results = qps::stub::evaluate(query_obj, readFacade);
+    for (const auto& result : query_results) {
+        results.emplace_back(result);
+    }
 }

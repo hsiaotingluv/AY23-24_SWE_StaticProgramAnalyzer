@@ -1,12 +1,10 @@
 #pragma once
 
 #include "sp/parser/ast/node_type.hpp"
+
 #include <iostream>
 #include <memory>
-#include <optional>
 #include <sstream>
-#include <string>
-#include <utility>
 #include <vector>
 
 namespace sp {

@@ -2,6 +2,8 @@
 
 #include "sp/parser/ast/ast.hpp"
 
+#include <optional>
+
 /* These nodes follow the specs on
  * https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/abstract-syntax-tree.html
  * It means that variable is not stored as a new name node, but as the content of read node itself

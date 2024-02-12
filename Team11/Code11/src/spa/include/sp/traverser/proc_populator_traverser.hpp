@@ -8,7 +8,7 @@ namespace sp {
 class ProcedurePopulatorTraverser : public Traverser {
     std::shared_ptr<WriteFacade> write_facade;
 
-    static bool is_proc_node(const std::shared_ptr<AstNode>& node);
+    static auto is_proc_node(const std::shared_ptr<AstNode>& node) -> bool;
 
   public:
     explicit ProcedurePopulatorTraverser(std::shared_ptr<WriteFacade> write_facade)

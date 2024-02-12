@@ -6,7 +6,8 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
 
 TEST_CASE("Test SP") {
-    auto tokenizer_runner = tokenizer::TokenizerRunner{std::make_unique<sp::SourceProcessorTokenizer>(), true};
+    auto tokenizer_runner =
+        std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
     std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>()};
     auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
