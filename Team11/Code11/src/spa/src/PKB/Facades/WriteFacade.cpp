@@ -23,8 +23,8 @@ void WriteFacade::addConstant(std::string constant) {
     this->pkb->entity_store->addConstant(c);
 }
 
-void WriteFacade::addStatement(Statement& statement) {
-    // TODO: Replace with actual implementation for addStatement
+void WriteFacade::addStatement(const std::string& statementNumber, StatementType statementType) {
+    this->pkb->statement_store->addStatement(statementNumber, statementType);
 }
 
 void WriteFacade::addStatementModifiesVar(const std::string& statementNumber, std::string variable) {

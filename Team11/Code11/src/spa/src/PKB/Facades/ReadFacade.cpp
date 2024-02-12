@@ -58,53 +58,45 @@ std::unordered_set<std::string> ReadFacade::getConstants() {
     return temp;
 }
 
-std::unordered_set<Statement> ReadFacade::getStatements() {
-    // TODO: Replace with actual implementation for getStatements
-    return std::unordered_set<Statement>{Statement("Statement1"), Statement("Statement2"), Statement("Statement3")};
+std::unordered_set<std::string> ReadFacade::getAllStatements() {
+    return this->pkb->statement_store->getStatements();
 }
 
-std::unordered_set<Statement> ReadFacade::getAssignStatements() {
-    // TODO: Replace with actual implementation for getAssignStatements
-    return std::unordered_set<Statement>{Statement("AssignStatement1"), Statement("AssignStatement2"),
-                                         Statement("AssignStatement3")};
+std::unordered_set<std::string> ReadFacade::getRawStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::RAW);
 }
 
-std::unordered_set<Statement> ReadFacade::getIfStatements() {
-    // TODO: Replace with actual implementation for getIfStatements
-    return std::unordered_set<Statement>{Statement("IfStatement1"), Statement("IfStatement2"),
-                                         Statement("IfStatement3")};
+std::unordered_set<std::string> ReadFacade::getAssignStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::ASSIGN);
 }
 
-std::unordered_set<Statement> ReadFacade::getWhileStatements() {
-    // TODO: Replace with actual implementation for getWhileStatements
-    return std::unordered_set<Statement>{Statement("WhileStatement1"), Statement("WhileStatement2"),
-                                         Statement("WhileStatement3")};
+std::unordered_set<std::string> ReadFacade::getIfStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::IF);
 }
 
-std::unordered_set<Statement> ReadFacade::getReadStatements() {
-    // TODO: Replace with actual implementation for getReadStatements
-    return std::unordered_set<Statement>{Statement("ReadStatement1"), Statement("ReadStatement2"),
-                                         Statement("ReadStatement3")};
+std::unordered_set<std::string> ReadFacade::getWhileStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::WHILE);
 }
 
-std::unordered_set<Statement> ReadFacade::getPrintStatements() {
-    // TODO: Replace with actual implementation for getPrintStatements
-    return std::unordered_set<Statement>{Statement("PrintStatement1"), Statement("PrintStatement2"),
-                                         Statement("PrintStatement3")};
+std::unordered_set<std::string> ReadFacade::getReadStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::READ);
 }
 
-std::unordered_set<Statement> ReadFacade::getCallStatements() {
-    // TODO: Replace with actual implementation for getCallStatements
-    return std::unordered_set<Statement>{Statement("CallStatement1"), Statement("CallStatement2"),
-                                         Statement("CallStatement3")};
+std::unordered_set<std::string> ReadFacade::getPrintStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::PRINT);
+}
+
+std::unordered_set<std::string> ReadFacade::getCallStatements() {
+    return this->pkb->statement_store->getStatementsOfType(StatementType::CALL);
 }
 
 std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(const std::string& s) {
     auto variables = this->pkb->modifies_store->getVarsModifiedByStatement(s);
 
     std::unordered_set<std::string> temp;
-    for (const Variable& v : variables)
+    for (const Variable& v : variables) {
         temp.insert(v.getName());
+    }
 
     return temp;
 }

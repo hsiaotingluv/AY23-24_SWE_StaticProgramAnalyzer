@@ -25,19 +25,21 @@ class ReadFacade {
     std::unordered_set<std::string> getConstants();
 
     // Statement-related Read Operations
-    std::unordered_set<Statement> getStatements();
+    std::unordered_set<std::string> getAllStatements();
 
-    std::unordered_set<Statement> getAssignStatements();
+    std::unordered_set<std::string> getRawStatements();
 
-    std::unordered_set<Statement> getIfStatements();
+    std::unordered_set<std::string> getAssignStatements();
 
-    std::unordered_set<Statement> getWhileStatements();
+    std::unordered_set<std::string> getIfStatements();
 
-    std::unordered_set<Statement> getReadStatements();
+    std::unordered_set<std::string> getWhileStatements();
 
-    std::unordered_set<Statement> getPrintStatements();
+    std::unordered_set<std::string> getReadStatements();
 
-    std::unordered_set<Statement> getCallStatements();
+    std::unordered_set<std::string> getPrintStatements();
+
+    std::unordered_set<std::string> getCallStatements();
 
     // Modifies-related Read Operations
     std::unordered_set<std::string> getVarsModifiedByStatement(const std::string& s);

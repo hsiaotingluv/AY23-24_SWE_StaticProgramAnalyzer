@@ -6,6 +6,7 @@
 #include "PKB/CommonTypes/Statement.h"
 #include "PKB/CommonTypes/Variable.h"
 #include "PKB/PKB.h"
+#include "common/StatementType.h"
 #include <unordered_set>
 
 class WriteFacade {
@@ -20,7 +21,7 @@ class WriteFacade {
 
     void addConstant(std::string constant);
 
-    void addStatement(Statement& statement);
+    void addStatement(const std::string& statementNumber, StatementType type);
 
     void addStatementModifiesVar(const std::string& statementNumber, std::string variable);
 

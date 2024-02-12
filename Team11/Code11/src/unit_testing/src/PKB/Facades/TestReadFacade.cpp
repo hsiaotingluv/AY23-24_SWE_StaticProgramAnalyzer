@@ -19,6 +19,32 @@ TEST_CASE("Simple Entity Test") {
     }
 }
 
+TEST_CASE("Simple Statement Test") {
+    SECTION("Statement Test") {
+        std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+
+        auto readFacade = std::make_shared<ReadFacade>(pkb);
+        auto writeFacade = std::make_shared<WriteFacade>(pkb);
+
+        writeFacade->addStatement("1", StatementType::READ);
+        writeFacade->addStatement("2", StatementType::PRINT);
+        writeFacade->addStatement("3", StatementType::ASSIGN);
+        writeFacade->addStatement("4", StatementType::IF);
+        writeFacade->addStatement("5", StatementType::WHILE);
+        writeFacade->addStatement("6", StatementType::CALL);
+        writeFacade->addStatement("7", StatementType::RAW);
+
+        REQUIRE(readFacade->getAllStatements().size() == 7);
+        REQUIRE(readFacade->getReadStatements().size() == 1);
+        REQUIRE(readFacade->getAssignStatements().size() == 1);
+        REQUIRE(readFacade->getPrintStatements().size() == 1);
+        REQUIRE(readFacade->getIfStatements().size() == 1);
+        REQUIRE(readFacade->getWhileStatements().size() == 1);
+        REQUIRE(readFacade->getCallStatements().size() == 1);
+        REQUIRE(readFacade->getRawStatements().size() == 1);
+    }
+}
+
 TEST_CASE("Simple Modify Test") {
     SECTION("Modify Test") {
         std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
