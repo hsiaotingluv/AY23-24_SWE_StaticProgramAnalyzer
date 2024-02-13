@@ -1,7 +1,7 @@
 #pragma once
 
+#include "common/ast/ast.hpp"
 #include "common/tokeniser/tokenizer.hpp"
-#include "sp/parser/ast/ast.hpp"
 #include "sp/parser/exception/parsing_error.hpp"
 
 #include <memory>

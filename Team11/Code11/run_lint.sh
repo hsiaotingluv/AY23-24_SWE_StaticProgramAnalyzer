@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
 MODE="all" # One of ["all", "sp", "pkb", "qps", "tests"]
+RUN_CLANG_TIDY="true"
 
 usage() {
-    echo "Usage: run_clang_tidy.sh [all|sp|pkb|qps|tests]"
+    echo "Usage: run_lint.sh [all|sp|pkb|qps|tests] (run_clang_tidy: [true|false])"
+    echo "Example ./run_lint.sh all false"
 }
 
 if [ "$#" -eq 0 ]; then
     echo "Running clang-tidy on all files in the project"
 elif [ "$#" -eq 1 ]; then
     MODE=$1
+elif [ "$#" -eq 2 ]; then
+    MODE=$1
+    RUN_CLANG_TIDY=$2
 else
     usage
     exit 1
@@ -28,7 +33,9 @@ run_clang_format() {
 
 run() {
     run_clang_format $1
-    run_clang_tidy $1
+    if test $RUN_CLANG_TIDY = "true"; then
+      run_clang_tidy $1
+    fi
 }
 
 

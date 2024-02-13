@@ -1,6 +1,6 @@
 #include "catch.hpp"
+#include "common/ast/factor_ast.hpp"
 #include "common/tokeniser/runner.hpp"
-#include "sp/parser/ast/factor_ast.hpp"
 #include "sp/parser/constant_parser.hpp"
 #include "sp/parser/factor_parser.hpp"
 #include "sp/parser/name_parser.hpp"

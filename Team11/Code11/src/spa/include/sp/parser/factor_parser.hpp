@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sp/parser/ast/ast.hpp"
+#include "common/ast/ast.hpp"
 #include "sp/parser/constant_parser.hpp"
 #include "sp/parser/expr_parser.hpp"
 #include "sp/parser/name_parser.hpp"

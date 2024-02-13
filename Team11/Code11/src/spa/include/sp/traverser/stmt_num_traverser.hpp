@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PKB/Facades/WriteFacade.h"
-#include "sp/parser/ast/statement_ast.hpp"
+#include "common/ast/statement_ast.hpp"
 #include "sp/traverser/traverser.hpp"
 
 namespace sp {

@@ -1,6 +1,6 @@
 #include "catch.hpp"
+#include "common/ast/procedure_ast.hpp"
 #include "common/tokeniser/runner.hpp"
-#include "sp/parser/ast/procedure_ast.hpp"
 #include "sp/parser/procedure_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>

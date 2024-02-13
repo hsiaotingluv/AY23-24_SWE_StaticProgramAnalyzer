@@ -1,6 +1,6 @@
 #include "sp/parser/rel_expr_parser.hpp"
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/rel_expr_ast.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/rel_expr_ast.hpp"
 
 #include <functional>
 #include <unordered_map>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/node_type.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/node_type.hpp"
 
 /*
  * Dummy token to return empty string parsing

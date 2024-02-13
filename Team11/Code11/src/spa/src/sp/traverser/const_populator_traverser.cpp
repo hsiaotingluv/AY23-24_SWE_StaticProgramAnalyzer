@@ -1,5 +1,5 @@
 #include "sp/traverser/const_populator_traverser.hpp"
-#include "sp/parser/ast/factor_ast.hpp"
+#include "common/ast/factor_ast.hpp"
 #include <memory>
 
 namespace sp {

@@ -1,6 +1,6 @@
 #include "catch.hpp"
+#include "common/ast/node_type.hpp"
 #include "sp/main.hpp"
-#include "sp/parser/ast/node_type.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"

@@ -1,6 +1,6 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/statement_ast.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/statement_ast.hpp"
 #include <memory>
 
 namespace sp {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sp/parser/ast/node_type.hpp"
+#include "common/ast/node_type.hpp"
 
 #include <iostream>
 #include <memory>

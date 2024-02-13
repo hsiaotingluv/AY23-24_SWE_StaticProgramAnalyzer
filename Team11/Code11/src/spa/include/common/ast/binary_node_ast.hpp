@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sp/parser/ast/ast.hpp"
+#include "common/ast/ast.hpp"
 
 namespace sp {
 // Generic Binary Expression with 2 operands

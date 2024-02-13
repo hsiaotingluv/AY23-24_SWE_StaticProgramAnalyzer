@@ -1,6 +1,6 @@
 #include "sp/parser/cond_expr_parser.hpp"
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/logical_ast.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/logical_ast.hpp"
 #include <memory>
 
 using namespace tokenizer;

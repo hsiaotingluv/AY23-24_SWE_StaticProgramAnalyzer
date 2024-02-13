@@ -2,7 +2,7 @@
 
 #include "common/tokeniser/runner.hpp"
 
-#include "sp/parser/ast/ast.hpp"
+#include "common/ast/ast.hpp"
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sp/parser/ast/ast.hpp"
+#include "common/ast/ast.hpp"
 
 // A Traverser is a class that is used to traverse the AST with possible some side effects
 // Traverser: AST -> AST

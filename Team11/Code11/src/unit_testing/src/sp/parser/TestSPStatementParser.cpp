@@ -1,7 +1,7 @@
 #include "catch.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/statement_ast.hpp"
 #include "common/tokeniser/runner.hpp"
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/statement_ast.hpp"
 #include "sp/parser/statement_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include <memory>

@@ -1,6 +1,6 @@
 #include "sp/parser/expr_parser.hpp"
-#include "sp/parser/ast/binary_node_ast.hpp"
-#include "sp/parser/ast/null_ast.hpp"
+#include "common/ast/binary_node_ast.hpp"
+#include "common/ast/null_ast.hpp"
 #include "sp/parser/term_parser.hpp"
 
 namespace sp {

@@ -1,5 +1,5 @@
 #include "sp/parser/program_parser.hpp"
-#include "sp/parser/ast/program_ast.hpp"
+#include "common/ast/program_ast.hpp"
 
 namespace sp {
 auto ProgramParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end)

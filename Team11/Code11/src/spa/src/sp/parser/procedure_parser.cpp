@@ -1,5 +1,5 @@
 #include "sp/parser/procedure_parser.hpp"
-#include "sp/parser/ast/procedure_ast.hpp"
+#include "common/ast/procedure_ast.hpp"
 #include "sp/parser/statement_keyword_const.hpp"
 
 namespace sp {

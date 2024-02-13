@@ -2,8 +2,8 @@
 #pragma ide diagnostic ignored "bugprone-suspicious-missing-comma"
 #include "catch.hpp"
 
+#include "common/ast/statement_ast.hpp"
 #include "sp/main.hpp"
-#include "sp/parser/ast/statement_ast.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"

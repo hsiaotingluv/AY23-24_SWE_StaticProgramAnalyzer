@@ -1,7 +1,7 @@
 #include "sp/traverser/modifies_traverser.hpp"
-#include "sp/parser/ast/ast.hpp"
-#include "sp/parser/ast/factor_ast.hpp"
-#include "sp/parser/ast/statement_ast.hpp"
+#include "common/ast/ast.hpp"
+#include "common/ast/factor_ast.hpp"
+#include "common/ast/statement_ast.hpp"
 #include <memory>
 
 namespace sp {
