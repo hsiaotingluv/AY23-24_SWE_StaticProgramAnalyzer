@@ -7,6 +7,7 @@
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/const_populator_traverser.hpp"
+#include "sp/traverser/modifies_traverser.hpp"
 #include "sp/traverser/proc_populator_traverser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
@@ -39,15 +40,16 @@ class SourceProcessor {
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), traversers(std::move(traversers)) {
     }
 
-    static auto get_complete_sp(std::shared_ptr<WriteFacade> write_facade) -> std::shared_ptr<SourceProcessor> {
+    static auto get_complete_sp(const std::shared_ptr<WriteFacade>& write_facade) -> std::shared_ptr<SourceProcessor> {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
             std::make_shared<ProgramParser>(),
             std::vector<std::shared_ptr<Traverser>>{
-                std::make_shared<StmtNumTraverser>(),
+                std::make_shared<StmtNumTraverser>(write_facade),
                 std::make_shared<ConstPopulatorTraverser>(write_facade),
                 std::make_shared<VarPopulatorTraverser>(write_facade),
                 std::make_shared<ProcedurePopulatorTraverser>(write_facade),
+                std::make_shared<ModifiesTraverser>(write_facade),
             });
     }
 

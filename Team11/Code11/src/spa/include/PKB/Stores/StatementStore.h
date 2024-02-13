@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common/StatementType.h"
+#include "common/statement_type.hpp"
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 

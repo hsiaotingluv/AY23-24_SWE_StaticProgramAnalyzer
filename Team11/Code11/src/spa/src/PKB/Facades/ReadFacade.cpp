@@ -63,31 +63,31 @@ std::unordered_set<std::string> ReadFacade::getAllStatements() {
 }
 
 std::unordered_set<std::string> ReadFacade::getRawStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::RAW);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::Raw);
 }
 
 std::unordered_set<std::string> ReadFacade::getAssignStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::ASSIGN);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::Assign);
 }
 
 std::unordered_set<std::string> ReadFacade::getIfStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::IF);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::If);
 }
 
 std::unordered_set<std::string> ReadFacade::getWhileStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::WHILE);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::While);
 }
 
 std::unordered_set<std::string> ReadFacade::getReadStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::READ);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::Read);
 }
 
 std::unordered_set<std::string> ReadFacade::getPrintStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::PRINT);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::Print);
 }
 
 std::unordered_set<std::string> ReadFacade::getCallStatements() {
-    return this->pkb->statement_store->getStatementsOfType(StatementType::CALL);
+    return this->pkb->statement_store->getStatementsOfType(StatementType::Call);
 }
 
 std::unordered_set<std::string> ReadFacade::getVarsModifiedByStatement(const std::string& s) {

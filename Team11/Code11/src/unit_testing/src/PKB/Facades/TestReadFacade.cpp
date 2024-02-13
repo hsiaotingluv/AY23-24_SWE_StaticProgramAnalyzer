@@ -26,13 +26,13 @@ TEST_CASE("Simple Statement Test") {
         auto readFacade = std::make_shared<ReadFacade>(pkb);
         auto writeFacade = std::make_shared<WriteFacade>(pkb);
 
-        writeFacade->addStatement("1", StatementType::READ);
-        writeFacade->addStatement("2", StatementType::PRINT);
-        writeFacade->addStatement("3", StatementType::ASSIGN);
-        writeFacade->addStatement("4", StatementType::IF);
-        writeFacade->addStatement("5", StatementType::WHILE);
-        writeFacade->addStatement("6", StatementType::CALL);
-        writeFacade->addStatement("7", StatementType::RAW);
+        writeFacade->addStatement("1", StatementType::Read);
+        writeFacade->addStatement("2", StatementType::Print);
+        writeFacade->addStatement("3", StatementType::Assign);
+        writeFacade->addStatement("4", StatementType::If);
+        writeFacade->addStatement("5", StatementType::While);
+        writeFacade->addStatement("6", StatementType::Call);
+        writeFacade->addStatement("7", StatementType::Raw);
 
         REQUIRE(readFacade->getAllStatements().size() == 7);
         REQUIRE(readFacade->getReadStatements().size() == 1);

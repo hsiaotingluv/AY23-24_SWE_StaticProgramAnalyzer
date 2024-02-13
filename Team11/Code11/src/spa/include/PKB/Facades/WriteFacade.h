@@ -6,7 +6,7 @@
 #include "PKB/CommonTypes/Statement.h"
 #include "PKB/CommonTypes/Variable.h"
 #include "PKB/PKB.h"
-#include "common/StatementType.h"
+#include "common/statement_type.hpp"
 #include <unordered_set>
 
 class WriteFacade {
