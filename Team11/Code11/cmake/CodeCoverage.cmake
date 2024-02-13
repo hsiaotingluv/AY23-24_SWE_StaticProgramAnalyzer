@@ -159,7 +159,9 @@ foreach(LANG ${LANGUAGES})
         if("${CMAKE_${LANG}_COMPILER_VERSION}" VERSION_LESS 3)
             message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
         endif()
-    elseif(NOT "${CMAKE_${LANG}_COMPILER_ID}" MATCHES "GNU"
+    elseif(
+        NOT "${CMAKE_${LANG}_COMPILER_ID}" STREQUAL ""
+        AND NOT "${CMAKE_${LANG}_COMPILER_ID}" MATCHES "GNU"
         AND NOT "${CMAKE_${LANG}_COMPILER_ID}" MATCHES "(LLVM)?[Ff]lang")
         message(FATAL_ERROR "Compiler is not GNU or Flang! Aborting...")
     endif()
