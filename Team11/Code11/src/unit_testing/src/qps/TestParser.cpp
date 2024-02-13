@@ -223,5 +223,27 @@ Select a pattern a ( _ , "count + 1"))";
         const auto output = parser.parse(query);
 
         REQUIRE(!output.has_value());
+
+        const auto query2 = "procedure p; Select p such that Modifies(1, p)";
+        const auto output2 = parser.parse(query2);
+        REQUIRE(!output2.has_value());
+
+        const auto query3 = "variable v; Select v such that Uses(v, 1)";
+        const auto output3 = parser.parse(query3);
+        REQUIRE(!output3.has_value());
+    }
+
+    SECTION("Modifies cannot start with wildcard") {
+        const auto query = "procedure p; variable v; Select p such that Modifies(_, v)";
+        const auto output = parser.parse(query);
+
+        REQUIRE(!output.has_value());
+    }
+
+    SECTION("Uses cannot start with wildcard") {
+        const auto query = "procedure p; variable v; Select p such that Uses(_, v)";
+        const auto output = parser.parse(query);
+
+        REQUIRE(!output.has_value());
     }
 }

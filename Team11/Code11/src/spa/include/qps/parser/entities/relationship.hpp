@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
 
 #include <ostream>
@@ -7,6 +8,11 @@
 #include <variant>
 
 namespace qps {
+
+using StmtRefNoWildcard = std::variant<StmtSynonym, Integer>;
+using ProcedureRefNoWildcard = std::variant<ProcSynonym, QuotedIdent>;
+using VarRef = std::variant<WildCard, VarSynonym, QuotedIdent>;
+
 struct Follows {
     /**
      * @brief A Follows relationship is a relationship between two statements where the first statement is executed
@@ -113,12 +119,12 @@ struct UsesS {
      * @param var
      */
 
-    StmtRef stmt;
-    EntRef ent;
+    StmtRefNoWildcard stmt;
+    VarRef ent;
 
     static constexpr auto keyword = "Uses";
 
-    UsesS(StmtRef stmt, EntRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
+    UsesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
 
     friend auto operator<<(std::ostream& os, const UsesS& usesS) -> std::ostream&;
@@ -137,12 +143,12 @@ struct UsesP {
      * @param var
      */
 
-    EntRef ent1;
-    EntRef ent2;
+    ProcedureRefNoWildcard ent1;
+    VarRef ent2;
 
     static constexpr auto keyword = "Uses";
 
-    UsesP(EntRef ent1, EntRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
+    UsesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
     }
 
     friend auto operator<<(std::ostream& os, const UsesP& usesP) -> std::ostream&;
@@ -161,12 +167,12 @@ struct ModifiesS {
      * @param var
      */
 
-    StmtRef stmt;
-    EntRef ent;
+    StmtRefNoWildcard stmt;
+    VarRef ent;
 
     static constexpr auto keyword = "Modifies";
 
-    ModifiesS(StmtRef stmt, EntRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
+    ModifiesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
 
     friend auto operator<<(std::ostream& os, const ModifiesS& modifiesS) -> std::ostream&;
@@ -186,13 +192,13 @@ struct ModifiesP {
      * @param var
      */
 
-    EntRef ent1;
-    EntRef ent2;
+    ProcedureRefNoWildcard ent1;
+    VarRef ent2;
 
     static constexpr auto keyword = "Modifies";
 
   public:
-    ModifiesP(EntRef ent1, EntRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
+    ModifiesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
     }
 
     friend auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream&;

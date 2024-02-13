@@ -1,45 +1,23 @@
 #pragma once
 
 #include "PKB/Facades/ReadFacade.h"
+#include "qps/evaluators/results_map.hpp"
 #include "qps/parser/parser.hpp"
 
-#include <unordered_set>
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace qps {
-template <class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
+class Evaluator {
+    ResultsMap results_map;
+    std::shared_ptr<ReadFacade> readFacade;
 
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-} // namespace qps
-
-namespace qps::stub {
-// TODO: This namespace should be removed once the actual evaluators are fully implemented!
-const auto get_supported_operations = [](std::shared_ptr<ReadFacade> readFacade) {
-    return overloaded{
-        [readFacade](const qps::VarSynonym& var) {
-            return readFacade->getVariables();
-        },
-        [readFacade](const qps::ProcSynonym& proc) {
-            return readFacade->getProcedures();
-        },
-        [readFacade](const qps::ConstSynonym& constant) {
-            return readFacade->getConstants();
-        },
-        [](const auto& x) {
-            return std::unordered_set<std::string>{};
-        } // catch-all
-    };
-};
-
-inline auto evaluate(qps::Query query_obj, std::shared_ptr<ReadFacade> readFacade) -> std::vector<std::string> {
-    if (!query_obj.clauses.empty()) {
-        throw std::runtime_error("Not implemented");
+  public:
+    Evaluator(std::shared_ptr<ReadFacade> readFacade) : readFacade(std::move(readFacade)) {
     }
-    const auto reference = query_obj.reference;
-    const auto results = std::visit(get_supported_operations(readFacade), reference);
-    return {results.begin(), results.end()};
+
+    auto evaluate(qps::Query query_obj) -> std::vector<std::string>;
 };
-} // namespace qps::stub
+
+} // namespace qps

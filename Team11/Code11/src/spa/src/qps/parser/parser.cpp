@@ -1,4 +1,6 @@
 #include "qps/parser/parser.hpp"
+#include "qps/evaluators/type_traits.hpp"
+#include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/expression_parser.hpp"
 #include "qps/parser/parser_helper.hpp"
 
@@ -11,6 +13,7 @@
 #include <optional>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 
 namespace qps {
 auto QueryProcessingSystemParser::parse(std::string query) -> std::optional<Query> {
@@ -338,7 +341,7 @@ auto parse_stmt_stmt(const Synonyms& declared, std::vector<Token>::const_iterato
 template <typename RelationshipType>
 auto parse_stmt_ent(const Synonyms& declared, std::vector<Token>::const_iterator it,
                     const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<RelationshipType, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<StmtRef, EntRef, std::vector<Token>::const_iterator>> {
     if (std::distance(it, end) < 6) {
         return std::nullopt;
     }
@@ -392,14 +395,13 @@ auto parse_stmt_ent(const Synonyms& declared, std::vector<Token>::const_iterator
         return std::nullopt;
     }
 
-    const auto follow_rel = RelationshipType{arg1, ent_ref};
-    return std::make_tuple(follow_rel, it);
+    return std::make_tuple(arg1, ent_ref, it);
 }
 
 template <typename RelationshipType>
 auto parse_ent_ent(const Synonyms& declared, std::vector<Token>::const_iterator it,
                    const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<RelationshipType, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<EntRef, EntRef, std::vector<Token>::const_iterator>> {
     if (std::distance(it, end) < 3) {
         return std::nullopt;
     }
@@ -465,12 +467,52 @@ auto parse_ent_ent(const Synonyms& declared, std::vector<Token>::const_iterator 
     }
 
     it = std::next(it, 1);
-    const auto follow_rel = RelationshipType{ent_ref1, ent_ref2};
-
-    return std::make_tuple(follow_rel, it);
+    return std::make_tuple(ent_ref1, ent_ref2, it);
 }
 
 // Helper functions
+
+auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard> {
+    return std::visit(
+        [](auto&& arg) -> std::optional<StmtRefNoWildcard> {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, WildCard>) {
+                return std::nullopt;
+            } else {
+                return std::make_optional(StmtRefNoWildcard{arg});
+            }
+        },
+        stmt_ref);
+}
+
+auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef> {
+    return std::visit(overloaded{[](const Synonym& x) -> std::optional<VarRef> {
+                                     if (is_var_syn(x)) {
+                                         return std::get<VarSynonym>(x);
+                                     }
+                                     return std::nullopt;
+                                 },
+                                 [](const auto& x) -> std::optional<VarRef> {
+                                     return x;
+                                 }},
+                      ent_ref);
+}
+
+auto to_proc_ref(const EntRef& ent_ref) -> std::optional<ProcedureRefNoWildcard> {
+    return std::visit(overloaded{[](const WildCard& x) -> std::optional<ProcedureRefNoWildcard> {
+                                     return std::nullopt;
+                                 },
+                                 [](const Synonym& x) -> std::optional<ProcedureRefNoWildcard> {
+                                     if (is_proc_syn(x)) {
+                                         return std::get<ProcSynonym>(x);
+                                     }
+                                     return std::nullopt;
+                                 },
+                                 [](const auto& x) -> std::optional<ProcedureRefNoWildcard> {
+                                     return x;
+                                 }},
+                      ent_ref);
+}
 
 auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_iterator it,
                    const std::vector<Token>::const_iterator& end)
@@ -481,9 +523,9 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         return std::make_tuple(follow_rel, rest);
     }
 
-    const auto maybe_followsT = parse_stmt_stmt<FollowsT, false>(declared_synonyms, it, end);
-    if (maybe_followsT) {
-        const auto& [follow_rel, rest] = maybe_followsT.value();
+    const auto maybe_follows_t = parse_stmt_stmt<FollowsT, false>(declared_synonyms, it, end);
+    if (maybe_follows_t) {
+        const auto& [follow_rel, rest] = maybe_follows_t.value();
         return std::make_tuple(follow_rel, rest);
     }
 
@@ -493,34 +535,72 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         return std::make_tuple(parent_rel, rest);
     }
 
-    const auto maybe_parentT = parse_stmt_stmt<ParentT, false>(declared_synonyms, it, end);
-    if (maybe_parentT) {
-        const auto& [parent_rel, rest] = maybe_parentT.value();
+    const auto maybe_parent_t = parse_stmt_stmt<ParentT, false>(declared_synonyms, it, end);
+    if (maybe_parent_t) {
+        const auto& [parent_rel, rest] = maybe_parent_t.value();
         return std::make_tuple(parent_rel, rest);
     }
 
-    const auto maybe_usesS = parse_stmt_ent<UsesS>(declared_synonyms, it, end);
-    if (maybe_usesS) {
-        const auto& [uses_rel, rest] = maybe_usesS.value();
-        return std::make_tuple(uses_rel, rest);
+    const auto maybe_uses_s = parse_stmt_ent<UsesS>(declared_synonyms, it, end);
+    if (maybe_uses_s) {
+        const auto& [stmt, ent, rest] = maybe_uses_s.value();
+        const auto maybe_arg1 = reject_wildcard(stmt);
+        if (!maybe_arg1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_arg2 = to_var_ref(ent);
+        if (!maybe_arg2.has_value()) {
+            return std::nullopt;
+        }
+        return std::make_tuple(UsesS{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
-    const auto maybe_usesP = parse_ent_ent<UsesP>(declared_synonyms, it, end);
-    if (maybe_usesP) {
-        const auto& [uses_rel, rest] = maybe_usesP.value();
-        return std::make_tuple(uses_rel, rest);
+    const auto maybe_uses_p = parse_ent_ent<UsesP>(declared_synonyms, it, end);
+    if (maybe_uses_p) {
+        const auto& [ent_ref1, ent_ref2, rest] = maybe_uses_p.value();
+
+        const auto maybe_arg1 = to_proc_ref(ent_ref1);
+        if (!maybe_arg1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_arg2 = to_var_ref(ent_ref2);
+        if (!maybe_arg2.has_value()) {
+            return std::nullopt;
+        }
+        return std::make_tuple(UsesP{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
-    const auto maybe_modifiesS = parse_stmt_ent<ModifiesS>(declared_synonyms, it, end);
-    if (maybe_modifiesS) {
-        const auto& [modifies_rel, rest] = maybe_modifiesS.value();
-        return std::make_tuple(modifies_rel, rest);
+    const auto maybe_modifies_s = parse_stmt_ent<ModifiesS>(declared_synonyms, it, end);
+    if (maybe_modifies_s) {
+        const auto& [stmt, ent, rest] = maybe_modifies_s.value();
+        const auto maybe_arg1 = reject_wildcard(stmt);
+        if (!maybe_arg1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_arg2 = to_var_ref(ent);
+        if (!maybe_arg2.has_value()) {
+            return std::nullopt;
+        }
+
+        return std::make_tuple(ModifiesS{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
-    const auto maybe_modifiesP = parse_ent_ent<ModifiesP>(declared_synonyms, it, end);
-    if (maybe_modifiesP) {
-        const auto& [modifies_rel, rest] = maybe_modifiesP.value();
-        return std::make_tuple(modifies_rel, rest);
+    const auto maybe_modifies_p = parse_ent_ent<ModifiesP>(declared_synonyms, it, end);
+    if (maybe_modifies_p) {
+        const auto& [ent_ref1, ent_ref2, rest] = maybe_modifies_p.value();
+        const auto maybe_arg1 = to_proc_ref(ent_ref1);
+        if (!maybe_arg1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_arg2 = to_var_ref(ent_ref2);
+        if (!maybe_arg2.has_value()) {
+            return std::nullopt;
+        }
+        return std::make_tuple(ModifiesP{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
     return std::nullopt;

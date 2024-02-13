@@ -1,9 +1,11 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <string>
 
 #include "AbstractWrapper.h"
+#include "qps/evaluators/simple_evaluator.hpp"
 #include "sp/main.hpp"
 
 #include "PKB/Facades/ReadFacade.h"
@@ -20,6 +22,7 @@ class TestWrapper : public AbstractWrapper {
     std::shared_ptr<WriteFacade> writeFacade;
 
     std::shared_ptr<qps::QueryProcessingSystemParser> qps_parser;
+    std::shared_ptr<qps::Evaluator> qps_evaluator;
 
     auto load_file(const std::string& filename) -> std::string;
 

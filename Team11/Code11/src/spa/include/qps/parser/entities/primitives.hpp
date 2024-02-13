@@ -24,6 +24,10 @@ class IDENT {
     explicit IDENT(std::string value) : value(std::move(value)) {
     }
 
+    [[nodiscard]] auto get_value() const -> std::string {
+        return value;
+    }
+
     friend auto operator<<(std::ostream& os, const IDENT& ident) -> std::ostream& {
         os << ident.value;
         return os;
@@ -47,6 +51,10 @@ class QuotedIdent {
 
   public:
     explicit QuotedIdent(std::string value) : value(std::move(value)) {
+    }
+
+    [[nodiscard]] auto get_value() const -> std::string {
+        return value;
     }
 
     friend auto operator<<(std::ostream& os, const QuotedIdent& quotedIdent) -> std::ostream& {

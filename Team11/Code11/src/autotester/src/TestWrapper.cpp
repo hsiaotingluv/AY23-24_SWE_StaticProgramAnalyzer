@@ -20,7 +20,9 @@ auto WrapperFactory::createWrapper() -> AbstractWrapper* {
 // Do not modify the following line
 volatile bool AbstractWrapper::GlobalStop = false;
 
-TestWrapper::TestWrapper() {
+TestWrapper::TestWrapper()
+    : source_processor(nullptr), readFacade(nullptr), writeFacade(nullptr), qps_parser(nullptr),
+      qps_evaluator(nullptr) {
 
     // TODO: replace the following line once PKB factory is merged
     auto pkb = std::make_shared<PKB>();
@@ -29,6 +31,7 @@ TestWrapper::TestWrapper() {
 
     source_processor = sp::SourceProcessor::get_complete_sp(writeFacade);
     qps_parser = std::make_shared<qps::QueryProcessingSystemParser>();
+    qps_evaluator = std::make_shared<qps::Evaluator>(readFacade);
 }
 
 auto TestWrapper::load_file(const std::string& filename) -> std::string {
@@ -59,13 +62,7 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
     }
 
     const auto query_obj = maybe_query_obj.value();
-
-    // TODO: Remove this check once clauses are supported by evaluator
-    if (!query_obj.clauses.empty()) {
-        throw std::runtime_error("QPS: query with non-empty clause is currently not supported");
-    }
-
-    const auto query_results = qps::stub::evaluate(query_obj, readFacade);
+    const auto query_results = qps_evaluator->evaluate(query_obj);
     for (const auto& result : query_results) {
         results.emplace_back(result);
     }

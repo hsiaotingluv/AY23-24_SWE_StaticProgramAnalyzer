@@ -91,7 +91,8 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            const auto results = qps::stub::evaluate(query_obj, readFacade);
+            auto evaluator = qps::Evaluator{readFacade};
+            const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_variables);
         }
 
@@ -104,7 +105,8 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            const auto results = qps::stub::evaluate(query_obj, readFacade);
+            auto evaluator = qps::Evaluator{readFacade};
+            const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_procedures);
         }
 
@@ -117,7 +119,8 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            const auto results = qps::stub::evaluate(query_obj, readFacade);
+            auto evaluator = qps::Evaluator{readFacade};
+            const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_constants);
         }
     }

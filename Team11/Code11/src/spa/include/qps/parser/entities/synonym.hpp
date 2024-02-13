@@ -380,3 +380,76 @@ auto find_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::o
 auto find_stmt_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::optional<StmtSynonym>;
 
 } // namespace qps
+
+namespace std {
+template <>
+struct hash<qps::RawStmtSynonym> {
+    auto operator()(const qps::RawStmtSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::RawStmtSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::ReadSynonym> {
+    auto operator()(const qps::ReadSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::ReadSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::PrintSynonym> {
+    auto operator()(const qps::PrintSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::PrintSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::CallSynonym> {
+    auto operator()(const qps::CallSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::CallSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::WhileSynonym> {
+    auto operator()(const qps::WhileSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::WhileSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::IfSynonym> {
+    auto operator()(const qps::IfSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::IfSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::AssignSynonym> {
+    auto operator()(const qps::AssignSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::AssignSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::VarSynonym> {
+    auto operator()(const qps::VarSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::VarSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::ConstSynonym> {
+    auto operator()(const qps::ConstSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::ConstSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+template <>
+struct hash<qps::ProcSynonym> {
+    auto operator()(const qps::ProcSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::ProcSynonym::keyword + syn.get_name().get_value());
+    }
+};
+
+} // namespace std
