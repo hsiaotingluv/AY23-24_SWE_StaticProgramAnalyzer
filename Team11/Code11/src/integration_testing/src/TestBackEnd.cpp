@@ -13,9 +13,7 @@
 #include <unordered_set>
 
 TEST_CASE("Test PKB and QPS - Entities") {
-    auto pkb = std::make_shared<PKB>();
-    auto readFacade = std::make_shared<ReadFacade>(pkb);
-    auto writeFacade = std::make_shared<WriteFacade>(pkb);
+    auto[readFacade, writeFacade] = PKB::create_facades();
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
     // Populate the PKB with some data
@@ -83,9 +81,7 @@ TEST_CASE("Test PKB and QPS - Entities") {
 }
 
 TEST_CASE("Test PKB and QPS - Statements") {
-    auto pkb = std::make_shared<PKB>();
-    auto readFacade = std::make_shared<ReadFacade>(pkb);
-    auto writeFacade = std::make_shared<WriteFacade>(pkb);
+    auto[readFacade, writeFacade] = PKB::create_facades();
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
     // Populate the PKB with some data
@@ -213,9 +209,8 @@ TEST_CASE("Test PKB and QPS - Statements") {
 }
 
 TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
-    auto pkb = std::make_shared<PKB>();
-    auto readFacade = std::make_shared<ReadFacade>(pkb);
-    auto writeFacade = std::make_shared<WriteFacade>(pkb);
+    auto[readFacade, writeFacade] = PKB::create_facades();
+
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
     // Populate the PKB with some data

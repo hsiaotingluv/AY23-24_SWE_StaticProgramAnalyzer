@@ -65,7 +65,7 @@ bool FollowsStore::hasFollowsStars(const StatementNumber& s1, const StatementNum
 
 FollowsStore::StatementToSetMap FollowsStore::getAllFollowsStar() const {
     return followsStarStore;
-};
+}
 
 FollowsStore::StatementSet FollowsStore::getAllFollowsStarKeys() const {
     StatementSet keys;

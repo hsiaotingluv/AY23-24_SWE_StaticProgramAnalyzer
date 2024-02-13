@@ -204,15 +204,15 @@ bool ReadFacade::doesProcedureUseVar(const std::string& procedure, const std::st
 
 std::unordered_map<std::string, std::string> ReadFacade::getAllFollows() const {
     return this->pkb->follows_store->getAllFollows();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllFollowsKeys() const {
     return this->pkb->follows_store->getAllFollowsKeys();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllFollowsValues() const {
     return this->pkb->follows_store->getAllFollowsValues();
-};
+}
 
 bool ReadFacade::hasFollows(const std::string& stmt1, const std::string& stmt2) const {
     return this->pkb->follows_store->hasFollows(stmt1, stmt2);
@@ -228,15 +228,15 @@ std::string ReadFacade::getFollowsBy(const std::string& s) const {
 
 std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllFollowsStar() const {
     return this->pkb->follows_store->getAllFollowsStar();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllFollowsStarKeys() const {
     return this->pkb->follows_store->getAllFollowsStarKeys();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllFollowsStarValues() const {
     return this->pkb->follows_store->getAllFollowsStarValues();
-};
+}
 
 bool ReadFacade::hasFollowsStars(const std::string& stmt1, const std::string& stmt2) const {
     return this->pkb->follows_store->hasFollowsStars(stmt1, stmt2);
@@ -256,15 +256,15 @@ bool ReadFacade::hasParent(const std::string& parent, const std::string& child) 
 
 std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllParent() const {
     return this->pkb->parent_store->getAllParent();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllParentKeys() const {
     return this->pkb->parent_store->getAllParentKeys();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllParentValues() const {
     return this->pkb->parent_store->getAllParentValues();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getParentChildren(const std::string& parent) const {
     return this->pkb->parent_store->getParentChildren(parent);
@@ -280,15 +280,15 @@ bool ReadFacade::hasParentStar(const std::string& parent, const std::string& chi
 
 std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllParentStar() const {
     return this->pkb->parent_store->getAllParentStar();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllParentStarKeys() const {
     return this->pkb->parent_store->getAllParentStarKeys();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getAllParentStarValues() const {
     return this->pkb->parent_store->getAllParentStarValues();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::getParentStarChildren(const std::string& parent) const {
     return this->pkb->parent_store->getParentStarChildren(parent);
@@ -296,4 +296,100 @@ std::unordered_set<std::string> ReadFacade::getParentStarChildren(const std::str
 
 std::unordered_set<std::string> ReadFacade::getStarParent(const std::string& child) const {
     return this->pkb->parent_store->getStarParent(child);
+}
+
+bool ReadFacade::hasNext(const std::string& before, const std::string& after) const {
+    return this->pkb->next_store->hasNext(before, after);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllNext() const {
+    return this->pkb->next_store->getAllNext();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllNextKeys() const {
+    return this->pkb->next_store->getAllNextKeys();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllNextValues() const {
+    return this->pkb->next_store->getAllNextValues();
+}
+
+std::unordered_set<std::string> ReadFacade::getNext(const std::string& before) const {
+    return this->pkb->next_store->getNext(before);
+}
+
+std::unordered_set<std::string> ReadFacade::getNextPrevious(const std::string& after) const {
+    return this->pkb->next_store->getNextPrevious(after);
+}
+
+bool ReadFacade::hasNextStar(const std::string& before, const std::string& after) const {
+    return this->pkb->next_store->hasNextStar(before, after);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllNextStar() const {
+    return this->pkb->next_store->getAllNextStar();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllNextStarKeys() const {
+    return this->pkb->next_store->getAllNextStarKeys();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllNextStarValues() const {
+    return this->pkb->next_store->getAllNextStarValues();
+}
+
+std::unordered_set<std::string> ReadFacade::getNextStar(const StatementNumber& before) const {
+    return this->pkb->next_store->getNextStar(before);
+}
+
+std::unordered_set<std::string> ReadFacade::getNextStarPrevious(const StatementNumber& after) const {
+    return this->pkb->next_store->getNextStarPrevious(after);
+}
+
+bool ReadFacade::hasCalls(const std::string& caller, const std::string& callee) const {
+    return this->pkb->calls_store->hasCalls(caller, callee);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllCalls() const {
+    return this->pkb->calls_store->getAllCalls();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllCallsValues() const {
+    return this->pkb->calls_store->getAllCallsValues();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllCallsKeys() const {
+    return this->pkb->calls_store->getAllCallsKeys();
+}
+
+std::unordered_set<std::string> ReadFacade::getCallees(const std::string& caller) const {
+    return this->pkb->calls_store->getCallees(caller);
+}
+
+std::unordered_set<std::string> ReadFacade::getCallers(const std::string& callee) const {
+    return this->pkb->calls_store->getCallers(callee);
+}
+
+bool ReadFacade::hasCallsStar(const std::string& caller, const std::string& callee) const {
+    return this->pkb->calls_store->hasCallsStar(caller, callee);
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::getAllCallsStar() const {
+    return this->pkb->calls_store->getAllCallsStar();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllCallsStarValues() const {
+    return this->pkb->calls_store->getAllCallsStarValues();
+}
+
+std::unordered_set<std::string> ReadFacade::getAllCallsStarKeys() const {
+    return this->pkb->calls_store->getAllCallsStarKeys();
+}
+
+std::unordered_set<std::string> ReadFacade::getCallsStarCallees(const std::string& caller) const {
+    return this->pkb->calls_store->getCallsStarCallees(caller);
+}
+
+std::unordered_set<std::string> ReadFacade::getCallsStarCallers(const std::string& callee) const {
+    return this->pkb->calls_store->getCallsStarCallers(callee);
 }

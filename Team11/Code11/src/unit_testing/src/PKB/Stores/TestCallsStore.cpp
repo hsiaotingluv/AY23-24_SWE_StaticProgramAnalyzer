@@ -13,7 +13,7 @@ TEST_CASE("CallsStore Tests") {
         REQUIRE(callsStore.hasCalls("Helper", "Logger"));
     }
 
-    SECTION("Adding and Verifying Direct Calls Relationships") {
+    SECTION("Verifying Absence of Non-existent Direct Calls Relationships") {
         callsStore.addCalls("Main", "Helper");
         callsStore.addCalls("Helper", "Logger");
 
@@ -22,11 +22,30 @@ TEST_CASE("CallsStore Tests") {
         REQUIRE_FALSE(callsStore.hasCalls("Logger", "Helper"));
     }
 
+    SECTION("Get All Direct Calls Relationships") {
+        callsStore.addCalls("Main", "Helper");
+        callsStore.addCalls("Main", "Logger");
+        callsStore.addCalls("Helper", "Validator");
+
+        auto allCalls = callsStore.getAllCalls();
+
+        REQUIRE(allCalls.size() == 2);
+        REQUIRE(allCalls["Main"].size() == 2);
+        REQUIRE(allCalls["Main"].count("Helper") == 1);
+        REQUIRE(allCalls["Main"].count("Logger") == 1);
+        REQUIRE(allCalls["Helper"].size() == 1);
+        REQUIRE(allCalls["Helper"].count("Validator") == 1);
+
+        REQUIRE(allCalls.count("Logger") == 0);
+        REQUIRE(allCalls.count("Validator") == 0);
+    }
+
     SECTION("Retrieving All Callees") {
         callsStore.addCalls("Main", "Helper");
         callsStore.addCalls("Main", "Utils");
 
-        auto callees = callsStore.getAllCallees();
+        auto callees = callsStore.getAllCallsValues();
+
         REQUIRE(callees.size() == 2);
         REQUIRE(callees.find("Main") == callees.end());
         REQUIRE(callees.find("Helper") != callees.end());
@@ -37,7 +56,8 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCalls("Main", "Helper");
         callsStore.addCalls("Utils", "Logger");
 
-        auto callers = callsStore.getAllCallers();
+        auto callers = callsStore.getAllCallsKeys();
+
         REQUIRE(callers.size() == 2);
         REQUIRE(callers.find("Main") != callers.end());
         REQUIRE(callers.find("Utils") != callers.end());
@@ -50,6 +70,7 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCalls("Main", "Logger");
 
         auto callees = callsStore.getCallees("Main");
+
         REQUIRE(callees.size() == 2);
         REQUIRE(callees.find("Helper") != callees.end());
         REQUIRE(callees.find("Logger") != callees.end());
@@ -58,6 +79,7 @@ TEST_CASE("CallsStore Tests") {
 
     SECTION("Retrieving Callees for Non-existent Caller Returns Empty Set") {
         auto callees = callsStore.getCallees("NonExisting");
+
         REQUIRE(callees.empty());
     }
 
@@ -66,6 +88,7 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCalls("Logger", "Helper");
 
         auto callers = callsStore.getCallers("Helper");
+
         REQUIRE(callers.size() == 2);
         REQUIRE(callers.find("Main") != callers.end());
         REQUIRE(callers.find("Logger") != callers.end());
@@ -74,6 +97,7 @@ TEST_CASE("CallsStore Tests") {
 
     SECTION("Retrieving Callers for Non-existent Callee Returns Empty Set") {
         auto callers = callsStore.getCallers("NonExisting");
+
         REQUIRE(callers.empty());
     }
 
@@ -94,11 +118,28 @@ TEST_CASE("CallsStore Tests") {
         REQUIRE_FALSE(callsStore.hasCallsStar("Helper", "Utils"));
     }
 
+    SECTION("Getting All Transitive Calls Relationships") {
+        callsStore.addCalls("Main", "Helper");
+        callsStore.addCalls("Helper", "Logger");
+        callsStore.addCallsStar("Main", "Logger");
+
+        auto allCallsStar = callsStore.getAllCallsStar();
+
+        REQUIRE(allCallsStar.size() == 2);
+        REQUIRE(allCallsStar["Main"].size() == 2);
+        REQUIRE(allCallsStar["Main"].count("Helper") == 1);
+        REQUIRE(allCallsStar["Main"].count("Logger") == 1);
+        REQUIRE(allCallsStar["Helper"].count("Logger") == 1);
+
+        REQUIRE(allCallsStar.count("Logger") == 0);
+    }
+
     SECTION("Retrieving All Transitive Callees") {
         callsStore.addCallsStar("Main", "Utils");
         callsStore.addCallsStar("Main", "Logger");
 
-        auto starCallees = callsStore.getAllCallsStarCallees();
+        auto starCallees = callsStore.getAllCallsStarValues();
+
         REQUIRE(starCallees.size() == 2);
         REQUIRE(starCallees.find("Utils") != starCallees.end());
         REQUIRE(starCallees.find("Logger") != starCallees.end());
@@ -109,7 +150,8 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCallsStar("Main", "Utils");
         callsStore.addCallsStar("Logger", "Utils");
 
-        auto starCallers = callsStore.getAllCallsStarCallers();
+        auto starCallers = callsStore.getAllCallsStarKeys();
+
         REQUIRE(starCallers.size() == 2);
         REQUIRE(starCallers.find("Main") != starCallers.end());
         REQUIRE(starCallers.find("Logger") != starCallers.end());
@@ -120,12 +162,14 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCallsStar("Main", "Utils");
 
         auto starCallees = callsStore.getCallsStarCallees("Main");
+
         REQUIRE(starCallees.find("Utils") != starCallees.end());
         REQUIRE_FALSE(starCallees.find("Main") != starCallees.end());
     }
 
     SECTION("Retrieving Transitive Callees for Non-existent Caller Returns Empty Set") {
         auto starCallees = callsStore.getCallsStarCallees("NonExisting");
+
         REQUIRE(starCallees.empty());
     }
 
@@ -134,6 +178,7 @@ TEST_CASE("CallsStore Tests") {
         callsStore.addCallsStar("Helper", "Utils");
 
         auto starCallers = callsStore.getCallsStarCallers("Utils");
+
         REQUIRE(starCallers.size() == 2);
         REQUIRE(starCallers.find("Main") != starCallers.end());
         REQUIRE(starCallers.find("Helper") != starCallers.end());
@@ -142,6 +187,7 @@ TEST_CASE("CallsStore Tests") {
 
     SECTION("Retrieving Transitive Callers for Non-existent Callee Returns Empty Set") {
         auto starCallers = callsStore.getCallsStarCallers("NonExisting");
+
         REQUIRE(starCallers.empty());
     }
 }

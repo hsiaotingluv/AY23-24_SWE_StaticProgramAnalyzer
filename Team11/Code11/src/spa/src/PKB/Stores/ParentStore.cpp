@@ -19,7 +19,7 @@ bool ParentStore::hasParent(const StatementNumber& parent, const StatementNumber
 
 ParentStore::StatementToSetMap ParentStore::getAllParent() const {
     return parentStore;
-};
+}
 
 ParentStore::StatementSet ParentStore::getAllParentKeys() const {
     StatementSet keys;
@@ -27,7 +27,7 @@ ParentStore::StatementSet ParentStore::getAllParentKeys() const {
         keys.insert(pair.first);
     }
     return keys;
-};
+}
 
 ParentStore::StatementSet ParentStore::getAllParentValues() const {
     StatementSet values;
@@ -65,7 +65,7 @@ bool ParentStore::hasParentStar(const StatementNumber& parent, const StatementNu
 
 ParentStore::StatementToSetMap ParentStore::getAllParentStar() const {
     return parentStarStore;
-};
+}
 
 ParentStore::StatementSet ParentStore::getAllParentStarKeys() const {
     StatementSet keys;
@@ -73,7 +73,7 @@ ParentStore::StatementSet ParentStore::getAllParentStarKeys() const {
         keys.insert(pair.first);
     }
     return keys;
-};
+}
 
 ParentStore::StatementSet ParentStore::getAllParentStarValues() const {
     StatementSet values;
@@ -81,7 +81,7 @@ ParentStore::StatementSet ParentStore::getAllParentStarValues() const {
         values.insert(pair.second.begin(), pair.second.end());
     }
     return values;
-};
+}
 
 ParentStore::StatementSet ParentStore::getParentStarChildren(const StatementNumber& parent) const {
     auto it = parentStarStore.find(parent);

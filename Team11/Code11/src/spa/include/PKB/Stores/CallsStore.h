@@ -31,21 +31,28 @@ class CallsStore {
      * @param callee The name of the called procedure.
      * @return True if caller directly calls callee, false otherwise.
      */
-    bool hasCalls(const ProcedureName& caller, const ProcedureName& callee) const;
+    [[nodiscard]] bool hasCalls(const ProcedureName& caller, const ProcedureName& callee) const;
+
+    /**
+     * Gets all direct Calls relationship.
+     *
+     * @return A map of all direct caller-callee procedures.
+     */
+    [[nodiscard]] ProcedureToProcedureSetMap getAllCalls() const;
 
     /**
      * Gets all procedures that are called by at least one other procedure.
      *
      * @return A set of all callee procedures.
      */
-    ProcedureSet getAllCallees() const;
+    [[nodiscard]] ProcedureSet getAllCallsValues() const;
 
     /**
      * Gets all procedures that call at least one other procedure.
      *
      * @return A set of all caller procedures.
      */
-    ProcedureSet getAllCallers() const;
+    [[nodiscard]] ProcedureSet getAllCallsKeys() const;
 
     /**
      * Gets all procedures called by a specific procedure.
@@ -53,7 +60,7 @@ class CallsStore {
      * @param caller The name of the calling procedure.
      * @return A set of procedures called by caller.
      */
-    ProcedureSet getCallees(const ProcedureName& caller) const;
+    [[nodiscard]] ProcedureSet getCallees(const ProcedureName& caller) const;
 
     /**
      * Gets all procedures that call a specific procedure.
@@ -61,7 +68,7 @@ class CallsStore {
      * @param callee The name of the called procedure.
      * @return A set of procedures that call callee.
      */
-    ProcedureSet getCallers(const ProcedureName& callee) const;
+    [[nodiscard]] ProcedureSet getCallers(const ProcedureName& callee) const;
 
     /**
      * Adds a transitive Calls* relationship between two procedures.
@@ -78,21 +85,28 @@ class CallsStore {
      * @param callee The name of the potentially descendant called procedure.
      * @return True if a transitive Calls* relationship exists from caller to callee, false otherwise.
      */
-    bool hasCallsStar(const ProcedureName& caller, const ProcedureName& callee) const;
+    [[nodiscard]] bool hasCallsStar(const ProcedureName& caller, const ProcedureName& callee) const;
+
+    /**
+     * Gets all Calls* relationship.
+     *
+     * @return A map of all transitive caller-callee procedures.
+     */
+    [[nodiscard]] ProcedureToProcedureSetMap getAllCallsStar() const;
 
     /**
      * Gets all procedures that are transitively called by at least one other procedure.
      *
      * @return A set of all callee procedures in Calls* relationships.
      */
-    ProcedureSet getAllCallsStarCallees() const;
+    [[nodiscard]] ProcedureSet getAllCallsStarValues() const;
 
     /**
      * Gets all procedures that transitively call at least one other procedure.
      *
      * @return A set of all caller procedures in Calls* relationships.
      */
-    ProcedureSet getAllCallsStarCallers() const;
+    [[nodiscard]] ProcedureSet getAllCallsStarKeys() const;
 
     /**
      * Gets all procedures transitively called by a specific procedure in Calls* relationships.
@@ -100,7 +114,7 @@ class CallsStore {
      * @param caller The name of the ancestor calling procedure.
      * @return A set of procedures transitively called by caller.
      */
-    ProcedureSet getCallsStarCallees(const ProcedureName& caller) const;
+    [[nodiscard]] ProcedureSet getCallsStarCallees(const ProcedureName& caller) const;
 
     /**
      * Gets all procedures that transitively call a specific procedure in Calls* relationships.
@@ -108,7 +122,7 @@ class CallsStore {
      * @param callee The name of the descendant called procedure.
      * @return A set of procedures that transitively call callee.
      */
-    ProcedureSet getCallsStarCallers(const ProcedureName& callee) const;
+    [[nodiscard]] ProcedureSet getCallsStarCallers(const ProcedureName& callee) const;
 
   private:
     ProcedureToProcedureSetMap callsStore;

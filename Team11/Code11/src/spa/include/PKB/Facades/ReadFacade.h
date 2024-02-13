@@ -122,6 +122,56 @@ class ReadFacade {
 
     std::unordered_set<std::string> getStarParent(const std::string& child) const;
 
+    // Next-related Read Operations
+    bool hasNext(const std::string& before, const std::string& after) const;
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> getAllNext() const;
+
+    std::unordered_set<std::string> getAllNextKeys() const;
+
+    std::unordered_set<std::string> getAllNextValues() const;
+
+    std::unordered_set<std::string> getNext(const std::string& before) const;
+
+    std::unordered_set<std::string> getNextPrevious(const std::string& after) const;
+
+    bool hasNextStar(const std::string& before, const std::string& after) const;
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> getAllNextStar() const;
+
+    std::unordered_set<std::string> getAllNextStarKeys() const;
+
+    std::unordered_set<std::string> getAllNextStarValues() const;
+
+    std::unordered_set<std::string> getNextStar(const std::string& before) const;
+
+    std::unordered_set<std::string> getNextStarPrevious(const std::string& after) const;
+
+    // Calls-related Read Operations
+    bool hasCalls(const std::string& caller, const std::string& callee) const;
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> getAllCalls() const;
+
+    std::unordered_set<std::string> getAllCallsValues() const;
+
+    std::unordered_set<std::string> getAllCallsKeys() const;
+
+    std::unordered_set<std::string> getCallees(const std::string& caller) const;
+
+    std::unordered_set<std::string> getCallers(const std::string& callee) const;
+
+    bool hasCallsStar(const std::string& caller, const std::string& callee) const;
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> getAllCallsStar() const;
+
+    std::unordered_set<std::string> getAllCallsStarValues() const;
+
+    std::unordered_set<std::string> getAllCallsStarKeys() const;
+
+    std::unordered_set<std::string> getCallsStarCallees(const std::string& caller) const;
+
+    std::unordered_set<std::string> getCallsStarCallers(const std::string& callee) const;
+
   private:
     std::shared_ptr<PKB> pkb;
 };

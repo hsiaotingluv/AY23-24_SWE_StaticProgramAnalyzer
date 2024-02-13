@@ -39,6 +39,14 @@ class WriteFacade {
 
     void addParentStar(const std::string& parent, const std::string& child);
 
+    void addNext(const std::string& before, const std::string& after);
+
+    void addNextStar(const std::string& before, const std::string& after);
+
+    void addCalls(const std::string& caller, const std::string& callee);
+
+    void addCallsStar(const std::string& caller, const std::string& callee);
+
   private:
     std::shared_ptr<PKB> pkb;
 };

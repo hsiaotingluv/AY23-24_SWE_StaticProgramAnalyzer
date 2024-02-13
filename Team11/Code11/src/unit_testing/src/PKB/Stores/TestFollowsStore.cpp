@@ -23,6 +23,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollows("3", "4");
 
         auto allFollows = followsStore.getAllFollows();
+
         REQUIRE(allFollows.size() == 2);
         REQUIRE(allFollows["1"] == "2");
         REQUIRE(allFollows["3"] == "4");
@@ -33,6 +34,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollows("3", "4");
 
         auto keys = followsStore.getAllFollowsKeys();
+
         REQUIRE(keys.size() == 2);
         REQUIRE(keys.find("1") != keys.end());
         REQUIRE(keys.find("3") != keys.end());
@@ -43,6 +45,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollows("3", "4");
 
         auto values = followsStore.getAllFollowsValues();
+
         REQUIRE(values.size() == 2);
         REQUIRE(values.find("2") != values.end());
         REQUIRE(values.find("4") != values.end());
@@ -83,6 +86,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollowsStars("1", "3");
 
         auto allFollowsStar = followsStore.getAllFollowsStar();
+
         REQUIRE(allFollowsStar["1"].size() == 2);
         REQUIRE(allFollowsStar["1"].find("2") != allFollowsStar["1"].end());
         REQUIRE(allFollowsStar["1"].find("3") != allFollowsStar["1"].end());
@@ -93,6 +97,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollowsStars("2", "4");
 
         auto keys = followsStore.getAllFollowsStarKeys();
+
         REQUIRE(keys.size() == 2);
         REQUIRE(keys.find("1") != keys.end());
         REQUIRE(keys.find("2") != keys.end());
@@ -104,6 +109,7 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollowsStars("2", "4");
 
         auto values = followsStore.getAllFollowsStarValues();
+
         REQUIRE(values.size() == 2);
         REQUIRE(values.find("3") != values.end());
         REQUIRE(values.find("4") != values.end());
@@ -113,10 +119,12 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollowsStars("1", "3");
 
         auto following = followsStore.getFollowsStarsFollowing("1");
+
         REQUIRE(!following.empty());
         REQUIRE(following.find("3") != following.end());
 
         auto noFollowing = followsStore.getFollowsStarsFollowing("3");
+
         REQUIRE(noFollowing.empty());
     }
 
@@ -124,10 +132,12 @@ TEST_CASE("FollowsStore Tests") {
         followsStore.addFollowsStars("1", "3");
 
         auto by = followsStore.getFollowsStarsBy("3");
+
         REQUIRE(!by.empty());
         REQUIRE(by.find("1") != by.end());
 
         auto noBy = followsStore.getFollowsStarsBy("1");
+
         REQUIRE(noBy.empty());
     }
 }

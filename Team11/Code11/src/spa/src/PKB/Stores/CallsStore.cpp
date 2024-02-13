@@ -15,7 +15,11 @@ bool CallsStore::hasCalls(const ProcedureName& caller, const ProcedureName& call
     return it != callsStore.end() && it->second.find(callee) != it->second.end();
 }
 
-CallsStore::ProcedureSet CallsStore::getAllCallees() const {
+CallsStore::ProcedureToProcedureSetMap CallsStore::getAllCalls() const {
+    return callsStore;
+}
+
+CallsStore::ProcedureSet CallsStore::getAllCallsValues() const {
     ProcedureSet allCallees;
     for (const auto& pair : callsStore) {
         allCallees.insert(pair.second.begin(), pair.second.end());
@@ -23,7 +27,7 @@ CallsStore::ProcedureSet CallsStore::getAllCallees() const {
     return allCallees;
 }
 
-CallsStore::ProcedureSet CallsStore::getAllCallers() const {
+CallsStore::ProcedureSet CallsStore::getAllCallsKeys() const {
     ProcedureSet allCallers;
     for (const auto& pair : callsStore) {
         allCallers.insert(pair.first);
@@ -57,7 +61,11 @@ bool CallsStore::hasCallsStar(const ProcedureName& caller, const ProcedureName& 
     return it != callsStarStore.end() && it->second.find(callee) != it->second.end();
 }
 
-CallsStore::ProcedureSet CallsStore::getAllCallsStarCallees() const {
+CallsStore::ProcedureToProcedureSetMap CallsStore::getAllCallsStar() const {
+    return callsStarStore;
+}
+
+CallsStore::ProcedureSet CallsStore::getAllCallsStarValues() const {
     ProcedureSet allCallees;
     for (const auto& pair : callsStarStore) {
         allCallees.insert(pair.second.begin(), pair.second.end());
@@ -65,7 +73,7 @@ CallsStore::ProcedureSet CallsStore::getAllCallsStarCallees() const {
     return allCallees;
 }
 
-CallsStore::ProcedureSet CallsStore::getAllCallsStarCallers() const {
+CallsStore::ProcedureSet CallsStore::getAllCallsStarKeys() const {
     ProcedureSet allCallers;
     for (const auto& pair : callsStarStore) {
         allCallers.insert(pair.first);

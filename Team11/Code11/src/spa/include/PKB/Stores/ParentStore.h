@@ -40,14 +40,14 @@ class ParentStore {
      *
      * @return A mapping of parent statements to their direct children.
      */
-    StatementToSetMap getAllParent() const;
+    [[nodiscard]] StatementToSetMap getAllParent() const;
 
     /**
      * Retrieves all parents from the Parent relationship.
      *
      * @return A set of parent statement numbers.
      */
-    StatementSet getAllParentKeys() const;
+    [[nodiscard]] StatementSet getAllParentKeys() const;
 
     /**
      * Retrieves all children from the Parent relationship.
@@ -87,7 +87,7 @@ class ParentStore {
      * @param child The statement number of the descendant.
      * @return True if the parent-child relationship exists, false otherwise.
      */
-    bool hasParentStar(const StatementNumber& parent, const StatementNumber& child) const;
+    [[nodiscard]] bool hasParentStar(const StatementNumber& parent, const StatementNumber& child) const;
 
     /**
      * Retrieves all Parent* relationships.

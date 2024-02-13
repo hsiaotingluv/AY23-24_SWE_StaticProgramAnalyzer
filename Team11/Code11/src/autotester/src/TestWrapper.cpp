@@ -24,10 +24,7 @@ TestWrapper::TestWrapper()
     : source_processor(nullptr), readFacade(nullptr), writeFacade(nullptr), qps_parser(nullptr),
       qps_evaluator(nullptr) {
 
-    // TODO: replace the following line once PKB factory is merged
-    auto pkb = std::make_shared<PKB>();
-    readFacade = std::make_shared<ReadFacade>(pkb);
-    writeFacade = std::make_shared<WriteFacade>(pkb);
+    auto [readFacade, writeFacade] = PKB::create_facades();
 
     source_processor = sp::SourceProcessor::get_complete_sp(writeFacade);
     qps_parser = std::make_shared<qps::QueryProcessingSystemParser>();

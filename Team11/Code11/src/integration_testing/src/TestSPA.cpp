@@ -60,10 +60,7 @@ static auto input_generator = []() -> std::string {
 };
 
 TEST_CASE("Test SPA - Entities") {
-    auto pkb = std::make_shared<PKB>();
-    // TODO: replace the following line once PKB factory is merged
-    auto readFacade = std::make_shared<ReadFacade>(pkb);
-    auto writeFacade = std::make_shared<WriteFacade>(pkb);
+    auto[readFacade, writeFacade] = PKB::create_facades();
 
     auto sp = sp::SourceProcessor::get_complete_sp(writeFacade);
 

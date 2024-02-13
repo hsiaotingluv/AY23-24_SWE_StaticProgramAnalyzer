@@ -69,8 +69,7 @@ TEST_CASE("Test Statement Number Traverser") {
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
 
-    auto pkb = std::make_shared<PKB>();
-    auto write_facade = std::make_shared<WriteFacade>(pkb);
+    auto[read_facade, write_facade] = PKB::create_facades();
 
     std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>(write_facade)};
     auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};

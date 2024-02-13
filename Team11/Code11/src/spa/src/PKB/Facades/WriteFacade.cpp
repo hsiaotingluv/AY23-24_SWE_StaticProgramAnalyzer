@@ -64,3 +64,19 @@ void WriteFacade::addParent(const std::string& parent, const std::string& child)
 void WriteFacade::addParentStar(const std::string& parent, const std::string& child) {
     this->pkb->parent_store->addParentStar(parent, child);
 }
+
+void WriteFacade::addNext(const std::string& before, const std::string& after) {
+    this->pkb->next_store->addNext(before, after);
+}
+
+void WriteFacade::addNextStar(const std::string& before, const std::string& after) {
+    this->pkb->next_store->addNextStar(before, after);
+}
+
+void WriteFacade::addCalls(const std::string& caller, const std::string& callee) {
+    this->pkb->calls_store->addCalls(caller, callee);
+}
+
+void WriteFacade::addCallsStar(const std::string& caller, const std::string& callee) {
+    this->pkb->calls_store->addCallsStar(caller, callee);
+}

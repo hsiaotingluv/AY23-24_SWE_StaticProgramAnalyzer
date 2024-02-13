@@ -9,6 +9,7 @@ TEST_CASE("EntityStore Tests") {
         entityStore.addVariable(Variable("y"));
 
         auto variables = entityStore.getVariables();
+
         REQUIRE(variables.size() == 2);
         REQUIRE(variables.find(Variable("x")) != variables.end());
         REQUIRE(variables.find(Variable("y")) != variables.end());
@@ -20,6 +21,7 @@ TEST_CASE("EntityStore Tests") {
         entityStore.addProcedure(Procedure("helper"));
 
         auto procedures = entityStore.getProcedures();
+
         REQUIRE(procedures.size() == 2);
         REQUIRE(procedures.find(Procedure("main")) != procedures.end());
         REQUIRE(procedures.find(Procedure("helper")) != procedures.end());
@@ -31,6 +33,7 @@ TEST_CASE("EntityStore Tests") {
         entityStore.addConstant(Constant("2"));
 
         auto constants = entityStore.getConstants();
+
         REQUIRE(constants.size() == 2);
         REQUIRE(constants.find(Constant("1")) != constants.end());
         REQUIRE(constants.find(Constant("2")) != constants.end());
@@ -46,14 +49,15 @@ TEST_CASE("EntityStore Tests") {
         entityStore.addConstant(Constant("1"));
 
         auto variables = entityStore.getVariables();
+        auto procedures = entityStore.getProcedures();
+        auto constants = entityStore.getConstants();
+
         REQUIRE(variables.size() == 1);
         REQUIRE(variables.find(Variable("x")) != variables.end());
 
-        auto procedures = entityStore.getProcedures();
         REQUIRE(procedures.size() == 1);
         REQUIRE(procedures.find(Procedure("main")) != procedures.end());
 
-        auto constants = entityStore.getConstants();
         REQUIRE(constants.size() == 1);
         REQUIRE(constants.find(Constant("1")) != constants.end());
     }

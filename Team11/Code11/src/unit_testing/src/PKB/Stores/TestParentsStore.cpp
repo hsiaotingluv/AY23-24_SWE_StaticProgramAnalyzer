@@ -26,6 +26,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParent("3", "4");
 
         auto allParents = parentStore.getAllParent();
+
         REQUIRE(allParents.size() == 2);
         REQUIRE(allParents["1"].find("2") != allParents["1"].end());
         REQUIRE(allParents["3"].find("4") != allParents["3"].end());
@@ -36,6 +37,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParent("2", "3");
 
         auto parentKeys = parentStore.getAllParentKeys();
+
         REQUIRE(parentKeys.size() == 2);
         REQUIRE(parentKeys.find("1") != parentKeys.end());
         REQUIRE(parentKeys.find("2") != parentKeys.end());
@@ -47,6 +49,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParent("2", "3");
 
         auto childValues = parentStore.getAllParentValues();
+
         REQUIRE(childValues.size() == 2);
         REQUIRE(childValues.find("1") == childValues.end());
         REQUIRE(childValues.find("2") != childValues.end());
@@ -58,6 +61,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParent("1", "3");
 
         auto children = parentStore.getParentChildren("1");
+
         REQUIRE(children.size() == 2);
         REQUIRE(children.find("1") == children.end());
         REQUIRE(children.find("2") != children.end());
@@ -68,6 +72,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParent("1", "2");
 
         auto parent = parentStore.getParent("2");
+
         REQUIRE(parent == "1");
         REQUIRE_FALSE(parent == "2");
     }
@@ -105,6 +110,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParentStar("1", "3");
 
         auto allParentStars = parentStore.getAllParentStar();
+
         REQUIRE(allParentStars.size() == 1);
         REQUIRE(allParentStars["1"].find("2") != allParentStars["1"].end());
         REQUIRE(allParentStars["1"].find("3") != allParentStars["1"].end());
@@ -115,6 +121,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParentStar("2", "3");
 
         auto parentStarKeys = parentStore.getAllParentStarKeys();
+
         REQUIRE(parentStarKeys.size() == 2);
         REQUIRE(parentStarKeys.find("1") != parentStarKeys.end());
         REQUIRE(parentStarKeys.find("2") != parentStarKeys.end());
@@ -126,6 +133,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParentStar("1", "3");
 
         auto parentStarValues = parentStore.getAllParentStarValues();
+
         REQUIRE(parentStarValues.size() == 2);
         REQUIRE(parentStarValues.find("1") == parentStarValues.end());
         REQUIRE(parentStarValues.find("2") != parentStarValues.end());
@@ -137,6 +145,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParentStar("1", "3");
 
         auto descendants = parentStore.getParentStarChildren("1");
+
         REQUIRE(descendants.size() == 2);
         REQUIRE(descendants.find("1") == descendants.end());
         REQUIRE(descendants.find("2") != descendants.end());
@@ -148,6 +157,7 @@ TEST_CASE("ParentStore Tests") {
         parentStore.addParentStar("2", "3");
 
         auto ancestors = parentStore.getStarParent("3");
+
         REQUIRE(ancestors.size() == 2);
         REQUIRE(ancestors.find("1") != ancestors.end());
         REQUIRE(ancestors.find("2") != ancestors.end());
