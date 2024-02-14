@@ -159,7 +159,7 @@ auto untyped_clause_visitor(const Synonyms& declarations, const std::unordered_m
             if (!maybe_syn.has_value()) {
                 return std::nullopt;
             }
-            const auto maybe_assign_syn = maybe_syn.value();
+            const auto& maybe_assign_syn = maybe_syn.value();
             if (!std::holds_alternative<AssignSynonym>(maybe_assign_syn)) {
                 return std::nullopt;
             }
@@ -178,7 +178,7 @@ auto untyped_clause_visitor(const Synonyms& declarations, const std::unordered_m
                 return std::nullopt;
             }
 
-            const auto ent_ref = maybe_ent_ref.value();
+            const auto& ent_ref = maybe_ent_ref.value();
             return std::make_shared<PatternClause>(assign_syn, ent_ref, pattern.expression_spec);
         }};
 };
@@ -196,7 +196,7 @@ auto SemanticValidator::validate(const Synonyms& declarations, const untyped::Un
     if (!maybe_mapping.has_value()) {
         return SemanticError{"Non-unique mapping"};
     }
-    const auto mapping = maybe_mapping.value();
+    const auto& mapping = maybe_mapping.value();
 
     const auto& [references, clauses] = untyped_query;
 
@@ -206,7 +206,7 @@ auto SemanticValidator::validate(const Synonyms& declarations, const untyped::Un
         return SemanticError{"Undeclared reference: " + references.get_name().get_value()};
     }
 
-    const auto reference = maybe_reference.value();
+    const auto& reference = maybe_reference.value();
 
     // Clauses must be valid
     std::vector<std::shared_ptr<Clause>> validated_clauses;

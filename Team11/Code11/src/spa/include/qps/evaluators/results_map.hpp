@@ -9,8 +9,8 @@ namespace qps {
 struct ResultsMap {
   private:
     std::unordered_map<Synonym, std::vector<std::string>> mapping;
-    bool is_unsatisfiable_;
-    bool is_valid_;
+    bool is_unsatisfiable_{false};
+    bool is_valid_{false};
 
   public:
     // TODO: update_mapping assumes that there is no conflict --> will not be true if there are multiple clauses

@@ -17,7 +17,7 @@ class Evaluator {
     Evaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)) {
     }
 
-    auto evaluate(qps::Query query_obj) -> std::vector<std::string>;
+    auto evaluate(const qps::Query& query_obj) -> std::vector<std::string>;
 };
 
 } // namespace qps

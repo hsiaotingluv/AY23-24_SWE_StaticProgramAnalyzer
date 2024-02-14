@@ -3,7 +3,7 @@
 #include "qps/evaluators/relationship/relationship_evaluator.hpp"
 
 namespace qps {
-auto Evaluator::evaluate(qps::Query query_obj) -> std::vector<std::string> {
+auto Evaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
     const auto results = std::visit(scan_entities(read_facade), reference);
 

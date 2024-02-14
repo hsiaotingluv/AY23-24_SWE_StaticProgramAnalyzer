@@ -228,7 +228,7 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     }
 }
 
-auto parse_stmt_stmt(std::string keyword, bool is_direct) {
+auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
     return [keyword, is_direct](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
                -> std::optional<std::tuple<AnyStmtSynonymtmtRel, std::vector<Token>::const_iterator>> {
         const auto offset = is_direct ? 0 : 1;
@@ -267,7 +267,7 @@ auto parse_stmt_stmt(std::string keyword, bool is_direct) {
     };
 };
 
-auto parse_stmt_ent(std::string keyword) {
+auto parse_stmt_ent(const std::string& keyword) {
     return [keyword](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
                -> std::optional<std::tuple<UntypedStmtEntRel, std::vector<Token>::const_iterator>> {
         if (std::distance(it, end) < 6) {
