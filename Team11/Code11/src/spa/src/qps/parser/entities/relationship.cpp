@@ -3,6 +3,32 @@
 #include <variant>
 
 namespace qps {
+auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard> {
+    return std::visit(
+        [](auto&& arg) -> std::optional<StmtRefNoWildcard> {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, WildCard>) {
+                return std::nullopt;
+            } else {
+                return std::make_optional(StmtRefNoWildcard{arg});
+            }
+        },
+        stmt_ref);
+}
+
+auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef> {
+    return std::visit(overloaded{[](const Synonym& x) -> std::optional<VarRef> {
+                                     if (is_var_syn(x)) {
+                                         return std::get<VarSynonym>(x);
+                                     }
+                                     return std::nullopt;
+                                 },
+                                 [](const auto& x) -> std::optional<VarRef> {
+                                     return x;
+                                 }},
+                      ent_ref);
+}
+
 auto operator<<(std::ostream& os, const Follows& follows) -> std::ostream& {
     os << "Follows(" << follows.stmt1 << ", " << follows.stmt2 << ")";
     return os;
@@ -46,4 +72,13 @@ auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream& {
     return os;
 }
 #endif
+
+auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream& {
+    std::visit(
+        [&os](auto&& relationship) {
+            os << relationship;
+        },
+        relationship);
+    return os;
+}
 } // namespace qps

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "qps/evaluators/type_traits.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 #include <unordered_map>
 #include <unordered_set>
 

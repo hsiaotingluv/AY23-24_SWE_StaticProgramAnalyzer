@@ -3,7 +3,7 @@
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/relationship/modifiesS_evaluator.hpp"
 #include "qps/evaluators/results_map.hpp"
-#include "qps/evaluators/type_traits.hpp"
+#include "qps/template_utils.hpp"
 
 #include "qps/parser/entities/relationship.hpp"
 #include <memory>

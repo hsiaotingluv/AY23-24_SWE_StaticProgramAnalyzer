@@ -6,15 +6,14 @@
 
 #include "common/statement_type.hpp"
 #include "qps/evaluators/simple_evaluator.hpp"
-#include "qps/parser/parser.hpp"
+#include "qps/qps.hpp"
 
 #include <memory>
-#include <optional>
 #include <unordered_set>
 
 TEST_CASE("Test pkb and QPS - Entities") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::QueryProcessingSystemParser{};
+    const auto qps_parser = qps::QueryProcessingSystem{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -26,7 +25,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
     SECTION("Test Query - all variables") {
         const auto query = "variable v; Select v";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -44,7 +43,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
     SECTION("Test Query - all procedures") {
         const auto query = "procedure p; Select p";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -62,7 +61,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
     SECTION("Test Query - all constants") {
         const auto query = "constant c; Select c";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -82,7 +81,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
 TEST_CASE("Test pkb and QPS - Statements") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::QueryProcessingSystemParser{};
+    const auto qps_parser = qps::QueryProcessingSystem{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -101,7 +100,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all assign") {
         const auto query = "assign a; Select a";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -119,7 +118,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all if") {
         const auto query = "if i; Select i";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -137,7 +136,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all while") {
         const auto query = "while w; Select w";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -155,7 +154,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all call") {
         const auto query = "call c; Select c";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -173,7 +172,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all read") {
         const auto query = "read r; Select r";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -191,8 +190,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
     SECTION("Test Query - all print") {
         const auto query = "print p; Select p";
-        const auto maybe_query_obj = qps_parser.parse(query);
-
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
@@ -211,7 +209,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
     auto [read_facade, write_facade] = PKB::create_facades();
 
-    const auto qps_parser = qps::QueryProcessingSystemParser{};
+    const auto qps_parser = qps::QueryProcessingSystem{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -223,7 +221,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - all variables modified by statement") {
         const auto query = R"(variable v; Select v such that Modifies(1, v))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -239,7 +237,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - all modifying assignments") {
         const auto query = R"(assign a; Select a such that Modifies(a, _))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -255,7 +253,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - two synonyms") {
         const auto query = R"(variable v; assign a; Select a such that Modifies(a, v))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -271,7 +269,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - modifies a particular synonym") {
         const auto query = R"(assign a; Select a such that Modifies(a, "x"))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -285,7 +283,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         }
 
         const auto query2 = R"(assign a; Select a such that Modifies(a, "y"))";
-        const auto maybe_query_obj2 = qps_parser.parse(query2);
+        const auto maybe_query_obj2 = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj2.has_value());
         const auto query_obj2 = maybe_query_obj2.value();
@@ -299,7 +297,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - impossible query") {
         const auto query = R"(variable v; Select v such that Modifies(2, _))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
@@ -311,7 +309,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
 
     SECTION("Test Query - get all query") {
         const auto query = R"(variable v; Select v such that Modifies(1, _))";
-        const auto maybe_query_obj = qps_parser.parse(query);
+        const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();

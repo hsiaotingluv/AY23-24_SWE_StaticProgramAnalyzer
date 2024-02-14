@@ -1,5 +1,5 @@
 #include "qps/parser/entities/synonym.hpp"
-#include <algorithm>
+#include "qps/template_utils.hpp"
 
 namespace qps {
 auto is_var_syn(const Synonym& syn) -> bool {
@@ -42,25 +42,6 @@ auto get_stmt_synonym(Synonym synonym) -> std::optional<StmtSynonym> {
             return std::nullopt;
         },
         synonym);
-}
-
-auto find_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::optional<Synonym> {
-    const auto syn_it = std::find_if(declared_synonyms.begin(), declared_synonyms.end(), [&syn_name](auto&& x) -> bool {
-        return std::visit(
-            [&syn_name](const auto& decl) -> bool {
-                return decl.get_name() == syn_name;
-            },
-            x);
-    });
-    return syn_it == declared_synonyms.end() ? std::nullopt : std::make_optional(*syn_it);
-}
-
-auto find_stmt_syn(const Synonyms& declared_synonyms, std::string syn_name) -> std::optional<StmtSynonym> {
-    const auto maybe_syn = find_syn(declared_synonyms, std::move(syn_name));
-    if (!maybe_syn.has_value() || !is_stmt_synonym(maybe_syn.value())) {
-        return std::nullopt;
-    }
-    return get_stmt_synonym(maybe_syn.value());
 }
 
 } // namespace qps

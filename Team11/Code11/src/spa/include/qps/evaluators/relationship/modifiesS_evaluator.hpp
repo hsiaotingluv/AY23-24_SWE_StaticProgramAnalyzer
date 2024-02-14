@@ -2,8 +2,8 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/results_map.hpp"
-#include "qps/evaluators/type_traits.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 
 #include <memory>
 
