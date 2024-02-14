@@ -21,14 +21,14 @@ auto WrapperFactory::createWrapper() -> AbstractWrapper* {
 volatile bool AbstractWrapper::GlobalStop = false;
 
 TestWrapper::TestWrapper()
-    : source_processor(nullptr), readFacade(nullptr), writeFacade(nullptr), qps_parser(nullptr),
+    : source_processor(nullptr), read_facade(nullptr), write_facade(nullptr), qps_parser(nullptr),
       qps_evaluator(nullptr) {
 
-    auto [readFacade, writeFacade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PKB::create_facades();
 
-    source_processor = sp::SourceProcessor::get_complete_sp(writeFacade);
+    source_processor = sp::SourceProcessor::get_complete_sp(write_facade);
     qps_parser = std::make_shared<qps::QueryProcessingSystemParser>();
-    qps_evaluator = std::make_shared<qps::Evaluator>(readFacade);
+    qps_evaluator = std::make_shared<qps::Evaluator>(read_facade);
 }
 
 auto TestWrapper::load_file(const std::string& filename) -> std::string {

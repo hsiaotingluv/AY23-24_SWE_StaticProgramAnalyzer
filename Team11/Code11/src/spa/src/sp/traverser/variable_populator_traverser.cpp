@@ -11,7 +11,7 @@ auto VarPopulatorTraverser::is_var_node(const std::shared_ptr<AstNode>& node) ->
 auto VarPopulatorTraverser::traverse(std::shared_ptr<AstNode> node) -> std::shared_ptr<AstNode> {
     if (is_var_node(node)) {
         auto var_node = std::dynamic_pointer_cast<VarNode>(node);
-        write_facade->addVariable(var_node->name);
+        write_facade->add_variable(var_node->name);
     }
 
     for (const auto& child : node->get_children()) {

@@ -2,9 +2,9 @@
 
 #include "sp/main.hpp"
 
-#include "PKB/Facades/ReadFacade.h"
-#include "PKB/Facades/WriteFacade.h"
-#include "PKB/PKB.h"
+#include "pkb/facades/read_facade.h"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb.h"
 
 #include "qps/evaluators/simple_evaluator.hpp"
 #include "qps/parser/parser.hpp"
@@ -60,9 +60,9 @@ static auto input_generator = []() -> std::string {
 };
 
 TEST_CASE("Test SPA - Entities") {
-    auto[readFacade, writeFacade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PKB::create_facades();
 
-    auto sp = sp::SourceProcessor::get_complete_sp(writeFacade);
+    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
@@ -88,7 +88,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{readFacade};
+            auto evaluator = qps::Evaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_variables);
         }
@@ -102,7 +102,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{readFacade};
+            auto evaluator = qps::Evaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_procedures);
         }
@@ -116,7 +116,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{readFacade};
+            auto evaluator = qps::Evaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_constants);
         }

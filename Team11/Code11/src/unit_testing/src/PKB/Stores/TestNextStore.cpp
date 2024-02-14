@@ -1,34 +1,34 @@
 #include <catch.hpp>
 
-#include "PKB/Stores/NextStore.h"
+#include "pkb/stores/next_store.h"
 
 TEST_CASE("NextStore Tests") {
-    NextStore nextStore;
+    NextStore next_store;
 
     SECTION("Add and Verify Direct Next Relationship") {
-        nextStore.addNext("1", "2");
-        nextStore.addNext("2", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next("2", "3");
 
-        REQUIRE(nextStore.hasNext("1", "2"));
-        REQUIRE(nextStore.hasNext("2", "3"));
-        REQUIRE_FALSE(nextStore.hasNext("1", "3"));
+        REQUIRE(next_store.has_next("1", "2"));
+        REQUIRE(next_store.has_next("2", "3"));
+        REQUIRE_FALSE(next_store.has_next("1", "3"));
     }
 
     SECTION("Verify Absence of Non-existent Direct Next Relationship") {
-        nextStore.addNext("1", "2");
-        nextStore.addNext("2", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next("2", "3");
 
-        REQUIRE_FALSE(nextStore.hasNext("2", "1"));
-        REQUIRE_FALSE(nextStore.hasNext("3", "2"));
-        REQUIRE_FALSE(nextStore.hasNext("1", "3"));
+        REQUIRE_FALSE(next_store.has_next("2", "1"));
+        REQUIRE_FALSE(next_store.has_next("3", "2"));
+        REQUIRE_FALSE(next_store.has_next("1", "3"));
     }
 
     SECTION("Get All Direct Next Relationships") {
-        nextStore.addNext("1", "2");
-        nextStore.addNext("2", "3");
-        nextStore.addNext("2", "4");
+        next_store.add_next("1", "2");
+        next_store.add_next("2", "3");
+        next_store.add_next("2", "4");
 
-        auto allNext = nextStore.getAllNext();
+        auto allNext = next_store.get_all_next();
 
         REQUIRE(allNext.size() == 2);
         REQUIRE(allNext["1"].find("1") == allNext["1"].end());
@@ -42,10 +42,10 @@ TEST_CASE("NextStore Tests") {
     }
 
     SECTION("Get Direct Next Successors") {
-        nextStore.addNext("1", "2");
-        nextStore.addNext("1", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next("1", "3");
 
-        auto next = nextStore.getNext("1");
+        auto next = next_store.get_next("1");
 
         REQUIRE(next.size() == 2);
         REQUIRE(next.find("1") == next.end());
@@ -54,10 +54,10 @@ TEST_CASE("NextStore Tests") {
     }
 
     SECTION("Get Direct Next Predecessors") {
-        nextStore.addNext("1", "2");
-        nextStore.addNext("3", "2");
+        next_store.add_next("1", "2");
+        next_store.add_next("3", "2");
 
-        auto previous = nextStore.getNextPrevious("2");
+        auto previous = next_store.get_next_previous("2");
 
         REQUIRE(previous.size() == 2);
         REQUIRE(previous.find("1") != previous.end());
@@ -66,28 +66,28 @@ TEST_CASE("NextStore Tests") {
     }
 
     SECTION("Add and Verify Transitive Next* Relationship") {
-        nextStore.addNext("1", "2");
-        nextStore.addNextStar("1", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next_star("1", "3");
 
-        REQUIRE(nextStore.hasNextStar("1", "2"));
-        REQUIRE(nextStore.hasNextStar("1", "3"));
+        REQUIRE(next_store.has_next_star("1", "2"));
+        REQUIRE(next_store.has_next_star("1", "3"));
     }
 
     SECTION("Verify Absence of Non-existent Transitive Next* Relationship") {
-        nextStore.addNext("1", "2");
-        nextStore.addNextStar("1", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next_star("1", "3");
 
-        REQUIRE_FALSE(nextStore.hasNextStar("2", "1"));
-        REQUIRE_FALSE(nextStore.hasNextStar("2", "3"));
-        REQUIRE_FALSE(nextStore.hasNextStar("3", "1"));
+        REQUIRE_FALSE(next_store.has_next_star("2", "1"));
+        REQUIRE_FALSE(next_store.has_next_star("2", "3"));
+        REQUIRE_FALSE(next_store.has_next_star("3", "1"));
     }
 
     SECTION("Get All Transitive Next* Relationships") {
-        nextStore.addNext("1", "2");
-        nextStore.addNextStar("1", "3");
-        nextStore.addNextStar("2", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next_star("1", "3");
+        next_store.add_next_star("2", "3");
 
-        auto allNextStar = nextStore.getAllNextStar();
+        auto allNextStar = next_store.get_all_next_star();
 
         REQUIRE(allNextStar.size() == 2);
         REQUIRE(allNextStar["1"].find("3") != allNextStar["1"].end());
@@ -98,10 +98,10 @@ TEST_CASE("NextStore Tests") {
     }
 
     SECTION("Get Transitive Next* Successors") {
-        nextStore.addNext("1", "2");
-        nextStore.addNextStar("1", "3");
+        next_store.add_next("1", "2");
+        next_store.add_next_star("1", "3");
 
-        auto nextStar = nextStore.getNextStar("1");
+        auto nextStar = next_store.get_next_star("1");
 
         REQUIRE(nextStar.size() == 2);
         REQUIRE(nextStar.find("2") != nextStar.end());
@@ -110,10 +110,10 @@ TEST_CASE("NextStore Tests") {
     }
 
     SECTION("Test Get Transitive Next* Predecessors") {
-        nextStore.addNext("2", "3");
-        nextStore.addNextStar("1", "3");
+        next_store.add_next("2", "3");
+        next_store.add_next_star("1", "3");
 
-        auto previousStar = nextStore.getNextStarPrevious("3");
+        auto previousStar = next_store.get_next_star_previous("3");
 
         REQUIRE(previousStar.size() == 2);
         REQUIRE(previousStar.find("1") != previousStar.end());

@@ -63,7 +63,7 @@ void StmtNumTraverser::add_statement_pkb(uint32_t stmt_num, const std::shared_pt
         statement_type = StatementType::Print;
     }
 
-    write_facade->addStatement(std::to_string(stmt_num), statement_type);
+    write_facade->add_statement(std::to_string(stmt_num), statement_type);
 }
 
 auto StmtNumTraverser::traverse(std::shared_ptr<AstNode> node) -> std::shared_ptr<AstNode> {

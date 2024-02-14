@@ -1,42 +1,42 @@
 #pragma once
 
-#include "PKB/Facades/ReadFacade.h"
+#include "pkb/facades/read_facade.h"
 #include "qps/evaluators/type_traits.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include <memory>
 
 namespace qps {
-const auto scan_entities = [](std::shared_ptr<ReadFacade> readFacade) {
+const auto scan_entities = [](std::shared_ptr<ReadFacade> read_facade) {
     return overloaded{
-        [readFacade](const qps::VarSynonym& var) {
-            return readFacade->getVariables();
+        [read_facade](const qps::VarSynonym& var) {
+            return read_facade->get_variables();
         },
-        [readFacade](const qps::ProcSynonym& proc) {
-            return readFacade->getProcedures();
+        [read_facade](const qps::ProcSynonym& proc) {
+            return read_facade->get_procedures();
         },
-        [readFacade](const qps::ConstSynonym& constant) {
-            return readFacade->getConstants();
+        [read_facade](const qps::ConstSynonym& constant) {
+            return read_facade->get_constants();
         },
-        [readFacade](const qps::RawStmtSynonym& stmt) {
-            return readFacade->getRawStatements();
+        [read_facade](const qps::RawStmtSynonym& stmt) {
+            return read_facade->get_raw_statements();
         },
-        [readFacade](const qps::AssignSynonym& stmt) {
-            return readFacade->getAssignStatements();
+        [read_facade](const qps::AssignSynonym& stmt) {
+            return read_facade->get_assign_statements();
         },
-        [readFacade](const qps::IfSynonym& stmt) {
-            return readFacade->getIfStatements();
+        [read_facade](const qps::IfSynonym& stmt) {
+            return read_facade->get_if_statements();
         },
-        [readFacade](const qps::WhileSynonym& stmt) {
-            return readFacade->getWhileStatements();
+        [read_facade](const qps::WhileSynonym& stmt) {
+            return read_facade->get_while_statements();
         },
-        [readFacade](const qps::ReadSynonym& stmt) {
-            return readFacade->getReadStatements();
+        [read_facade](const qps::ReadSynonym& stmt) {
+            return read_facade->get_read_statements();
         },
-        [readFacade](const qps::PrintSynonym& stmt) {
-            return readFacade->getPrintStatements();
+        [read_facade](const qps::PrintSynonym& stmt) {
+            return read_facade->get_print_statements();
         },
-        [readFacade](const qps::CallSynonym& stmt) {
-            return readFacade->getCallStatements();
+        [read_facade](const qps::CallSynonym& stmt) {
+            return read_facade->get_call_statements();
         },
         [](const auto& x) {
             return std::unordered_set<std::string>{};

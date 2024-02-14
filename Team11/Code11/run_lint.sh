@@ -47,7 +47,7 @@ elif test $MODE = "sp"; then
     run src/spa/src/sp
 elif test $MODE = "pkb"; then
     echo "Lint on all files in PKB"
-    run src/spa/src/PKB
+    run src/spa/src/pkb
 elif test $MODE = "qps"; then
     echo "Lint on all files in QPS"
     run src/spa/src/qps

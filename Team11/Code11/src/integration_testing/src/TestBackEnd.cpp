@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include "PKB/Facades/ReadFacade.h"
-#include "PKB/Facades/WriteFacade.h"
-#include "PKB/PKB.h"
+#include "pkb/facades/read_facade.h"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb.h"
 
 #include "common/statement_type.hpp"
 #include "qps/evaluators/simple_evaluator.hpp"
@@ -12,17 +12,17 @@
 #include <optional>
 #include <unordered_set>
 
-TEST_CASE("Test PKB and QPS - Entities") {
-    auto[readFacade, writeFacade] = PKB::create_facades();
+TEST_CASE("Test pkb and QPS - Entities") {
+    auto [read_facade, write_facade] = PKB::create_facades();
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
-    // Populate the PKB with some data
-    writeFacade->addProcedure("procedure1");
-    writeFacade->addVariable("x");
-    writeFacade->addVariable("y");
-    writeFacade->addVariable("z");
-    writeFacade->addConstant("1");
-    writeFacade->addConstant("2");
+    // Populate the pkb with some data
+    write_facade->add_procedure("procedure1");
+    write_facade->add_variable("x");
+    write_facade->add_variable("y");
+    write_facade->add_variable("z");
+    write_facade->add_constant("1");
+    write_facade->add_constant("2");
 
     SECTION("Test Query - all variables") {
         const auto query = "variable v; Select v";
@@ -33,7 +33,7 @@ TEST_CASE("Test PKB and QPS - Entities") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x", "y", "z"};
         REQUIRE(results.size() == 3);
@@ -51,7 +51,7 @@ TEST_CASE("Test PKB and QPS - Entities") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"procedure1"};
         REQUIRE(results.size() == 1);
@@ -70,7 +70,7 @@ TEST_CASE("Test PKB and QPS - Entities") {
         REQUIRE(query_obj.clauses.empty());
 
         // Simple evaluator:
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1", "2"};
         REQUIRE(results.size() == 2);
@@ -80,24 +80,24 @@ TEST_CASE("Test PKB and QPS - Entities") {
     }
 }
 
-TEST_CASE("Test PKB and QPS - Statements") {
-    auto[readFacade, writeFacade] = PKB::create_facades();
+TEST_CASE("Test pkb and QPS - Statements") {
+    auto [read_facade, write_facade] = PKB::create_facades();
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
-    // Populate the PKB with some data
-    writeFacade->addProcedure("procedure1");
-    writeFacade->addVariable("x");
-    writeFacade->addVariable("y");
-    writeFacade->addVariable("z");
-    writeFacade->addConstant("1");
-    writeFacade->addConstant("2");
-    writeFacade->addStatement("1", StatementType::Assign);
-    writeFacade->addStatement("2", StatementType::If);
-    writeFacade->addStatement("3", StatementType::While);
-    writeFacade->addStatement("4", StatementType::Call);
-    writeFacade->addStatement("5", StatementType::Read);
-    writeFacade->addStatement("6", StatementType::Print);
-    writeFacade->addStatement("7", StatementType::Raw);
+    // Populate the pkb with some data
+    write_facade->add_procedure("procedure1");
+    write_facade->add_variable("x");
+    write_facade->add_variable("y");
+    write_facade->add_variable("z");
+    write_facade->add_constant("1");
+    write_facade->add_constant("2");
+    write_facade->add_statement("1", StatementType::Assign);
+    write_facade->add_statement("2", StatementType::If);
+    write_facade->add_statement("3", StatementType::While);
+    write_facade->add_statement("4", StatementType::Call);
+    write_facade->add_statement("5", StatementType::Read);
+    write_facade->add_statement("6", StatementType::Print);
+    write_facade->add_statement("7", StatementType::Raw);
 
     SECTION("Test Query - all assign") {
         const auto query = "assign a; Select a";
@@ -108,7 +108,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -126,7 +126,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"2"};
         REQUIRE(results.size() == expected.size());
@@ -144,7 +144,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"3"};
         REQUIRE(results.size() == expected.size());
@@ -162,7 +162,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"4"};
         REQUIRE(results.size() == expected.size());
@@ -180,7 +180,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"5"};
         REQUIRE(results.size() == expected.size());
@@ -198,7 +198,7 @@ TEST_CASE("Test PKB and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"6"};
         REQUIRE(results.size() == expected.size());
@@ -208,18 +208,18 @@ TEST_CASE("Test PKB and QPS - Statements") {
     }
 }
 
-TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
-    auto[readFacade, writeFacade] = PKB::create_facades();
+TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
+    auto [read_facade, write_facade] = PKB::create_facades();
 
     const auto qps_parser = qps::QueryProcessingSystemParser{};
 
-    // Populate the PKB with some data
-    writeFacade->addProcedure("procedure1");
-    writeFacade->addStatement("1", StatementType::Assign);
-    writeFacade->addStatement("2", StatementType::Call);
-    writeFacade->addVariable("x");
+    // Populate the pkb with some data
+    write_facade->add_procedure("procedure1");
+    write_facade->add_statement("1", StatementType::Assign);
+    write_facade->add_statement("2", StatementType::Call);
+    write_facade->add_variable("x");
 
-    writeFacade->addStatementModifiesVar("1", "x");
+    write_facade->add_statement_modifies_var("1", "x");
 
     SECTION("Test Query - all variables modified by statement") {
         const auto query = R"(variable v; Select v such that Modifies(1, v))";
@@ -228,7 +228,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x"};
         REQUIRE(results.size() == expected.size());
@@ -244,7 +244,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -260,7 +260,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -276,7 +276,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -304,7 +304,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         REQUIRE(results.empty());
     }
@@ -316,7 +316,7 @@ TEST_CASE("Test PKB and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{readFacade};
+        auto evaluator = qps::Evaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x"};
         REQUIRE(results.size() == expected.size());

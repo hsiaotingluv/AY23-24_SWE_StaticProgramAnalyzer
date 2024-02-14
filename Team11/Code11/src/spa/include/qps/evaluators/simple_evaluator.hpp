@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PKB/Facades/ReadFacade.h"
+#include "pkb/facades/read_facade.h"
 #include "qps/evaluators/results_map.hpp"
 #include "qps/parser/parser.hpp"
 
@@ -11,10 +11,10 @@
 namespace qps {
 class Evaluator {
     ResultsMap results_map;
-    std::shared_ptr<ReadFacade> readFacade;
+    std::shared_ptr<ReadFacade> read_facade;
 
   public:
-    Evaluator(std::shared_ptr<ReadFacade> readFacade) : readFacade(std::move(readFacade)) {
+    Evaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)) {
     }
 
     auto evaluate(qps::Query query_obj) -> std::vector<std::string>;

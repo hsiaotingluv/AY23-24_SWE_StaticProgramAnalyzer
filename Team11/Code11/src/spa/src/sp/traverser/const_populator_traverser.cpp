@@ -11,7 +11,7 @@ auto ConstPopulatorTraverser::is_const_node(const std::shared_ptr<AstNode>& node
 auto ConstPopulatorTraverser::traverse(std::shared_ptr<AstNode> node) -> std::shared_ptr<AstNode> {
     if (is_const_node(node)) {
         auto const_node = std::dynamic_pointer_cast<ConstantNode>(node);
-        write_facade->addConstant(std::to_string(const_node->integer));
+        write_facade->add_constant(std::to_string(const_node->integer));
     }
 
     for (const auto& child : node->get_children()) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PKB/Facades/WriteFacade.h"
+#include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
 
 namespace sp {

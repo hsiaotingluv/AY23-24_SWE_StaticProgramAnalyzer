@@ -25,6 +25,11 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  message(STATUS "Export compile_commands.json")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+endif()
+
 set(AUTOTESTER_ROOT "${CMAKE_CURRENT_LIST_DIR}/lib/autotester/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
 include(${CMAKE_MODULE_PATH}/CodeCoverage.cmake)
 

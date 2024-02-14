@@ -1,31 +1,31 @@
-#include "PKB/Stores/ParentStore.h"
+#include "pkb/stores/parent_store.h"
 #include <catch.hpp>
 
 TEST_CASE("ParentStore Tests") {
-    ParentStore parentStore;
+    ParentStore parent_store;
 
     SECTION("Adding and Verifying Direct Parent Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
 
-        REQUIRE(parentStore.hasParent("1", "2"));
-        REQUIRE(parentStore.hasParent("1", "3"));
+        REQUIRE(parent_store.has_parent("1", "2"));
+        REQUIRE(parent_store.has_parent("1", "3"));
     }
 
     SECTION("Verifying Absence of Non-existent Direct Parent Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
 
-        REQUIRE_FALSE(parentStore.hasParent("2", "1"));
-        REQUIRE_FALSE(parentStore.hasParent("3", "1"));
-        REQUIRE_FALSE(parentStore.hasParent("1", "4"));
+        REQUIRE_FALSE(parent_store.has_parent("2", "1"));
+        REQUIRE_FALSE(parent_store.has_parent("3", "1"));
+        REQUIRE_FALSE(parent_store.has_parent("1", "4"));
     }
 
     SECTION("Retrieving All Direct Parent Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("3", "4");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("3", "4");
 
-        auto allParents = parentStore.getAllParent();
+        auto allParents = parent_store.get_all_parent();
 
         REQUIRE(allParents.size() == 2);
         REQUIRE(allParents["1"].find("2") != allParents["1"].end());
@@ -33,10 +33,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Getting Parent Keys from All Parent Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("2", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("2", "3");
 
-        auto parentKeys = parentStore.getAllParentKeys();
+        auto parentKeys = parent_store.get_all_parent_keys();
 
         REQUIRE(parentKeys.size() == 2);
         REQUIRE(parentKeys.find("1") != parentKeys.end());
@@ -45,10 +45,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Getting Child Values from All Parent Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("2", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("2", "3");
 
-        auto childValues = parentStore.getAllParentValues();
+        auto childValues = parent_store.get_all_parent_values();
 
         REQUIRE(childValues.size() == 2);
         REQUIRE(childValues.find("1") == childValues.end());
@@ -57,10 +57,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving Direct Children of a Specific Parent") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
 
-        auto children = parentStore.getParentChildren("1");
+        auto children = parent_store.get_parent_children("1");
 
         REQUIRE(children.size() == 2);
         REQUIRE(children.find("1") == children.end());
@@ -69,47 +69,47 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving the Direct Parent of a Specific Child") {
-        parentStore.addParent("1", "2");
+        parent_store.add_parent("1", "2");
 
-        auto parent = parentStore.getParent("2");
+        auto parent = parent_store.get_parent("2");
 
         REQUIRE(parent == "1");
         REQUIRE_FALSE(parent == "2");
     }
 
     SECTION("Adding and Verifying Parent* Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("2", "3");
-        parentStore.addParent("3", "4");
-        parentStore.addParentStar("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("2", "3");
+        parent_store.add_parent("3", "4");
+        parent_store.add_parent_star("1", "3");
 
-        REQUIRE(parentStore.hasParentStar("1", "2"));
-        REQUIRE(parentStore.hasParentStar("1", "3"));
-        REQUIRE(parentStore.hasParentStar("2", "3"));
-        REQUIRE(parentStore.hasParentStar("3", "4"));
+        REQUIRE(parent_store.has_parent_star("1", "2"));
+        REQUIRE(parent_store.has_parent_star("1", "3"));
+        REQUIRE(parent_store.has_parent_star("2", "3"));
+        REQUIRE(parent_store.has_parent_star("3", "4"));
     }
 
     SECTION("Verifying Absence of Non-existent Parent* Relationships") {
-        parentStore.addParent("1", "2");
-        parentStore.addParent("2", "3");
-        parentStore.addParent("3", "4");
-        parentStore.addParentStar("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("2", "3");
+        parent_store.add_parent("3", "4");
+        parent_store.add_parent_star("1", "3");
 
-        REQUIRE_FALSE(parentStore.hasParentStar("1", "1"));
-        REQUIRE_FALSE(parentStore.hasParentStar("1", "4"));
-        REQUIRE_FALSE(parentStore.hasParentStar("2", "1"));
-        REQUIRE_FALSE(parentStore.hasParentStar("2", "2"));
-        REQUIRE_FALSE(parentStore.hasParentStar("2", "4"));
-        REQUIRE_FALSE(parentStore.hasParentStar("3", "1"));
-        REQUIRE_FALSE(parentStore.hasParentStar("3", "2"));
-        REQUIRE_FALSE(parentStore.hasParentStar("3", "3"));
+        REQUIRE_FALSE(parent_store.has_parent_star("1", "1"));
+        REQUIRE_FALSE(parent_store.has_parent_star("1", "4"));
+        REQUIRE_FALSE(parent_store.has_parent_star("2", "1"));
+        REQUIRE_FALSE(parent_store.has_parent_star("2", "2"));
+        REQUIRE_FALSE(parent_store.has_parent_star("2", "4"));
+        REQUIRE_FALSE(parent_store.has_parent_star("3", "1"));
+        REQUIRE_FALSE(parent_store.has_parent_star("3", "2"));
+        REQUIRE_FALSE(parent_store.has_parent_star("3", "3"));
     }
 
     SECTION("Retrieving All Parent* Relationships") {
-        parentStore.addParentStar("1", "2");
-        parentStore.addParentStar("1", "3");
+        parent_store.add_parent_star("1", "2");
+        parent_store.add_parent_star("1", "3");
 
-        auto allParentStars = parentStore.getAllParentStar();
+        auto allParentStars = parent_store.get_all_parent_star();
 
         REQUIRE(allParentStars.size() == 1);
         REQUIRE(allParentStars["1"].find("2") != allParentStars["1"].end());
@@ -117,10 +117,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Getting Ancestor Keys from All Parent* Relationships") {
-        parentStore.addParentStar("1", "3");
-        parentStore.addParentStar("2", "3");
+        parent_store.add_parent_star("1", "3");
+        parent_store.add_parent_star("2", "3");
 
-        auto parentStarKeys = parentStore.getAllParentStarKeys();
+        auto parentStarKeys = parent_store.get_all_parent_star_keys();
 
         REQUIRE(parentStarKeys.size() == 2);
         REQUIRE(parentStarKeys.find("1") != parentStarKeys.end());
@@ -129,10 +129,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Getting Descendant Values from All Parent* Relationships") {
-        parentStore.addParentStar("1", "2");
-        parentStore.addParentStar("1", "3");
+        parent_store.add_parent_star("1", "2");
+        parent_store.add_parent_star("1", "3");
 
-        auto parentStarValues = parentStore.getAllParentStarValues();
+        auto parentStarValues = parent_store.get_all_parent_star_values();
 
         REQUIRE(parentStarValues.size() == 2);
         REQUIRE(parentStarValues.find("1") == parentStarValues.end());
@@ -141,10 +141,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving All Descendants of a Specific Ancestor in Parent* Relationships") {
-        parentStore.addParentStar("1", "2");
-        parentStore.addParentStar("1", "3");
+        parent_store.add_parent_star("1", "2");
+        parent_store.add_parent_star("1", "3");
 
-        auto descendants = parentStore.getParentStarChildren("1");
+        auto descendants = parent_store.get_parent_star_children("1");
 
         REQUIRE(descendants.size() == 2);
         REQUIRE(descendants.find("1") == descendants.end());
@@ -153,10 +153,10 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving All Ancestors of a Specific Descendant in Parent* Relationships") {
-        parentStore.addParentStar("1", "3");
-        parentStore.addParentStar("2", "3");
+        parent_store.add_parent_star("1", "3");
+        parent_store.add_parent_star("2", "3");
 
-        auto ancestors = parentStore.getStarParent("3");
+        auto ancestors = parent_store.get_star_parent("3");
 
         REQUIRE(ancestors.size() == 2);
         REQUIRE(ancestors.find("1") != ancestors.end());

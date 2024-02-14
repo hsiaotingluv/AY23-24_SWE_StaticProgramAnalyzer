@@ -5,7 +5,7 @@
 namespace qps {
 auto Evaluator::evaluate(qps::Query query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
-    const auto results = std::visit(scan_entities(readFacade), reference);
+    const auto results = std::visit(scan_entities(read_facade), reference);
 
     auto results_map = ResultsMap{};
 
@@ -24,7 +24,7 @@ auto Evaluator::evaluate(qps::Query query_obj) -> std::vector<std::string> {
         const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause);
         const auto relationship = such_that_clause->rel_ref;
 
-        std::visit(relationship_evaluator(readFacade, results_map), relationship);
+        std::visit(relationship_evaluator(read_facade, results_map), relationship);
 
         if (results_map.is_unsatisfiable()) {
             return {};

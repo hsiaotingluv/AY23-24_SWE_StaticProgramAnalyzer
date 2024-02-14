@@ -8,9 +8,9 @@
 #include "qps/evaluators/simple_evaluator.hpp"
 #include "sp/main.hpp"
 
-#include "PKB/Facades/ReadFacade.h"
-#include "PKB/Facades/WriteFacade.h"
-#include "PKB/PKB.h"
+#include "pkb/facades/read_facade.h"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb.h"
 
 #include "qps/parser/parser.hpp"
 
@@ -18,8 +18,8 @@ class TestWrapper : public AbstractWrapper {
   private:
     std::shared_ptr<sp::SourceProcessor> source_processor;
 
-    std::shared_ptr<ReadFacade> readFacade;
-    std::shared_ptr<WriteFacade> writeFacade;
+    std::shared_ptr<ReadFacade> read_facade;
+    std::shared_ptr<WriteFacade> write_facade;
 
     std::shared_ptr<qps::QueryProcessingSystemParser> qps_parser;
     std::shared_ptr<qps::Evaluator> qps_evaluator;

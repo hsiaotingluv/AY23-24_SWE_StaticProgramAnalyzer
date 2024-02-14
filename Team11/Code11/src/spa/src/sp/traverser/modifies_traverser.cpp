@@ -22,11 +22,11 @@ auto ModifiesTraverser::traverse(std::shared_ptr<AstNode> node) -> std::shared_p
         auto assignment_node = std::dynamic_pointer_cast<AssignmentNode>(node);
         auto stmt_number = std::to_string(assignment_node->get_statement_number());
         auto var_node = std::dynamic_pointer_cast<VarNode>(assignment_node->variable);
-        write_facade->addStatementModifiesVar(stmt_number, var_node->name);
+        write_facade->add_statement_modifies_var(stmt_number, var_node->name);
     } else if (is_read_node(node)) {
         auto read_node = std::dynamic_pointer_cast<ReadNode>(node);
         auto stmt_number = std::to_string(read_node->get_statement_number());
-        write_facade->addStatementModifiesVar(stmt_number, read_node->variable);
+        write_facade->add_statement_modifies_var(stmt_number, read_node->variable);
     } else {
         for (const auto& child : node->get_children()) {
             traverse(child);
