@@ -40,6 +40,8 @@ auto QueryProcessingSystemParser::parse(std::string query) -> std::optional<Quer
     begin = rest2;
 
     std::vector<std::shared_ptr<Clause>> clauses{};
+
+#ifndef MILESTONE1
     auto can_still_parse = true;
     while (can_still_parse) {
         // Parse such that clauses
@@ -61,6 +63,21 @@ auto QueryProcessingSystemParser::parse(std::string query) -> std::optional<Quer
         }
         can_still_parse = false;
     }
+#else
+    // Parse such that clauses
+    const auto maybe_such_that_clause = parse_such_that_clause(declared_synonyms, begin, end);
+    const auto maybe_pattern_clause = parse_pattern_clause(declared_synonyms, begin, end);
+
+    if (maybe_such_that_clause.has_value()) {
+        const auto& [clause, rest] = maybe_such_that_clause.value();
+        begin = rest;
+        clauses.emplace_back(clause);
+    } else if (maybe_pattern_clause.has_value()) {
+        const auto& [clause, rest] = maybe_pattern_clause.value();
+        begin = rest;
+        clauses.emplace_back(clause);
+    }
+#endif
 
     if (begin != end) {
         // Still tokens left to parse
@@ -556,6 +573,7 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         return std::make_tuple(UsesS{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
+#ifndef MILESTONE1
     const auto maybe_uses_p = parse_ent_ent<UsesP>(declared_synonyms, it, end);
     if (maybe_uses_p) {
         const auto& [ent_ref1, ent_ref2, rest] = maybe_uses_p.value();
@@ -571,6 +589,7 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         }
         return std::make_tuple(UsesP{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
+#endif
 
     const auto maybe_modifies_s = parse_stmt_ent<ModifiesS>(declared_synonyms, it, end);
     if (maybe_modifies_s) {
@@ -588,6 +607,7 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         return std::make_tuple(ModifiesS{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
 
+#ifndef MILESTONE1
     const auto maybe_modifies_p = parse_ent_ent<ModifiesP>(declared_synonyms, it, end);
     if (maybe_modifies_p) {
         const auto& [ent_ref1, ent_ref2, rest] = maybe_modifies_p.value();
@@ -602,6 +622,7 @@ auto parse_rel_ref(const Synonyms& declared_synonyms, std::vector<Token>::const_
         }
         return std::make_tuple(ModifiesP{maybe_arg1.value(), maybe_arg2.value()}, rest);
     }
+#endif
 
     return std::nullopt;
 }

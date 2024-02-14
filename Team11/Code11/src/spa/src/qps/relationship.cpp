@@ -28,18 +28,22 @@ auto operator<<(std::ostream& os, const UsesS& uses) -> std::ostream& {
     return os;
 }
 
+#ifndef MILESTONE1
 auto operator<<(std::ostream& os, const UsesP& uses) -> std::ostream& {
     os << "UsesP(" << uses.ent1 << ", " << uses.ent2 << ")";
     return os;
 }
+#endif
 
 auto operator<<(std::ostream& os, const ModifiesS& modifies) -> std::ostream& {
     os << "ModifiesS(" << modifies.stmt << ", " << modifies.ent << ")";
     return os;
 }
 
+#ifndef MILESTONE1
 auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream& {
     os << "ModifiesP(" << modifies.ent1 << ", " << modifies.ent2 << ")";
     return os;
 }
+#endif
 } // namespace qps

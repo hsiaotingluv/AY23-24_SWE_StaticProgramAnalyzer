@@ -134,6 +134,7 @@ struct UsesS {
     }
 };
 
+#ifndef MILESTONE1
 struct UsesP {
     /**
      * @brief A Uses relationship is a relationship between a procedure and a variable where the procedure uses the
@@ -157,6 +158,7 @@ struct UsesP {
         return ent1 == other.ent1 && ent2 == other.ent2;
     }
 };
+#endif
 
 struct ModifiesS {
     /**
@@ -182,6 +184,7 @@ struct ModifiesS {
     }
 };
 
+#ifndef MILESTONE1
 struct ModifiesP {
 
     /**
@@ -207,8 +210,13 @@ struct ModifiesP {
         return ent1 == other.ent1 && ent2 == other.ent2;
     }
 };
+#endif
 
+#ifndef MILESTONE1
 using Relationship = std::variant<Follows, FollowsT, Parent, ParentT, UsesS, UsesP, ModifiesS, ModifiesP>;
+#else
+using Relationship = std::variant<Follows, FollowsT, Parent, ParentT, UsesS, ModifiesS>;
+#endif
 
 inline auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream& {
     std::visit(

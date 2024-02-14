@@ -229,6 +229,7 @@ TEST_CASE("Text Expression Spec") {
         }
     }
 
+#ifndef MILESTONE1
     SECTION("expression spec success - exact match") {
         for (const auto& [query, expected] : exprs) {
             const auto query2 = "\"" + query + "\"";
@@ -242,6 +243,7 @@ TEST_CASE("Text Expression Spec") {
             REQUIRE(rest2 == tokens2.end());
         }
     }
+#endif
 
     SECTION("expression spec success - partial match") {
         for (const auto& [query, expected] : exprs) {

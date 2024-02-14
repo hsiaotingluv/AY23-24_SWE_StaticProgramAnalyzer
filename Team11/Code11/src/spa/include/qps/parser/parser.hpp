@@ -71,6 +71,13 @@ auto parse_pattern_clause(const Synonyms& declared, std::vector<Token>::const_it
 template <typename... T>
 struct TypeList {};
 
+#ifndef MILESTONE1
 using SupportedSynonyms = TypeList<ProcSynonym, VarSynonym, ConstSynonym, UntypedStmtSynonym, ReadSynonym, CallSynonym,
                                    WhileSynonym, IfSynonym, AssignSynonym, PrintSynonym>;
+#else
+// design-entity : 'stmt' | 'read' | 'print' | 'while' | 'if' | 'assign' | 'variable' | 'constant' | 'procedure'
+using SupportedSynonyms = TypeList<UntypedStmtSynonym, ReadSynonym, PrintSynonym, WhileSynonym, IfSynonym,
+                                   AssignSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
+#endif
+
 } // namespace qps

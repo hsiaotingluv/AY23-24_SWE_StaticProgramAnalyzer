@@ -48,7 +48,12 @@ struct ExactMatch {
         return lhs.expr == rhs.expr;
     }
 };
+
+#ifndef MILESTONE1
 using ExpressionSpec = std::variant<WildCard, PartialMatch, ExactMatch>;
+#else
+using ExpressionSpec = std::variant<WildCard, PartialMatch>;
+#endif
 
 using TokenType = tokenizer::TokenType;
 
