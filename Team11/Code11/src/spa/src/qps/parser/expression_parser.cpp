@@ -58,7 +58,7 @@ auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vec
         it = std::next(new_it);
 
         // Expect wildcard
-        if (!is_wildcard(*it)) {
+        if (it == end || !is_wildcard(*it)) {
             return std::nullopt;
         }
         return std::make_tuple(PartialMatch{expr}, it + 1);
