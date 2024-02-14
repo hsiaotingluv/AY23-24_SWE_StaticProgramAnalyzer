@@ -1,10 +1,10 @@
 name: "Ubuntu: Lint cpp/h files and test"
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
-  run-linters:
-    name: Run linters
+  run-testing:
+    name: Run Testing
     runs-on: ubuntu-latest
 
     steps:
@@ -13,7 +13,7 @@ jobs:
 
       - name: Setup CMake
         run: sudo apt install -y cmake
-      
+
       - name: Setup Clang
         run: sudo apt install -y llvm
 
@@ -40,7 +40,47 @@ jobs:
           files-changed-only: false
           tidy-checks: "-*"
           step-summary: true
-      
+
+      - name: Check linter status
+        if: steps.linter.outputs.clang-format-checks-failed > 0
+        run: echo "Some files failed the linting checks!" && exit 1
+
+      - name: Run Unit Test
+        run: |
+          chmod +x Team11/Code11/build/src/unit_testing/unit_testing
+          ./Team11/Code11/build/src/unit_testing/unit_testing
+
+      - name: Run Integration Test
+        run: |
+          chmod +x Team11/Code11/build/src/integration_testing/integration_testing
+          ./Team11/Code11/build/src/integration_testing/integration_testing
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run System Testing on Push
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          python3 Team11/run_autotester.py Team11/Tests11/simple_source.txt Team11/Tests11/simple_queries.txt -i
+
+      - name: Run System Testing
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          output=$(python3 Team11/run_autotester.py Team11/Tests11/simple_source.txt Team11/Tests11/simple_queries.txt -i)
+          result=$(echo "$output" | tail -n 1)
+          request_body="{ \"body\": \"$result\" }"
+          curl \
+            -X POST \
+            $URL \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            --data-raw "$request_body"
+
       - name: Run linters and analyser
         if: ${{ github.event_name == 'pull_request' }}
         uses: cpp-linter/cpp-linter-action@v2
@@ -56,51 +96,3 @@ jobs:
           files-changed-only: false
           tidy-checks: "-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return"
           step-summary: true
-
-      - name: Check linter status
-        if: steps.linter.outputs.clang-format-checks-failed > 0
-        run: echo "Some files failed the linting checks!" && exit 1
-
-      - name: Upload integration test
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration_testing
-          path: Team11/Code11/build/src/integration_testing/integration_testing
-
-      - name: Upload unit test
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit_testing
-          path: Team11/Code11/build/src/unit_testing/unit_testing
-
-  run-unit-testing:
-    name: Run Unit Testing
-    runs-on: ubuntu-latest
-    needs: run-linters
-
-    steps:
-      - name: Download unit testing from linters
-        uses: actions/download-artifact@v4
-        with:
-          name: unit_testing
-
-      - name: Run Unit Test
-        run: |
-          chmod +x unit_testing
-          ./unit_testing
-
-  run-integration-testing:
-    name: Run Integration Testing
-    runs-on: ubuntu-latest
-    needs: run-linters
-
-    steps:
-      - name: Download integration testing from linters
-        uses: actions/download-artifact@v4
-        with:
-          name: integration_testing
-
-      - name: Run Integration Test
-        run: |
-          chmod +x integration_testing
-          ./integration_testing

@@ -685,4 +685,5 @@ FodyWeavers.xsd
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
+Team11/out.xml
 # End of https://www.toptal.com/developers/gitignore/api/qt,qtcreator,linux,windows,macos,visualstudio,visualstudiocode,clion,c++
