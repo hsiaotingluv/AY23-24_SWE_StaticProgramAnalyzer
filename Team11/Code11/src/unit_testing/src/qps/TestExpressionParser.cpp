@@ -23,7 +23,10 @@ static const std::vector<std::tuple<std::string, std::string>> exprs = {
     {"(x + z) * 5", "(((x)+(z))*(5))"},
     {"z + 2 *(v+ x)", "((z)+((2)*((v)+(x))))"},
     {"z + 2* (v +x)", "((z)+((2)*((v)+(x))))"},
-    {"a - b    +4", "(((a)-(b))+(4))"}};
+    {"a - b    +4", "(((a)-(b))+(4))"},
+    {"a - b / 2", "((a)-((b)/(2)))"},
+    {"b%3+2%5", "(((b)%(3))+((2)%(5)))"},
+};
 
 TEST_CASE("Test constant") {
     const auto runner = tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
@@ -219,6 +222,18 @@ TEST_CASE("Text Expression Spec") {
 
     SECTION("expression spec failure - wildcard3") {
         constexpr std::array<const char* const, 2> queries = {R"(_"X))", R"(_"+"_)"};
+
+        for (const auto& query : queries) {
+            const auto tokens = runner.apply_tokeniser(query);
+            // std::cout << "query: " << query << "\n";
+            const auto result = parse_expression_spec(tokens.begin(), tokens.end());
+
+            REQUIRE_FALSE(result.has_value());
+        }
+    }
+
+    SECTION("expression spec failure - missinng closing bracket") {
+        constexpr std::array<const char* const, 1> queries = {R"(_"X")"};
 
         for (const auto& query : queries) {
             const auto tokens = runner.apply_tokeniser(query);

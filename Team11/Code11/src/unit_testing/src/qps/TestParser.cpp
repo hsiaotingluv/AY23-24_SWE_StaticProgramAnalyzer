@@ -228,3 +228,38 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(!output3.has_value());
     }
 }
+
+TEST_CASE("Test Parser - Basic Syntax Issues") {
+    const auto parser = QPSParser{};
+    SECTION("Missing synonym") {
+        const auto query = "variable v,";
+        const auto output = parser.parse(query);
+        REQUIRE(!output.has_value());
+
+        const auto query2 = "variable v,+";
+        const auto output2 = parser.parse(query);
+        REQUIRE(!output2.has_value());
+    }
+
+    SECTION("Wrong Keyword") {
+        const auto query = "variable v; select v such that Uses(v, 1)";
+        const auto output = parser.parse(query);
+        REQUIRE(!output.has_value()); // Select should be in uppercase
+
+        const auto query2 = "variable v; Select + such that Uses(v, 1) such that Uses(v, 1)";
+        const auto output2 = parser.parse(query2);
+        REQUIRE(!output2.has_value()); // + is not a valid keyword
+
+        const auto query3 = "variable v; Select s such that Uses(v, 1";
+        const auto output3 = parser.parse(query3);
+        REQUIRE(!output3.has_value()); // Missing closing bracket
+
+        const auto query4 = "variable v; Select s such that Uses(v, 1(";
+        const auto output4 = parser.parse(query4);
+        REQUIRE(!output4.has_value()); // Wrong closing bracket
+
+        const auto query5 = R"(variable v; Select s such that Uses("v", 1))";
+        const auto output5 = parser.parse(query5);
+        REQUIRE(!output5.has_value()); // "v" is not a valid synonym
+    }
+}

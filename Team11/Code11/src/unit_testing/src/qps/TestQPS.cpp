@@ -337,6 +337,20 @@ TEST_CASE("Test QPS - Semantics") {
 
         REQUIRE(is_semantic_error(output));
     }
+
+    SECTION("Query with multiple declarations of the same synonym") {
+        const auto query = "procedure p, p; Select p";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_semantic_error(output));
+    }
+
+    SECTION("Query with multiple declarations of the same name") {
+        const auto query = "procedure p; variable p; Select p";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_semantic_error(output));
+    }
 }
 
 TEST_CASE("Test QPS - long queries") {
