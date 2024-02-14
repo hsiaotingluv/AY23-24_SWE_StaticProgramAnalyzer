@@ -152,6 +152,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
         }
     }
 
+#ifndef MILESTONE1
     SECTION("Test Query - all call") {
         const auto query = "call c; Select c";
         const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
@@ -169,6 +170,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
             REQUIRE(expected.find(x) != expected.end());
         }
     }
+#endif
 
     SECTION("Test Query - all read") {
         const auto query = "read r; Select r";
@@ -283,7 +285,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         }
 
         const auto query2 = R"(assign a; Select a such that Modifies(a, "y"))";
-        const auto maybe_query_obj2 = qps::to_query(qps_parser.parse(query));
+        const auto maybe_query_obj2 = qps::to_query(qps_parser.parse(query2));
 
         REQUIRE(maybe_query_obj2.has_value());
         const auto query_obj2 = maybe_query_obj2.value();
