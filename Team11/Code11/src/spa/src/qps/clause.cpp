@@ -11,7 +11,7 @@ auto SuchThatClause::operator==(const SuchThatClause& other) const -> bool {
 }
 
 auto PatternClause::operator<<(std::ostream& os) const -> std::ostream& {
-    os << "Pattern(" << assign_synonym << ", " << ent_ref << ", " << expression_spec.value << ")";
+    os << "Pattern(" << assign_synonym << ", " << ent_ref << ", " << expression_spec << ")";
     return os;
 }
 

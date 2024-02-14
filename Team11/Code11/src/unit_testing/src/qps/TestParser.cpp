@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "qps/parser/expression_parser.hpp"
 #include "qps/parser/parser.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
