@@ -71,6 +71,6 @@ auto parse_pattern_clause(const Synonyms& declared, std::vector<Token>::const_it
 template <typename... T>
 struct TypeList {};
 
-using SupportedSynonyms = TypeList<ProcSynonym, VarSynonym, ConstSynonym, RawStmtSynonym, ReadSynonym, CallSynonym,
+using SupportedSynonyms = TypeList<ProcSynonym, VarSynonym, ConstSynonym, UntypedStmtSynonym, ReadSynonym, CallSynonym,
                                    WhileSynonym, IfSynonym, AssignSynonym, PrintSynonym>;
 } // namespace qps

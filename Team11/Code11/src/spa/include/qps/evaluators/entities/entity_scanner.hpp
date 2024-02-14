@@ -17,8 +17,8 @@ const auto scan_entities = [](std::shared_ptr<ReadFacade> read_facade) {
         [read_facade](const qps::ConstSynonym& constant) {
             return read_facade->get_constants();
         },
-        [read_facade](const qps::RawStmtSynonym& stmt) {
-            return read_facade->get_raw_statements();
+        [read_facade](const qps::UntypedStmtSynonym& stmt) {
+            return read_facade->get_all_statements();
         },
         [read_facade](const qps::AssignSynonym& stmt) {
             return read_facade->get_assign_statements();

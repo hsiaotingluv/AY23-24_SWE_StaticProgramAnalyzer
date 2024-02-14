@@ -88,11 +88,11 @@ TEST_CASE("Test Parser") {
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
         REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
-        REQUIRE(std::holds_alternative<RawStmtSynonym>(result.declared[1]));
-        REQUIRE(std::get<RawStmtSynonym>(result.declared[1]).get_name() == "s");
+        REQUIRE(std::holds_alternative<UntypedStmtSynonym>(result.declared[1]));
+        REQUIRE(std::get<UntypedStmtSynonym>(result.declared[1]).get_name() == "s");
 
-        REQUIRE(std::holds_alternative<RawStmtSynonym>(result.reference));
-        REQUIRE(std::get<RawStmtSynonym>(result.reference).get_name() == "s");
+        REQUIRE(std::holds_alternative<UntypedStmtSynonym>(result.reference));
+        REQUIRE(std::get<UntypedStmtSynonym>(result.reference).get_name() == "s");
     }
 
     SECTION("Query with stmt-ent relationship") {

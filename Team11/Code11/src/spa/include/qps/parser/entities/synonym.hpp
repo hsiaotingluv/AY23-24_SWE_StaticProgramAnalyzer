@@ -31,24 +31,24 @@ struct Integer {
     }
 };
 
-// StmtSynonym := RawStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym | AssignSynonym
-class RawStmtSynonym {
+// StmtSynonym := UntypedStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym | AssignSynonym
+class UntypedStmtSynonym {
     IDENT name;
 
   public:
     static constexpr auto keyword = "stmt";
 
-    explicit RawStmtSynonym(IDENT name) : name(std::move(name)) {
+    explicit UntypedStmtSynonym(IDENT name) : name(std::move(name)) {
     }
 
-    explicit RawStmtSynonym(std::string name) : name(std::move(name)) {
+    explicit UntypedStmtSynonym(std::string name) : name(std::move(name)) {
     }
 
     [[nodiscard]] auto get_name() const -> IDENT {
         return name;
     }
 
-    auto operator==(const RawStmtSynonym& rhs) const -> bool {
+    auto operator==(const UntypedStmtSynonym& rhs) const -> bool {
         return name == rhs.name;
     }
 };
@@ -180,7 +180,7 @@ class AssignSynonym {
 };
 
 using StmtSynonym =
-    std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym, AssignSynonym>;
+    std::variant<UntypedStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym, AssignSynonym>;
 
 class VarSynonym {
     IDENT name;
@@ -245,7 +245,7 @@ class ProcSynonym {
     }
 };
 
-using Synonym = std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym,
+using Synonym = std::variant<UntypedStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym,
                              AssignSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
 
 template <class T, class U>
@@ -282,8 +282,8 @@ inline auto operator==(const StmtSynonym& lhs, const StmtSynonym& rhs) -> bool {
         lhs, rhs);
 }
 
-inline auto operator<<(std::ostream& os, const RawStmtSynonym& stmt_syn) -> std::ostream& {
-    os << "RawStmtSynonym(" << stmt_syn.get_name() << ")";
+inline auto operator<<(std::ostream& os, const UntypedStmtSynonym& stmt_syn) -> std::ostream& {
+    os << "UntypedStmtSynonym(" << stmt_syn.get_name() << ")";
     return os;
 }
 
@@ -383,9 +383,9 @@ auto find_stmt_syn(const Synonyms& declared_synonyms, std::string syn_name) -> s
 
 namespace std {
 template <>
-struct hash<qps::RawStmtSynonym> {
-    auto operator()(const qps::RawStmtSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::RawStmtSynonym::keyword + syn.get_name().get_value());
+struct hash<qps::UntypedStmtSynonym> {
+    auto operator()(const qps::UntypedStmtSynonym& syn) const -> size_t {
+        return hash<std::string>{}(qps::UntypedStmtSynonym::keyword + syn.get_name().get_value());
     }
 };
 
