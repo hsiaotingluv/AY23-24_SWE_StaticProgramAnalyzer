@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pkb/facades/read_facade.h"
-#include "qps/evaluators/results_map.hpp"
 #include "qps/parser/semantic_validator.hpp"
 
 #include <memory>
@@ -10,7 +9,6 @@
 
 namespace qps {
 class Evaluator {
-    ResultsMap results_map;
     std::shared_ptr<ReadFacade> read_facade;
 
   public:

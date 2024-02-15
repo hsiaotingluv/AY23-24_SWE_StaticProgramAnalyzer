@@ -33,7 +33,7 @@ auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
 
                 for (const auto& stmt : stmt_vec) {
                     if (relevant_stmts.find(stmt) != relevant_stmts.end()) {
-                        table.add_row({static_cast<unsigned int>(std::stoi(stmt))});
+                        table.add_row({stmt});
                     }
                 }
             }
@@ -59,21 +59,20 @@ auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
             return Table{};
         },
         [read_facade](const std::shared_ptr<qps::StmtSynonym>& synonym,
-                      const std::shared_ptr<qps::VarSynonym>& var) -> std::optional<Table> {
+                      const std::shared_ptr<qps::VarSynonym>& var_syn) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
             const auto relevant_stmts = scan_entities(read_facade, synonym);
-            const auto relevant_variables = scan_entities(read_facade, synonym);
+            const auto relevant_variables = scan_entities(read_facade, var_syn);
 
             const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
             const auto var_vec = std::vector<std::string>{relevant_variables.begin(), relevant_variables.end()};
 
-            auto table = Table{{synonym, var}};
+            auto table = Table{{synonym, var_syn}};
 
             for (const auto& stmt : stmt_vec) {
                 for (const auto& v : var_vec) {
                     if (read_facade->does_statement_modify_var(stmt, v)) {
-                        table.add_row(
-                            {static_cast<unsigned int>(std::stoi(stmt)), static_cast<unsigned int>(std::stoi(v))});
+                        table.add_row({stmt, v});
                     }
                 }
             }
@@ -84,7 +83,7 @@ auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
             const auto variables = read_facade->get_vars_modified_by_statement(std::to_string(stmt_num.value));
             auto table = Table{{var}};
             for (const auto& v : variables) {
-                table.add_row({static_cast<unsigned int>(std::stoi(v))});
+                table.add_row({v});
             }
             return table;
         },
@@ -98,7 +97,7 @@ auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
 
             for (const auto& stmt : relevant_stmt_vec) {
                 if (stmts.find(stmt) != stmts.end()) {
-                    table.add_row({static_cast<unsigned int>(std::stoi(stmt))});
+                    table.add_row({stmt});
                 }
             }
 

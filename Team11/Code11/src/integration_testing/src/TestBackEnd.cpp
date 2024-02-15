@@ -291,9 +291,6 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         const auto query_obj2 = maybe_query_obj2.value();
 
         const auto results2 = evaluator.evaluate(query_obj2);
-        for (const auto& x : results2) {
-            std::cout << x << std::endl;
-        }
         REQUIRE(results2.empty());
     }
 

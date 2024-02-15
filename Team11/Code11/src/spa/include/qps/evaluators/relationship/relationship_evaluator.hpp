@@ -10,8 +10,8 @@
 #include <optional>
 
 namespace qps {
-const auto relationship_evaluator = [](std::shared_ptr<ReadFacade> read_facade, ResultsMap& results_map) {
-    return overloaded{[read_facade, &results_map](const qps::ModifiesS& modifies) -> std::optional<Table> {
+auto relationship_evaluator(std::shared_ptr<ReadFacade> read_facade) {
+    return overloaded{[read_facade](const qps::ModifiesS& modifies) -> std::optional<Table> {
                           const auto syn1 = modifies.stmt;
                           const auto syn2 = modifies.ent;
 
@@ -21,4 +21,4 @@ const auto relationship_evaluator = [](std::shared_ptr<ReadFacade> read_facade, 
                           return std::nullopt;
                       }};
 };
-}
+} // namespace qps
