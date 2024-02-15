@@ -1,11 +1,13 @@
 #include "catch.hpp"
 #include "common/tokeniser/runner.hpp"
+#include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/expression_parser.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include <iterator>
 #include <memory>
 #include <tuple>
+#include <variant>
 #include <vector>
 
 using namespace qps;
@@ -21,7 +23,10 @@ static const std::vector<std::tuple<std::string, std::string>> exprs = {
     {"(x + z) * 5", "(((x)+(z))*(5))"},
     {"z + 2 *(v+ x)", "((z)+((2)*((v)+(x))))"},
     {"z + 2* (v +x)", "((z)+((2)*((v)+(x))))"},
-    {"a - b    +4", "(((a)-(b))+(4))"}};
+    {"a - b    +4", "(((a)-(b))+(4))"},
+    {"a - b / 2", "((a)-((b)/(2)))"},
+    {"b%3+2%5", "(((b)%(3))+((2)%(5)))"},
+};
 
 TEST_CASE("Test constant") {
     const auto runner = tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
@@ -200,7 +205,7 @@ TEST_CASE("Text Expression Spec") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "_");
+        REQUIRE(std::holds_alternative<WildCard>(success));
         REQUIRE(rest == tokens.end());
     }
 
@@ -211,7 +216,7 @@ TEST_CASE("Text Expression Spec") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "_");
+        REQUIRE(std::holds_alternative<WildCard>(success));
         REQUIRE(rest == std::next(tokens.begin()));
     }
 
@@ -227,7 +232,20 @@ TEST_CASE("Text Expression Spec") {
         }
     }
 
-    SECTION("expression spec success - quoted expression") {
+    SECTION("expression spec failure - missinng closing bracket") {
+        constexpr std::array<const char* const, 1> queries = {R"(_"X")"};
+
+        for (const auto& query : queries) {
+            const auto tokens = runner.apply_tokeniser(query);
+            // std::cout << "query: " << query << "\n";
+            const auto result = parse_expression_spec(tokens.begin(), tokens.end());
+
+            REQUIRE_FALSE(result.has_value());
+        }
+    }
+
+#ifndef MILESTONE1
+    SECTION("expression spec success - exact match") {
         for (const auto& [query, expected] : exprs) {
             const auto query2 = "\"" + query + "\"";
             auto tokens2 = runner.apply_tokeniser(query2);
@@ -235,12 +253,14 @@ TEST_CASE("Text Expression Spec") {
 
             REQUIRE(result2.has_value());
             const auto& [success2, rest2] = result2.value();
-            REQUIRE(success2.value == expected);
+            REQUIRE(std::holds_alternative<ExactMatch>(success2));
+            REQUIRE(success2 == expected);
             REQUIRE(rest2 == tokens2.end());
         }
     }
+#endif
 
-    SECTION("expression spec success - quoted expression with wildcard") {
+    SECTION("expression spec success - partial match") {
         for (const auto& [query, expected] : exprs) {
             const auto query2 = "_ \"" + query + "\" _";
             auto tokens2 = runner.apply_tokeniser(query2);
@@ -248,7 +268,9 @@ TEST_CASE("Text Expression Spec") {
 
             REQUIRE(result2.has_value());
             const auto& [success2, rest2] = result2.value();
-            REQUIRE(success2.value == "_" + expected + "_");
+            REQUIRE(std::holds_alternative<PartialMatch>(success2));
+            const auto partial_match = std::get<PartialMatch>(success2);
+            REQUIRE(partial_match.expr.value == expected);
             REQUIRE(rest2 == tokens2.end());
         }
     }

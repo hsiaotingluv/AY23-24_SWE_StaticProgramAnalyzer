@@ -1,81 +1,21 @@
 #include "catch.hpp"
 
-#include "qps/parser/parser.hpp"
-#include "qps/tokeniser/tokeniser.hpp"
-
-#include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/primitives.hpp"
-#include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/parser/entities/untyped/clause.hpp"
+#include "qps/parser/entities/untyped/relationship.hpp"
+#include "qps/parser/entities/untyped/synonym.hpp"
 
-#include <iterator>
-#include <memory>
+#include "qps/parser/parser.hpp"
+
 #include <variant>
 
 using namespace qps;
 
-TEST_CASE("Test Declaration Parser") {
-    const auto runner = tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
+TEST_CASE("Test QPSParser") {
+    const auto parser = QPSParser{};
 
-    SECTION("Declaration with one synonym") {
-        const auto query = "procedure p;";
-        const auto tokens = runner.apply_tokeniser(query);
-        const auto output = parse_declarations(tokens.begin(), tokens.end());
-
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
-
-        REQUIRE(result.size() == 1);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
-        REQUIRE(std::distance(rest, tokens.end()) == 0);
-    }
-
-    SECTION("Declaration with multiple synonyms") {
-        const auto query = "procedure p, q, r; Select p";
-        const auto tokens = runner.apply_tokeniser(query);
-        const auto output = parse_declarations(tokens.begin(), tokens.end());
-
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
-
-        REQUIRE(result.size() == 3);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[1]));
-        REQUIRE(std::get<ProcSynonym>(result[1]).get_name() == "q");
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[2]));
-        REQUIRE(std::get<ProcSynonym>(result[2]).get_name() == "r");
-        REQUIRE(std::distance(rest, tokens.end()) == 2);
-    }
-
-    SECTION("Multiple declarations") {
-        const auto query = "procedure p ; variable v; Select p";
-        const auto tokens = runner.apply_tokeniser(query);
-        const auto output = parse_declarations(tokens.begin(), tokens.end());
-
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
-
-        REQUIRE(result.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
-        REQUIRE(std::holds_alternative<VarSynonym>(result[1]));
-        REQUIRE(std::get<VarSynonym>(result[1]).get_name() == "v");
-        REQUIRE(std::distance(rest, tokens.end()) == 2);
-    }
-
-    SECTION("Declaration with invalid keyword") {
-        const auto query = "proc p;";
-        auto tokens = runner.apply_tokeniser(query);
-        const auto result = parse_declarations(tokens.begin(), tokens.end());
-
-        REQUIRE(!result.has_value());
-    }
-}
-
-TEST_CASE("Test Parser") {
-    const auto parser = QueryProcessingSystemParser{};
+#ifndef MILESTONE1
     SECTION("Query with stmt-stmt relationship") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13) such that Follows*(13, s) such "
                            "that Parent (s, 12) such that Parent*(12, s) ";
@@ -88,45 +28,74 @@ TEST_CASE("Test Parser") {
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
         REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
-        REQUIRE(std::holds_alternative<RawStmtSynonym>(result.declared[1]));
-        REQUIRE(std::get<RawStmtSynonym>(result.declared[1]).get_name() == "s");
+        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.declared[1]));
+        REQUIRE(std::get<AnyStmtSynonymynonym>(result.declared[1]).get_name() == "s");
 
-        REQUIRE(std::holds_alternative<RawStmtSynonym>(result.reference));
-        REQUIRE(std::get<RawStmtSynonym>(result.reference).get_name() == "s");
+        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.reference));
+        REQUIRE(std::get<AnyStmtSynonymynonym>(result.reference).get_name() == "s");
     }
+#else
+    SECTION("Query with stmt-stmt relationship") {
+        const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
+        const auto output = parser.parse(query);
 
+        REQUIRE(output.has_value());
+        const auto& [declarations, untyped] = output.value();
+
+        REQUIRE(declarations.size() == 2);
+        REQUIRE(std::holds_alternative<ProcSynonym>(declarations[0]));
+        REQUIRE(std::get<ProcSynonym>(declarations[0]).get_name() == "p");
+        REQUIRE(std::holds_alternative<AnyStmtSynonym>(declarations[1]));
+        REQUIRE(std::get<AnyStmtSynonym>(declarations[1]).get_name() == "s");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::AnyStmtSynonymtmtRel{"Follows", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                          untyped::UntypedStmtRef{Integer{13}}}};
+        REQUIRE(such_that_clause == reference_clause);
+    };
+
+#endif
     SECTION("Query with stmt-ent relationship") {
+
+#ifndef MILESTONE1
         const auto query =
             R"(stmt s; Select s such that Uses(s, "v") such that Modifies(s, "q") such that Modifies("x", "y"))";
         const auto result = parser.parse(query);
 
         REQUIRE(result.has_value());
-    }
-
-    SECTION("Query with ent-ent relationship") {
-        const auto query = R"(procedure p; variable v; Select v such that Uses("s", v))";
+#else
+        const auto query = R"(stmt s; Select s such that Uses(s, "v"))";
         const auto output = parser.parse(query);
 
         REQUIRE(output.has_value());
-        const auto result = output.value();
+        const auto& [declarations, untyped] = output.value();
 
-        REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
+        REQUIRE(declarations.size() == 1);
+        REQUIRE(std::holds_alternative<AnyStmtSynonym>(declarations[0]));
+        REQUIRE(std::get<AnyStmtSynonym>(declarations[0]).get_name() == "s");
 
-        REQUIRE(std::holds_alternative<VarSynonym>(result.declared[1]));
-        REQUIRE(std::get<VarSynonym>(result.declared[1]).get_name() == "v");
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
 
-        REQUIRE(std::holds_alternative<VarSynonym>(result.reference));
-        REQUIRE(std::get<VarSynonym>(result.reference).get_name() == "v");
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedStmtEntRel{"Uses", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                       untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+        REQUIRE(such_that_clause == reference_clause);
 
-        REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<SuchThatClause>(UsesP{QuotedIdent{"s"}, VarSynonym{IDENT{"v"}}});
-        REQUIRE(*(result.clauses[0]) == *reference_clause);
+#endif
     }
 
-    SECTION("Query with ent-ent relationship 2") {
+#ifndef MILESTONE1
+    SECTION("Query with ent-ent relationship for procedures") {
         const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
         const auto output = parser.parse(query);
 
@@ -143,26 +112,30 @@ TEST_CASE("Test Parser") {
         REQUIRE(std::holds_alternative<ProcSynonym>(result.reference));
         REQUIRE(std::get<ProcSynonym>(result.reference).get_name() == "p");
     }
+#endif
 
     SECTION("Query with pattern clause") {
         const auto query = R"(        assign a;
-Select a pattern a ( _ , "count + 1"))";
+Select a pattern a ( _ , _"count + 1"_))";
         const auto output = parser.parse(query);
 
         REQUIRE(output.has_value());
         const auto result = output.value();
+        const auto& [declarations, untyped] = output.value();
 
-        REQUIRE(result.declared.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "a");
+        REQUIRE(declarations.size() == 1);
+        REQUIRE(std::holds_alternative<AssignSynonym>(declarations[0]));
+        REQUIRE(std::get<AssignSynonym>(declarations[0]).get_name() == "a");
 
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "a");
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"a"}});
 
-        REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, WildCard{}, ExpressionSpec{"((count)+(1))"});
-        REQUIRE(*(result.clauses[0]) == *reference_clause);
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}}, WildCard{},
+                                                                    ExpressionSpec{PartialMatch{"((count)+(1))"}}};
+        REQUIRE(pattern_clause == reference_clause);
     }
 
     SECTION("Query with pattern clause 2") {
@@ -172,19 +145,26 @@ Select a pattern a ( _ , "count + 1"))";
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "newa");
+        const auto& [declarations, untyped] = output.value();
 
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "newa");
+        REQUIRE(declarations.size() == 1);
+        REQUIRE(std::holds_alternative<AssignSynonym>(declarations[0]));
+        REQUIRE(std::get<AssignSynonym>(declarations[0]).get_name() == "newa");
 
-        REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
-            AssignSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{"_((cenX)*(cenX))_"});
-        REQUIRE(*(result.clauses[0]) == *reference_clause);
+        const auto& [reference, clauses] = untyped;
+
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"((cenX)*(cenX))"}}};
+        REQUIRE(pattern_clause == reference_clause);
     }
 
+#ifndef MILESTONE1
     SECTION("Query with such that clause and pattern clause") {
         const auto query = R"(assign a; while w; Select w such that Parent* (w, a) pattern a ("count", _))";
         const auto output = parser.parse(query);
@@ -210,40 +190,76 @@ Select a pattern a ( _ , "count + 1"))";
             std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, QuotedIdent{"count"}, ExpressionSpec{"_"});
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
+#endif
 
     SECTION("Query with undefined synonym") {
         const auto query = "procedure p; Select v";
         const auto result = parser.parse(query);
 
-        REQUIRE(!result.has_value());
+        REQUIRE(result.has_value());
+        const auto& [declarations, untyped] = result.value();
+
+        REQUIRE(declarations.size() == 1);
+        REQUIRE(std::holds_alternative<ProcSynonym>(declarations[0]));
+        REQUIRE(std::get<ProcSynonym>(declarations[0]).get_name() == "p");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"v"}});
+        REQUIRE(clauses.empty());
     }
 
-    SECTION("Query with semantic issues") {
+    SECTION("Modifies cannot start with wildcard") {
+        const auto query = R"(procedure p; variable v; Select p such that Modifies("x", v))";
+        const auto output = parser.parse(query);
+
+        REQUIRE(!output.has_value());
+    }
+
+    SECTION("Uses cannot start with quoted ident") {
         const auto query = R"(procedure p; variable v; Select p such that Uses("s", p))";
         const auto output = parser.parse(query);
 
         REQUIRE(!output.has_value());
+    }
 
-        const auto query2 = "procedure p; Select p such that Modifies(1, p)";
-        const auto output2 = parser.parse(query2);
-        REQUIRE(!output2.has_value());
-
+    SECTION("Uses cannot start with integer") {
         const auto query3 = "variable v; Select v such that Uses(v, 1)";
         const auto output3 = parser.parse(query3);
         REQUIRE(!output3.has_value());
     }
+}
 
-    SECTION("Modifies cannot start with wildcard") {
-        const auto query = "procedure p; variable v; Select p such that Modifies(_, v)";
+TEST_CASE("Test Parser - Basic Syntax Issues") {
+    const auto parser = QPSParser{};
+    SECTION("Missing synonym") {
+        const auto query = "variable v,";
         const auto output = parser.parse(query);
-
         REQUIRE(!output.has_value());
+
+        const auto query2 = "variable v,+";
+        const auto output2 = parser.parse(query);
+        REQUIRE(!output2.has_value());
     }
 
-    SECTION("Uses cannot start with wildcard") {
-        const auto query = "procedure p; variable v; Select p such that Uses(_, v)";
+    SECTION("Wrong Keyword") {
+        const auto query = "variable v; select v such that Uses(v, 1)";
         const auto output = parser.parse(query);
+        REQUIRE(!output.has_value()); // Select should be in uppercase
 
-        REQUIRE(!output.has_value());
+        const auto query2 = "variable v; Select + such that Uses(v, 1) such that Uses(v, 1)";
+        const auto output2 = parser.parse(query2);
+        REQUIRE(!output2.has_value()); // + is not a valid keyword
+
+        const auto query3 = "variable v; Select s such that Uses(v, 1";
+        const auto output3 = parser.parse(query3);
+        REQUIRE(!output3.has_value()); // Missing closing bracket
+
+        const auto query4 = "variable v; Select s such that Uses(v, 1(";
+        const auto output4 = parser.parse(query4);
+        REQUIRE(!output4.has_value()); // Wrong closing bracket
+
+        const auto query5 = R"(variable v; Select s such that Uses("v", 1))";
+        const auto output5 = parser.parse(query5);
+        REQUIRE(!output5.has_value()); // "v" is not a valid synonym
     }
 }

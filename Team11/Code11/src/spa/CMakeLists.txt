@@ -8,6 +8,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     target_link_options(spa PRIVATE -fsanitize=address)
 endif()
 
+message(STATUS "Building SPA in Milestone1 mode")
+target_compile_definitions(spa PRIVATE MILESTONE1)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     append_coverage_compiler_flags()
 

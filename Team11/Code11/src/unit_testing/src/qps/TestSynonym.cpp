@@ -13,10 +13,10 @@ TEST_CASE("Test QPS Synonym") {
 }
 
 TEST_CASE("Test is_stmt_synonym") {
-    // StmtSynonym := RawStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym |
+    // StmtSynonym := AnyStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym |
     // AssignSynonym
-    SECTION("StmtSynonym - RawStmtSynonym") {
-        const Synonym synonym = RawStmtSynonym("s");
+    SECTION("StmtSynonym - AnyStmtSynonym") {
+        const Synonym synonym = AnyStmtSynonym("s");
         REQUIRE(is_stmt_synonym(synonym));
     }
 
@@ -67,8 +67,8 @@ TEST_CASE("Test is_stmt_synonym") {
 }
 
 TEST_CASE("Test get_stmt_synonym") {
-    SECTION("StmtSynonym - RawStmtSynonym") {
-        const Synonym synonym = RawStmtSynonym("s");
+    SECTION("StmtSynonym - AnyStmtSynonym") {
+        const Synonym synonym = AnyStmtSynonym("s");
         const auto maybe_stmt_syn = get_stmt_synonym(synonym);
         REQUIRE(maybe_stmt_syn.has_value());
 

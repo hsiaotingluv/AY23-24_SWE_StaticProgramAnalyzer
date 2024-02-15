@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/results_map.hpp"
-#include "qps/parser/parser.hpp"
+#include "qps/qps.hpp"
 
 #include <memory>
 #include <utility>
@@ -17,7 +17,7 @@ class Evaluator {
     Evaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)) {
     }
 
-    auto evaluate(qps::Query query_obj) -> std::vector<std::string>;
+    auto evaluate(const qps::Query& query_obj) -> std::vector<std::string>;
 };
 
 } // namespace qps

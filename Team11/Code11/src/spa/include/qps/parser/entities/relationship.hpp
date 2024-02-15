@@ -2,7 +2,9 @@
 
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 
+#include <optional>
 #include <ostream>
 #include <utility>
 #include <variant>
@@ -12,6 +14,9 @@ namespace qps {
 using StmtRefNoWildcard = std::variant<StmtSynonym, Integer>;
 using ProcedureRefNoWildcard = std::variant<ProcSynonym, QuotedIdent>;
 using VarRef = std::variant<WildCard, VarSynonym, QuotedIdent>;
+
+auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard>;
+auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef>;
 
 struct Follows {
     /**
@@ -124,6 +129,20 @@ struct UsesS {
 
     static constexpr auto keyword = "Uses";
 
+    static auto construct(const StmtRef& stmt_ref, const EntRef& ent_ref) -> std::optional<UsesS> {
+        const auto maybe_stmt = reject_wildcard(stmt_ref);
+        if (!maybe_stmt.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return UsesS{maybe_stmt.value(), maybe_var.value()};
+    }
+
     UsesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
 
@@ -134,6 +153,7 @@ struct UsesS {
     }
 };
 
+#ifndef MILESTONE1
 struct UsesP {
     /**
      * @brief A Uses relationship is a relationship between a procedure and a variable where the procedure uses the
@@ -157,6 +177,7 @@ struct UsesP {
         return ent1 == other.ent1 && ent2 == other.ent2;
     }
 };
+#endif
 
 struct ModifiesS {
     /**
@@ -172,6 +193,20 @@ struct ModifiesS {
 
     static constexpr auto keyword = "Modifies";
 
+    static auto construct(const StmtRef& stmt_ref, const EntRef& ent_ref) -> std::optional<ModifiesS> {
+        const auto maybe_stmt = reject_wildcard(stmt_ref);
+        if (!maybe_stmt.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return ModifiesS{maybe_stmt.value(), maybe_var.value()};
+    }
+
     ModifiesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
 
@@ -182,6 +217,7 @@ struct ModifiesS {
     }
 };
 
+#ifndef MILESTONE1
 struct ModifiesP {
 
     /**
@@ -207,15 +243,21 @@ struct ModifiesP {
         return ent1 == other.ent1 && ent2 == other.ent2;
     }
 };
+#endif
 
-using Relationship = std::variant<Follows, FollowsT, Parent, ParentT, UsesS, UsesP, ModifiesS, ModifiesP>;
+#ifndef MILESTONE1
+using StmtStmtList = TypeList<Follows, FollowsT, Parent, ParentT>;
+using StmtEntList = TypeList<UsesS, ModifiesS>;
+using EntEntList = TypeList<UsesP, ModifiesP>;
 
-inline auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream& {
-    std::visit(
-        [&os](auto&& relationship) {
-            os << relationship;
-        },
-        relationship);
-    return os;
-}
+using Relationship = TypeListToVariant<Concat<Concat<StmtStmtList, StmtEntList>::type, EntEntList>::type>::type;
+#else
+
+using StmtStmtList = TypeList<Follows, FollowsT, Parent, ParentT>;
+using StmtEntList = TypeList<UsesS, ModifiesS>;
+
+using Relationship = TypeListToVariant<Concat<StmtStmtList, StmtEntList>::type>::type;
+#endif
+
+auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream&;
 } // namespace qps
