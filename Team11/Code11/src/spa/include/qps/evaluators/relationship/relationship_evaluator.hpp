@@ -7,17 +7,18 @@
 
 #include "qps/parser/entities/relationship.hpp"
 #include <memory>
+#include <optional>
 
 namespace qps {
 const auto relationship_evaluator = [](std::shared_ptr<ReadFacade> read_facade, ResultsMap& results_map) {
-    return overloaded{[read_facade, &results_map](const qps::ModifiesS& modifies) {
+    return overloaded{[read_facade, &results_map](const qps::ModifiesS& modifies) -> std::optional<Table> {
                           const auto syn1 = modifies.stmt;
                           const auto syn2 = modifies.ent;
 
-                          return std::visit(ModifiesS_evaluator(read_facade, results_map), syn1, syn2);
+                          return std::visit(ModifiesS_evaluator(read_facade), syn1, syn2);
                       },
-                      [](const auto& x) {
-                          return;
+                      [](const auto& x) -> std::optional<Table> {
+                          return std::nullopt;
                       }};
 };
 }

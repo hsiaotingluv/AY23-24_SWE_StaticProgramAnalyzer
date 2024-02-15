@@ -1,17 +1,29 @@
 #pragma once
 
 #include "pkb/facades/read_facade.h"
+#include "qps/evaluators/entities/entity_scanner.hpp"
 #include "qps/evaluators/results_map.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
 #include <memory>
+#include <optional>
+#include <type_traits>
 
 namespace qps {
-const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, ResultsMap& results_map) {
+template <typename T, std::enable_if_t<std::is_base_of_v<Synonym, T>, int> = 0>
+auto to_synonym(const std::shared_ptr<T>& x) {
+    return std::static_pointer_cast<qps::Synonym>(x);
+}
+
+auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
     return overloaded{
-        [read_facade, &results_map](const std::shared_ptr<qps::StmtSynonym>& synonym, const qps::WildCard& wildcard2) {
+        [read_facade](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
+                      const qps::WildCard& wildcard2) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies
+            const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
+            auto table = Table{{stmt_synonym}};
+
             const auto variables = read_facade->get_variables();
             const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
 
@@ -20,12 +32,14 @@ const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, Res
                 const auto stmt_vec = std::vector<std::string>{statements.begin(), statements.end()};
 
                 for (const auto& stmt : stmt_vec) {
-                    results_map.update_mapping(synonym, stmt);
+                    if (relevant_stmts.find(stmt) != relevant_stmts.end()) {
+                        table.add_row({static_cast<unsigned int>(std::stoi(stmt))});
+                    }
                 }
             }
-            return;
+            return table;
         },
-        [read_facade, &results_map](const qps::Integer& stmt_num, const qps::WildCard& wildcard2) {
+        [read_facade](const qps::Integer& stmt_num, const qps::WildCard& wildcard2) -> std::optional<Table> {
             // TODO: Improve pkb API: Does statement modify var?
             auto does_statement_modify_var = false;
             const auto variables = read_facade->get_variables();
@@ -40,58 +54,64 @@ const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, Res
             }
 
             if (!does_statement_modify_var) {
-                results_map.set_unsatisfiable();
-            } else {
-                // TODO: this no longer holds if we allow chaining of clauses
-                results_map.set_valid();
+                return std::nullopt;
             }
-            return;
+            return Table{};
         },
-        [read_facade, &results_map](const std::shared_ptr<qps::StmtSynonym>& synonym,
-                                    const std::shared_ptr<qps::VarSynonym>& var) {
+        [read_facade](const std::shared_ptr<qps::StmtSynonym>& synonym,
+                      const std::shared_ptr<qps::VarSynonym>& var) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
-            const auto statements = read_facade->get_all_statements();
-            const auto variables = read_facade->get_variables();
-            const auto stmt_vec = std::vector<std::string>{statements.begin(), statements.end()};
-            const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
+            const auto relevant_stmts = scan_entities(read_facade, synonym);
+            const auto relevant_variables = scan_entities(read_facade, synonym);
+
+            const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
+            const auto var_vec = std::vector<std::string>{relevant_variables.begin(), relevant_variables.end()};
+
+            auto table = Table{{synonym, var}};
 
             for (const auto& stmt : stmt_vec) {
                 for (const auto& v : var_vec) {
                     if (read_facade->does_statement_modify_var(stmt, v)) {
-                        results_map.update_mapping(synonym, stmt);
-                        results_map.update_mapping(var, v);
+                        table.add_row(
+                            {static_cast<unsigned int>(std::stoi(stmt)), static_cast<unsigned int>(std::stoi(v))});
                     }
                 }
             }
-            return;
+            return table;
         },
-        [read_facade, &results_map](const qps::Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var) {
+        [read_facade](const qps::Integer& stmt_num,
+                      const std::shared_ptr<qps::VarSynonym>& var) -> std::optional<Table> {
             const auto variables = read_facade->get_vars_modified_by_statement(std::to_string(stmt_num.value));
-            results_map.update_mapping(var, variables);
-            return;
+            auto table = Table{{var}};
+            for (const auto& v : variables) {
+                table.add_row({static_cast<unsigned int>(std::stoi(v))});
+            }
+            return table;
         },
-        [read_facade, &results_map](const std::shared_ptr<qps::StmtSynonym>& synonym,
-                                    const qps::QuotedIdent& identifier) {
+        [read_facade](const std::shared_ptr<qps::StmtSynonym>& synonym,
+                      const qps::QuotedIdent& identifier) -> std::optional<Table> {
+            const auto relevant_stmts = scan_entities(read_facade, synonym);
+            const auto relevant_stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
+
             const auto stmts = read_facade->get_statements_that_modify_var(identifier.get_value());
+            auto table = Table{{synonym}};
 
-            results_map.update_mapping(synonym, stmts);
+            for (const auto& stmt : relevant_stmt_vec) {
+                if (stmts.find(stmt) != stmts.end()) {
+                    table.add_row({static_cast<unsigned int>(std::stoi(stmt))});
+                }
+            }
 
-            return;
+            return table;
         },
-        [read_facade, &results_map](const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) {
+        [read_facade](const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) -> std::optional<Table> {
             const auto does_modify =
                 read_facade->does_statement_modify_var(std::to_string(stmt_num.value), identifier.get_value());
 
             if (!does_modify) {
-                results_map.set_unsatisfiable();
-            } else {
-                // TODO: this no longer holds if we allow chaining of clauses
-                results_map.set_valid();
+                return std::nullopt;
             }
-            return;
-        },
-        [](const auto& x) {
-            return std::unordered_set<std::string>{};
+            return Table{};
         }};
 };
-}
+} // namespace qps

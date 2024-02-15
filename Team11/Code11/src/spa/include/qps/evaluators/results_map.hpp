@@ -1,12 +1,36 @@
 #pragma once
 
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/template_utils.hpp"
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 namespace qps {
+
+class Table {
+    const std::vector<std::shared_ptr<Synonym>> record_type;
+    std::vector<std::vector<uint32_t>> record_value;
+
+  public:
+    Table() = default;
+
+    Table(const std::vector<std::shared_ptr<Synonym>>& column_keys) : record_type(column_keys) {
+    }
+
+    auto add_row(const std::vector<uint32_t>& record) -> void {
+        record_value.push_back(record);
+    }
+
+    [[nodiscard]] auto get_column() const -> std::vector<std::shared_ptr<Synonym>> {
+        return record_type;
+    }
+
+    [[nodiscard]] auto get_record() const -> std::vector<std::vector<uint32_t>> {
+        return record_value;
+    }
+};
+
 struct ResultsMap {
   private:
     std::unordered_map<std::shared_ptr<Synonym>, std::vector<std::string>> mapping;
