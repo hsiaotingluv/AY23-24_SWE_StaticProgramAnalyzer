@@ -26,6 +26,11 @@ class FollowsStore {
     void add_follows(const StatementNumber& s1, const StatementNumber& s2);
 
     /**
+     * Populates the Follows* and reverse Follows* relationship.
+     */
+    void populate_follows_and_reverse_follows_star();
+
+    /**
      * Checks if a direct Follows relationship exists between two statements.
      *
      * @param s1 The statement number of the potentially preceding statement.
@@ -70,14 +75,6 @@ class FollowsStore {
      * @return The statement number that is directly followed by s, or an empty string if none exists.
      */
     [[nodiscard]] StatementNumber get_follows_by(const StatementNumber& s) const;
-
-    /**
-     * Adds a transitive Follows relationship (Follows*) between two statements.
-     *
-     * @param s1 The statement number of the ancestor statement in the relationship.
-     * @param s2 The statement number of the descendant statement in the relationship.
-     */
-    void add_follows_stars(const StatementNumber& s1, const StatementNumber& s2);
 
     /**
      * Checks if a transitive Follows relationship (Follows*) exists between two statements.

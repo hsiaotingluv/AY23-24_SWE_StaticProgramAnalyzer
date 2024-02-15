@@ -81,11 +81,13 @@ TEST_CASE("ParentStore Tests") {
         parent_store.add_parent("1", "2");
         parent_store.add_parent("2", "3");
         parent_store.add_parent("3", "4");
-        parent_store.add_parent_star("1", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         REQUIRE(parent_store.has_parent_star("1", "2"));
         REQUIRE(parent_store.has_parent_star("1", "3"));
+        REQUIRE(parent_store.has_parent_star("1", "4"));
         REQUIRE(parent_store.has_parent_star("2", "3"));
+        REQUIRE(parent_store.has_parent_star("2", "4"));
         REQUIRE(parent_store.has_parent_star("3", "4"));
     }
 
@@ -93,21 +95,20 @@ TEST_CASE("ParentStore Tests") {
         parent_store.add_parent("1", "2");
         parent_store.add_parent("2", "3");
         parent_store.add_parent("3", "4");
-        parent_store.add_parent_star("1", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         REQUIRE_FALSE(parent_store.has_parent_star("1", "1"));
-        REQUIRE_FALSE(parent_store.has_parent_star("1", "4"));
         REQUIRE_FALSE(parent_store.has_parent_star("2", "1"));
         REQUIRE_FALSE(parent_store.has_parent_star("2", "2"));
-        REQUIRE_FALSE(parent_store.has_parent_star("2", "4"));
         REQUIRE_FALSE(parent_store.has_parent_star("3", "1"));
         REQUIRE_FALSE(parent_store.has_parent_star("3", "2"));
         REQUIRE_FALSE(parent_store.has_parent_star("3", "3"));
     }
 
     SECTION("Retrieving All Parent* Relationships") {
-        parent_store.add_parent_star("1", "2");
-        parent_store.add_parent_star("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         auto allParentStars = parent_store.get_all_parent_star();
 
@@ -117,20 +118,21 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Getting Ancestor Keys from All Parent* Relationships") {
-        parent_store.add_parent_star("1", "3");
-        parent_store.add_parent_star("2", "3");
+        parent_store.add_parent("1", "3");
+        parent_store.add_parent("2", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         auto parentStarKeys = parent_store.get_all_parent_star_keys();
 
         REQUIRE(parentStarKeys.size() == 2);
         REQUIRE(parentStarKeys.find("1") != parentStarKeys.end());
         REQUIRE(parentStarKeys.find("2") != parentStarKeys.end());
-        REQUIRE(parentStarKeys.find("3") == parentStarKeys.end());
     }
 
     SECTION("Getting Descendant Values from All Parent* Relationships") {
-        parent_store.add_parent_star("1", "2");
-        parent_store.add_parent_star("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         auto parentStarValues = parent_store.get_all_parent_star_values();
 
@@ -141,8 +143,9 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving All Descendants of a Specific Ancestor in Parent* Relationships") {
-        parent_store.add_parent_star("1", "2");
-        parent_store.add_parent_star("1", "3");
+        parent_store.add_parent("1", "2");
+        parent_store.add_parent("1", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         auto descendants = parent_store.get_parent_star_children("1");
 
@@ -153,8 +156,9 @@ TEST_CASE("ParentStore Tests") {
     }
 
     SECTION("Retrieving All Ancestors of a Specific Descendant in Parent* Relationships") {
-        parent_store.add_parent_star("1", "3");
-        parent_store.add_parent_star("2", "3");
+        parent_store.add_parent("1", "3");
+        parent_store.add_parent("2", "3");
+        parent_store.populate_parent_and_reverse_parent_star();
 
         auto ancestors = parent_store.get_star_parent("3");
 
@@ -162,5 +166,37 @@ TEST_CASE("ParentStore Tests") {
         REQUIRE(ancestors.find("1") != ancestors.end());
         REQUIRE(ancestors.find("2") != ancestors.end());
         REQUIRE(ancestors.find("3") == ancestors.end());
+    }
+
+    SECTION("Adding and Verifying Complex Follows* relationships") {
+        parent_store.add_parent("4", "5");
+        parent_store.add_parent("4", "6");
+        parent_store.add_parent("6", "7");
+        parent_store.add_parent("6", "8");
+        parent_store.add_parent("6", "10");
+        parent_store.add_parent("4", "11");
+        parent_store.add_parent("4", "12");
+        parent_store.add_parent("4", "13");
+        parent_store.add_parent("8", "9");
+        parent_store.populate_parent_and_reverse_parent_star();
+
+        auto allParentStar = parent_store.get_all_parent_star();
+
+        REQUIRE(parent_store.has_parent_star("4", "5"));
+        REQUIRE(parent_store.has_parent_star("4", "6"));
+        REQUIRE(parent_store.has_parent_star("4", "7"));
+        REQUIRE(parent_store.has_parent_star("4", "8"));
+        REQUIRE(parent_store.has_parent_star("4", "9"));
+        REQUIRE(parent_store.has_parent_star("4", "10"));
+        REQUIRE(parent_store.has_parent_star("4", "11"));
+        REQUIRE(parent_store.has_parent_star("4", "12"));
+        REQUIRE(parent_store.has_parent_star("4", "13"));
+
+        REQUIRE(parent_store.has_parent_star("6", "7"));
+        REQUIRE(parent_store.has_parent_star("6", "8"));
+        REQUIRE(parent_store.has_parent_star("6", "9"));
+        REQUIRE(parent_store.has_parent_star("6", "10"));
+
+        REQUIRE(parent_store.has_parent_star("8", "9"));
     }
 }
