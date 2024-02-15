@@ -31,256 +31,204 @@ struct Integer {
     }
 };
 
-// StmtSynonym := RawStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym | AssignSynonym
-class RawStmtSynonym {
+class Synonym {
     IDENT name;
 
-  public:
+public:
+    explicit Synonym(IDENT name) : name(std::move(name)) {
+    }
+
+    explicit Synonym(std::string name) : name(std::move(name)) {
+    }
+
+    [[nodiscard]] virtual auto get_keyword() const -> std::string = 0;
+
+    virtual auto is_keyword_match(const std::string &str) -> bool {
+        return str == get_keyword();
+    }
+
+    [[nodiscard]] auto get_name() const -> IDENT {
+        return name;
+    }
+
+    auto operator==(const Synonym& rhs) const -> bool {
+        // I'm aware typeid may incur some performance cost, but will stick to it for now
+        return typeid(*this) == typeid(rhs) && name == rhs.name;
+    }
+
+};
+
+// StmtSynonym := RawStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym | AssignSynonym
+class StmtSynonym : public Synonym {
+public:
+    explicit StmtSynonym(IDENT name) : Synonym(std::move(name)){
+    }
+
+    explicit StmtSynonym(std::string name) : Synonym(std::move(name)){
+    }
+};
+
+class RawStmtSynonym : public StmtSynonym {
     static constexpr auto keyword = "stmt";
 
-    explicit RawStmtSynonym(IDENT name) : name(std::move(name)) {
+public:
+    explicit RawStmtSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit RawStmtSynonym(std::string name) : name(std::move(name)) {
+    explicit RawStmtSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
-    }
-
-    auto operator==(const RawStmtSynonym& rhs) const -> bool {
-        return name == rhs.name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class ReadSynonym {
-    IDENT name;
-
-  public:
+class ReadSynonym : public StmtSynonym {
     static constexpr auto keyword = "read";
 
-    explicit ReadSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit ReadSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit ReadSynonym(std::string name) : name(std::move(name)) {
+    explicit ReadSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const ReadSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class PrintSynonym {
-    IDENT name;
-
-  public:
+class PrintSynonym : public StmtSynonym {
     static constexpr auto keyword = "print";
 
-    explicit PrintSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit PrintSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit PrintSynonym(std::string name) : name(std::move(name)) {
+    explicit PrintSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const PrintSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class CallSynonym {
-    IDENT name;
-
-  public:
+class CallSynonym : public StmtSynonym {
     static constexpr auto keyword = "call";
 
-    explicit CallSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit CallSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit CallSynonym(std::string name) : name(std::move(name)) {
+    explicit CallSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const CallSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class WhileSynonym {
-    IDENT name;
-
-  public:
+class WhileSynonym : public StmtSynonym {
     static constexpr auto keyword = "while";
 
-    explicit WhileSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit WhileSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit WhileSynonym(std::string name) : name(std::move(name)) {
+    explicit WhileSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const WhileSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class IfSynonym {
-    IDENT name;
-
-  public:
+class IfSynonym : public StmtSynonym {
     static constexpr auto keyword = "if";
 
-    explicit IfSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit IfSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit IfSynonym(std::string name) : name(std::move(name)) {
+    explicit IfSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const IfSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class AssignSynonym {
-    IDENT name;
-
-  public:
+class AssignSynonym : public StmtSynonym {
     static constexpr auto keyword = "assign";
 
-    explicit AssignSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit AssignSynonym(IDENT name) : StmtSynonym(std::move(name)) {
     }
 
-    explicit AssignSynonym(std::string name) : name(std::move(name)) {
+    explicit AssignSynonym(std::string name) : StmtSynonym(std::move(name)) {
     }
 
-    auto operator==(const AssignSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-using StmtSynonym =
-    std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym, AssignSynonym>;
+//using StmtSynonym =
+//    std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym, AssignSynonym>;
 
-class VarSynonym {
-    IDENT name;
-
-  public:
+class VarSynonym : public Synonym {
     static constexpr auto keyword = "variable";
 
-    explicit VarSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit VarSynonym(IDENT name) : Synonym(std::move(name)) {
     }
 
-    explicit VarSynonym(std::string name) : name(std::move(name)) {
+    explicit VarSynonym(std::string name) : Synonym(std::move(name)) {
     }
 
-    auto operator==(const VarSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class ConstSynonym {
-    IDENT name;
-
-  public:
+class ConstSynonym : public Synonym {
     static constexpr auto keyword = "constant";
 
-    explicit ConstSynonym(IDENT name) : name(std::move(name)) {
+public:
+    explicit ConstSynonym(IDENT name) : Synonym(std::move(name)) {
     }
 
-    explicit ConstSynonym(std::string name) : name(std::move(name)) {
+    explicit ConstSynonym(std::string name) : Synonym(std::move(name)) {
     }
 
-    auto operator==(const ConstSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-class ProcSynonym {
-    IDENT name;
-
-  public:
+class ProcSynonym : public Synonym {
     static constexpr auto keyword = "procedure";
 
-    explicit ProcSynonym(IDENT name) : name(std::move(name)) {
+  public:
+    explicit ProcSynonym(IDENT name) : Synonym(std::move(name)) {
     }
 
-    explicit ProcSynonym(std::string name) : name(std::move(name)) {
+    explicit ProcSynonym(std::string name) : Synonym(std::move(name)) {
     }
 
-    auto operator==(const ProcSynonym& rhs) const -> bool {
-        return name == rhs.name;
-    }
-
-    [[nodiscard]] auto get_name() const -> IDENT {
-        return name;
+    auto get_keyword() const -> std::string override {
+        return keyword;
     }
 };
 
-using Synonym = std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym,
-                             AssignSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
+//using Synonym = std::variant<RawStmtSynonym, ReadSynonym, PrintSynonym, CallSynonym, WhileSynonym, IfSynonym,
+//                             AssignSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
 
 template <class T, class U>
 struct is_one_of;
 
 template <class T, class... Ts>
 struct is_one_of<T, std::variant<Ts...>> : std::bool_constant<(std::is_same_v<T, Ts> || ...)> {};
-
-inline auto operator==(const Synonym& lhs, const Synonym& rhs) -> bool {
-    return std::visit(
-        [](auto&& lhs, auto&& rhs) {
-            using TL = std::decay_t<decltype(lhs)>;
-            using TR = std::decay_t<decltype(rhs)>;
-            if constexpr (std::is_same_v<TL, TR>) {
-                return lhs.get_name() == rhs.get_name();
-            } else {
-                return false;
-            }
-        },
-        lhs, rhs);
-}
-
-inline auto operator==(const StmtSynonym& lhs, const StmtSynonym& rhs) -> bool {
-    return std::visit(
-        [](auto&& lhs, auto&& rhs) {
-            using TL = std::decay_t<decltype(lhs)>;
-            using TR = std::decay_t<decltype(rhs)>;
-            if constexpr (std::is_same_v<TL, TR>) {
-                return lhs.get_name() == rhs.get_name();
-            } else {
-                return false;
-            }
-        },
-        lhs, rhs);
-}
 
 inline auto operator<<(std::ostream& os, const RawStmtSynonym& stmt_syn) -> std::ostream& {
     os << "RawStmtSynonym(" << stmt_syn.get_name() << ")";
@@ -383,72 +331,9 @@ auto find_stmt_syn(const Synonyms& declared_synonyms, std::string syn_name) -> s
 
 namespace std {
 template <>
-struct hash<qps::RawStmtSynonym> {
-    auto operator()(const qps::RawStmtSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::RawStmtSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::ReadSynonym> {
-    auto operator()(const qps::ReadSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::ReadSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::PrintSynonym> {
-    auto operator()(const qps::PrintSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::PrintSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::CallSynonym> {
-    auto operator()(const qps::CallSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::CallSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::WhileSynonym> {
-    auto operator()(const qps::WhileSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::WhileSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::IfSynonym> {
-    auto operator()(const qps::IfSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::IfSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::AssignSynonym> {
-    auto operator()(const qps::AssignSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::AssignSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::VarSynonym> {
-    auto operator()(const qps::VarSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::VarSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::ConstSynonym> {
-    auto operator()(const qps::ConstSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::ConstSynonym::keyword + syn.get_name().get_value());
-    }
-};
-
-template <>
-struct hash<qps::ProcSynonym> {
-    auto operator()(const qps::ProcSynonym& syn) const -> size_t {
-        return hash<std::string>{}(qps::ProcSynonym::keyword + syn.get_name().get_value());
+struct hash<qps::Synonym> {
+    auto operator()(const qps::Synonym& syn) const -> size_t {
+        return hash<std::string>{}( syn.get_keyword() + syn.get_name().get_value());
     }
 };
 

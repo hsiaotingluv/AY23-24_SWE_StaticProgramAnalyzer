@@ -4,7 +4,10 @@
 #include <string>
 
 namespace qps {
-class WildCard {
+
+class Ref {};
+
+class WildCard : public Ref {
   public:
     friend auto operator<<(std::ostream& os, const WildCard& wildCard) -> std::ostream& {
         os << "_";
@@ -46,7 +49,7 @@ class IDENT {
     }
 };
 
-class QuotedIdent {
+class QuotedIdent : public Ref {
     std::string value;
 
   public:
