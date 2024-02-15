@@ -8,6 +8,7 @@
 #include "qps/parser/errors.hpp"
 #include "qps/template_utils.hpp"
 
+#include <memory>
 #include <optional>
 #include <unordered_map>
 #include <variant>
@@ -15,21 +16,19 @@
 namespace qps {
 
 auto enforce_unique_declarations(const Synonyms& declarations)
-    -> std::optional<std::unordered_map<std::string, Synonym>> {
-    std::unordered_map<std::string, Synonym> mapping;
+    -> std::optional<std::unordered_map<std::string, std::shared_ptr<Synonym>>> {
+    std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping;
 
-    for (const Synonym& declaration : declarations) {
-        std::visit(overloaded{[&mapping, &declaration](const auto& decl) {
-                       mapping.insert({decl.get_name().get_value(), declaration});
-                   }},
-                   declaration);
+    for (const auto& declaration : declarations) {
+        mapping.insert({declaration->get_name().get_value(), declaration});
     }
 
     return mapping.size() == declarations.size() ? std::make_optional(mapping) : std::nullopt;
 }
 
-auto is_synonym_declared(const Synonyms& declarations, const std::unordered_map<std::string, Synonym>& mapping,
-                         const untyped::UntypedSynonym& reference) -> std::optional<Synonym> {
+auto is_synonym_declared(const Synonyms& declarations,
+                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                         const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<Synonym>> {
 
     if (mapping.find(reference.get_name().get_value()) == mapping.end()) {
         return std::nullopt;
@@ -37,18 +36,23 @@ auto is_synonym_declared(const Synonyms& declarations, const std::unordered_map<
     return mapping.at(reference.get_name().get_value());
 }
 
-auto get_stmt_synonym(const Synonyms& declarations, const std::unordered_map<std::string, Synonym>& mapping,
-                      const untyped::UntypedSynonym& reference) -> std::optional<StmtSynonym> {
+auto get_stmt_synonym(const Synonyms& declarations,
+                      const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                      const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<StmtSynonym>> {
     const auto maybe_syn = is_synonym_declared(declarations, mapping, reference);
 
     if (!maybe_syn.has_value()) {
         return std::nullopt;
     }
 
-    return get_stmt_synonym(maybe_syn.value());
+    const auto maybe_stmt_syn = std::dynamic_pointer_cast<StmtSynonym>(maybe_syn.value());
+    if (!maybe_stmt_syn) {
+        return std::nullopt;
+    }
+    return maybe_stmt_syn;
 }
 
-auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::string, Synonym>& mapping,
+auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                  const untyped::UntypedStmtRef& x) -> std::optional<StmtRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<StmtRef> {
@@ -65,7 +69,7 @@ auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::str
         x);
 }
 
-auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::string, Synonym>& mapping,
+auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                 const untyped::UntypedEntRef& x) -> std::optional<EntRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<EntRef> {
@@ -115,9 +119,9 @@ auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, cons
 }
 
 auto untyped_relationship_visitor(const Synonyms& declarations,
-                                  const std::unordered_map<std::string, Synonym>& mapping) {
+                                  const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping) {
     return overloaded{
-        [&declarations, &mapping](const untyped::AnyStmtSynonymtmtRel& stmt_stmt_rel) -> std::optional<Relationship> {
+        [&declarations, &mapping](const untyped::UntypedStmtStmtRel& stmt_stmt_rel) -> std::optional<Relationship> {
             const auto keyword = std::get<0>(stmt_stmt_rel);
             const auto maybe_stmt_ref1 = to_stmt_ref(declarations, mapping, std::get<1>(stmt_stmt_rel));
             const auto maybe_stmt_ref2 = to_stmt_ref(declarations, mapping, std::get<2>(stmt_stmt_rel));
@@ -140,7 +144,8 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         }};
 };
 
-auto untyped_clause_visitor(const Synonyms& declarations, const std::unordered_map<std::string, Synonym> mapping) {
+auto untyped_clause_visitor(const Synonyms& declarations,
+                            const std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping) {
     return overloaded{
         [&declarations,
          &mapping](const untyped::UntypedSuchThatClause& such_that) -> std::optional<std::shared_ptr<Clause>> {
@@ -159,11 +164,11 @@ auto untyped_clause_visitor(const Synonyms& declarations, const std::unordered_m
             if (!maybe_syn.has_value()) {
                 return std::nullopt;
             }
-            const auto& maybe_assign_syn = maybe_syn.value();
-            if (!std::holds_alternative<AssignSynonym>(maybe_assign_syn)) {
+            const auto& maybe_assign_syn = std::dynamic_pointer_cast<AssignSynonym>(maybe_syn.value());
+            if (!maybe_assign_syn) {
                 return std::nullopt;
             }
-            const auto assign_syn = std::get<AssignSynonym>(maybe_assign_syn);
+            const auto assign_syn = maybe_assign_syn;
 
             const auto maybe_ent_ref = std::visit(
                 overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<EntRef> {
@@ -183,7 +188,8 @@ auto untyped_clause_visitor(const Synonyms& declarations, const std::unordered_m
         }};
 };
 
-auto validate_clause(const Synonyms& declarations, const std::unordered_map<std::string, Synonym>& mapping,
+auto validate_clause(const Synonyms& declarations,
+                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                      const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>> {
 
     return std::visit(untyped_clause_visitor(declarations, mapping), clause);

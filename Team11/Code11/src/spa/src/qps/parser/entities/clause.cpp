@@ -1,18 +1,23 @@
 #include "qps/parser/entities/clause.hpp"
 
+#include <sstream>
+#include <string>
+
 namespace qps {
-auto SuchThatClause::operator<<(std::ostream& os) const -> std::ostream& {
-    os << "SuchThat(" << rel_ref << ")";
-    return os;
+auto SuchThatClause::representation() const -> std::string {
+    std::stringstream ss;
+    ss << "SuchThat(" << rel_ref << ")";
+    return ss.str();
 }
 
 auto SuchThatClause::operator==(const SuchThatClause& other) const -> bool {
     return rel_ref == other.rel_ref;
 }
 
-auto PatternClause::operator<<(std::ostream& os) const -> std::ostream& {
-    os << "Pattern(" << assign_synonym << ", " << ent_ref << ", " << expression_spec << ")";
-    return os;
+auto PatternClause::representation() const -> std::string {
+    std::stringstream ss;
+    ss << "Pattern(" << assign_synonym->get_name().get_value() << ", " << ent_ref << ", " << expression_spec << ")";
+    return ss.str();
 }
 
 auto PatternClause::operator==(const PatternClause& other) const -> bool {

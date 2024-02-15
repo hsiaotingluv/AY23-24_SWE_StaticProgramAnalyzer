@@ -78,4 +78,25 @@ class QuotedIdent : public Ref {
     }
 };
 
+struct Integer {
+    uint32_t value;
+
+    friend auto operator<<(std::ostream& os, const Integer& integer) -> std::ostream& {
+        os << integer.value;
+        return os;
+    }
+
+    friend auto operator==(const Integer& lhs, const Integer& rhs) -> bool {
+        return lhs.value == rhs.value;
+    }
+
+    friend auto operator==(const Integer& lhs, const int& rhs) -> bool {
+        return lhs.value == rhs;
+    }
+
+    friend auto operator==(const int& lhs, const Integer& rhs) -> bool {
+        return lhs == rhs.value;
+    }
+};
+
 } // namespace qps

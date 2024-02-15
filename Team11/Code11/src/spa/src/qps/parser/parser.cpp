@@ -1,4 +1,5 @@
 #include "qps/parser/parser.hpp"
+#include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/entities/untyped/clause.hpp"
 #include "qps/parser/entities/untyped/relationship.hpp"
 #include "qps/parser/entities/untyped/synonym.hpp"
@@ -37,6 +38,7 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
     }
 
     // Match keyword
+    // TODO: find a better way to build this thing
     constexpr auto expected = SynonymType::keyword;
     const auto keyword = *it;
     if (!is_keyword(keyword, expected)) {
@@ -52,7 +54,7 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
         return std::nullopt;
     }
     it = std::next(it);
-    synonyms.push_back(SynonymType{IDENT{maybe_synonym.content}});
+    synonyms.push_back(std::make_shared<SynonymType>(IDENT{maybe_synonym.content}));
 
     // Try to consume remaining synonyms with pattern: ',' <synonym>
     while (it != end) {
@@ -70,7 +72,7 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
             break;
         }
         it = std::next(it);
-        synonyms.push_back(SynonymType{IDENT{synonym.content}});
+        synonyms.push_back(std::make_shared<SynonymType>(IDENT{synonym.content}));
     }
 
     // Consume ';' delimiter if it exists
@@ -81,7 +83,7 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
 }
 
 template <typename T>
-auto try_declare_synonym(std::vector<Synonym>& synonyms, std::vector<Token>::const_iterator it,
+auto try_declare_synonym(Synonyms& synonyms, std::vector<Token>::const_iterator it,
                          const std::vector<Token>::const_iterator& end)
     -> std::optional<std::vector<Token>::const_iterator> {
     const auto maybe_decl = build_synonyms<T>(it, end);
@@ -93,14 +95,14 @@ auto try_declare_synonym(std::vector<Synonym>& synonyms, std::vector<Token>::con
     return std::nullopt;
 }
 
-auto parse_declarations(std::vector<Synonym>& synonyms, std::vector<Token>::const_iterator it,
+auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
                         const std::vector<Token>::const_iterator& end, TypeList<> _)
     -> std::optional<std::vector<Token>::const_iterator> {
     return std::nullopt;
 }
 
 template <typename Head, typename... Tails>
-auto parse_declarations(std::vector<Synonym>& synonyms, std::vector<Token>::const_iterator it,
+auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
                         const std::vector<Token>::const_iterator& end, TypeList<Head, Tails...> _)
     -> std::optional<std::vector<Token>::const_iterator> {
     auto maybe_it = try_declare_synonym<Head>(synonyms, it, end);
@@ -109,7 +111,7 @@ auto parse_declarations(std::vector<Synonym>& synonyms, std::vector<Token>::cons
 
 auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>> {
-    auto declared_synonyms = std::vector<Synonym>{};
+    auto declared_synonyms = Synonyms{};
     while (true) {
         const auto maybe_it = parse_declarations(declared_synonyms, it, end, SupportedSynonyms());
         if (!maybe_it.has_value()) {
@@ -230,7 +232,7 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
 
 auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
     return [keyword, is_direct](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-               -> std::optional<std::tuple<AnyStmtSynonymtmtRel, std::vector<Token>::const_iterator>> {
+               -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
         const auto offset = is_direct ? 0 : 1;
         if (std::distance(it, end) < 6 + offset) {
             return std::nullopt;
@@ -262,7 +264,7 @@ auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
         }
 
         return std::make_tuple(
-            AnyStmtSynonymtmtRel{keyword, parse_stmt_ref(maybe_first_arg), parse_stmt_ref(maybe_second_arg)},
+            UntypedStmtStmtRel{keyword, parse_stmt_ref(maybe_first_arg), parse_stmt_ref(maybe_second_arg)},
             std::next(it, 6 + offset));
     };
 };

@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include "utils.hpp"
+
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/entities/untyped/clause.hpp"
@@ -28,11 +30,11 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
         REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
 
-        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.declared[1]));
-        REQUIRE(std::get<AnyStmtSynonymynonym>(result.declared[1]).get_name() == "s");
+        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result.declared[1]));
+        REQUIRE(std::get<AnyStmtSynonym>(result.declared[1]).get_name() == "s");
 
-        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.reference));
-        REQUIRE(std::get<AnyStmtSynonymynonym>(result.reference).get_name() == "s");
+        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result.reference));
+        REQUIRE(std::get<AnyStmtSynonym>(result.reference).get_name() == "s");
     }
 #else
     SECTION("Query with stmt-stmt relationship") {
@@ -43,10 +45,9 @@ TEST_CASE("Test QPSParser") {
         const auto& [declarations, untyped] = output.value();
 
         REQUIRE(declarations.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(declarations[0]));
-        REQUIRE(std::get<ProcSynonym>(declarations[0]).get_name() == "p");
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(declarations[1]));
-        REQUIRE(std::get<AnyStmtSynonym>(declarations[1]).get_name() == "s");
+
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
         REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
@@ -55,8 +56,8 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
-            untyped::AnyStmtSynonymtmtRel{"Follows", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                          untyped::UntypedStmtRef{Integer{13}}}};
+            untyped::UntypedStmtStmtRel{"Follows", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                        untyped::UntypedStmtRef{Integer{13}}}};
         REQUIRE(such_that_clause == reference_clause);
     };
 
@@ -77,8 +78,7 @@ TEST_CASE("Test QPSParser") {
         const auto& [declarations, untyped] = output.value();
 
         REQUIRE(declarations.size() == 1);
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(declarations[0]));
-        REQUIRE(std::get<AnyStmtSynonym>(declarations[0]).get_name() == "s");
+        require_value<AnyStmtSynonym>(declarations[0], "s");
 
         const auto& [reference, clauses] = untyped;
         REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
@@ -124,8 +124,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto& [declarations, untyped] = output.value();
 
         REQUIRE(declarations.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(declarations[0]));
-        REQUIRE(std::get<AssignSynonym>(declarations[0]).get_name() == "a");
+        require_value<AssignSynonym>(declarations[0], "a");
 
         const auto& [reference, clauses] = untyped;
         REQUIRE(reference == untyped::UntypedSynonym{IDENT{"a"}});
@@ -148,8 +147,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto& [declarations, untyped] = output.value();
 
         REQUIRE(declarations.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(declarations[0]));
-        REQUIRE(std::get<AssignSynonym>(declarations[0]).get_name() == "newa");
+        require_value<AssignSynonym>(declarations[0], "newa");
 
         const auto& [reference, clauses] = untyped;
 
@@ -200,8 +198,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto& [declarations, untyped] = result.value();
 
         REQUIRE(declarations.size() == 1);
-        REQUIRE(std::holds_alternative<ProcSynonym>(declarations[0]));
-        REQUIRE(std::get<ProcSynonym>(declarations[0]).get_name() == "p");
+        require_value<ProcSynonym>(declarations[0], "p");
 
         const auto& [reference, clauses] = untyped;
         REQUIRE(reference == untyped::UntypedSynonym{IDENT{"v"}});

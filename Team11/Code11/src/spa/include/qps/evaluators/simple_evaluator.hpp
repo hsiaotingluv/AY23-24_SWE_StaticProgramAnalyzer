@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/results_map.hpp"
-#include "qps/qps.hpp"
+#include "qps/parser/semantic_validator.hpp"
 
 #include <memory>
 #include <utility>

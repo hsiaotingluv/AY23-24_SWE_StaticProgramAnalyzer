@@ -1,4 +1,7 @@
 #include "qps/parser/entities/relationship.hpp"
+#include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
+#include <memory>
 #include <ostream>
 #include <variant>
 
@@ -17,11 +20,12 @@ auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard
 }
 
 auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef> {
-    return std::visit(overloaded{[](const Synonym& x) -> std::optional<VarRef> {
-                                     if (is_var_syn(x)) {
-                                         return std::get<VarSynonym>(x);
+    return std::visit(overloaded{[](const std::shared_ptr<Synonym>& x) -> std::optional<VarRef> {
+                                     auto try_ptr = std::dynamic_pointer_cast<VarSynonym>(x);
+                                     if (!try_ptr) {
+                                         return std::nullopt;
                                      }
-                                     return std::nullopt;
+                                     return VarRef{try_ptr};
                                  },
                                  [](const auto& x) -> std::optional<VarRef> {
                                      return x;

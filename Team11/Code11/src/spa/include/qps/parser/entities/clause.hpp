@@ -8,9 +8,11 @@ namespace qps {
 struct Clause {
     virtual ~Clause() = default;
 
-    virtual auto operator<<(std::ostream& os) const -> std::ostream& {
-        return os;
+    auto operator<<(std::ostream& os) const -> std::ostream& {
+        return os << representation();
     }
+
+    [[nodiscard]] virtual auto representation() const -> std::string = 0;
 
     auto operator==(const Clause& rhs) const -> bool {
         if (typeid(*this) != typeid(rhs)) {
@@ -28,7 +30,7 @@ struct SuchThatClause : Clause {
     SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
     }
 
-    auto operator<<(std::ostream& os) const -> std::ostream& override;
+    [[nodiscard]] auto representation() const -> std::string override;
 
     auto operator==(const SuchThatClause& other) const -> bool;
 
@@ -41,16 +43,16 @@ struct SuchThatClause : Clause {
 };
 
 struct PatternClause : Clause {
-    AssignSynonym assign_synonym;
+    std::shared_ptr<AssignSynonym> assign_synonym;
     EntRef ent_ref;
     ExpressionSpec expression_spec;
 
-    PatternClause(AssignSynonym assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
+    PatternClause(std::shared_ptr<AssignSynonym> assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
         : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
           expression_spec(std::move(expression_spec)) {
     }
 
-    auto operator<<(std::ostream& os) const -> std::ostream& override;
+    [[nodiscard]] auto representation() const -> std::string override;
 
     auto operator==(const PatternClause& other) const -> bool;
 

@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include "utils.hpp"
+
 #include "qps/parser/expression_parser.hpp"
 #include "qps/qps.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
@@ -12,7 +14,6 @@
 #include <iterator>
 #include <memory>
 #include <optional>
-#include <variant>
 
 using namespace qps;
 
@@ -28,8 +29,7 @@ TEST_CASE("Test Declaration Parser") {
         const auto& [result, rest] = output.value();
 
         REQUIRE(result.size() == 1);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
+        require_value<ProcSynonym>(result[0], "p");
         REQUIRE(std::distance(rest, tokens.end()) == 0);
     }
 
@@ -42,12 +42,9 @@ TEST_CASE("Test Declaration Parser") {
         const auto& [result, rest] = output.value();
 
         REQUIRE(result.size() == 3);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[1]));
-        REQUIRE(std::get<ProcSynonym>(result[1]).get_name() == "q");
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[2]));
-        REQUIRE(std::get<ProcSynonym>(result[2]).get_name() == "r");
+        require_value<ProcSynonym>(result[0], "p");
+        require_value<ProcSynonym>(result[1], "q");
+        require_value<ProcSynonym>(result[2], "r");
         REQUIRE(std::distance(rest, tokens.end()) == 2);
     }
 
@@ -60,10 +57,8 @@ TEST_CASE("Test Declaration Parser") {
         const auto& [result, rest] = output.value();
 
         REQUIRE(result.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result[0]));
-        REQUIRE(std::get<ProcSynonym>(result[0]).get_name() == "p");
-        REQUIRE(std::holds_alternative<VarSynonym>(result[1]));
-        REQUIRE(std::get<VarSynonym>(result[1]).get_name() == "v");
+        require_value<ProcSynonym>(result[0], "p");
+        require_value<VarSynonym>(result[1], "v");
         REQUIRE(std::distance(rest, tokens.end()) == 2);
     }
 
@@ -107,18 +102,13 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto result = output.value();
 
         REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
-
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result.declared[1]));
-        REQUIRE(std::get<AnyStmtSynonym>(result.declared[1]).get_name() == "s");
-
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result.reference));
-        REQUIRE(std::get<AnyStmtSynonym>(result.reference).get_name() == "s");
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+        require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<SuchThatClause>(Follows{AnyStmtSynonym{IDENT{"s"}}, Integer{13}});
+        const std::shared_ptr<Clause> reference_clause = std::make_shared<SuchThatClause>(
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
     }
 #endif
     SECTION("Query with stmt-ent relationship") {
@@ -135,15 +125,12 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(result.has_value());
         REQUIRE(result->declared.size() == 1);
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result->declared[0]));
-        REQUIRE(std::get<AnyStmtSynonym>(result->declared[0]).get_name() == "s");
-
-        REQUIRE(std::holds_alternative<AnyStmtSynonym>(result->reference));
-        REQUIRE(std::get<AnyStmtSynonym>(result->reference).get_name() == "s");
+        require_value<AnyStmtSynonym>(result->declared[0], "s");
+        require_value<AnyStmtSynonym>(result->reference, "s");
 
         REQUIRE(result->clauses.size() == 1);
         const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<SuchThatClause>(UsesS{AnyStmtSynonym{IDENT{"s"}}, QuotedIdent{"v"}});
+            std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), QuotedIdent{"v"}});
 #endif
     }
 
@@ -155,18 +142,13 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto result = output.value();
 
         REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
-
-        REQUIRE(std::holds_alternative<VarSynonym>(result.declared[1]));
-        REQUIRE(std::get<VarSynonym>(result.declared[1]).get_name() == "v");
-
-        REQUIRE(std::holds_alternative<VarSynonym>(result.reference));
-        REQUIRE(std::get<VarSynonym>(result.reference).get_name() == "v");
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<VarSynonym>(result.declared[1], "v");
+        require_value<VarSynonym>(result.reference, "v");
 
         REQUIRE(result.clauses.size() == 1);
         const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<SuchThatClause>(UsesS{Integer{1}, VarSynonym{IDENT{"v"}}});
+            std::make_shared<SuchThatClause>(UsesS{Integer{1}, std::make_shared<VarSynonym>(IDENT{"v"})});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -199,15 +181,12 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto result = output.value();
 
         REQUIRE(result.declared.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "a");
-
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "a");
+        require_value<AssignSynonym>(result.declared[0], "a");
+        require_value<AssignSynonym>(result.reference, "a");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
-            std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, WildCard{}, PartialMatch{"((count)+(1))"});
+        const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
+            std::make_shared<AssignSynonym>(IDENT{"a"}), WildCard{}, PartialMatch{"((count)+(1))"});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -219,15 +198,13 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto result = output.value();
 
         REQUIRE(result.declared.size() == 1);
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "newa");
 
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.reference));
-        REQUIRE(std::get<AssignSynonym>(result.reference).get_name() == "newa");
+        require_value<AssignSynonym>(result.declared[0], "newa");
+        require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
         const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
-            AssignSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, PartialMatch{"((cenX)*(cenX))"});
+            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"((cenX)*(cenX))"});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 

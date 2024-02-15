@@ -5,7 +5,7 @@
 namespace qps {
 auto Evaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
-    const auto results = std::visit(scan_entities(read_facade), reference);
+    const auto results = scan_entities(read_facade, reference);
 
     auto results_map = ResultsMap{};
 

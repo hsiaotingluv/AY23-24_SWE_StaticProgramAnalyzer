@@ -10,10 +10,10 @@
 namespace qps {
 struct Query {
     Synonyms declared;
-    Synonym reference;
+    std::shared_ptr<Synonym> reference;
     std::vector<std::shared_ptr<Clause>> clauses;
 
-    Query(Synonyms declared, Synonym reference, std::vector<std::shared_ptr<Clause>> clauses)
+    Query(Synonyms declared, std::shared_ptr<Synonym> reference, std::vector<std::shared_ptr<Clause>> clauses)
         : declared(std::move(declared)), reference(std::move(reference)), clauses(std::move(clauses)) {
     }
 
@@ -24,7 +24,7 @@ struct Query {
             os << "\t\t" << declared << "\n";
         }
         os << "\tReference:\n";
-        os << "\t\t" << reference << "\n";
+        os << "\t\t" << reference << "\n"; // TODO: dispatch to reference's operator<<
         os << "\tClauses:\n";
         for (const auto& clause : clauses) {
             os << "\t\t" << clause << "\n";
