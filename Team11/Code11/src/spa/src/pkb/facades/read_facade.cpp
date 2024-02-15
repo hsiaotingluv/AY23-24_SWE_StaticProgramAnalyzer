@@ -107,10 +107,72 @@ std::unordered_set<std::string> ReadFacade::get_statements_that_modify_var(const
     return this->pkb->modifies_store->get_statements_that_modify_var(v);
 }
 
+std::unordered_set<std::string> ReadFacade::get_statements_that_modify_var(const std::string& variable,
+                                                                           const StatementType& statementType) {
+    auto stmts_pool = get_statements_that_modify_var(variable);
+
+    std::unordered_set<std::string> temp;
+
+    for (const std::string& stmt : stmts_pool) {
+        if (this->pkb->statement_store->get_statement_type(stmt) == statementType) {
+            temp.insert(stmt);
+        }
+    }
+
+    return temp;
+}
+
 bool ReadFacade::does_statement_modify_var(const std::string& statement, const std::string& variable) {
     auto v = Variable(variable);
 
     return this->pkb->modifies_store->does_statement_modify_var(statement, v);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_statements_that_modify() {
+    return this->pkb->modifies_store->get_all_statements_that_modify();
+};
+
+bool ReadFacade::does_statement_modify_any_var(const std::string& statement_number) {
+    return this->pkb->modifies_store->does_statement_modify_any_var(statement_number);
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_statements_and_var_modify_pairs() {
+    auto pairs = this->pkb->modifies_store->get_all_statements_and_var_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [s, v] : pairs) {
+        temp.insert(std::make_tuple(s, v.getName()));
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_procedures_that_modify() {
+    auto procedures = this->pkb->modifies_store->get_all_procedures_that_modify();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+bool ReadFacade::does_procedure_modify_any_var(const std::string& procedure) {
+    auto p = Procedure(procedure);
+
+    return this->pkb->modifies_store->does_procedure_modify_any_var(p);
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_procedures_and_var_modify_pairs() {
+    auto pairs = this->pkb->modifies_store->get_all_procedures_and_var_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [p, v] : pairs) {
+        temp.insert(std::make_tuple(p.getName(), v.getName()));
+    }
+
+    return temp;
 }
 
 std::unordered_set<std::string> ReadFacade::get_vars_modified_by_procedure(const std::string& procedure) {
@@ -163,6 +225,21 @@ std::unordered_set<std::string> ReadFacade::get_statements_that_use_var(const st
     return this->pkb->uses_store->get_statements_that_use_var(v);
 }
 
+std::unordered_set<std::string> ReadFacade::get_statements_that_use_var(const std::string& variable,
+                                                                        const StatementType& statementType) {
+    auto stmts_pool = get_statements_that_use_var(variable);
+
+    std::unordered_set<std::string> temp;
+
+    for (const std::string& stmt : stmts_pool) {
+        if (this->pkb->statement_store->get_statement_type(stmt) == statementType) {
+            temp.insert(stmt);
+        }
+    }
+
+    return temp;
+}
+
 bool ReadFacade::does_statement_use_var(const std::string& statement, const std::string& variable) {
     auto v = Variable(variable);
 
@@ -200,6 +277,53 @@ bool ReadFacade::does_procedure_use_var(const std::string& procedure, const std:
     auto p = Procedure(procedure);
 
     return this->pkb->uses_store->does_procedure_use_var(p, v);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_statements_that_use() {
+    return this->pkb->uses_store->get_all_statements_that_use();
+};
+
+bool ReadFacade::does_statement_use_any_var(const std::string& statement_number) {
+    return this->pkb->uses_store->does_statement_use_any_var(statement_number);
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_statements_and_var_use_pairs() {
+    auto pairs = this->pkb->uses_store->get_all_statements_and_var_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [s, v] : pairs) {
+        temp.insert(std::make_tuple(s, v.getName()));
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_procedures_that_use() {
+    auto procedures = this->pkb->uses_store->get_all_procedures_that_use();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+bool ReadFacade::does_procedure_use_any_var(const std::string& procedure) {
+    auto p = Procedure(procedure);
+
+    return this->pkb->uses_store->does_procedure_use_any_var(p);
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_procedures_and_var_use_pairs() {
+    auto pairs = this->pkb->uses_store->get_all_procedures_and_var_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [p, v] : pairs) {
+        temp.insert(std::make_tuple(p.getName(), v.getName()));
+    }
+
+    return temp;
 }
 
 std::unordered_map<std::string, std::string> ReadFacade::get_all_follows() const {

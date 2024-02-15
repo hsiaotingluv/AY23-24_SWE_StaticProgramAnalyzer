@@ -91,8 +91,8 @@ TEST_CASE("Parent Test") {
     REQUIRE(read_facade->has_parent_star("1", "7"));
 }
 
-TEST_CASE("Simple Modify Test") {
-    SECTION("Modify Test") {
+TEST_CASE("Modify Test") {
+    SECTION("Simple Modify Test") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
         write_facade->add_statement_modifies_var("1", "x");
@@ -106,10 +106,51 @@ TEST_CASE("Simple Modify Test") {
         REQUIRE(read_facade->get_statements_that_modify_var("z").size() == 1);
         REQUIRE(read_facade->get_vars_modified_by_statement("1").size() == 2);
     }
+
+    SECTION("More complex modify test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_procedure_modifies_var("main", "x");
+        write_facade->add_procedure_modifies_var("main", "y");
+        write_facade->add_procedure_modifies_var("helper", "z");
+        write_facade->add_statement_modifies_var("1", "x");
+        write_facade->add_statement_modifies_var("1", "y");
+        write_facade->add_statement_modifies_var("2", "x");
+        write_facade->add_statement_modifies_var("2", "z");
+
+        REQUIRE(read_facade->get_all_statements_that_modify().size() == 2);
+        REQUIRE(read_facade->does_statement_modify_any_var("1"));
+        REQUIRE(read_facade->get_all_statements_and_var_modify_pairs().size() == 4);
+        REQUIRE(read_facade->get_all_procedures_that_modify().size() == 2);
+        REQUIRE(read_facade->does_procedure_modify_any_var("main"));
+        REQUIRE(read_facade->get_all_procedures_and_var_modify_pairs().size() == 3);
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->does_statement_modify_any_var("3"));
+        REQUIRE_FALSE(read_facade->does_procedure_modify_any_var("nonexistent"));
+    }
+
+    SECTION("Test get_statements_that_modify_var of certain type") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_statement_modifies_var("1", "x");
+        write_facade->add_statement_modifies_var("1", "y");
+        write_facade->add_statement_modifies_var("2", "x");
+        write_facade->add_statement_modifies_var("2", "z");
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Call);
+
+        REQUIRE(read_facade->get_statements_that_modify_var("x", StatementType::Read).size() == 1);
+        REQUIRE(read_facade->get_statements_that_modify_var("z", StatementType::Call).size() == 1);
+        REQUIRE(read_facade->get_statements_that_modify_var("x", StatementType::Print).size() == 0);
+        REQUIRE(read_facade->get_statements_that_modify_var("a", StatementType::If).size() == 0);
+        REQUIRE(read_facade->get_statements_that_modify_var("b", StatementType::Read).size() == 0);
+    }
 }
 
-TEST_CASE("Simple Use Test") {
-    SECTION("Use Test") {
+TEST_CASE("Use Test") {
+    SECTION("Simple Use Test") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
         write_facade->add_statement_uses_var("1", "x");
@@ -122,5 +163,46 @@ TEST_CASE("Simple Use Test") {
         REQUIRE(read_facade->get_statements_that_use_var("x").size() == 2);
         REQUIRE(read_facade->get_statements_that_use_var("z").size() == 1);
         REQUIRE(read_facade->get_vars_used_by_statement("1").size() == 2);
+    }
+
+    SECTION("More complex use test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_procedure_uses_var("main", "x");
+        write_facade->add_procedure_uses_var("main", "y");
+        write_facade->add_procedure_uses_var("helper", "z");
+        write_facade->add_statement_uses_var("1", "x");
+        write_facade->add_statement_uses_var("1", "y");
+        write_facade->add_statement_uses_var("2", "x");
+        write_facade->add_statement_uses_var("2", "z");
+
+        REQUIRE(read_facade->get_all_statements_that_use().size() == 2);
+        REQUIRE(read_facade->does_statement_use_any_var("1"));
+        REQUIRE(read_facade->get_all_statements_and_var_use_pairs().size() == 4);
+        REQUIRE(read_facade->get_all_procedures_that_use().size() == 2);
+        REQUIRE(read_facade->does_procedure_use_any_var("main"));
+        REQUIRE(read_facade->get_all_procedures_and_var_use_pairs().size() == 3);
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->does_statement_use_any_var("3"));
+        REQUIRE_FALSE(read_facade->does_procedure_use_any_var("nonexistent"));
+    }
+
+    SECTION("Test get_statements_that_use_var of certain type") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_statement_uses_var("1", "x");
+        write_facade->add_statement_uses_var("1", "y");
+        write_facade->add_statement_uses_var("2", "x");
+        write_facade->add_statement_uses_var("2", "z");
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Call);
+
+        REQUIRE(read_facade->get_statements_that_use_var("x", StatementType::Read).size() == 1);
+        REQUIRE(read_facade->get_statements_that_use_var("z", StatementType::Call).size() == 1);
+        REQUIRE(read_facade->get_statements_that_use_var("x", StatementType::Print).size() == 0);
+        REQUIRE(read_facade->get_statements_that_use_var("a", StatementType::If).size() == 0);
+        REQUIRE(read_facade->get_statements_that_use_var("b", StatementType::Read).size() == 0);
     }
 }

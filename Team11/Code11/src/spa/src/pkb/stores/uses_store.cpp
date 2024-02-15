@@ -63,3 +63,55 @@ std::unordered_set<Procedure> UsesStore::get_procedures_that_use_var(const Varia
 
     return reverse_procedure_uses_var_store.at(v);
 };
+
+std::unordered_set<UsesStore::StatementNumber> UsesStore::get_all_statements_that_use() {
+    std::unordered_set<StatementNumber> allStatements;
+
+    for (const auto& [s, _] : statement_uses_var_store) {
+        allStatements.insert(s);
+    }
+
+    return allStatements;
+};
+
+bool UsesStore::does_statement_use_any_var(const StatementNumber& statement) {
+    return statement_uses_var_store.find(statement) != statement_uses_var_store.end();
+}
+
+UsesStore::StatementNumberVariableTupleSet UsesStore::get_all_statements_and_var_pairs() {
+    StatementNumberVariableTupleSet allPairs;
+
+    for (const auto& [s, vars] : statement_uses_var_store) {
+        for (const auto& v : vars) {
+            allPairs.insert(std::make_tuple(s, v));
+        }
+    }
+
+    return allPairs;
+};
+
+std::unordered_set<Procedure> UsesStore::get_all_procedures_that_use() {
+    std::unordered_set<Procedure> allProcedures;
+
+    for (const auto& [p, _] : procedure_uses_var_store) {
+        allProcedures.insert(p);
+    }
+
+    return allProcedures;
+}
+
+bool UsesStore::does_procedure_use_any_var(const Procedure& procedure) {
+    return procedure_uses_var_store.find(procedure) != procedure_uses_var_store.end();
+}
+
+UsesStore::ProcedureVariableTupleSet UsesStore::get_all_procedures_and_var_pairs() {
+    ProcedureVariableTupleSet allPairs;
+
+    for (const auto& [p, vars] : procedure_uses_var_store) {
+        for (const auto& v : vars) {
+            allPairs.insert(std::make_tuple(p, v));
+        }
+    }
+
+    return allPairs;
+}

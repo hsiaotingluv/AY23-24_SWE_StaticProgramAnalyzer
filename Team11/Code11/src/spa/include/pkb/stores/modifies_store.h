@@ -1,13 +1,17 @@
 #pragma once
 
+#include "common/hashable_tuple.h"
 #include "pkb/common_types/procedure.h"
 #include "pkb/common_types/variable.h"
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 
 class ModifiesStore {
   public:
     using StatementNumber = std::string;
+    using StatementNumberVariableTupleSet = std::unordered_set<std::tuple<StatementNumber, Variable>>;
+    using ProcedureVariableTupleSet = std::unordered_set<std::tuple<Procedure, Variable>>;
 
     ModifiesStore();
 
@@ -22,6 +26,14 @@ class ModifiesStore {
 
     std::unordered_set<StatementNumber> get_statements_that_modify_var(const Variable& v);
     std::unordered_set<Procedure> get_procedures_that_modify_var(const Variable& v);
+
+    std::unordered_set<StatementNumber> get_all_statements_that_modify();
+    bool does_statement_modify_any_var(const StatementNumber& statement);
+    StatementNumberVariableTupleSet get_all_statements_and_var_pairs();
+
+    std::unordered_set<Procedure> get_all_procedures_that_modify();
+    bool does_procedure_modify_any_var(const Procedure& procedure);
+    ProcedureVariableTupleSet get_all_procedures_and_var_pairs();
 
   private:
     std::unordered_map<Procedure, std::unordered_set<Variable>> procedure_modifies_var_store;
