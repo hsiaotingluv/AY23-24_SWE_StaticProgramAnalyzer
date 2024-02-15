@@ -47,7 +47,8 @@ const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, Res
             }
             return;
         },
-        [read_facade, &results_map](const std::shared_ptr<qps::StmtSynonym>& synonym, const std::shared_ptr<qps::VarSynonym>& var) {
+        [read_facade, &results_map](const std::shared_ptr<qps::StmtSynonym>& synonym,
+                                    const std::shared_ptr<qps::VarSynonym>& var) {
             // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
             const auto statements = read_facade->get_all_statements();
             const auto variables = read_facade->get_variables();

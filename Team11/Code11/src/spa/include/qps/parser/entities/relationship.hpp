@@ -4,6 +4,7 @@
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
+#include <memory>
 #include <optional>
 #include <ostream>
 #include <utility>
@@ -14,20 +15,6 @@ namespace qps {
 using StmtRefNoWildcard = std::variant<std::shared_ptr<StmtSynonym>, Integer>;
 using ProcedureRefNoWildcard = std::variant<std::shared_ptr<ProcSynonym>, QuotedIdent>;
 using VarRef = std::variant<WildCard, std::shared_ptr<VarSynonym>, QuotedIdent>;
-
-template <>
-inline auto operator<<(std::ostream& os, const VarRef& ent_ref) -> std::ostream& {
-    return std::visit(overloaded{
-                          [&os](const std::shared_ptr<VarSynonym>& stmt_syn) -> std::ostream& {
-                              auto syn = std::static_pointer_cast<Synonym>(stmt_syn);
-                              return os << *syn;
-                          },
-                          [&os](auto&& x) -> std::ostream& {
-                              return os << x;
-                          },
-                      },
-                      ent_ref);
-}
 
 auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard>;
 auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef>;

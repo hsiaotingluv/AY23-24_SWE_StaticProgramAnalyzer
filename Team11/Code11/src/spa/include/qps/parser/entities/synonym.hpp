@@ -1,7 +1,6 @@
 #pragma once
 
 #include "qps/parser/entities/primitives.hpp"
-#include "qps/template_utils.hpp"
 
 #include <memory>
 #include <ostream>
@@ -251,43 +250,16 @@ inline auto operator<<(std::ostream& os, const ProcSynonym& proc_syn) -> std::os
 }
 
 template <typename... Ts, std::enable_if_t<(sizeof...(Ts) > 0), int> = 0>
-inline auto operator<<(std::ostream& os, const std::variant<Ts...>& stmt) -> std::ostream& {
+inline auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> std::ostream& {
     return std::visit(
         [&os](auto&& x) -> std::ostream& {
             return os << x;
         },
-        stmt);
+        some_variant);
 }
 
 using StmtRef = std::variant<WildCard, std::shared_ptr<StmtSynonym>, Integer>;
 using EntRef = std::variant<WildCard, std::shared_ptr<Synonym>, QuotedIdent>;
-
-template <>
-inline auto operator<<(std::ostream& os, const EntRef& ent_ref) -> std::ostream& {
-    return std::visit(overloaded{
-                          [&os](const std::shared_ptr<Synonym>& syn) -> std::ostream& {
-                              return os << *syn;
-                          },
-                          [&os](auto&& x) -> std::ostream& {
-                              return os << x;
-                          },
-                      },
-                      ent_ref);
-}
-
-template <>
-inline auto operator<<(std::ostream& os, const StmtRef& ent_ref) -> std::ostream& {
-    return std::visit(overloaded{
-                          [&os](const std::shared_ptr<StmtSynonym>& stmt_syn) -> std::ostream& {
-                              auto syn = std::static_pointer_cast<Synonym>(stmt_syn);
-                              return os << *syn;
-                          },
-                          [&os](auto&& x) -> std::ostream& {
-                              return os << x;
-                          },
-                      },
-                      ent_ref);
-}
 
 using Synonyms = std::vector<std::shared_ptr<Synonym>>;
 
@@ -307,7 +279,15 @@ inline auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -
         lhs, rhs);
 }
 
-template <typename T>
+template <typename T, std::enable_if_t<std::is_base_of_v<Synonym, T>, int> = 0>
+inline auto operator<<(std::ostream& os, const std::shared_ptr<T>& ptr) -> std::ostream& {
+    if (ptr == nullptr) {
+        return os << "Synonym(nullptr)";
+    }
+    return os << *std::static_pointer_cast<Synonym>(ptr);
+}
+
+template <typename T, std::enable_if_t<std::is_base_of_v<Synonym, T>, int> = 0>
 inline auto operator==(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) -> bool {
     if (!lhs && !rhs) {
         return true;
