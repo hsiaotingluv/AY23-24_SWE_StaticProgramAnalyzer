@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace qps {
-auto print(const Table& table) {
+void print(const Table& table) {
     for (const auto& col : table.get_column()) {
         std::cout << col->get_name() << "\t";
     }
