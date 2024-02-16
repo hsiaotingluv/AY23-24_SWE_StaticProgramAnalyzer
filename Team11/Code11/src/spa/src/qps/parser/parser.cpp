@@ -5,10 +5,22 @@
 #include "qps/parser/entities/untyped/synonym.hpp"
 
 #include "qps/template_utils.hpp"
+#include <vector>
 
 namespace qps {
 auto QPSParser::parse(std::string query) -> std::optional<std::tuple<Synonyms, untyped::UntypedQuery>> {
-    const auto tokens = tokeniser_runner.apply_tokeniser(std::move(query));
+    const auto maybe_tokens = [&query]() -> std::optional<std::vector<Token>> {
+        try {
+            return tokeniser_runner.apply_tokeniser(std::move(query));
+        } catch (const std::exception& e) {
+            return std::nullopt;
+        }
+    }();
+
+    if (!maybe_tokens.has_value()) {
+        return std::nullopt;
+    }
+    const auto tokens = maybe_tokens.value();
     auto begin = tokens.begin();
     const auto end = tokens.end();
 
