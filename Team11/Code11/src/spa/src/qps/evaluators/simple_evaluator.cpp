@@ -125,10 +125,6 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
     for (const auto& row : record) {
         results.push_back(row.at(col_idx));
     }
-    std::cout << "Results: " << std::endl;
-    for (const auto& result : results) {
-        std::cout << result << std::endl;
-    }
     return results;
 }
 
