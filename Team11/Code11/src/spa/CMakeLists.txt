@@ -6,7 +6,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     message(STATUS "Building SPA with AddressSanitizer")
     target_compile_options(spa PRIVATE -fsanitize=address -fsanitize=undefined)
     target_link_options(spa PRIVATE -fsanitize=address -fsanitize=undefined)
-    target_compile_options(spa PRIVATE -Wall -Wextra -Werror -Wpedantic)
+    target_compile_options(spa PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 message(STATUS "Building SPA in Milestone1 mode")

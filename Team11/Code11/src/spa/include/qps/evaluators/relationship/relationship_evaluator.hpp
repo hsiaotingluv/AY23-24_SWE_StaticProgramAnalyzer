@@ -17,7 +17,7 @@ auto relationship_evaluator(std::shared_ptr<ReadFacade> read_facade) {
 
                           return std::visit(ModifiesS_evaluator(read_facade), syn1, syn2);
                       },
-                      [](const auto& x) -> std::optional<Table> {
+                      [](const auto&) -> std::optional<Table> {
                           return std::nullopt;
                       }};
 };

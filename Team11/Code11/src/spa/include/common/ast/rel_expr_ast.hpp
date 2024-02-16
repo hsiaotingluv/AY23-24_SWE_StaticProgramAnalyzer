@@ -9,7 +9,7 @@ class ComparatorNode : public sp::AstNode {
     std::shared_ptr<AstNode> left{}, right{};
 
     explicit ComparatorNode(NodeType T, std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : left(std::move(left)), right(std::move(right)), AstNode(T) {
+        : AstNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {

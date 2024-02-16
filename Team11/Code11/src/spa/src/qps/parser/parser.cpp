@@ -107,15 +107,16 @@ auto try_declare_synonym(Synonyms& synonyms, std::vector<Token>::const_iterator 
     return std::nullopt;
 }
 
-auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
-                        const std::vector<Token>::const_iterator& end, TypeList<> _)
+
+auto parse_declarations(std::vector<Synonym>&, std::vector<Token>::const_iterator,
+                        const std::vector<Token>::const_iterator&, TypeList<>)
     -> std::optional<std::vector<Token>::const_iterator> {
     return std::nullopt;
 }
 
 template <typename Head, typename... Tails>
 auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
-                        const std::vector<Token>::const_iterator& end, TypeList<Head, Tails...> _)
+                        const std::vector<Token>::const_iterator& end, TypeList<Head, Tails...>)
     -> std::optional<std::vector<Token>::const_iterator> {
     auto maybe_it = try_declare_synonym<Head>(synonyms, it, end);
     return maybe_it.has_value() ? maybe_it.value() : parse_declarations(synonyms, it, end, TypeList<Tails...>{});
