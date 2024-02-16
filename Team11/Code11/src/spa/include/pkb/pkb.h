@@ -19,9 +19,9 @@ class PKB {
   public:
     static std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> create_facades();
 
-  private:
     PKB();
 
+  private:
     std::shared_ptr<EntityStore> entity_store;
     std::shared_ptr<StatementStore> statement_store;
     std::shared_ptr<FollowsStore> follows_store;

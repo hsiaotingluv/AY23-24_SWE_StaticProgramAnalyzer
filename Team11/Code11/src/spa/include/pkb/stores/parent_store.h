@@ -27,6 +27,11 @@ class ParentStore {
     void add_parent(const StatementNumber& parent, const StatementNumber& child);
 
     /**
+     * Populates the Parent* and reverse Parent* relationship.
+     */
+    void populate_parent_and_reverse_parent_star();
+
+    /**
      * Checks if a direct Parent relationship exists between a parent and a child statement.
      *
      * @param parent The statement number of the parent.
@@ -71,14 +76,6 @@ class ParentStore {
      * @return The statement number of the direct parent.
      */
     [[nodiscard]] StatementNumber get_parent(const StatementNumber& child) const;
-
-    /**
-     * Adds a transitive Parent* relationship between an ancestor and a descendant statement.
-     *
-     * @param parent The statement number of the ancestor.
-     * @param child The statement number of the descendant.
-     */
-    void add_parent_star(const StatementNumber& parent, const StatementNumber& child);
 
     /**
      * Checks if a transitive Parent* relationship exists between a ancestor and a descendant statement.

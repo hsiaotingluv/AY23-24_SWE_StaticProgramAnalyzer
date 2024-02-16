@@ -15,6 +15,8 @@ class StatementStore {
 
     std::unordered_set<std::string> get_statements_of_type(const StatementType& type);
 
+    StatementType get_statement_type(const std::string& statement_number);
+
   private:
     std::unordered_map<std::string, StatementType> statement_map;
     std::unordered_map<StatementType, std::unordered_set<std::string>> reverse_statement_map;

@@ -7,6 +7,7 @@
 #include "pkb/common_types/variable.h"
 #include "pkb/pkb.h"
 #include <memory>
+#include <tuple>
 #include <unordered_set>
 
 class ReadFacade {
@@ -46,6 +47,9 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_statements_that_modify_var(const std::string& variable);
 
+    std::unordered_set<std::string> get_statements_that_modify_var(const std::string& variable,
+                                                                   const StatementType& statementType);
+
     bool does_statement_modify_var(const std::string& statement_number, const std::string& variable);
 
     std::unordered_set<std::string> get_vars_modified_by_procedure(const std::string& procedure);
@@ -54,10 +58,25 @@ class ReadFacade {
 
     bool does_procedure_modify_var(const std::string& procedure, const std::string& variable);
 
+    std::unordered_set<std::string> get_all_statements_that_modify();
+
+    bool does_statement_modify_any_var(const std::string& statement_number);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_statements_and_var_modify_pairs();
+
+    std::unordered_set<std::string> get_all_procedures_that_modify();
+
+    bool does_procedure_modify_any_var(const std::string& procedure);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_procedures_and_var_modify_pairs();
+
     // Uses-related Read Operations
     std::unordered_set<std::string> get_vars_used_by_statement(const std::string& s);
 
     std::unordered_set<std::string> get_statements_that_use_var(const std::string& variable);
+
+    std::unordered_set<std::string> get_statements_that_use_var(const std::string& variable,
+                                                                const StatementType& statementType);
 
     bool does_statement_use_var(const std::string& statement_number, const std::string& variable);
 
@@ -66,6 +85,18 @@ class ReadFacade {
     std::unordered_set<std::string> get_procedures_that_use_var(const std::string& variable);
 
     bool does_procedure_use_var(const std::string& procedure, const std::string& variable);
+
+    std::unordered_set<std::string> get_all_statements_that_use();
+
+    bool does_statement_use_any_var(const std::string& statement_number);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_statements_and_var_use_pairs();
+
+    std::unordered_set<std::string> get_all_procedures_that_use();
+
+    bool does_procedure_use_any_var(const std::string& procedure);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_procedures_and_var_use_pairs();
 
     // Follows-related Read Operations
     bool has_follows(const std::string& stmt1, const std::string& stmt2) const;

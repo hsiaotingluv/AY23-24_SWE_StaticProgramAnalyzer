@@ -25,27 +25,25 @@ class WriteFacade {
 
     void add_statement_modifies_var(const std::string& statement_number, std::string variable);
 
-    void addProcedureModifiesvar(std::string procedure, std::string variable);
+    void add_procedure_modifies_var(std::string procedure, std::string variable);
 
     void add_statement_uses_var(const std::string& statement_number, std::string variable);
 
-    void addProcedureUsesvar(std::string procedure, std::string variable);
+    void add_procedure_uses_var(std::string procedure, std::string variable);
 
     void add_follows(const std::string& stmt1, const std::string& stmt2);
 
-    void addFollowStars(const std::string& stmt1, const std::string& stmt2);
-
     void add_parent(const std::string& parent, const std::string& child);
-
-    void add_parent_star(const std::string& parent, const std::string& child);
 
     void add_next(const std::string& before, const std::string& after);
 
     void add_next_star(const std::string& before, const std::string& after);
 
-    void addCalls(const std::string& caller, const std::string& callee);
+    void add_calls(const std::string& caller, const std::string& callee);
 
     void add_calls_star(const std::string& caller, const std::string& callee);
+
+    void finalise_pkb();
 
   private:
     std::shared_ptr<PKB> pkb;
