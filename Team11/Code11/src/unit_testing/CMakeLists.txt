@@ -6,8 +6,8 @@ target_link_libraries(unit_testing spa)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     message(STATUS "Building unit_testing with AddressSanitizer")
-    target_compile_options(unit_testing PRIVATE -fsanitize=address)
-    target_link_options(unit_testing PRIVATE -fsanitize=address)
+    target_compile_options(unit_testing PRIVATE -fsanitize=address -fsanitize=undefined)
+    target_link_options(unit_testing PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
 
 target_compile_definitions(unit_testing PRIVATE MILESTONE1)

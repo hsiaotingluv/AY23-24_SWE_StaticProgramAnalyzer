@@ -5,8 +5,8 @@ target_link_libraries(autotester spa ${AUTOTESTER_LIBRARIES})
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     message(STATUS "Building autotester with AddressSanitizer")
-    target_compile_options(autotester PRIVATE -fsanitize=address)
-    target_link_options(autotester PRIVATE -fsanitize=address)
+    target_compile_options(autotester PRIVATE -fsanitize=address -fsanitize=undefined)
+    target_link_options(autotester PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
 
 if(NOT WIN32)
