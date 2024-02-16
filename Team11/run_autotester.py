@@ -18,7 +18,9 @@ if __name__ == "__main__":
     parser.add_argument("query", help="The query file.")
     parser.add_argument("-i", "--ignore_exists", action="store_true")
     parser.add_argument("--output", help="Output xml", default="out.xml")
-    parser.add_argument("--run_server", help="Run Autotester Server", default=False)
+    parser.add_argument(
+        "--run_server", help="Run Autotester Server", default=False, action="store_true"
+    )
     parser.add_argument(
         "--autotester",
         help="Path to autotester",
@@ -47,7 +49,6 @@ if __name__ == "__main__":
 
     errors = []
 
-
     def traverse(node):
         # do something with node
         if node.tag == "query":
@@ -67,19 +68,18 @@ if __name__ == "__main__":
             for child in node:
                 traverse(child)
 
-
     traverse(root)
 
+    if run_server:
+        path = os.path.join(FILE_PATH, "Code11", "tests")
+        subprocess.run(["mv", f"{output_path}", "Code11/tests"], check=True)
+        subprocess.run(
+            ["python3", "-m", "http.server", "8080", "--directory", path],
+            check=False,
+        )
+
     if errors:
-        print(f"Failed test cases: {','.join(map(lambda x: str(x), errors))}")
+        print(f"Failed test cases: {','.join(map(str, errors))}")
         exit(1)
     else:
-        print(f"Pass all system testing")
-
-    if run_server:
-        subprocess.run(
-            ["mv", f"{output_path}", "Code11/tests"]
-        )
-        subprocess.run(
-            ["python3", "-m", "http.server", "8080", "--directory", FILE_PATH], check=False
-        )
+        print("Pass all system testing")
