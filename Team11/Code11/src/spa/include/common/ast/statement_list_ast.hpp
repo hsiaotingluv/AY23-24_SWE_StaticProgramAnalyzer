@@ -9,7 +9,7 @@ class StatementListNode : public sp::AstNode {
     std::vector<std::shared_ptr<AstNode>> statements;
 
     explicit StatementListNode(std::vector<std::shared_ptr<AstNode>>& statements)
-        : statements(std::move(statements)), AstNode(sp::NodeType::StmtList) {
+        : AstNode(sp::NodeType::StmtList), statements(std::move(statements)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {

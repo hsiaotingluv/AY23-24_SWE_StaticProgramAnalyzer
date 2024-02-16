@@ -9,7 +9,7 @@ class ConstantNode : public AstNode {
   public:
     int integer;
 
-    explicit ConstantNode(int integer) : integer(integer), AstNode(NodeType::Constant) {
+    explicit ConstantNode(int integer) : AstNode(NodeType::Constant), integer(integer) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -27,7 +27,7 @@ class VarNode : public AstNode {
   public:
     std::string name;
 
-    explicit VarNode(std::string name) : name(std::move(name)), AstNode(NodeType::Variable) {
+    explicit VarNode(std::string name) : AstNode(NodeType::Variable), name(std::move(name)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {

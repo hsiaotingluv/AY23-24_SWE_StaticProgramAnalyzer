@@ -16,7 +16,7 @@ const auto relationship_evaluator = [](std::shared_ptr<ReadFacade> read_facade, 
 
                           return std::visit(ModifiesS_evaluator(read_facade, results_map), syn1, syn2);
                       },
-                      [](const auto& x) {
+                      [](const auto&) {
                           return;
                       }};
 };
