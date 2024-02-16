@@ -45,9 +45,7 @@ run_clang_tidy() {
     sleep 2
     find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' \) -exec clang-tidy {} -p $2\
     -header-filter=.*\
-    -checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*\
-    -checks=-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter\
-    -checks=-cppcoreguidelines-special-member-functions \;
+    -checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter,-cppcoreguidelines-special-member-functions \;
 }
 
 run_clang_format() {
