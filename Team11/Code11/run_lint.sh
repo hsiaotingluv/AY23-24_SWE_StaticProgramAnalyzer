@@ -44,17 +44,20 @@ if test $MODE = "all"; then
     run src/
 elif test $MODE = "sp"; then
     echo "Lint on all files in SP"
-    run src/spa/src/sp
+    run src/spa/src/sp/
+    run src/spa/include/sp/
 elif test $MODE = "pkb"; then
     echo "Lint on all files in PKB"
-    run src/spa/src/pkb
+    run src/spa/src/pkb/
+    run src/spa/include/pkb/
 elif test $MODE = "qps"; then
     echo "Lint on all files in QPS"
-    run src/spa/src/qps
+    run src/spa/src/qps/
+    run src/spa/include/qps/
 elif test $MODE = "tests"; then
     echo "Lint all tests"
-    run src/unit_testing/src
-    run src/integration_testing/src
+    run src/unit_testing/src/
+    run src/integration_testing/src/
 else
     echo "Invalid mode: ${MODE}"
     usage
