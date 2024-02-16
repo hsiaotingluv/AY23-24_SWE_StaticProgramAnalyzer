@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <variant>
 
 namespace qps {
@@ -44,5 +45,29 @@ template <typename... Types>
 struct TypeListToVariant<TypeList<Types...>> {
     using type = std::variant<Types...>;
 };
+
+template <typename... Ts, std::enable_if_t<(sizeof...(Ts) > 0), int> = 0>
+inline auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> std::ostream& {
+    return std::visit(
+        [&os](auto&& x) -> std::ostream& {
+            return os << x;
+        },
+        some_variant);
+}
+
+template <typename T>
+inline auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -> bool {
+    return std::visit(
+        [](auto&& lhs, auto&& rhs) {
+            using TL = std::decay_t<decltype(lhs)>;
+            using TR = std::decay_t<decltype(rhs)>;
+            if constexpr (std::is_same_v<TL, TR>) {
+                return lhs == rhs;
+            } else {
+                return false;
+            }
+        },
+        lhs, rhs);
+}
 
 } // namespace qps
