@@ -1,0 +1,34 @@
+@startuml qps_synonym
+abstract class Synonym
+abstract class StmtSynonym
+Synonym <|-- StmtSynonym
+Synonym <|-- RawStmtSynonym
+Synonym <|-- ReadSynonym
+Synonym <|-- PrintSynonym
+Synonym <|-- CallSynonym
+Synonym <|-- WhileSynonym
+Synonym <|-- IfSynonym
+Synonym <|-- AssignSynonym
+Synonym <|-- VarSynonym
+Synonym <|-- ConstSynonym
+Synonym <|-- ProcSynonym
+
+StmtSynonym <|-- RawStmtSynonym
+StmtSynonym <|-- ReadSynonym
+StmtSynonym <|-- PrintSynonym
+StmtSynonym <|-- CallSynonym
+StmtSynonym <|-- WhileSynonym
+StmtSynonym <|-- IfSynonym
+StmtSynonym <|-- AssignSynonym
+
+abstract class StmtRef
+StmtRef <|-- StmtSynonym
+StmtRef <|-- WildCard
+StmtRef <|-- Integer
+
+abstract class EntRef
+EntRef <|-- WildCard
+EntRef <|-- Synonym
+EntRef <|-- QuotedIdent
+
+@enduml

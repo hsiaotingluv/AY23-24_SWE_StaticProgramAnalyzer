@@ -1,0 +1,25 @@
+@startuml qps_clause
+
+abstract class Clause
+
+class SuchThatClause {
+    + Relationship rel_ref
+}
+
+class PatternClause {
+    + AssignSynonym assign_synonym
+    + EntRef ent_ref
+    + ExpressionSpec expression_spec
+}
+
+Clause <|-- SuchThatClause
+Clause <|-- PatternClause
+
+class Query {
+    + Synonym[] synonyms
+    + Synonym reference
+    + Clause[] clauses
+}
+Query --> Clause
+
+@enduml

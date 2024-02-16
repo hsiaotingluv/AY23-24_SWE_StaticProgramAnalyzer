@@ -1,0 +1,30 @@
+@startuml qps_relationship
+abstract class Relationship
+abstract class StmtStmtRelationship {
+    +StmtRef stmt1
+    +StmtRef stmt2
+}
+abstract class StmtEntRelationship {
+    +StmtRef stmt
+    +EntRef ent
+}
+abstract class EntEntRelationship {
+    +EntRef ent1
+    +EntRef ent2
+}
+
+Relationship <|-- StmtStmtRelationship
+Relationship <|-- StmtEntRelationship
+Relationship <|-- EntEntRelationship
+
+StmtStmtRelationship <|-- Follows
+StmtStmtRelationship <|-- FollowsT
+StmtStmtRelationship <|-- Parent
+StmtStmtRelationship <|-- ParentT
+StmtEntRelationship <|-- UsesS
+StmtEntRelationship <|-- ModifiesS
+EntEntRelationship <|-- UsesP
+EntEntRelationship <|-- ModifiesP
+
+
+@enduml
