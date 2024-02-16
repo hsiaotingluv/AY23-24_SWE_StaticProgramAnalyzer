@@ -6,12 +6,12 @@
 namespace qps {
 class WildCard {
   public:
-    friend auto operator<<(std::ostream& os, const WildCard& wildCard) -> std::ostream& {
+    friend auto operator<<(std::ostream& os, const WildCard&) -> std::ostream& {
         os << "_";
         return os;
     }
 
-    friend auto operator==(const WildCard& lhs, const WildCard& rhs) -> bool {
+    friend auto operator==(const WildCard&, const WildCard&) -> bool {
         return true;
     }
 };

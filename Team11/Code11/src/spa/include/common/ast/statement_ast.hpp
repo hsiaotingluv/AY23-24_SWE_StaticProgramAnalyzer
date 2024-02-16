@@ -34,7 +34,7 @@ class ReadNode : public StatementNode {
   public:
     std::string variable;
 
-    explicit ReadNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Read) {
+    explicit ReadNode(std::string variable) : StatementNode(sp::NodeType::Read), variable(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -52,7 +52,7 @@ class PrintNode : public StatementNode {
   public:
     std::string variable;
 
-    explicit PrintNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Print) {
+    explicit PrintNode(std::string variable) : StatementNode(sp::NodeType::Print), variable(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -70,7 +70,7 @@ class CallNode : public StatementNode {
   public:
     std::string variable;
 
-    explicit CallNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Call) {
+    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), variable(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -92,8 +92,8 @@ class IfNode : public StatementNode {
 
     IfNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& then_stmt_list,
            std::shared_ptr<AstNode>& else_stmt_list)
-        : cond_expr(cond_expr), then_stmt_list(then_stmt_list), else_stmt_list(else_stmt_list),
-          StatementNode(sp::NodeType::If) {
+        : StatementNode(sp::NodeType::If), cond_expr(cond_expr), then_stmt_list(then_stmt_list),
+          else_stmt_list(else_stmt_list) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -113,7 +113,7 @@ class WhileNode : public StatementNode {
     std::shared_ptr<AstNode> stmt_list;
 
     WhileNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& stmt_list)
-        : cond_expr(cond_expr), stmt_list(stmt_list), StatementNode(sp::NodeType::While) {
+        : StatementNode(sp::NodeType::While), cond_expr(cond_expr), stmt_list(stmt_list) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -133,7 +133,7 @@ class AssignmentNode : public StatementNode {
     std::shared_ptr<AstNode> expr;
 
     AssignmentNode(std::shared_ptr<AstNode> variable, std::shared_ptr<AstNode> expr)
-        : variable(std::move(variable)), expr(std::move(expr)), StatementNode(sp::NodeType::Assign) {
+        : StatementNode(sp::NodeType::Assign), variable(std::move(variable)), expr(std::move(expr)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {

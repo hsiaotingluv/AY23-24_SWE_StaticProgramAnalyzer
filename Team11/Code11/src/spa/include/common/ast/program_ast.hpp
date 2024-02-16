@@ -9,7 +9,7 @@ class ProgramNode : public sp::AstNode {
     std::vector<std::shared_ptr<AstNode>> procedures;
 
     explicit ProgramNode(std::vector<std::shared_ptr<AstNode>>& procedures)
-        : procedures(std::move(procedures)), AstNode(sp::NodeType::Program) {
+        : AstNode(sp::NodeType::Program), procedures(std::move(procedures)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {

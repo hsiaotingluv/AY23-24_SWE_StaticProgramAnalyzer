@@ -9,7 +9,7 @@
 
 namespace qps {
 const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, ResultsMap& results_map) {
-    return overloaded{[read_facade, &results_map](const qps::StmtSynonym& synonym, const qps::WildCard& wildcard2) {
+    return overloaded{[read_facade, &results_map](const qps::StmtSynonym& synonym, const qps::WildCard&) {
                           // TODO: Improve pkb API: Get all statement that modifies
                           const auto variables = read_facade->get_variables();
                           const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
@@ -24,7 +24,7 @@ const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, Res
                           }
                           return;
                       },
-                      [read_facade, &results_map](const qps::Integer& stmt_num, const qps::WildCard& wildcard2) {
+                      [read_facade, &results_map](const qps::Integer& stmt_num, const qps::WildCard&) {
                           // TODO: Improve pkb API: Does statement modify var?
                           auto does_statement_modify_var = false;
                           const auto variables = read_facade->get_variables();
@@ -88,7 +88,7 @@ const auto ModifiesS_evaluator = [](std::shared_ptr<ReadFacade> read_facade, Res
                           }
                           return;
                       },
-                      [](const auto& x) {
+                      [](const auto&) {
                           return std::unordered_set<std::string>{};
                       }};
 };

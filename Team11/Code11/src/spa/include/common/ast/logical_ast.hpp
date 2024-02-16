@@ -12,7 +12,7 @@ class LogicalBinaryNode : public LogicalNode {
     std::shared_ptr<AstNode> left{}, right{};
 
     explicit LogicalBinaryNode(sp::NodeType T, std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : left(std::move(left)), right(std::move(right)), LogicalNode(T) {
+        : LogicalNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -51,7 +51,7 @@ class LogicalNotNode : public LogicalNode {
     std::shared_ptr<AstNode> cond_expr;
 
     explicit LogicalNotNode(std::shared_ptr<AstNode>& cond_expr)
-        : cond_expr(cond_expr), LogicalNode(sp::NodeType::LNot) {
+        : LogicalNode(sp::NodeType::LNot), cond_expr(cond_expr) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
