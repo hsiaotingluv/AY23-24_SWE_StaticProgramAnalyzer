@@ -47,8 +47,8 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
 
     const auto fn = [&new_column](const std::vector<std::shared_ptr<Synonym>>& column) {
         auto mapping = std::unordered_map<int, int>{};
-        for (int i = 0; i < column.size(); i++) {
-            for (int j = 0; j < new_column.size(); j++) {
+        for (int i = 0; i < static_cast<int>(column.size()); i++) {
+            for (int j = 0; j < static_cast<int>(new_column.size()); j++) {
                 if (column[i] == new_column[j]) {
                     mapping[j] = i;
                 }
@@ -63,13 +63,13 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
     const auto record1 = table1.get_records();
     const auto record2 = table2.get_records();
 
-    for (const auto record1 : table1.get_records()) {
-        for (const auto record2 : table2.get_records()) {
+    for (const auto &record1 : table1.get_records()) {
+        for (const auto &record2 : table2.get_records()) {
             auto new_record = std::vector<std::string>(new_column.size(), "");
             auto has_conflict = false;
 
             // Populate new_record with values from record1
-            for (int i = 0; i < record1.size(); i++) {
+            for (int i = 0; i < static_cast<int>(record1.size()); i++) {
                 if (table1_mask.find(i) == table1_mask.end()) {
                     continue;
                 }
@@ -77,7 +77,7 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
             }
 
             // Populate new_record with values from record2, checking for conflicts
-            for (int i = 0; i < record2.size(); i++) {
+            for (int i = 0; i < static_cast<int>(record2.size()); i++) {
                 if (table2_mask.find(i) == table2_mask.end()) {
                     continue;
                 }
@@ -116,7 +116,7 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
     const auto record = table.get_records();
 
     const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
-    if (col_idx == column.size()) {
+    if (col_idx == static_cast<long>(column.size())) {
         // Synonym not found in table
         return {};
     }

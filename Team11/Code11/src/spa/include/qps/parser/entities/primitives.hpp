@@ -91,11 +91,11 @@ struct Integer {
         return lhs.value == rhs.value;
     }
 
-    friend auto operator==(const Integer& lhs, const int& rhs) -> bool {
+    friend auto operator==(const Integer& lhs, const uint32_t& rhs) -> bool {
         return lhs.value == rhs;
     }
 
-    friend auto operator==(const int& lhs, const Integer& rhs) -> bool {
+    friend auto operator==(const uint32_t& lhs, const Integer& rhs) -> bool {
         return lhs == rhs.value;
     }
 };

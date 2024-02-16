@@ -107,10 +107,8 @@ auto try_declare_synonym(Synonyms& synonyms, std::vector<Token>::const_iterator 
     return std::nullopt;
 }
 
-
-auto parse_declarations(std::vector<Synonym>&, std::vector<Token>::const_iterator,
-                        const std::vector<Token>::const_iterator&, TypeList<>)
-    -> std::optional<std::vector<Token>::const_iterator> {
+auto parse_declarations(Synonyms&, std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&,
+                        TypeList<>) -> std::optional<std::vector<Token>::const_iterator> {
     return std::nullopt;
 }
 

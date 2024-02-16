@@ -98,7 +98,7 @@ auto ConstSynonym::get_keyword() const -> std::string {
     return keyword;
 }
 
-auto is_stmt_synonym(const std::shared_ptr<StmtSynonym>& synonym) -> bool {
+auto is_stmt_synonym(const std::shared_ptr<StmtSynonym>&) -> bool {
     return true;
 }
 

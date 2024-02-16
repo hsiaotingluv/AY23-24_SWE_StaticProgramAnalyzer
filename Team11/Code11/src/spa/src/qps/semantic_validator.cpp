@@ -26,8 +26,7 @@ auto enforce_unique_declarations(const Synonyms& declarations)
     return mapping.size() == declarations.size() ? std::make_optional(mapping) : std::nullopt;
 }
 
-auto is_synonym_declared(const Synonyms& declarations,
-                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+auto is_synonym_declared(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                          const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<Synonym>> {
 
     if (mapping.find(reference.get_name().get_value()) == mapping.end()) {
@@ -86,14 +85,13 @@ auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::stri
         x);
 }
 
-auto validate_stmt_stmt(const std::string& keyword, const StmtRef& stmt_ref1, const StmtRef& stmt_ref2, TypeList<> _)
-    -> std::optional<Relationship> {
+auto validate_stmt_stmt(const std::string&, const StmtRef&, const StmtRef&, TypeList<>) -> std::optional<Relationship> {
     return std::nullopt;
 }
 
 template <typename Head, typename... Tails>
 auto validate_stmt_stmt(const std::string& keyword, const StmtRef& stmt_ref1, const StmtRef& stmt_ref2,
-                        TypeList<Head, Tails...> _) -> std::optional<Relationship> {
+                        TypeList<Head, Tails...>) -> std::optional<Relationship> {
 
     if (Head::keyword != keyword) {
         return validate_stmt_stmt(keyword, stmt_ref1, stmt_ref2, TypeList<Tails...>{});
@@ -102,14 +100,13 @@ auto validate_stmt_stmt(const std::string& keyword, const StmtRef& stmt_ref1, co
     }
 }
 
-auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, const EntRef& ent_ref, TypeList<> _)
-    -> std::optional<Relationship> {
+auto validate_stmt_ent(const std::string&, const StmtRef&, const EntRef&, TypeList<>) -> std::optional<Relationship> {
     return std::nullopt;
 }
 
 template <typename Head, typename... Tails>
 auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, const EntRef& ent_ref,
-                       TypeList<Head, Tails...> _) -> std::optional<Relationship> {
+                       TypeList<Head, Tails...>) -> std::optional<Relationship> {
 
     if (Head::keyword != keyword) {
         return validate_stmt_ent(keyword, stmt_ref, ent_ref, TypeList<Tails...>{});

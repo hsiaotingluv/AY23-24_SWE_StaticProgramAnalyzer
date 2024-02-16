@@ -19,7 +19,7 @@ auto to_synonym(const std::shared_ptr<T>& x) {
 auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
     return overloaded{
         [read_facade](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                      const qps::WildCard& wildcard2) -> std::optional<Table> {
+                      const qps::WildCard&) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies
             const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
             auto table = Table{{stmt_synonym}};
@@ -39,7 +39,7 @@ auto ModifiesS_evaluator(std::shared_ptr<ReadFacade> read_facade) {
             }
             return table;
         },
-        [read_facade](const qps::Integer& stmt_num, const qps::WildCard& wildcard2) -> std::optional<Table> {
+        [read_facade](const qps::Integer& stmt_num, const qps::WildCard&) -> std::optional<Table> {
             // TODO: Improve pkb API: Does statement modify var?
             auto does_statement_modify_var = false;
             const auto variables = read_facade->get_variables();
