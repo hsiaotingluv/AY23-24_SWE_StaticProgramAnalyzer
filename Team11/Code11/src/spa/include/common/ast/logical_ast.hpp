@@ -18,6 +18,21 @@ class LogicalBinaryNode : public LogicalNode {
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {left, right};
     }
+
+    [[nodiscard]] auto identifier() const -> std::stringstream override {
+        auto ss = std::stringstream();
+        ss << get_node_name() << "(" << *left << ", " << *right << ")";
+        return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto start_xml = "<" + get_node_name() + ">";
+        auto left_xml = left->to_xml();
+        auto right_xml = right->to_xml();
+        auto end_xml = "</" + get_node_name() + ">";
+
+        return start_xml + left_xml + right_xml + end_xml;
+    }
 };
 
 class LogicalAndNode : public LogicalBinaryNode {
@@ -26,10 +41,8 @@ class LogicalAndNode : public LogicalBinaryNode {
         : LogicalBinaryNode(sp::NodeType::LAnd, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "LogicalAndNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "LogicalAndNode";
     }
 };
 
@@ -39,10 +52,8 @@ class LogicalOrNode : public LogicalBinaryNode {
         : LogicalBinaryNode(sp::NodeType::LOr, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "LogicalOrNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "LogicalOrNode";
     }
 };
 
@@ -58,10 +69,22 @@ class LogicalNotNode : public LogicalNode {
         return {cond_expr};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "LogicalNotNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "LogicalNotNode(" << *cond_expr << ")";
+        ss << get_node_name() << "(" << *cond_expr << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto start_xml = "<" + get_node_name() + ">";
+        auto cond_expr_xml = cond_expr->to_xml();
+        auto end_xml = "</" + get_node_name() + ">";
+
+        return start_xml + cond_expr_xml + end_xml;
     }
 };
 } // namespace sp

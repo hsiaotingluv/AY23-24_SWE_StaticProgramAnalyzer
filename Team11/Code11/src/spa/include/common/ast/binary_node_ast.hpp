@@ -14,6 +14,21 @@ class BinopNode : public sp::AstNode {
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {left, right};
     }
+
+    [[nodiscard]] auto identifier() const -> std::stringstream override {
+        auto ss = std::stringstream();
+        ss << get_node_name() << "(" << *left << ", " << *right << ")";
+        return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto start_xml = "<" + get_node_name() + ">";
+        auto left_xml = left->to_xml();
+        auto right_xml = right->to_xml();
+        auto end_xml = "</" + get_node_name() + ">";
+
+        return start_xml + left_xml + right_xml + end_xml;
+    }
 };
 
 class MulNode : public BinopNode {
@@ -21,10 +36,8 @@ class MulNode : public BinopNode {
     explicit MulNode() : BinopNode(NodeType::Mul) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "MulBinopNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "MulNode";
     }
 };
 
@@ -33,10 +46,8 @@ class DivNode : public BinopNode {
     explicit DivNode() : BinopNode(NodeType::Div) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "DivBinopNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "DivNode";
     }
 };
 
@@ -45,10 +56,8 @@ class ModNode : public BinopNode {
     explicit ModNode() : BinopNode(NodeType::Mod) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "ModBinopNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "ModNode";
     }
 };
 
@@ -57,10 +66,8 @@ class AddNode : public BinopNode {
     explicit AddNode() : BinopNode(NodeType::Add) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "AddBinopNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "AddNode";
     }
 };
 
@@ -69,10 +76,8 @@ class SubNode : public BinopNode {
     explicit SubNode() : BinopNode(NodeType::Sub) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "SubBinopNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "SubNode";
     }
 };
 } // namespace sp

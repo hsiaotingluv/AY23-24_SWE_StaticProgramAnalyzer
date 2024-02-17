@@ -131,22 +131,22 @@ TEST_CASE("Test Statement Number Traverser") {
             "AssignmentNode(VarNode(cenY), ConstantNode(0))",
             "CallNode(readPoint)",
             "WhileNode(LogicalAndNode(NotEqualNode(VarNode(x), ConstantNode(0)), NotEqualNode(VarNode(y), "
-            "ConstantNode(0))), StatementListNode(AssignmentNode(VarNode(count), AddBinopNode(VarNode(count), "
-            "ConstantNode(1))), AssignmentNode(VarNode(cenX), AddBinopNode(VarNode(cenX), VarNode(x))), "
-            "AssignmentNode(VarNode(cenY), AddBinopNode(VarNode(cenY), VarNode(y))), CallNode(readPoint), ))",
-            "AssignmentNode(VarNode(count), AddBinopNode(VarNode(count), ConstantNode(1)))",
-            "AssignmentNode(VarNode(cenX), AddBinopNode(VarNode(cenX), VarNode(x)))",
-            "AssignmentNode(VarNode(cenY), AddBinopNode(VarNode(cenY), VarNode(y)))",
+            "ConstantNode(0))), StatementListNode(AssignmentNode(VarNode(count), AddNode(VarNode(count), "
+            "ConstantNode(1))), AssignmentNode(VarNode(cenX), AddNode(VarNode(cenX), VarNode(x))), "
+            "AssignmentNode(VarNode(cenY), AddNode(VarNode(cenY), VarNode(y))), CallNode(readPoint), ))",
+            "AssignmentNode(VarNode(count), AddNode(VarNode(count), ConstantNode(1)))",
+            "AssignmentNode(VarNode(cenX), AddNode(VarNode(cenX), VarNode(x)))",
+            "AssignmentNode(VarNode(cenY), AddNode(VarNode(cenY), VarNode(y)))",
             "CallNode(readPoint)",
             "IfNode(EqualNode(VarNode(count), ConstantNode(0)), "
             "StatementListNode(AssignmentNode(VarNode(flag), ConstantNode(1)), ), "
-            "StatementListNode(AssignmentNode(VarNode(cenX), DivBinopNode(VarNode(cenX), VarNode(count))), "
-            "AssignmentNode(VarNode(cenY), DivBinopNode(VarNode(cenY), VarNode(count))), ))",
+            "StatementListNode(AssignmentNode(VarNode(cenX), DivNode(VarNode(cenX), VarNode(count))), "
+            "AssignmentNode(VarNode(cenY), DivNode(VarNode(cenY), VarNode(count))), ))",
             "AssignmentNode(VarNode(flag), ConstantNode(1))",
-            "AssignmentNode(VarNode(cenX), DivBinopNode(VarNode(cenX), VarNode(count)))",
-            "AssignmentNode(VarNode(cenY), DivBinopNode(VarNode(cenY), VarNode(count)))",
-            "AssignmentNode(VarNode(normSq), AddBinopNode(MulBinopNode(VarNode(cenX), VarNode(cenX)), "
-            "MulBinopNode(VarNode(cenY), VarNode(cenY))))"};
+            "AssignmentNode(VarNode(cenX), DivNode(VarNode(cenX), VarNode(count)))",
+            "AssignmentNode(VarNode(cenY), DivNode(VarNode(cenY), VarNode(count)))",
+            "AssignmentNode(VarNode(normSq), AddNode(MulNode(VarNode(cenX), VarNode(cenX)), "
+            "MulNode(VarNode(cenY), VarNode(cenY))))"};
 
         check_stmt_num(ast, 1, expected_output.begin(), expected_output.end());
     }

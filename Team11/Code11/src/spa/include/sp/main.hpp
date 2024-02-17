@@ -13,6 +13,8 @@
 #include "sp/traverser/traverser.hpp"
 #include "sp/traverser/variable_populator_traverser.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -28,6 +30,7 @@ class SourceProcessor {
     std::shared_ptr<TokenizerRunner> tokenizer_runner;
     std::shared_ptr<Parser> parser;
     std::vector<std::shared_ptr<Traverser>> traversers;
+    static int counter;
 
   public:
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
@@ -53,6 +56,28 @@ class SourceProcessor {
             });
     }
 
+    static auto output_xml(const std::shared_ptr<AstNode>& ast_node) -> std::string {
+        auto ast_xml = ast_node->to_xml();
+        auto current_path = std::filesystem::current_path();
+
+        while (!current_path.empty() && current_path.filename() != "23s2-cp-spa-team-11") {
+            current_path = current_path.parent_path();
+        }
+
+        auto default_folder = std::string(current_path.string() + "/Team11/Code11/tests/");
+        auto filename = default_folder + "source_xml_" + std::to_string(counter++) + ".xml";
+        std::ofstream output_file(filename);
+
+        if (!output_file.is_open()) {
+            throw std::runtime_error("Unable to write file to output xml " + filename);
+        }
+
+        output_file << ast_xml;
+        output_file.close();
+
+        return ast_xml;
+    }
+
     auto process(std::string& input) -> std::shared_ptr<AstNode> {
         const auto tokens = tokenizer_runner->apply_tokeniser(std::move(input));
         auto it = tokens.begin();
@@ -61,6 +86,9 @@ class SourceProcessor {
             ast = traverser->traverse(ast);
         }
 
+#ifdef DEBUG
+        output_xml(ast);
+#endif
         return ast;
     }
 };
