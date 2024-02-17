@@ -2,13 +2,13 @@
 #include <catch.hpp>
 
 TEST_CASE("EntityStore Tests") {
-    EntityStore entityStore;
+    EntityStore entity_store;
 
     SECTION("Adding Variables") {
-        entityStore.add_variable(Variable("x"));
-        entityStore.add_variable(Variable("y"));
+        entity_store.add_variable(Variable("x"));
+        entity_store.add_variable(Variable("y"));
 
-        auto variables = entityStore.get_variables();
+        auto variables = entity_store.get_variables();
 
         REQUIRE(variables.size() == 2);
         REQUIRE(variables.find(Variable("x")) != variables.end());
@@ -17,10 +17,10 @@ TEST_CASE("EntityStore Tests") {
     }
 
     SECTION("Adding Procedures") {
-        entityStore.add_procedure(Procedure("main"));
-        entityStore.add_procedure(Procedure("helper"));
+        entity_store.add_procedure(Procedure("main"));
+        entity_store.add_procedure(Procedure("helper"));
 
-        auto procedures = entityStore.get_procedures();
+        auto procedures = entity_store.get_procedures();
 
         REQUIRE(procedures.size() == 2);
         REQUIRE(procedures.find(Procedure("main")) != procedures.end());
@@ -29,10 +29,10 @@ TEST_CASE("EntityStore Tests") {
     }
 
     SECTION("Adding Constants") {
-        entityStore.add_constant(Constant("1"));
-        entityStore.add_constant(Constant("2"));
+        entity_store.add_constant(Constant("1"));
+        entity_store.add_constant(Constant("2"));
 
-        auto constants = entityStore.get_constants();
+        auto constants = entity_store.get_constants();
 
         REQUIRE(constants.size() == 2);
         REQUIRE(constants.find(Constant("1")) != constants.end());
@@ -41,16 +41,16 @@ TEST_CASE("EntityStore Tests") {
     }
 
     SECTION("Entity uniqueness") {
-        entityStore.add_variable(Variable("x"));
-        entityStore.add_variable(Variable("x"));
-        entityStore.add_procedure(Procedure("main"));
-        entityStore.add_procedure(Procedure("main"));
-        entityStore.add_constant(Constant("1"));
-        entityStore.add_constant(Constant("1"));
+        entity_store.add_variable(Variable("x"));
+        entity_store.add_variable(Variable("x"));
+        entity_store.add_procedure(Procedure("main"));
+        entity_store.add_procedure(Procedure("main"));
+        entity_store.add_constant(Constant("1"));
+        entity_store.add_constant(Constant("1"));
 
-        auto variables = entityStore.get_variables();
-        auto procedures = entityStore.get_procedures();
-        auto constants = entityStore.get_constants();
+        auto variables = entity_store.get_variables();
+        auto procedures = entity_store.get_procedures();
+        auto constants = entity_store.get_constants();
 
         REQUIRE(variables.size() == 1);
         REQUIRE(variables.find(Variable("x")) != variables.end());
@@ -63,36 +63,40 @@ TEST_CASE("EntityStore Tests") {
     }
 
     SECTION("Initial Store state") {
-        REQUIRE(entityStore.get_variables().empty());
-        REQUIRE(entityStore.get_procedures().empty());
-        REQUIRE(entityStore.get_constants().empty());
+        REQUIRE(entity_store.get_variables().empty());
+        REQUIRE(entity_store.get_procedures().empty());
+        REQUIRE(entity_store.get_constants().empty());
     }
 
     SECTION("Adding Entities after initial check") {
-        REQUIRE(entityStore.get_variables().empty());
-        REQUIRE(entityStore.get_procedures().empty());
-        REQUIRE(entityStore.get_constants().empty());
+        REQUIRE(entity_store.get_variables().empty());
+        REQUIRE(entity_store.get_procedures().empty());
+        REQUIRE(entity_store.get_constants().empty());
 
-        entityStore.add_variable(Variable("v"));
-        entityStore.add_procedure(Procedure("p"));
-        entityStore.add_constant(Constant("c"));
+        entity_store.add_variable(Variable("v"));
+        entity_store.add_procedure(Procedure("p"));
+        entity_store.add_constant(Constant("c"));
 
-        REQUIRE(entityStore.get_variables().size() == 1);
-        REQUIRE(entityStore.get_procedures().size() == 1);
-        REQUIRE(entityStore.get_constants().size() == 1);
+        REQUIRE(entity_store.get_variables().size() == 1);
+        REQUIRE(entity_store.get_procedures().size() == 1);
+        REQUIRE(entity_store.get_constants().size() == 1);
     }
 
     SECTION("Mixed Entities handling") {
-        entityStore.add_variable(Variable("v"));
-        entityStore.add_procedure(Procedure("p"));
-        entityStore.add_constant(Constant("c"));
+        entity_store.add_variable(Variable("v"));
+        entity_store.add_procedure(Procedure("p"));
+        entity_store.add_constant(Constant("c"));
 
-        REQUIRE(entityStore.get_variables().find(Variable("v")) != entityStore.get_variables().end());
-        REQUIRE(entityStore.get_procedures().find(Procedure("p")) != entityStore.get_procedures().end());
-        REQUIRE(entityStore.get_constants().find(Constant("c")) != entityStore.get_constants().end());
+        auto variables = entity_store.get_variables();
+        auto procedures = entity_store.get_procedures();
+        auto constants = entity_store.get_constants();
 
-        REQUIRE(entityStore.get_variables().find(Variable("p")) == entityStore.get_variables().end());
-        REQUIRE(entityStore.get_procedures().find(Procedure("c")) == entityStore.get_procedures().end());
-        REQUIRE(entityStore.get_constants().find(Constant("v")) == entityStore.get_constants().end());
+        REQUIRE(variables.find(Variable("v")) != variables.end());
+        REQUIRE(procedures.find(Procedure("p")) != procedures.end());
+        REQUIRE(constants.find(Constant("c")) != constants.end());
+
+        REQUIRE(variables.find(Variable("p")) == variables.end());
+        REQUIRE(procedures.find(Procedure("c")) == procedures.end());
+        REQUIRE(constants.find(Constant("v")) == constants.end());
     }
 }

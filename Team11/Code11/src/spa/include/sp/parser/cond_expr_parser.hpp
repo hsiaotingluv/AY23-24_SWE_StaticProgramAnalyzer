@@ -4,13 +4,14 @@
 #include "sp/parser/parser.hpp"
 #include "sp/parser/rel_expr_parser.hpp"
 
-#include <memory>
-
 using namespace tokenizer;
 
 namespace sp {
-/*
- * cond_expr: rel_expr | '!' '(' cond_expr ')' | '(' cond_expr ')' '&&' '(' cond_expr ')' |
+/**
+ * @class CondExprParser
+ * @brief Parses conditional expressions (i.e. !, ||, &&) in the SIMPLE language.
+ *
+ * @note cond_expr: rel_expr | '!' '(' cond_expr ')' | '(' cond_expr ')' '&&' '(' cond_expr ')' |
  *            '(' cond_expr ')' '||' '('cond_expr ')'
  *
  * Note that this production rule is unable to be parsed to LL(k) grammar, formal proof is omitted here but
@@ -32,11 +33,30 @@ namespace sp {
 class CondExprParser : public Parser {
     RelExprParser rel_expr_parser;
 
+    /**
+     * Parse the first prime production of a conditional expression.
+     * @param token_start Start of the conditional expression.
+     * @param token_end End of the conditional expression.
+     * @return Parsed first prime production of the conditional expression.
+     */
     auto parseCondFirstPrime(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode>;
 
+    /**
+     * Parse the second prime production of a conditional expression.
+     *
+     * @param token_start Start of the conditional expression.
+     * @param token_end End of the conditional expression.
+     * @return Parsed second prime production of the conditional expression.
+     */
     auto parseCondSecondPrime(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode>;
 
   public:
+    /**
+     * Parses a conditional expression.
+     * @param token_start Start of the conditional expression.
+     * @param token_end End of the conditional expression.
+     * @return Parsed conditional expression.
+     */
     auto parse(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode> override;
 };
 } // namespace sp
