@@ -106,9 +106,7 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
 }
 
 auto ModifiesSEvaluator::evaluate() -> std::optional<Table> {
-    const auto syn1 = modifies_s.stmt;
-    const auto syn2 = modifies_s.ent;
-    return std::visit(eval_modifies(read_facade), syn1, syn2);
+    return std::visit(eval_modifies(read_facade), modifies_s.stmt, modifies_s.ent);
 };
 
 }

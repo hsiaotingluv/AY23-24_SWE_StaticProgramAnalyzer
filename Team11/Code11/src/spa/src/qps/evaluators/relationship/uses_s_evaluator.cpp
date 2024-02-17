@@ -2,11 +2,17 @@
 
 namespace qps {
 
-    auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade) {
-        return nullptr;
-    }
+auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade) {
+    return overloaded {
 
-    auto UsesSEvaluator::evaluate() -> std::optional<Table> {
+            [read_facade](auto& x, auto& y) -> std::optional<Table> {
+                return Table{};
+            }
+    };
+}
 
-    }
+auto UsesSEvaluator::evaluate() -> std::optional<Table> {
+    return std::visit(eval_uses_s(read_facade), uses_s.stmt, uses_s.ent);
+}
+
 }
