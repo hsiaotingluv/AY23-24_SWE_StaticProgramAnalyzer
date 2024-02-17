@@ -24,7 +24,7 @@ struct Clause {
     [[nodiscard]] virtual auto is_equal(const Clause& other) const -> bool = 0;
 };
 
-struct SuchThatClause : Clause {
+struct SuchThatClause : public Clause {
     Relationship rel_ref;
 
     SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
@@ -42,7 +42,7 @@ struct SuchThatClause : Clause {
     }
 };
 
-struct PatternClause : Clause {
+struct PatternClause : public Clause {
     std::shared_ptr<AssignSynonym> assign_synonym;
     EntRef ent_ref;
     ExpressionSpec expression_spec;

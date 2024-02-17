@@ -6,9 +6,12 @@
 
 namespace qps {
 
-class Ref {};
+class Ref {
+};
 
 class WildCard : public Ref {
+    std::string value = "_";
+
   public:
     friend auto operator<<(std::ostream& os, const WildCard&) -> std::ostream& {
         os << "_";

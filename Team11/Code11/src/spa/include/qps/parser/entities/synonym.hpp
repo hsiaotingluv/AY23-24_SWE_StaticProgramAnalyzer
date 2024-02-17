@@ -10,7 +10,7 @@
 
 namespace qps {
 
-class Synonym {
+class Synonym : public Ref {
     IDENT name;
 
     [[nodiscard]] virtual auto representation() const -> std::string = 0;
