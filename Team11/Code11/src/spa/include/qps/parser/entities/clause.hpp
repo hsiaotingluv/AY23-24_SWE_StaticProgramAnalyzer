@@ -8,8 +8,8 @@ namespace qps {
 struct Clause {
     virtual ~Clause() = default;
 
-    auto operator<<(std::ostream& os) const -> std::ostream& {
-        return os << representation();
+    friend auto operator<<(std::ostream& os, const Clause& clause) -> std::ostream& {
+        return os << clause.representation();
     }
 
     [[nodiscard]] virtual auto representation() const -> std::string = 0;

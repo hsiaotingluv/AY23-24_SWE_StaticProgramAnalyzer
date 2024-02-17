@@ -12,6 +12,8 @@
 
 namespace qps {
 
+using StmtRef = std::variant<WildCard, std::shared_ptr<StmtSynonym>, Integer>;
+using EntRef = std::variant<WildCard, std::shared_ptr<Synonym>, QuotedIdent>;
 using StmtRefNoWildcard = std::variant<std::shared_ptr<StmtSynonym>, Integer>;
 using ProcedureRefNoWildcard = std::variant<std::shared_ptr<ProcSynonym>, QuotedIdent>;
 using VarRef = std::variant<WildCard, std::shared_ptr<VarSynonym>, QuotedIdent>;
@@ -259,8 +261,4 @@ using StmtEntList = TypeList<UsesS, ModifiesS>;
 
 using Relationship = TypeListToVariant<Concat<StmtStmtList, StmtEntList>::type>::type;
 #endif
-
-auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream&;
-
-auto operator==(const StmtRef& a, const StmtRef& b) -> bool;
 } // namespace qps

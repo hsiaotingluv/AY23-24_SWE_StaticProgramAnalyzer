@@ -1,11 +1,11 @@
 #pragma once
 
 #include "qps/parser/entities/primitives.hpp"
+#include "qps/template_utils.hpp" // NOLINT
 
 #include <memory>
 #include <ostream>
 #include <type_traits>
-#include <variant>
 #include <vector>
 
 namespace qps {
@@ -25,8 +25,6 @@ class Synonym : public Ref {
     }
 
     [[nodiscard]] virtual auto get_keyword() const -> std::string = 0;
-
-    [[nodiscard]] auto is_keyword_match(const std::string& str) const -> bool;
 
     [[nodiscard]] auto get_name() const -> IDENT;
 
@@ -152,9 +150,6 @@ class ProcSynonym final : public Synonym {
     [[nodiscard]] auto get_keyword() const -> std::string override;
 };
 
-using StmtRef = std::variant<WildCard, std::shared_ptr<StmtSynonym>, Integer>;
-using EntRef = std::variant<WildCard, std::shared_ptr<Synonym>, QuotedIdent>;
-
 using Synonyms = std::vector<std::shared_ptr<Synonym>>;
 
 // Helper functions
@@ -167,21 +162,10 @@ inline auto operator<<(std::ostream& os, const std::shared_ptr<T>& ptr) -> std::
     if (ptr == nullptr) {
         return os << "Synonym(nullptr)";
     }
-    return os << *std::static_pointer_cast<Synonym>(ptr);
+    return os << *ptr;
 }
 
-// Define how to compare shared_ptr of Synonym
-template <typename T, std::enable_if_t<std::is_base_of_v<Synonym, T>, int> = 0>
-inline auto operator==(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) -> bool {
-    if (!lhs && !rhs) {
-        return true;
-    }
-    if (!lhs || !rhs) {
-        return false;
-    }
-    return *lhs == *rhs;
-}
-
+template auto operator== <Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
 } // namespace qps
 
 namespace std {

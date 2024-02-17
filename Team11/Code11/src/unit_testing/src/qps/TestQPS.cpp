@@ -107,7 +107,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause = std::make_shared<SuchThatClause>(
+        const auto reference_clause = std::make_shared<SuchThatClause>(
             Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
     }
 #endif
@@ -129,7 +129,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
         require_value<AnyStmtSynonym>(result->reference, "s");
 
         REQUIRE(result->clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
+        const auto reference_clause =
             std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), QuotedIdent{"v"}});
 #endif
     }
@@ -147,7 +147,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
         require_value<VarSynonym>(result.reference, "v");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause =
+        const auto reference_clause =
             std::make_shared<SuchThatClause>(UsesS{Integer{1}, std::make_shared<VarSynonym>(IDENT{"v"})});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
@@ -185,8 +185,8 @@ Select a pattern a ( _ , _"count + 1"_))";
         require_value<AssignSynonym>(result.reference, "a");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
-            std::make_shared<AssignSynonym>(IDENT{"a"}), WildCard{}, PartialMatch{"((count)+(1))"});
+        const auto reference_clause = std::make_shared<PatternClause>(std::make_shared<AssignSynonym>(IDENT{"a"}),
+                                                                      WildCard{}, PartialMatch{"count 1 + "});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -203,8 +203,8 @@ Select a pattern a ( _ , _"count + 1"_))";
         require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
-        const std::shared_ptr<Clause> reference_clause = std::make_shared<PatternClause>(
-            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"((cenX)*(cenX))"});
+        const auto reference_clause = std::make_shared<PatternClause>(
+            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -226,11 +226,11 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(std::get<WhileSynonym>(result.reference).get_name() == "w");
 
         REQUIRE(result.clauses.size() == 2);
-        const std::shared_ptr<Clause> reference_clause = std::make_shared<SuchThatClause>(
+        const auto reference_clause = std::make_shared<SuchThatClause>(
             ParentT{StmtSynonym{WhileSynonym{IDENT{"w"}}}, StmtSynonym{AssignSynonym{IDENT{"a"}}}});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
 
-        const std::shared_ptr<Clause> reference_clause2 =
+        const auto reference_clause2 =
             std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, QuotedIdent{"count"}, ExpressionSpec{"_"});
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }

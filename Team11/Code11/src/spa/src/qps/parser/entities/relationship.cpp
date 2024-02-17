@@ -1,6 +1,7 @@
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
+
 #include <memory>
 #include <ostream>
 #include <variant>
@@ -77,12 +78,4 @@ auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream& {
 }
 #endif
 
-auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream& {
-    std::visit(
-        [&os](auto&& relationship) {
-            os << relationship;
-        },
-        relationship);
-    return os;
-}
 } // namespace qps

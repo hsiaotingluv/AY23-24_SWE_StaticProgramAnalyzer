@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <memory>
 #include <ostream>
 #include <variant>
 
@@ -46,8 +48,8 @@ struct TypeListToVariant<TypeList<Types...>> {
     using type = std::variant<Types...>;
 };
 
-template <typename... Ts, std::enable_if_t<(sizeof...(Ts) > 0), int> = 0>
-inline auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> std::ostream& {
+template <typename... Ts, typename = std::enable_if_t<(sizeof...(Ts) > 0)>>
+auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> std::ostream& {
     return std::visit(
         [&os](auto&& x) -> std::ostream& {
             return os << x;
@@ -56,7 +58,18 @@ inline auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant
 }
 
 template <typename T>
-inline auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -> bool {
+auto operator==(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) -> bool {
+    if (!lhs && !rhs) {
+        return true;
+    }
+    if (!lhs || !rhs) {
+        return false;
+    }
+    return *lhs == *rhs;
+}
+
+template <typename T>
+auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -> bool {
     return std::visit(
         [](auto&& lhs, auto&& rhs) {
             using TL = std::decay_t<decltype(lhs)>;
