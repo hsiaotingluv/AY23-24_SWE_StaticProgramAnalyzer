@@ -2,8 +2,6 @@
 
 #include "sp/main.hpp"
 
-#include "pkb/facades/read_facade.h"
-#include "pkb/facades/write_facade.h"
 #include "pkb/pkb.h"
 
 #include "qps/evaluators/simple_evaluator.hpp"

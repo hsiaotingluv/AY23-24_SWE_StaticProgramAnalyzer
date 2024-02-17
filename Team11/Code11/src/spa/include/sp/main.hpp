@@ -6,12 +6,10 @@
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/const_populator_traverser.hpp"
+#include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
-#include "sp/traverser/proc_populator_traverser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
-#include "sp/traverser/variable_populator_traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
 
 #include <filesystem>
@@ -51,9 +49,7 @@ class SourceProcessor {
             std::make_shared<ProgramParser>(),
             std::vector<std::shared_ptr<Traverser>>{
                 std::make_shared<StmtNumTraverser>(write_facade),
-                std::make_shared<ConstPopulatorTraverser>(write_facade),
-                std::make_shared<VarPopulatorTraverser>(write_facade),
-                std::make_shared<ProcedurePopulatorTraverser>(write_facade),
+                std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade),
             });
     }
@@ -84,11 +80,10 @@ class SourceProcessor {
         const auto tokens = tokenizer_runner->apply_tokeniser(std::move(input));
         auto it = tokens.begin();
         auto ast = parser->parse(it, tokens.end());
-        auto orders = semantic_validator.validate_get_traversal_order(ast);
+        auto procedure_topology_orders = semantic_validator.validate_get_traversal_order(ast);
 
-        // TODO: use orders in traversing ast
         for (const auto& traverser : traversers) {
-            ast = traverser->traverse(ast);
+            ast = traverser->traverse(ast, procedure_topology_orders);
         }
 
 #ifdef DEBUG

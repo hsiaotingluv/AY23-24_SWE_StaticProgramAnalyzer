@@ -48,10 +48,10 @@ auto SemanticValidator::build_graph(const std::shared_ptr<AstNode>& node, const 
             throw SemanticError(caller_name + " trying to call non-existing callee " + callee);
         }
 
-        auto& callee_node = dependency_graph[callee];
+        auto& callee_node = dependency_graph.at(callee);
         if (callee_node.find(caller_name) == callee_node.end()) {
             callee_node.insert(caller_name);
-            indegree_map[caller_name]++;
+            indegree_map.at(caller_name)++;
         }
 
     } else {
@@ -75,8 +75,8 @@ auto SemanticValidator::topological_sort() -> std::vector<std::string> {
         auto curr_node = q.front();
         q.pop();
         result.push_back(curr_node);
-        for (const auto& neighbour : dependency_graph[curr_node]) {
-            if (--indegree_map[neighbour] == 0) {
+        for (const auto& neighbour : dependency_graph.at(curr_node)) {
+            if (--indegree_map.at(neighbour) == 0) {
                 q.push(neighbour);
             }
         }
