@@ -86,9 +86,9 @@ class PrintNode : public StatementNode {
 
 class CallNode : public StatementNode {
   public:
-    std::string variable;
+    std::string proc_name;
 
-    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), variable(std::move(variable)) {
+    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), proc_name(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
@@ -101,13 +101,13 @@ class CallNode : public StatementNode {
 
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << get_node_name() << "(" << variable << ")";
+        ss << get_node_name() << "(" << proc_name << ")";
         return ss;
     }
 
     [[nodiscard]] auto to_xml() const -> std::string override {
         const auto stmt_number = std::to_string(get_statement_number());
-        return "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\" variable=\"" + variable + "\" />";
+        return "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\" proc_name=\"" + proc_name + "\" />";
     }
 };
 

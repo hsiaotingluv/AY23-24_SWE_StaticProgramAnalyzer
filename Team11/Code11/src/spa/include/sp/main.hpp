@@ -12,6 +12,7 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include "sp/traverser/variable_populator_traverser.hpp"
+#include "sp/validator/semantic_validator.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -30,6 +31,7 @@ class SourceProcessor {
     std::shared_ptr<TokenizerRunner> tokenizer_runner;
     std::shared_ptr<Parser> parser;
     std::vector<std::shared_ptr<Traverser>> traversers;
+    SemanticValidator semantic_validator{};
     static int counter;
 
   public:
@@ -82,6 +84,9 @@ class SourceProcessor {
         const auto tokens = tokenizer_runner->apply_tokeniser(std::move(input));
         auto it = tokens.begin();
         auto ast = parser->parse(it, tokens.end());
+        auto orders = semantic_validator.validate_get_traversal_order(ast);
+
+        // TODO: use orders in traversing ast
         for (const auto& traverser : traversers) {
             ast = traverser->traverse(ast);
         }
