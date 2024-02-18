@@ -1,4 +1,4 @@
-procedure Follows {
+procedure FollowsStar {
   a = 0;
   read x;
   y = x + 1;
