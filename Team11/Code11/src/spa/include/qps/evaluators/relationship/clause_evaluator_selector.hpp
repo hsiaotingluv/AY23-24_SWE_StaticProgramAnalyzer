@@ -9,6 +9,7 @@
 #include "follows_t_evaluator.hpp"
 #include "modifies_s_evaluator.hpp"
 #include "uses_s_evaluator.hpp"
+#include "parent_t_evaluator.hpp"
 
 namespace qps {
 auto clause_evaluator_selector(const std::shared_ptr<ReadFacade>& read_facade) {
@@ -24,6 +25,10 @@ auto clause_evaluator_selector(const std::shared_ptr<ReadFacade>& read_facade) {
 
         [read_facade](qps::Parent& parent) -> std::shared_ptr<ClauseEvaluator> {
             return std::make_shared<ParentEvaluator>(read_facade, parent);
+        },
+
+        [read_facade](qps::ParentT& parent) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<ParentTEvaluator>(read_facade, parent);
         },
 
         [read_facade](qps::UsesS& uses_s) -> std::shared_ptr<ClauseEvaluator> {
