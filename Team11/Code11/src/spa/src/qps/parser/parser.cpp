@@ -266,8 +266,8 @@ auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
         const auto& maybe_second_arg = *std::next(it, 4 + offset);
         const auto& maybe_close_bracket = *std::next(it, 5 + offset);
 
-        if (!is_keyword(maybe_keyword, keyword.substr(0, keyword.size() - 1)) || !is_open_bracket(maybe_open_bracket) ||
-            !is_comma(maybe_comma) || !is_close_bracket(maybe_close_bracket)) {
+        if (!is_keyword(maybe_keyword, keyword.substr(0, keyword.size() - offset)) ||
+            !is_open_bracket(maybe_open_bracket) || !is_comma(maybe_comma) || !is_close_bracket(maybe_close_bracket)) {
             return std::nullopt;
         }
 
