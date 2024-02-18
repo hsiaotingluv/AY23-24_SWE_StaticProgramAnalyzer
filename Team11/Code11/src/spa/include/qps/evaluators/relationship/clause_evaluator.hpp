@@ -2,6 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/results_table.hpp"
+#include <optional>
 
 namespace qps {
 class ClauseEvaluator {
