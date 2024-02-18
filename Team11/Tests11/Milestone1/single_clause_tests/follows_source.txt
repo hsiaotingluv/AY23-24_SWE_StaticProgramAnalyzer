@@ -1,0 +1,20 @@
+procedure follows {
+  a = 0;
+  read x;
+  y = x + 1;
+  if (y < 5) then {
+    status = 2;
+    print status;
+    while (a < 3) {
+      z = a + 1;
+      read a;
+      print z;
+    }
+    status = 0;
+  } else {
+    status = 1;
+    a = a + 2;
+  }
+  print status;
+  read c;
+}
