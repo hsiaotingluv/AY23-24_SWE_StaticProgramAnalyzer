@@ -31,6 +31,8 @@ class Synonym : public Ref {
     auto operator==(const Synonym& rhs) const noexcept -> bool;
 
     friend auto operator<<(std::ostream& os, const Synonym& synonym) -> std::ostream&;
+
+    auto operator<(const Synonym& rhs) const noexcept -> bool;
 };
 
 // StmtSynonym := AnyStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym |
@@ -165,7 +167,10 @@ inline auto operator<<(std::ostream& os, const std::shared_ptr<T>& ptr) -> std::
     return os << *ptr;
 }
 
-template auto operator==<Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
+template auto operator== <Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
+
+template auto operator< <Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
+
 } // namespace qps
 
 namespace std {

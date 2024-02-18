@@ -10,6 +10,10 @@ auto Synonym::operator==(const Synonym& rhs) const noexcept -> bool {
     return typeid(*this) == typeid(rhs) && name == rhs.name;
 }
 
+auto Synonym::operator<(const Synonym& rhs) const noexcept -> bool {
+    return name.get_value() < rhs.name.get_value();
+}
+
 auto operator<<(std::ostream& os, const Synonym& synonym) -> std::ostream& {
     return os << synonym.representation() << "(" << synonym.name << ")";
 }

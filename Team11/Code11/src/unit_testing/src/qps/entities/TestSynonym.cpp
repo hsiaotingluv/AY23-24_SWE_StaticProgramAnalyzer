@@ -366,3 +366,38 @@ TEST_CASE("Synonym - keyword") {
         REQUIRE(synonym.get_keyword() == "assign");
     }
 }
+
+TEST_CASE("Comparison - Less Than Relation") {
+    SECTION("VarSynonym") {
+        const auto synonym1 = std::make_shared<VarSynonym>("a");
+        const auto synonym2 = std::make_shared<VarSynonym>("b");
+        REQUIRE(synonym1 < synonym2);
+    }
+
+    SECTION("ConstSynonym") {
+        const auto synonym1 = std::make_shared<ConstSynonym>("c");
+        const auto synonym2 = std::make_shared<ConstSynonym>("d");
+        REQUIRE(synonym1 < synonym2);
+    }
+
+    SECTION("Different Type") {
+        const std::shared_ptr<Synonym> synonym1 = std::make_shared<VarSynonym>("a");
+        const std::shared_ptr<Synonym> synonym2 = std::make_shared<ConstSynonym>("c");
+        REQUIRE(synonym1 < synonym2);
+    }
+
+    SECTION("Sort") {
+        std::vector<std::shared_ptr<Synonym>> synonyms = {
+            std::make_shared<VarSynonym>("a"),
+            std::make_shared<ConstSynonym>("c"),
+            std::make_shared<VarSynonym>("b"),
+            std::make_shared<ConstSynonym>("d"),
+        };
+
+        std::sort(synonyms.begin(), synonyms.end());
+        REQUIRE(synonyms[0]->get_name() == "a");
+        REQUIRE(synonyms[1]->get_name() == "b");
+        REQUIRE(synonyms[2]->get_name() == "c");
+        REQUIRE(synonyms[3]->get_name() == "d");
+    }
+}

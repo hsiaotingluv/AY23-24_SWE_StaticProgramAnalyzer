@@ -69,6 +69,17 @@ auto operator==(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) ->
 }
 
 template <typename T>
+auto operator<(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) -> bool {
+    if (lhs == nullptr) {
+        return rhs != nullptr;
+    }
+    if (rhs == nullptr) {
+        return false;
+    }
+    return *lhs < *rhs;
+}
+
+template <typename T>
 auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -> bool {
     return std::visit(
         [](auto&& lhs, auto&& rhs) {
