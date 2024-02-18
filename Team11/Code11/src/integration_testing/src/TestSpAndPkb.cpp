@@ -52,7 +52,7 @@ TEST_CASE("Test SP and PKB") {
 
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
-        // computeCentroid starts with stmt 9
+        // computeCentroid starts with stmt 10
         REQUIRE(read_facade->does_statement_modify_var("10", "count"));
         REQUIRE(read_facade->does_statement_modify_var("16", "cenX"));
         REQUIRE(read_facade->does_statement_modify_var("18", "x"));
@@ -62,5 +62,23 @@ TEST_CASE("Test SP and PKB") {
 
         REQUIRE_FALSE(read_facade->does_statement_modify_var("14", "flag"));
         REQUIRE_FALSE(read_facade->does_procedure_modify_var("printResults", "normSq"));
+    }
+
+    SECTION("Test SP and PKB Follows Website - success") {
+        auto ast = sp->process(input);
+
+        // Taken from
+        // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#follows--follows
+        // computeCentroid starts with stmt 10
+        REQUIRE(read_facade->has_follows("10", "11"));
+        REQUIRE(read_facade->has_follows("13", "14"));
+        REQUIRE(read_facade->has_follows("14", "19"));
+        REQUIRE(read_facade->has_follows_stars("12", "19"));
+        REQUIRE(read_facade->has_follows_stars("10", "23"));
+
+        REQUIRE_FALSE(read_facade->has_follows("14", "15"));
+        REQUIRE_FALSE(read_facade->has_follows("18", "19"));
+        REQUIRE_FALSE(read_facade->has_follows("20", "21"));
+        REQUIRE_FALSE(read_facade->has_follows_stars("21", "23"));
     }
 }
