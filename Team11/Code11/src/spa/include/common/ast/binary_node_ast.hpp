@@ -1,10 +1,12 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
+#include "common/ast/expr.hpp"
 
 namespace sp {
+
 // Generic Binary Expression with 2 operands
-class BinopNode : public sp::AstNode {
+class BinopNode : public sp::AstNode, public Expr {
   public:
     std::shared_ptr<AstNode> left{}, right{};
 
@@ -39,6 +41,10 @@ class MulNode : public BinopNode {
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "MulNode";
     }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return "*";
+    }
 };
 
 class DivNode : public BinopNode {
@@ -48,6 +54,10 @@ class DivNode : public BinopNode {
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "DivNode";
+    }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return "/";
     }
 };
 
@@ -59,6 +69,10 @@ class ModNode : public BinopNode {
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "ModNode";
     }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return "%";
+    }
 };
 
 class AddNode : public BinopNode {
@@ -69,6 +83,10 @@ class AddNode : public BinopNode {
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "AddNode";
     }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return "+";
+    }
 };
 
 class SubNode : public BinopNode {
@@ -78,6 +96,10 @@ class SubNode : public BinopNode {
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "SubNode";
+    }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return "%";
     }
 };
 } // namespace sp

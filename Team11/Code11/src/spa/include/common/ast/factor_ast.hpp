@@ -1,11 +1,12 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
+#include "common/ast/expr.hpp"
 #include "common/ast/node_type.hpp"
 
 namespace sp {
 
-class ConstantNode : public AstNode {
+class ConstantNode : public AstNode, public Expr {
   public:
     int integer;
 
@@ -29,9 +30,13 @@ class ConstantNode : public AstNode {
     [[nodiscard]] auto to_xml() const -> std::string override {
         return "<" + get_node_name() + " integer=\"" + std::to_string(integer) + "\" />";
     }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return std::to_string(integer);
+    }
 };
 
-class VarNode : public AstNode {
+class VarNode : public AstNode, public Expr {
   public:
     std::string name;
 
@@ -54,6 +59,10 @@ class VarNode : public AstNode {
 
     [[nodiscard]] auto to_xml() const -> std::string override {
         return "<" + get_node_name() + " name=\"" + name + "\" />";
+    }
+
+    [[nodiscard]] auto get_postfix_token() const -> std::string override {
+        return name;
     }
 };
 } // namespace sp

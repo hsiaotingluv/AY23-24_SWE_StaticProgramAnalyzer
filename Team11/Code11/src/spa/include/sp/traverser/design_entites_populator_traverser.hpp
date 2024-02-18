@@ -28,7 +28,6 @@ class DesignEntitiesPopulatorTraverser : public Traverser {
     explicit DesignEntitiesPopulatorTraverser(std::shared_ptr<WriteFacade> write_facade)
         : write_facade(std::move(write_facade)){};
 
-    auto traverse(std::shared_ptr<AstNode> ast, const std::vector<std::string>& proc_topo_sort)
-        -> std::shared_ptr<AstNode> override;
+    auto traverse(std::shared_ptr<AstNode> ast, const std::vector<std::string>&) -> std::shared_ptr<AstNode> override;
 };
 } // namespace sp
