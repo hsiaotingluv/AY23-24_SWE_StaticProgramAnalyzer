@@ -203,6 +203,17 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_calls_star_callers(const std::string& callee) const;
 
+    // Pattern-related Read Operations
+    std::unordered_set<std::string> get_all_assignments_rhs(const std::string& rhs);
+
+    std::unordered_set<std::string> get_all_assignments_rhs_partial(const std::string& rhs);
+
+    std::unordered_set<std::string> get_all_assignments_lhs(const std::string& lhs);
+
+    std::unordered_set<std::string> get_all_assignments_lhs_rhs(const std::string& lhs, const std::string& rhs);
+
+    std::unordered_set<std::string> get_all_assignments_lhs_rhs_partial(const std::string& lhs, const std::string& rhs);
+
   private:
     std::shared_ptr<PKB> pkb;
 };

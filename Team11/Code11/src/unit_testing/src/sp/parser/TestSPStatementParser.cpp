@@ -45,7 +45,7 @@ TEST_CASE("Test SP Statement Parser") {
         auto node = statement_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<CallNode>(node);
         REQUIRE(node->T == NodeType::Call);
-        REQUIRE(casted_node->variable == "procName");
+        REQUIRE(casted_node->proc_name == "procName");
         REQUIRE(it->T == TokenType::Done);
     }
 

@@ -8,7 +8,7 @@ auto Tokenizer::tokenize_string(TokeniserInput input, std::string token, TokenTy
         return std::nullopt;
     }
 
-    for (int i = 0; i < token.length(); i++) {
+    for (std::string::size_type i = 0; i < token.length(); i++) {
         if (input[i] != token[i]) {
             return std::nullopt;
         }

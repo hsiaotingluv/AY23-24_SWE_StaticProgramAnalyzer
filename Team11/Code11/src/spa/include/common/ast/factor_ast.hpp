@@ -9,17 +9,25 @@ class ConstantNode : public AstNode {
   public:
     int integer;
 
-    explicit ConstantNode(int integer) : integer(integer), AstNode(NodeType::Constant) {
+    explicit ConstantNode(int integer) : AstNode(NodeType::Constant), integer(integer) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "ConstantNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "ConstantNode(" << integer << ")";
+        ss << get_node_name() << "(" << integer << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        return "<" + get_node_name() + " integer=\"" + std::to_string(integer) + "\" />";
     }
 };
 
@@ -27,17 +35,25 @@ class VarNode : public AstNode {
   public:
     std::string name;
 
-    explicit VarNode(std::string name) : name(std::move(name)), AstNode(NodeType::Variable) {
+    explicit VarNode(std::string name) : AstNode(NodeType::Variable), name(std::move(name)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "VarNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "VarNode(" << name << ")";
+        ss << get_node_name() << "(" << name << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        return "<" + get_node_name() + " name=\"" + name + "\" />";
     }
 };
 } // namespace sp

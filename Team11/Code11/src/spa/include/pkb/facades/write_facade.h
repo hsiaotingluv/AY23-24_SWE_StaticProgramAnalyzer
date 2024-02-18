@@ -43,6 +43,8 @@ class WriteFacade {
 
     void add_calls_star(const std::string& caller, const std::string& callee);
 
+    void add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs);
+
     void finalise_pkb();
 
   private:

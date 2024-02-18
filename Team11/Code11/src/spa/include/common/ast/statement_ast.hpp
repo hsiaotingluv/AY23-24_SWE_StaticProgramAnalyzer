@@ -34,17 +34,26 @@ class ReadNode : public StatementNode {
   public:
     std::string variable;
 
-    explicit ReadNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Read) {
+    explicit ReadNode(std::string variable) : StatementNode(sp::NodeType::Read), variable(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "ReadNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "ReadNode(" << variable << ")";
+        ss << get_node_name() << "(" << variable << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        return "<" + get_node_name() + " stmt_number=\"" + std::to_string(get_statement_number()) + "\" variable=\"" +
+               variable + "\" />";
     }
 };
 
@@ -52,35 +61,53 @@ class PrintNode : public StatementNode {
   public:
     std::string variable;
 
-    explicit PrintNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Print) {
+    explicit PrintNode(std::string variable) : StatementNode(sp::NodeType::Print), variable(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "PrintNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "PrintNode(" << variable << ")";
+        ss << get_node_name() << "(" << variable << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        return "<" + get_node_name() + " stmt_number=\"" + std::to_string(get_statement_number()) + "\" variable=\"" +
+               variable + "\" />";
     }
 };
 
 class CallNode : public StatementNode {
   public:
-    std::string variable;
+    std::string proc_name;
 
-    explicit CallNode(std::string variable) : variable(std::move(variable)), StatementNode(sp::NodeType::Call) {
+    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), proc_name(std::move(variable)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "CallNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "CallNode(" << variable << ")";
+        ss << get_node_name() << "(" << proc_name << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        const auto stmt_number = std::to_string(get_statement_number());
+        return "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\" proc_name=\"" + proc_name + "\" />";
     }
 };
 
@@ -92,18 +119,32 @@ class IfNode : public StatementNode {
 
     IfNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& then_stmt_list,
            std::shared_ptr<AstNode>& else_stmt_list)
-        : cond_expr(cond_expr), then_stmt_list(then_stmt_list), else_stmt_list(else_stmt_list),
-          StatementNode(sp::NodeType::If) {
+        : StatementNode(sp::NodeType::If), cond_expr(cond_expr), then_stmt_list(then_stmt_list),
+          else_stmt_list(else_stmt_list) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {cond_expr, then_stmt_list, else_stmt_list};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "IfNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "IfNode(" << *cond_expr << ", " << *then_stmt_list << ", " << *else_stmt_list << ")";
+        ss << get_node_name() << "(" << *cond_expr << ", " << *then_stmt_list << ", " << *else_stmt_list << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto cond_expr_xml = cond_expr->to_xml();
+        auto then_xml = then_stmt_list->to_xml();
+        auto else_xml = else_stmt_list->to_xml();
+        const auto stmt_number = std::to_string(get_statement_number());
+        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
+        auto ending_xml = "</" + get_node_name() + ">";
+        return opening_xml + cond_expr_xml + then_xml + else_xml + ending_xml;
     }
 };
 
@@ -113,17 +154,31 @@ class WhileNode : public StatementNode {
     std::shared_ptr<AstNode> stmt_list;
 
     WhileNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& stmt_list)
-        : cond_expr(cond_expr), stmt_list(stmt_list), StatementNode(sp::NodeType::While) {
+        : StatementNode(sp::NodeType::While), cond_expr(cond_expr), stmt_list(stmt_list) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {cond_expr, stmt_list};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "WhileNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "WhileNode(" << *cond_expr << ", " << *stmt_list << ")";
+        ss << get_node_name() << "(" << *cond_expr << ", " << *stmt_list << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto cond_expr_xml = cond_expr->to_xml();
+        auto body_xml = stmt_list->to_xml();
+        const auto stmt_number = std::to_string(get_statement_number());
+
+        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
+        auto ending_xml = "</" + get_node_name() + ">";
+        return opening_xml + cond_expr_xml + body_xml + ending_xml;
     }
 };
 
@@ -133,17 +188,31 @@ class AssignmentNode : public StatementNode {
     std::shared_ptr<AstNode> expr;
 
     AssignmentNode(std::shared_ptr<AstNode> variable, std::shared_ptr<AstNode> expr)
-        : variable(std::move(variable)), expr(std::move(expr)), StatementNode(sp::NodeType::Assign) {
+        : StatementNode(sp::NodeType::Assign), variable(std::move(variable)), expr(std::move(expr)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {variable, expr};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "AssignmentNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "AssignmentNode(" << *variable << ", " << *expr << ")";
+        ss << get_node_name() << "(" << *variable << ", " << *expr << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto var_xml = variable->to_xml();
+        auto expr_xml = expr->to_xml();
+        const auto stmt_number = std::to_string(get_statement_number());
+
+        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
+        auto ending_xml = "</" + get_node_name() + ">";
+        return opening_xml + var_xml + expr_xml + ending_xml;
     }
 };
 

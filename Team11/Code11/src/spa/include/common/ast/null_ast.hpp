@@ -16,10 +16,18 @@ class NullNode : public sp::AstNode {
         return {};
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "NullNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "NullNode()";
+        ss << get_node_name() << "()";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        return "<" + get_node_name() + " />";
     }
 };
 } // namespace sp

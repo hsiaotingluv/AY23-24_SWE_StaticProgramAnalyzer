@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pkb/stores/assignment_store.h"
 #include "pkb/stores/calls_store.h"
 #include "pkb/stores/entity_store.h"
 #include "pkb/stores/follows_store.h"
@@ -30,6 +31,7 @@ class PKB {
     std::shared_ptr<UsesStore> uses_store;
     std::shared_ptr<NextStore> next_store;
     std::shared_ptr<CallsStore> calls_store;
+    std::shared_ptr<AssignmentStore> assignment_store;
 
     friend class ReadFacade;
 

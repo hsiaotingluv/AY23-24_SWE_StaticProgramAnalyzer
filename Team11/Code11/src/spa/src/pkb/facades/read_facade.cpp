@@ -517,3 +517,31 @@ std::unordered_set<std::string> ReadFacade::get_calls_star_callees(const std::st
 std::unordered_set<std::string> ReadFacade::get_calls_star_callers(const std::string& callee) const {
     return this->pkb->calls_store->get_calls_star_callers(callee);
 }
+
+std::unordered_set<std::string> ReadFacade::get_all_assignments_rhs(const std::string& rhs) {
+    return this->pkb->assignment_store->get_all_assignments_rhs(rhs);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_assignments_rhs_partial(const std::string& rhs) {
+    return this->pkb->assignment_store->get_all_assignments_rhs_partial(rhs);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_assignments_lhs(const std::string& lhs) {
+    auto v = Variable(lhs);
+
+    return this->pkb->assignment_store->get_all_assignments_lhs(v);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_assignments_lhs_rhs(const std::string& lhs,
+                                                                        const std::string& rhs) {
+    auto v = Variable(lhs);
+
+    return this->pkb->assignment_store->get_all_assignments_lhs_rhs(v, rhs);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_assignments_lhs_rhs_partial(const std::string& lhs,
+                                                                                const std::string& rhs) {
+    auto v = Variable(lhs);
+
+    return this->pkb->assignment_store->get_all_assignments_lhs_rhs_partial(v, rhs);
+}

@@ -9,11 +9,26 @@ class ComparatorNode : public sp::AstNode {
     std::shared_ptr<AstNode> left{}, right{};
 
     explicit ComparatorNode(NodeType T, std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : left(std::move(left)), right(std::move(right)), AstNode(T) {
+        : AstNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
         return {left, right};
+    }
+
+    [[nodiscard]] auto identifier() const -> std::stringstream override {
+        auto ss = std::stringstream();
+        ss << get_node_name() << "(" << *left << ", " << *right << ")";
+        return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto start_xml = "<" + get_node_name() + ">";
+        auto left_xml = left->to_xml();
+        auto right_xml = right->to_xml();
+        auto end_xml = "</" + get_node_name() + ">";
+
+        return start_xml + left_xml + right_xml + end_xml;
     }
 };
 
@@ -23,10 +38,8 @@ class GreaterThanNode : public ComparatorNode {
         : ComparatorNode(NodeType::Gt, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "GreaterThanNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "GreaterThanNode";
     }
 };
 
@@ -36,10 +49,8 @@ class GreaterThanEqualNode : public ComparatorNode {
         : ComparatorNode(NodeType::Gte, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "GreaterThanEqualNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "GreaterThanEqualNode";
     }
 };
 
@@ -49,10 +60,8 @@ class LessThanNode : public ComparatorNode {
         : ComparatorNode(NodeType::Lt, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "LessThanNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "LessThanNode";
     }
 };
 
@@ -62,10 +71,8 @@ class LessThanEqualNode : public ComparatorNode {
         : ComparatorNode(NodeType::Lte, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "LessThanEqualNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "LessThanEqualNode";
     }
 };
 
@@ -75,10 +82,8 @@ class EqualNode : public ComparatorNode {
         : ComparatorNode(NodeType::Eq, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "EqualNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "EqualNode";
     }
 };
 
@@ -88,10 +93,8 @@ class NotEqualNode : public ComparatorNode {
         : ComparatorNode(NodeType::Neq, std::move(left), std::move(right)) {
     }
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << "NotEqualNode(" << *left << ", " << *right << ")";
-        return ss;
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "NotEqualNode";
     }
 };
 } // namespace sp

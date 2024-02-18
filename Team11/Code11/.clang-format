@@ -24,3 +24,4 @@ BraceWrapping:
 SeparateDefinitionBlocks: Always
 EmptyLineBeforeAccessModifier: LogicalBlock
 PointerAlignment: Left
+InsertBraces: True

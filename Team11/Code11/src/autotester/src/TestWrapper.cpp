@@ -12,8 +12,9 @@
 AbstractWrapper* WrapperFactory::wrapper = nullptr;
 
 auto WrapperFactory::createWrapper() -> AbstractWrapper* {
-    if (wrapper == nullptr)
+    if (wrapper == nullptr) {
         wrapper = new TestWrapper;
+    }
     return wrapper;
 }
 
