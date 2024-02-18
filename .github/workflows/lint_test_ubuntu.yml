@@ -71,15 +71,8 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          output=$(python3 Team11/run_autotester.py Team11/Tests11/simple_source.txt Team11/Tests11/simple_queries.txt -i)
-          result=$(echo "$output" | tail -n 1)
-          request_body="{ \"body\": \"$result\" }"
-          curl \
-            -X POST \
-            $URL \
-            -H "Content-Type: application/json" \
-            -H "Authorization: token $GITHUB_TOKEN" \
-            --data-raw "$request_body"
+          chmod +x ./.github/scripts/run_sys_test.sh
+          ./.github/scripts/run_sys_test.sh
 
       - name: Run linters and analyser
         if: ${{ github.event_name == 'pull_request' }}
