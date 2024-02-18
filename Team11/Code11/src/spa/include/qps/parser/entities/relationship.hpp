@@ -56,7 +56,7 @@ struct FollowsT {
     StmtRef stmt1;
     StmtRef stmt2;
 
-    static constexpr auto keyword = "Follows";
+    static constexpr auto keyword = "Follows*";
 
   public:
     FollowsT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
@@ -106,7 +106,7 @@ struct ParentT {
     StmtRef stmt1;
     StmtRef stmt2;
 
-    static constexpr auto keyword = "Parent";
+    static constexpr auto keyword = "Parent*";
 
     ParentT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
     }
