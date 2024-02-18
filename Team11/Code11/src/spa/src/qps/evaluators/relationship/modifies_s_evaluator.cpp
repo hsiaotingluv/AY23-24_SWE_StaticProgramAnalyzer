@@ -5,7 +5,7 @@ namespace qps {
 auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_facade) {
     return overloaded {
             [read_facade](const std::shared_ptr <qps::StmtSynonym> &stmt_synonym,
-                          const qps::WildCard &wildcard2) -> std::optional <Table> {
+                          const qps::WildCard &wild_card_2) -> std::optional <Table> {
                 // TODO: Improve pkb API: Get all statement that modifies
                 const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
                 auto table = Table{{stmt_synonym}};
@@ -25,15 +25,14 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
                 }
                 return table;
             },
-            [read_facade](const qps::Integer &stmt_num, const qps::WildCard &wildcard2) -> std::optional <Table> {
-                // TODO: Improve pkb API: Does statement modify var?
+            [read_facade](const qps::Integer &stmt_num, const qps::WildCard &wild_card_2) -> std::optional <Table> {
+
                 auto does_statement_modify_var = false;
                 const auto variables = read_facade->get_variables();
                 const auto var_vec = std::vector < std::string > {variables.begin(), variables.end()};
 
                 for (const auto &var: var_vec) {
-                    const auto statements = read_facade->get_statements_that_modify_var(var);
-                    if (statements.find(std::to_string(stmt_num.value)) != statements.end()) {
+                    if (read_facade->does_statement_modify_var(std::to_string(stmt_num.value), var)) {
                         does_statement_modify_var = true;
                         break;
                     }
@@ -101,8 +100,8 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
                     return std::nullopt;
                 }
                 return Table{};
-            }};
-
+            }
+    };
 }
 
 auto ModifiesSEvaluator::evaluate() -> std::optional<Table> {
