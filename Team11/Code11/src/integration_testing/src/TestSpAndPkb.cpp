@@ -81,4 +81,22 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE_FALSE(read_facade->has_follows("20", "21"));
         REQUIRE_FALSE(read_facade->has_follows_stars("21", "23"));
     }
+
+    SECTION("Test SP and PKB Assignment Pattern - success") {
+        auto ast = sp->process(input);
+
+        REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_lhs("count").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_lhs("cenX").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_lhs("cenY").size() == 3);
+
+        REQUIRE(read_facade->get_all_assignments_rhs("0").size() == 4);
+        REQUIRE(read_facade->get_all_assignments_rhs("cenX").empty());
+
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX cenX *").size() == 1);
+
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("flag", "1").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("cenX", "cenX").size() == 2);
+    }
 }

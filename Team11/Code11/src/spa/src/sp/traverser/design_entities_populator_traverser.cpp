@@ -46,8 +46,8 @@ auto DesignEntitiesPopulatorTraverser::is_print_node(const std::shared_ptr<AstNo
     return (std::dynamic_pointer_cast<PrintNode>(node) != nullptr);
 }
 
-auto DesignEntitiesPopulatorTraverser::traverse(std::shared_ptr<AstNode> node,
-                                                const std::vector<std::string>& topo_sort) -> std::shared_ptr<AstNode> {
+auto DesignEntitiesPopulatorTraverser::traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>&)
+    -> std::shared_ptr<AstNode> {
     if (is_const_node(node)) {
         auto const_node = std::dynamic_pointer_cast<ConstantNode>(node);
         write_facade->add_constant(std::to_string(const_node->integer));
@@ -63,7 +63,7 @@ auto DesignEntitiesPopulatorTraverser::traverse(std::shared_ptr<AstNode> node,
     }
 
     for (const auto& child : node->get_children()) {
-        traverse(child, topo_sort);
+        traverse(child, {});
     }
 
     return node;
