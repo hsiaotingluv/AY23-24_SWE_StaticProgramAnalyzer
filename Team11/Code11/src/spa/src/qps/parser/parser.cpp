@@ -1,5 +1,7 @@
 #include "qps/parser/parser.hpp"
+#include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
+
 #include "qps/parser/entities/untyped/clause.hpp"
 #include "qps/parser/entities/untyped/relationship.hpp"
 #include "qps/parser/entities/untyped/synonym.hpp"
@@ -328,12 +330,12 @@ auto parse_stmt_ent(const std::string& keyword) {
     };
 }
 
-const auto parse_follows = parse_stmt_stmt("Follows", true);
-const auto parse_follows_star = parse_stmt_stmt("Follows*", false);
-const auto parse_parent = parse_stmt_stmt("Parent", true);
-const auto parse_parent_star = parse_stmt_stmt("Parent*", false);
-const auto parse_uses = parse_stmt_ent("Uses");
-const auto parse_modifies = parse_stmt_ent("Modifies");
+const auto parse_follows = parse_stmt_stmt(Follows::keyword, true);
+const auto parse_follows_star = parse_stmt_stmt(FollowsT::keyword, false);
+const auto parse_parent = parse_stmt_stmt(Parent::keyword, true);
+const auto parse_parent_star = parse_stmt_stmt(ParentT::keyword, false);
+const auto parse_uses = parse_stmt_ent(UsesS::keyword);
+const auto parse_modifies = parse_stmt_ent(ModifiesS::keyword);
 
 auto parse_rel_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>> {
