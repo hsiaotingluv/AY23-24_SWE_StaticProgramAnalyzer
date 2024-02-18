@@ -13,6 +13,6 @@ public:
 
     explicit ClauseEvaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)){}
 
-    virtual auto evaluate() -> std::optional<Table>;
+    virtual auto evaluate() -> std::optional<Table> = 0;
 };
 }
