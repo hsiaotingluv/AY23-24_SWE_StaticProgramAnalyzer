@@ -10,8 +10,6 @@
 #include <unordered_set>
 #include <vector>
 
-#define ENABLE_BENCHMARK
-
 using namespace qps;
 
 template <>
