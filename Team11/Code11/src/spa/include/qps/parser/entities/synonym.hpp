@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pkb/facades/read_facade.h"
+
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/template_utils.hpp" // NOLINT
 
@@ -28,6 +30,9 @@ class Synonym : public Ref {
 
     [[nodiscard]] auto get_name() const -> IDENT;
 
+    [[nodiscard]] virtual auto scan(const std::shared_ptr<ReadFacade>& read_facade) const
+        -> std::unordered_set<std::string> = 0;
+
     auto operator==(const Synonym& rhs) const noexcept -> bool;
 
     friend auto operator<<(std::ostream& os, const Synonym& synonym) -> std::ostream&;
@@ -51,6 +56,8 @@ class AnyStmtSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class ReadSynonym final : public StmtSynonym {
@@ -62,6 +69,8 @@ class ReadSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class PrintSynonym final : public StmtSynonym {
@@ -73,6 +82,8 @@ class PrintSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class CallSynonym final : public StmtSynonym {
@@ -84,6 +95,8 @@ class CallSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class WhileSynonym final : public StmtSynonym {
@@ -95,6 +108,8 @@ class WhileSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class IfSynonym final : public StmtSynonym {
@@ -106,6 +121,8 @@ class IfSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class AssignSynonym final : public StmtSynonym {
@@ -117,6 +134,8 @@ class AssignSynonym final : public StmtSynonym {
     using StmtSynonym::StmtSynonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class VarSynonym final : public Synonym {
@@ -128,6 +147,8 @@ class VarSynonym final : public Synonym {
     using Synonym::Synonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class ConstSynonym final : public Synonym {
@@ -139,6 +160,8 @@ class ConstSynonym final : public Synonym {
     using Synonym::Synonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 class ProcSynonym final : public Synonym {
@@ -150,6 +173,8 @@ class ProcSynonym final : public Synonym {
     using Synonym::Synonym;
 
     [[nodiscard]] auto get_keyword() const -> std::string override;
+
+    [[nodiscard]] auto scan(const std::shared_ptr<ReadFacade>&) const -> std::unordered_set<std::string> override;
 };
 
 using Synonyms = std::vector<std::shared_ptr<Synonym>>;
