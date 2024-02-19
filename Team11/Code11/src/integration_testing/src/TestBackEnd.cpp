@@ -5,7 +5,7 @@
 #include "pkb/pkb.h"
 
 #include "common/statement_type.hpp"
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 #include "qps/qps.hpp"
 
 #include <memory>
@@ -32,7 +32,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x", "y", "z"};
         REQUIRE(results.size() == 3);
@@ -50,7 +50,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"procedure1"};
         REQUIRE(results.size() == 1);
@@ -69,7 +69,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
         REQUIRE(query_obj.clauses.empty());
 
         // Simple evaluator:
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1", "2"};
         REQUIRE(results.size() == 2);
@@ -107,7 +107,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -125,7 +125,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"2"};
         REQUIRE(results.size() == expected.size());
@@ -143,7 +143,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"3"};
         REQUIRE(results.size() == expected.size());
@@ -162,7 +162,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"4"};
         REQUIRE(results.size() == expected.size());
@@ -181,7 +181,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"5"};
         REQUIRE(results.size() == expected.size());
@@ -198,7 +198,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 
         REQUIRE(query_obj.clauses.empty());
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"6"};
         REQUIRE(results.size() == expected.size());
@@ -228,7 +228,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x"};
         REQUIRE(results.size() == expected.size());
@@ -244,7 +244,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -260,7 +260,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -276,7 +276,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"1"};
         REQUIRE(results.size() == expected.size());
@@ -301,7 +301,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         REQUIRE(results.empty());
     }
@@ -313,7 +313,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
         REQUIRE(maybe_query_obj.has_value());
         const auto query_obj = maybe_query_obj.value();
 
-        auto evaluator = qps::Evaluator{read_facade};
+        auto evaluator = qps::QueryEvaluator{read_facade};
         const auto results = evaluator.evaluate(query_obj);
         const auto expected = std::unordered_set<std::string>{"x"};
         REQUIRE(results.size() == expected.size());

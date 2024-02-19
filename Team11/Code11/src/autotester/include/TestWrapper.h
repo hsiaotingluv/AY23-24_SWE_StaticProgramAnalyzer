@@ -5,7 +5,7 @@
 #include <string>
 
 #include "AbstractWrapper.h"
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 #include "sp/main.hpp"
 
 #include "pkb/facades/read_facade.h"
@@ -22,7 +22,7 @@ class TestWrapper : public AbstractWrapper {
     std::shared_ptr<WriteFacade> write_facade;
 
     std::shared_ptr<qps::QueryProcessingSystem> qps_parser;
-    std::shared_ptr<qps::Evaluator> qps_evaluator;
+    std::shared_ptr<qps::QueryEvaluator> qps_evaluator;
 
     auto load_file(const std::string& filename) -> std::string;
 

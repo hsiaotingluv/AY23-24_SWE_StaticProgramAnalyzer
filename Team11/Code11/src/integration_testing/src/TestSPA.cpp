@@ -4,7 +4,7 @@
 
 #include "pkb/pkb.h"
 
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 #include "qps/qps.hpp"
 
 #include <unordered_set>
@@ -86,7 +86,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_variables);
         }
@@ -100,7 +100,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_procedures);
         }
@@ -114,7 +114,7 @@ TEST_CASE("Test SPA - Entities") {
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_constants);
         }

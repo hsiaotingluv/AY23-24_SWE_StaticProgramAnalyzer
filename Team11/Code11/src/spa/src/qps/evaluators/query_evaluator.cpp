@@ -1,4 +1,4 @@
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 #include "qps/evaluators/entities/entity_scanner.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/parser/entities/synonym.hpp"
@@ -129,7 +129,7 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
     return results;
 }
 
-auto Evaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
+auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
     const auto results = scan_entities(read_facade, reference);
 

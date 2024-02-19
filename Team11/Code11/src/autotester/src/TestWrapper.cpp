@@ -3,7 +3,7 @@
 #include "qps/template_utils.hpp"
 #include "sp/main.hpp"
 
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -33,7 +33,7 @@ TestWrapper::TestWrapper()
 
     source_processor = sp::SourceProcessor::get_complete_sp(write_facade);
     qps_parser = std::make_shared<qps::QueryProcessingSystem>();
-    qps_evaluator = std::make_shared<qps::Evaluator>(read_facade);
+    qps_evaluator = std::make_shared<qps::QueryEvaluator>(read_facade);
 }
 
 auto TestWrapper::load_file(const std::string& filename) -> std::string {
