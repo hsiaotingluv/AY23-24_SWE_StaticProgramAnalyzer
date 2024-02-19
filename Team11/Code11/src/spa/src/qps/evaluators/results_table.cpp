@@ -704,9 +704,8 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
 auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
              const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
     if (table.get_column().empty()) {
-        // Table is empty -> no constraints -> return everything
-        const auto results = scan_entities(read_facade, synonym);
-        return {results.begin(), results.end()};
+        // Table is empty --> contradiction
+        return {};
     }
 
     const auto column = table.get_column();
@@ -718,11 +717,11 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
         return {};
     }
 
-    auto results = std::vector<std::string>{};
+    auto results = std::unordered_set<std::string>{};
     for (const auto& row : record) {
-        results.push_back(row.at(col_idx));
+        results.insert(row.at(col_idx));
     }
-    return results;
+    return {results.begin(), results.end()};
 }
 
 void print(const Table& table) {

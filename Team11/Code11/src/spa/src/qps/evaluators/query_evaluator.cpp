@@ -15,7 +15,10 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
     const auto reference = query_obj.reference;
     const auto results = scan_entities(read_facade, reference);
 
-    auto curr_table = Table{};
+    auto curr_table = Table{{reference}};
+    for (const auto& result : results) {
+        curr_table.add_row({result});
+    }
 
     if (query_obj.clauses.empty()) {
         // Short-circuit if there are no clauses
