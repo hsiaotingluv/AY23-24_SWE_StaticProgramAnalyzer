@@ -9,6 +9,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
         // e.g. Parent*(s1, s2)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+            if (stmt_syn_1 == stmt_syn_2) {
+                return std::nullopt;
+            }
             const auto relevant_stmts_1 = scan_entities(read_facade, stmt_syn_1);
             const auto relevant_stmts_2 = scan_entities(read_facade, stmt_syn_2);
 
