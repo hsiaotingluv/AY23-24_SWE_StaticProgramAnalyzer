@@ -1,5 +1,11 @@
 #include "qps/evaluators/relationship/modifies_s_evaluator.hpp"
 #include "qps/evaluators/entities/entity_scanner.hpp"
+#include "qps/evaluators/results_table.hpp"
+#include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
+
+#include <memory>
+#include <optional>
 
 namespace qps {
 
@@ -23,6 +29,10 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
                         table.add_row({stmt});
                     }
                 }
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -61,6 +71,10 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
                     }
                 }
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
         [read_facade](const qps::Integer& stmt_num,
@@ -69,6 +83,10 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
             auto table = Table{{var}};
             for (const auto& v : variables) {
                 table.add_row({v});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -85,7 +103,9 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
                     table.add_row({stmt});
                 }
             }
-
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
         [read_facade](const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) -> std::optional<Table> {
