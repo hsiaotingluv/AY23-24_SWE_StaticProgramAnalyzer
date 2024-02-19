@@ -15,8 +15,12 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
             auto table = Table{{stmt_syn_1, stmt_syn_2}};
             const auto follows_map = read_facade->get_all_follows();
             for (const auto& follows_pair : follows_map) {
-                if (relevant_stmts_1.find(follows_pair.first) == relevant_stmts_1.end()) continue;
-                if (relevant_stmts_2.find(follows_pair.second) == relevant_stmts_1.end()) continue;
+                if (relevant_stmts_1.find(follows_pair.first) == relevant_stmts_1.end()) {
+                    continue;
+                }
+                if (relevant_stmts_2.find(follows_pair.second) == relevant_stmts_1.end()) {
+                    continue;
+                }
                 table.add_row({follows_pair.first, follows_pair.second});
             }
             return table;
@@ -40,7 +44,9 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
             auto table = Table{{stmt_syn_1}};
             const auto all_followed_stmts = read_facade->get_all_follows_keys();
             for (const auto& stmt : all_followed_stmts) {
-                if (relevant_stmts.find(stmt) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({stmt});
             }
             return table;
@@ -90,7 +96,9 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
             auto table = Table({stmt_syn_2});
             const auto all_following = read_facade->get_all_follows_values();
             for (const auto& stmt : all_following) {
-                if (relevant_stmts.find(stmt) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({stmt});
             }
             return table;

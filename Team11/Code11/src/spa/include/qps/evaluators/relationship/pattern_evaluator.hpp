@@ -10,11 +10,12 @@ namespace qps {
 class PatternEvaluator : public ClauseEvaluator {
     PatternClause pattern;
 
-    static auto eval_pattern(const std::shared_ptr<ReadFacade>& read_facade, const std::shared_ptr<AssignSynonym>& assign_synonym);
+    static auto eval_pattern(const std::shared_ptr<ReadFacade>& read_facade,
+                             const std::shared_ptr<AssignSynonym>& assign_synonym);
 
-public:
+  public:
     PatternEvaluator(std::shared_ptr<ReadFacade> read_facade, PatternClause pattern)
-            : ClauseEvaluator(std::move(read_facade)), pattern(std::move(pattern)) {
+        : ClauseEvaluator(std::move(read_facade)), pattern(std::move(pattern)) {
     }
 
     auto evaluate() -> std::optional<Table> override;

@@ -16,10 +16,14 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             // TODO: Improve pkb API: Get all parent-star-child pairs
             const auto parents_map = read_facade->get_all_parent_star();
             for (const auto& parent_child_set : parents_map) {
-                if (relevant_stmts_1.find(parent_child_set.first) == relevant_stmts_1.end()) continue;
+                if (relevant_stmts_1.find(parent_child_set.first) == relevant_stmts_1.end()) {
+                    continue;
+                }
 
                 for (const auto& child : parent_child_set.second) {
-                    if (relevant_stmts_2.find(child) == relevant_stmts_2.end()) continue;
+                    if (relevant_stmts_2.find(child) == relevant_stmts_2.end()) {
+                        continue;
+                    }
                     table.add_row({parent_child_set.first, child});
                 }
             }
@@ -33,7 +37,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             auto table = Table{{stmt_syn_1}};
             const auto ancestors = read_facade->get_star_parent(std::to_string(stmt_num_2.value));
             for (const auto& ancestor : ancestors) {
-                if (relevant_stmts.find(ancestor) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(ancestor) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({ancestor});
             }
             return table;
@@ -45,7 +51,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             auto table = Table{{stmt_syn_1}};
             const auto all_parents = read_facade->get_all_parent_star_keys();
             for (const auto& parent_name : all_parents) {
-                if (relevant_stmts.find(parent_name) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(parent_name) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({parent_name});
             }
             return table;
@@ -59,7 +67,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             const auto all_descendants_of_stmt =
                 read_facade->get_parent_star_children(std::to_string(stmt_num_1.value));
             for (const auto& descendant : all_descendants_of_stmt) {
-                if (relevant_stmts.find(descendant) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(descendant) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({descendant});
             }
             return table;
@@ -97,7 +107,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             auto table = Table({stmt_syn_2});
             const auto all_descendants = read_facade->get_all_parent_star_values();
             for (const auto& descendant_name : all_descendants) {
-                if (relevant_stmts.find(descendant_name) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(descendant_name) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({descendant_name});
             }
             return table;

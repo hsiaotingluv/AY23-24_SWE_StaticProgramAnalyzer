@@ -15,10 +15,14 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
             auto table = Table{{stmt_syn_1, stmt_syn_2}};
             const auto follows_star_map = read_facade->get_all_follows_star();
             for (const auto& stmt_and_followers : follows_star_map) {
-                if (relevant_stmts_1.find(stmt_and_followers.first) == relevant_stmts_1.end()) continue;
+                if (relevant_stmts_1.find(stmt_and_followers.first) == relevant_stmts_1.end()) {
+                    continue;
+                }
 
                 for (const auto& follower : stmt_and_followers.second) {
-                    if (relevant_stmts_2.find(follower) == relevant_stmts_1.end()) continue;
+                    if (relevant_stmts_2.find(follower) == relevant_stmts_1.end()) {
+                        continue;
+                    }
                     table.add_row({stmt_and_followers.first, follower});
                 }
             }
@@ -32,7 +36,9 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
             auto table = Table{{stmt_syn_1}};
             const auto followed_stmts = read_facade->get_follows_stars_by(std::to_string(stmt_num_2.value));
             for (const auto& stmt : followed_stmts) {
-                if (relevant_stmts.find(stmt) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({stmt});
             }
             return table;
@@ -44,7 +50,9 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
             auto table = Table{{stmt_syn_1}};
             const auto all_followed_stmts = read_facade->get_all_follows_star_keys();
             for (const auto& stmt : all_followed_stmts) {
-                if (relevant_stmts.find(stmt) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({stmt});
             }
             return table;
@@ -55,9 +63,12 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             const auto relevant_stmts = scan_entities(read_facade, stmt_syn_2);
             auto table = Table({stmt_syn_2});
-            const auto all_followers_of_stmt = read_facade->get_follows_stars_following(std::to_string(stmt_num_1.value));
+            const auto all_followers_of_stmt =
+                read_facade->get_follows_stars_following(std::to_string(stmt_num_1.value));
             for (const auto& follower : all_followers_of_stmt) {
-                if (relevant_stmts.find(follower) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(follower) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({follower});
             }
             return table;
@@ -113,7 +124,9 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
             auto table = Table({stmt_syn_2});
             const auto all_following = read_facade->get_all_follows_star_values();
             for (const auto& stmt : all_following) {
-                if (relevant_stmts.find(stmt) == relevant_stmts.end()) continue;
+                if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
+                    continue;
+                }
                 table.add_row({stmt});
             }
             return table;
