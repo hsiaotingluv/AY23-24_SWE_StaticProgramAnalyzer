@@ -110,6 +110,40 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto reference_clause = std::make_shared<SuchThatClause>(
             Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
     }
+
+    SECTION("Query with stmt-stmt relationship - Follows*") {
+        const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
+    }
+
+    SECTION("Query with stmt-stmt relationship - Parent*") {
+        const auto query = " procedure p; stmt s; Select s such that Parent*(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
+    }
 #endif
     SECTION("Query with stmt-ent relationship") {
 

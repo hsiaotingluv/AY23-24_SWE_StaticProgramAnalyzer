@@ -61,6 +61,30 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(such_that_clause == reference_clause);
     };
 
+    SECTION("Query with stmt-stmt relationship - indirect") {
+        const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13)";
+        const auto output = parser.parse(query);
+
+        REQUIRE(output.has_value());
+        const auto& [declarations, untyped] = output.value();
+
+        REQUIRE(declarations.size() == 2);
+
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<AnyStmtSynonym>(declarations[1], "s");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                        untyped::UntypedStmtRef{Integer{13}}}};
+        REQUIRE(such_that_clause == reference_clause);
+    };
+
 #endif
     SECTION("Query with stmt-ent relationship") {
 
