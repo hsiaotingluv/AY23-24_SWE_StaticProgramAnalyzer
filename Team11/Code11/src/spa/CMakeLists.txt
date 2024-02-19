@@ -13,6 +13,8 @@ add_library(spa ${srcs}
         src/qps/evaluators/relationship/follows_evaluator.cpp
         src/qps/evaluators/relationship/follows_t_evaluator.cpp
         src/qps/evaluators/relationship/uses_s_evaluator.cpp
+        include/qps/evaluators/relationship/pattern_evaluator.hpp
+        src/qps/evaluators/relationship/pattern_evaluator.cpp
 )
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 

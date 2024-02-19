@@ -2,6 +2,7 @@
 #include "qps/evaluators/entities/entity_scanner.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/evaluators/relationship/pattern_evaluator.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -141,22 +142,20 @@ auto Evaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string
 
     // Step 1: populate all synonyms
     for (const auto& clause : query_obj.clauses) {
-        // TODO: currently we don't support any other clause types
-        if (std::dynamic_pointer_cast<qps::SuchThatClause>(clause) == nullptr) {
-            continue;
+
+        if (const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
+            const auto relationship = such_that_clause->rel_ref;
+            evaluator = std::visit(clause_evaluator_selector(read_facade), relationship);
+        } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
+            evaluator = std::make_shared<PatternEvaluator>(read_facade, *pattern_clause);
         }
 
-        const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause);
-        const auto relationship = such_that_clause->rel_ref;
-
-        const std::shared_ptr<ClauseEvaluator> evaluator =
-            std::visit(clause_evaluator_selector(read_facade), relationship);
         const auto maybe_table = evaluator->evaluate();
         if (!maybe_table.has_value()) {
             return {};
         }
 
-        const auto next_table = maybe_table.value();
+        const auto& next_table = maybe_table.value();
         const auto maybe_new_table = join(curr_table, next_table);
         if (!maybe_new_table.has_value()) {
             // Conflict detected -> no results

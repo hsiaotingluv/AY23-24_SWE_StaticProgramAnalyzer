@@ -2,6 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/semantic_validator.hpp"
+#include "qps/evaluators/relationship/clause_evaluator.hpp"
 
 #include <memory>
 #include <utility>
@@ -9,6 +10,7 @@
 
 namespace qps {
 class Evaluator {
+    std::shared_ptr<ClauseEvaluator> evaluator;
     std::shared_ptr<ReadFacade> read_facade;
 
   public:
