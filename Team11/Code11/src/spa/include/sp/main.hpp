@@ -6,12 +6,13 @@
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/assignment_populator_traverser.hpp"
 #include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
+#include "sp/traverser/parent_traverser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
+#include "sp/traverser/uses_traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
 
 #include <filesystem>
@@ -57,11 +58,11 @@ class SourceProcessor {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
             std::make_shared<ProgramParser>(),
-            std::vector<std::shared_ptr<Traverser>>{std::make_shared<StmtNumTraverser>(write_facade),
-                                                    std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
-                                                    std::make_shared<ModifiesTraverser>(write_facade),
-                                                    std::make_shared<AssignmentPopulatorTraverser>(write_facade),
-                                                    std::make_shared<FollowsTraverser>(write_facade)},
+            std::vector<std::shared_ptr<Traverser>>{
+                std::make_shared<StmtNumTraverser>(write_facade),
+                std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
+                std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
+                std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
             write_facade);
     }
 

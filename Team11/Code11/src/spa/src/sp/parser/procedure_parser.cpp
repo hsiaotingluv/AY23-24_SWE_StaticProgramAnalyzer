@@ -23,13 +23,14 @@ auto ProcedureParser::parse(Parser::Iterator& token_start, const Parser::Iterato
     }
 
     auto stmt_list_tree = statement_list_parser.parse(token_start, token_end);
+    auto statement_list_node = std::dynamic_pointer_cast<StatementListNode>(stmt_list_tree);
 
     auto rcurly_token = get_next_token(token_start);
     if (rcurly_token.T != TokenType::RCurly) {
         throw ParsingError("Expecting } keyword in procedure but found other token");
     }
 
-    return std::make_shared<ProcedureNode>(procedure_name.content, stmt_list_tree);
+    return std::make_shared<ProcedureNode>(procedure_name.content, statement_list_node);
 }
 
 } // namespace sp

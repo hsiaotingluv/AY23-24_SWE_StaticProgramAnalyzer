@@ -1,6 +1,11 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
+#include "common/ast/mixin/design_entities_mixin.hpp"
+#include "common/ast/mixin/expr_mixin.hpp"
+#include "common/ast/mixin/modifies_mixin.hpp"
+#include "factor_ast.hpp"
+#include "statement_list_ast.hpp"
 
 #include <optional>
 
@@ -10,51 +15,32 @@
  */
 namespace sp {
 
-class StatementNode : public sp::AstNode {
+class StatementNode : public AstNode, public DesignEntitiesMixin {
     std::optional<uint32_t> statement_number;
 
   public:
     explicit StatementNode(sp::NodeType T) : AstNode(T) {
     }
 
-    auto set_statement_number(uint32_t statement_number) -> void {
-        this->statement_number = statement_number;
-    }
-
-    [[nodiscard]] auto get_statement_number() const -> int {
-        return statement_number.value_or(-1);
-    }
-
-    [[nodiscard]] auto has_statement_number() const -> bool {
-        return statement_number.has_value();
-    }
+    auto set_statement_number(uint32_t statement_number) -> void;
+    [[nodiscard]] auto get_statement_number() const -> int;
+    [[nodiscard]] auto has_statement_number() const -> bool;
 };
 
-class ReadNode : public StatementNode {
+class ReadNode : public StatementNode, public ModifiesMixin {
   public:
     std::string variable;
 
     explicit ReadNode(std::string variable) : StatementNode(sp::NodeType::Read), variable(std::move(variable)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "ReadNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << variable << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        return "<" + get_node_name() + " stmt_number=\"" + std::to_string(get_statement_number()) + "\" variable=\"" +
-               variable + "\" />";
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap>)
+        -> std::unordered_set<std::string> override;
 };
 
 class PrintNode : public StatementNode {
@@ -64,156 +50,84 @@ class PrintNode : public StatementNode {
     explicit PrintNode(std::string variable) : StatementNode(sp::NodeType::Print), variable(std::move(variable)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "PrintNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << variable << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        return "<" + get_node_name() + " stmt_number=\"" + std::to_string(get_statement_number()) + "\" variable=\"" +
-               variable + "\" />";
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 
-class CallNode : public StatementNode {
+class CallNode : public StatementNode, public ModifiesMixin {
   public:
     std::string proc_name;
 
     explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), proc_name(std::move(variable)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "CallNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << proc_name << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        const auto stmt_number = std::to_string(get_statement_number());
-        return "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\" proc_name=\"" + proc_name + "\" />";
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
+        -> std::unordered_set<std::string> override;
 };
 
-class IfNode : public StatementNode {
+class IfNode : public StatementNode, public ModifiesMixin {
   public:
     std::shared_ptr<AstNode> cond_expr;
-    std::shared_ptr<AstNode> then_stmt_list;
-    std::shared_ptr<AstNode> else_stmt_list;
+    std::shared_ptr<StatementListNode> then_stmt_list;
+    std::shared_ptr<StatementListNode> else_stmt_list;
 
-    IfNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& then_stmt_list,
-           std::shared_ptr<AstNode>& else_stmt_list)
+    IfNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<StatementListNode>& then_stmt_list,
+           std::shared_ptr<StatementListNode>& else_stmt_list)
         : StatementNode(sp::NodeType::If), cond_expr(cond_expr), then_stmt_list(then_stmt_list),
           else_stmt_list(else_stmt_list) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {cond_expr, then_stmt_list, else_stmt_list};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "IfNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << *cond_expr << ", " << *then_stmt_list << ", " << *else_stmt_list << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        auto cond_expr_xml = cond_expr->to_xml();
-        auto then_xml = then_stmt_list->to_xml();
-        auto else_xml = else_stmt_list->to_xml();
-        const auto stmt_number = std::to_string(get_statement_number());
-        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
-        auto ending_xml = "</" + get_node_name() + ">";
-        return opening_xml + cond_expr_xml + then_xml + else_xml + ending_xml;
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
+        -> std::unordered_set<std::string> override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 
-class WhileNode : public StatementNode {
+class WhileNode : public StatementNode, public ModifiesMixin {
   public:
     std::shared_ptr<AstNode> cond_expr;
-    std::shared_ptr<AstNode> stmt_list;
+    std::shared_ptr<StatementListNode> stmt_list;
 
-    WhileNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<AstNode>& stmt_list)
+    WhileNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<StatementListNode>& stmt_list)
         : StatementNode(sp::NodeType::While), cond_expr(cond_expr), stmt_list(stmt_list) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {cond_expr, stmt_list};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "WhileNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << *cond_expr << ", " << *stmt_list << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        auto cond_expr_xml = cond_expr->to_xml();
-        auto body_xml = stmt_list->to_xml();
-        const auto stmt_number = std::to_string(get_statement_number());
-
-        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
-        auto ending_xml = "</" + get_node_name() + ">";
-        return opening_xml + cond_expr_xml + body_xml + ending_xml;
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
+        -> std::unordered_set<std::string> override;
 };
 
-class AssignmentNode : public StatementNode {
+class AssignmentNode : public StatementNode, public ModifiesMixin {
   public:
-    std::shared_ptr<AstNode> variable;
-    std::shared_ptr<AstNode> expr;
+    std::shared_ptr<VarNode> variable;
+    std::shared_ptr<ExprNode> expr;
 
-    AssignmentNode(std::shared_ptr<AstNode> variable, std::shared_ptr<AstNode> expr)
+    AssignmentNode(std::shared_ptr<VarNode> variable, std::shared_ptr<ExprNode> expr)
         : StatementNode(sp::NodeType::Assign), variable(std::move(variable)), expr(std::move(expr)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {variable, expr};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "AssignmentNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << *variable << ", " << *expr << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        auto var_xml = variable->to_xml();
-        auto expr_xml = expr->to_xml();
-        const auto stmt_number = std::to_string(get_statement_number());
-
-        auto opening_xml = "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\">";
-        auto ending_xml = "</" + get_node_name() + ">";
-        return opening_xml + var_xml + expr_xml + ending_xml;
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap>)
+        -> std::unordered_set<std::string> override;
 };
 
 } // namespace sp

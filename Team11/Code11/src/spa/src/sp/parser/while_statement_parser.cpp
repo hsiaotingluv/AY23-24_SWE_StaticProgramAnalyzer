@@ -24,12 +24,13 @@ auto StatementParser::parseWhileStmt(Parser::Iterator& token_start, const Parser
     }
 
     auto stmt_list_tree = statement_list_parser.parse(token_start, token_end);
+    auto stmt_node = std::dynamic_pointer_cast<StatementListNode>(stmt_list_tree);
 
     auto rcurly_token = get_next_token(token_start);
     if (rcurly_token.T != TokenType::RCurly) {
         throw ParsingError("Expecting while } keyword in while but found other token");
     }
 
-    return std::make_shared<WhileNode>(cond_expr_tree, stmt_list_tree);
+    return std::make_shared<WhileNode>(cond_expr_tree, stmt_node);
 }
 } // namespace sp
