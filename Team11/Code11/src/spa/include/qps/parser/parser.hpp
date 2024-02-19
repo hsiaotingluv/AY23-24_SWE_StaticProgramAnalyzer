@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/tokeniser/runner.hpp"
+#include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/entities/untyped/clause.hpp"
 #include "qps/parser/entities/untyped/synonym.hpp"
 

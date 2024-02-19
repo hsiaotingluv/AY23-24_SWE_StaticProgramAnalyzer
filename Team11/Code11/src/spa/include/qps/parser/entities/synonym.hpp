@@ -167,7 +167,7 @@ inline auto operator<<(std::ostream& os, const std::shared_ptr<T>& ptr) -> std::
     return os << *ptr;
 }
 
-template auto operator== <Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
+template auto operator==<Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
 
 template auto operator< <Synonym>(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) -> bool;
 

@@ -3,12 +3,9 @@
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/relationship/clause_evaluator.hpp"
 #include "qps/parser/entities/relationship.hpp"
-#include "qps/parser/entities/synonym.hpp"
-#include "qps/template_utils.hpp"
 
 #include <memory>
 #include <optional>
-#include <type_traits>
 #include <utility>
 
 namespace qps {

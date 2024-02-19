@@ -1,7 +1,6 @@
 #pragma once
 
 #include "qps/parser/entities/primitives.hpp"
-#include "qps/parser/entities/synonym.hpp"
 #include <variant>
 
 namespace qps::untyped {

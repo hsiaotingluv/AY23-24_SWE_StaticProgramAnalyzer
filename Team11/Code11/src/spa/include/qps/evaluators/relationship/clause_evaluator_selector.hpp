@@ -40,7 +40,6 @@ auto clause_evaluator_selector(const std::shared_ptr<ReadFacade>& read_facade) {
         },
 
         // TODO: add other clause evaluator cases here
-
         [](const auto&) -> std::shared_ptr<ClauseEvaluator> {
             return nullptr;
         }};

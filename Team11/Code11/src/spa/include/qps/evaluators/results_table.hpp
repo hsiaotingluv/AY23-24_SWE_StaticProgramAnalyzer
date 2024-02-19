@@ -3,7 +3,6 @@
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/entities/synonym.hpp"
 #include <memory>
-
 #include <optional>
 #include <vector>
 
