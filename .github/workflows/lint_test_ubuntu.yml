@@ -67,9 +67,6 @@ jobs:
 
       - name: Run System Testing
         if: ${{ github.event_name == 'pull_request' }}
-        env:
-          URL: ${{ github.event.pull_request.comments_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           chmod +x ./.github/scripts/run_sys_test.sh
           ./.github/scripts/run_sys_test.sh

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-COMMENT_URL=$URL
-GITHUB_TOKEN=$GITHUB_TOKEN
-
 accumulated_result=""
 
 for source_file in $(find "Team11/Tests11" -type f -name "*_source.txt"); do
