@@ -79,7 +79,7 @@ if __name__ == "__main__":
         )
 
     if errors:
-        print(f"Failed test cases: {','.join(map(str, errors))}")
+        print(f"[{args.source} - {args.query}] Failed test cases: {','.join(map(str, errors))}")
         exit(1)
     else:
-        print("Pass all system testing")
+        print(f"[{args.source} - {args.query}] Pass all system testing")

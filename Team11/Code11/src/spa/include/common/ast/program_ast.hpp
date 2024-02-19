@@ -16,14 +16,27 @@ class ProgramNode : public sp::AstNode {
         return procedures;
     }
 
+    [[nodiscard]] auto get_node_name() const -> std::string override {
+        return "ProgramNode";
+    }
+
     [[nodiscard]] auto identifier() const -> std::stringstream override {
         auto ss = std::stringstream();
-        ss << "ProgramNode(";
+        ss << get_node_name() << "(";
         for (const auto& proc : procedures) {
             ss << *proc << ", ";
         }
         ss << ")";
         return ss;
+    }
+
+    [[nodiscard]] auto to_xml() const -> std::string override {
+        auto xml = "<" + get_node_name() + ">";
+        for (auto const& proc : procedures) {
+            xml += proc->to_xml();
+        }
+        xml += "</" + get_node_name() + ">";
+        return xml;
     }
 };
 } // namespace sp

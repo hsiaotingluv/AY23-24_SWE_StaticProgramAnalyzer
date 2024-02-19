@@ -73,6 +73,11 @@ void WriteFacade::add_calls_star(const std::string& caller, const std::string& c
     this->pkb->calls_store->add_calls_star(caller, callee);
 }
 
+void WriteFacade::add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs) {
+    auto v = Variable(lhs);
+    this->pkb->assignment_store->add_assignment(statement_number, v, rhs);
+}
+
 void WriteFacade::finalise_pkb() {
     this->pkb->follows_store->populate_follows_and_reverse_follows_star();
     this->pkb->parent_store->populate_parent_and_reverse_parent_star();
