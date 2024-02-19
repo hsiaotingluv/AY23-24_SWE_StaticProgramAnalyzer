@@ -12,37 +12,21 @@
 
 using namespace qps;
 
-// static const std::vector<std::tuple<std::string, std::string>> exprs = {
-//     {"42", "(42)"},
-//     {"42 + 42", "((42)+(42))"},
-//     {"v + x * y + z * t", "(((v)+((x)*(y)))+((z)*(t)))"},
-//     {"x + z", "((x)+(z))"},
-//     {" x + y + z", "(((x)+(y))+(z))"},
-//     {"x + z * 5", "((x)+((z)*(5)))"},
-//     {"z * 5 + x", "(((z)*(5))+(x))"},
-//     {"(x + z) * 5", "(((x)+(z))*(5))"},
-//     {"z + 2 *(v+ x)", "((z)+((2)*((v)+(x))))"},
-//     {"z + 2* (v +x)", "((z)+((2)*((v)+(x))))"},
-//     {"a - b    +4", "(((a)-(b))+(4))"},
-//     {"a - b / 2", "((a)-((b)/(2)))"},
-//     {"b%3+2%5", "(((b)%(3))+((2)%(5)))"},
-// };
-
 static const std::vector<std::tuple<std::string, std::string>> exprs = {
-    {"42", "42 "},
-    {"42 + 42", "42 42 + "},
-    {"42 + 42 * 42", "42 42 42 * + "},
-    {"v + x * y + z * t", "v x y * + z t * + "},
-    {"x + z", "x z + "},
-    {"x + y + z", "x y + z + "},
-    {"x + z * 5", "x z 5 * + "},
-    {"z * 5 + x", "z 5 * x + "},
-    {"(x + z) * 5", "x z + 5 * "},
-    {"z + 2 *(v+ x)", "z 2 v x + * + "},
-    {"z + 2* (v +x)", "z 2 v x + * + "},
-    {"a - b    +4", "a b - 4 + "},
-    {"a - b / 2", "a b 2 / - "},
-    {"b%3+2%5", "b 3 % 2 5 % + "},
+    {"42", "42"},
+    {"42 + 42", "42 42 +"},
+    {"42 + 42 * 42", "42 42 42 * +"},
+    {"v + x * y + z * t", "v x y * + z t * +"},
+    {"x + z", "x z +"},
+    {"x + y + z", "x y + z +"},
+    {"x + z * 5", "x z 5 * +"},
+    {"z * 5 + x", "z 5 * x +"},
+    {"(x + z) * 5", "x z + 5 *"},
+    {"z + 2 *(v+ x)", "z 2 v x + * +"},
+    {"z + 2* (v +x)", "z 2 v x + * +"},
+    {"a - b    +4", "a b - 4 +"},
+    {"a - b / 2", "a b 2 / -"},
+    {"b%3+2%5", "b 3 % 2 5 % +"},
 };
 
 TEST_CASE("Test constant") {
@@ -55,7 +39,7 @@ TEST_CASE("Test constant") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "42 ");
+        REQUIRE(success.value == "42");
         REQUIRE(rest == tokens.end());
 
         const auto query2 = "42 + 42";
@@ -64,7 +48,7 @@ TEST_CASE("Test constant") {
 
         REQUIRE(result2.has_value());
         const auto& [success2, rest2] = result2.value();
-        REQUIRE(success2.value == "42 ");
+        REQUIRE(success2.value == "42");
         REQUIRE(rest2 == tokens2.begin() + 1);
     }
 
@@ -86,7 +70,7 @@ TEST_CASE("Test variable") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "a ");
+        REQUIRE(success.value == "a");
         REQUIRE(rest == tokens.end());
 
         const auto query2 = "a + 42";
@@ -95,7 +79,7 @@ TEST_CASE("Test variable") {
 
         REQUIRE(result2.has_value());
         const auto& [success2, rest2] = result2.value();
-        REQUIRE(success2.value == "a ");
+        REQUIRE(success2.value == "a");
         REQUIRE(rest2 == tokens2.begin() + 1);
     }
 
@@ -117,7 +101,7 @@ TEST_CASE("Test Expression") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "42 ");
+        REQUIRE(success.value == "42");
         REQUIRE(rest == tokens.end());
     }
 
@@ -128,7 +112,7 @@ TEST_CASE("Test Expression") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "a ");
+        REQUIRE(success.value == "a");
         REQUIRE(rest == tokens.end());
     }
 
@@ -139,7 +123,7 @@ TEST_CASE("Test Expression") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "42 a + ");
+        REQUIRE(success.value == "42 a +");
         REQUIRE(rest == tokens.end());
     }
 
@@ -150,7 +134,7 @@ TEST_CASE("Test Expression") {
 
         REQUIRE(result.has_value());
         const auto& [success, rest] = result.value();
-        REQUIRE(success.value == "42 a + ");
+        REQUIRE(success.value == "42 a +");
         REQUIRE(rest == tokens.end());
     }
 

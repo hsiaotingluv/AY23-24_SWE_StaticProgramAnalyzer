@@ -27,11 +27,7 @@ auto to_string(TokenType T) -> std::string {
 }
 
 auto order_traversal(const Expression& lhs, TokenType op, const Expression& rhs) -> std::string {
-    return lhs.value + rhs.value + to_string(op);
-}
-
-auto wrap_parentheses(const std::string& s) -> std::string {
-    return s + " ";
+    return lhs.value + " " + rhs.value + " " + to_string(op);
 }
 
 auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
@@ -100,7 +96,7 @@ auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vec
 auto constant(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Expression, std::vector<Token>::const_iterator>> {
     if (it != end && it->T == TokenType::Integer) {
-        return std::make_tuple(Expression{wrap_parentheses(it->content)}, it + 1);
+        return std::make_tuple(Expression{it->content}, it + 1);
     }
     return std::nullopt;
 }
@@ -126,7 +122,7 @@ auto expression(std::vector<Token>::const_iterator it, const std::vector<Token>:
 auto variable(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Expression, std::vector<Token>::const_iterator>> {
     if (it != end && it->T == TokenType::String) {
-        return std::make_tuple(Expression{wrap_parentheses(it->content)}, it + 1);
+        return std::make_tuple(Expression{it->content}, it + 1);
     }
     return std::nullopt;
 }
@@ -189,7 +185,7 @@ auto bin_op_rhs(int min_precedence, Expression lhs, std::vector<Token>::const_it
 
         // Exhausted all tokens --> construct the final expression
         if (it == end) {
-            return std::make_tuple(Expression{wrap_parentheses(order_traversal(lhs, op, rhs))}, it);
+            return std::make_tuple(Expression{order_traversal(lhs, op, rhs)}, it);
         }
 
         // Check if the next operator has a higher precedence
@@ -209,7 +205,7 @@ auto bin_op_rhs(int min_precedence, Expression lhs, std::vector<Token>::const_it
         }
 
         // Success: merge the lhs and rhs into a new lhs
-        lhs = Expression{wrap_parentheses(order_traversal(lhs, op, rhs))};
+        lhs = Expression{order_traversal(lhs, op, rhs)};
     }
     return std::make_tuple(lhs, it);
 }

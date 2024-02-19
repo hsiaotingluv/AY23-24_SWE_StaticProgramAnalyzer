@@ -57,7 +57,6 @@ using ExpressionSpec = std::variant<WildCard, PartialMatch>;
 
 using TokenType = tokenizer::TokenType;
 
-auto wrap_parentheses(const std::string& s) -> std::string;
 auto constant(std::vector<tokenizer::Token>::const_iterator it,
               const std::vector<tokenizer::Token>::const_iterator& end)
     -> std::optional<std::tuple<Expression, std::vector<tokenizer::Token>::const_iterator>>;

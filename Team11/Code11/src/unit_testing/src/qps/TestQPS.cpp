@@ -220,7 +220,7 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<PatternClause>(std::make_shared<AssignSynonym>(IDENT{"a"}),
-                                                                      WildCard{}, PartialMatch{"count 1 + "});
+                                                                      WildCard{}, PartialMatch{"count 1 +"});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -238,7 +238,7 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<PatternClause>(
-            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "});
+            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX *"});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
