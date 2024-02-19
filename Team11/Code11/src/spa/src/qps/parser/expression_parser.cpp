@@ -66,9 +66,7 @@ auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vec
             return std::nullopt;
         }
         return std::make_tuple(PartialMatch{expr}, it + 1);
-    }
-#ifndef MILESTONE1
-    else if (is_open_quote(*it)) {
+    } else if (is_open_quote(*it)) {
         // Case 3: Starts with quote
         it = std::next(it);
 
@@ -85,9 +83,7 @@ auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vec
             return std::nullopt;
         }
         return std::make_tuple(ExactMatch{expr}, it + 1);
-    }
-#endif
-    else {
+    } else {
         // Default: error
         return std::nullopt;
     }

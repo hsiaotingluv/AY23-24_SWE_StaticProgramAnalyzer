@@ -75,8 +75,50 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
             return table;
         },
 
-        [assign_synonym](const auto& x, const auto& y) -> std::optional<Table> {
-            return Table{{assign_synonym}};
+        // e.g. pattern a(_, "v")
+        [&read_facade, &assign_synonym](const WildCard&, const ExactMatch& exact) -> std::optional<Table> {
+            const auto& statements = read_facade->get_all_assignments_rhs(exact.expr.value);
+            if (statements.empty()) {
+                return std::nullopt;
+            }
+
+            auto table = Table{{assign_synonym}};
+            for (const auto& statement : statements) {
+                table.add_row({{statement}});
+            }
+            return table;
+        },
+
+        // e.g. pattern a(x, "v")
+        [&read_facade, &assign_synonym](const std::shared_ptr<Synonym>& var_synonym,
+                                        const ExactMatch& exact) -> std::optional<Table> {
+            const auto& statements = read_facade->get_all_assignments_rhs(exact.expr.value);
+            if (statements.empty()) {
+                return std::nullopt;
+            }
+
+            auto table = Table{{assign_synonym, var_synonym}};
+            for (const auto& assign_stmt : statements) {
+                const auto& variables = read_facade->get_vars_modified_by_statement(assign_stmt);
+                for (const auto& variable : variables) {
+                    table.add_row({{assign_stmt, variable}});
+                }
+            }
+            return table;
+        },
+
+        // e.g. pattern a("x", "v")
+        [&read_facade, &assign_synonym](const QuotedIdent& lhs, const ExactMatch& exact) -> std::optional<Table> {
+            const auto& statements = read_facade->get_all_assignments_lhs_rhs(lhs.get_value(), exact.expr.value);
+            if (statements.empty()) {
+                return std::nullopt;
+            }
+
+            auto table = Table{{assign_synonym}};
+            for (const auto& statement : statements) {
+                table.add_row({{statement}});
+            }
+            return table;
         }};
 }
 

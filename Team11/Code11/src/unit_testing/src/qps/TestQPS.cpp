@@ -301,16 +301,6 @@ TEST_CASE("Test QPS - Syntax") {
 
         REQUIRE(is_syntax_error(output));
     }
-
-#ifdef MILESTONE1
-    SECTION("Query with semantic issues and syntactically wrong expression") {
-        const auto query = R"(procedure p; Select v pattern a (_, "count"))";
-        const auto output = qps.parse(query);
-
-        // expression-spec : '_' '"' factor '"' '_' | '_'
-        REQUIRE(is_syntax_error(output));
-    }
-#endif
 }
 
 TEST_CASE("Test QPS - Semantics") {
