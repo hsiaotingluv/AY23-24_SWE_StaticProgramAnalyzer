@@ -6,7 +6,6 @@
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/assignment_populator_traverser.hpp"
 #include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
@@ -62,9 +61,8 @@ class SourceProcessor {
             std::vector<std::shared_ptr<Traverser>>{
                 std::make_shared<StmtNumTraverser>(write_facade),
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
-                std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<UsesTraverser>(write_facade),
-                std::make_shared<AssignmentPopulatorTraverser>(write_facade),
-                std::make_shared<FollowsTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade)},
+                std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
+                std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
             write_facade);
     }
 

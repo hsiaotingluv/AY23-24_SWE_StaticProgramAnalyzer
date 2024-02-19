@@ -1,5 +1,8 @@
 #pragma once
 
+#include "common/ast/ast.hpp"
+#include "common/ast/procedure_ast.hpp"
+#include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
 
 #include <memory>
@@ -9,22 +12,11 @@
 namespace sp {
 
 class ModifiesTraverser : public Traverser {
-    using ModifyMap = std::unordered_map<std::string, std::unordered_set<std::string>>;
-    using ProcMap = std::unordered_map<std::string, std::shared_ptr<AstNode>>;
+    using ProcMap = std::unordered_map<std::string, std::shared_ptr<ProcedureNode>>;
 
-    ModifyMap modifies_map{};
     ProcMap proc_map{};
 
     std::shared_ptr<WriteFacade> write_facade;
-
-    auto traverse_helper(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-
-    auto get_modify_assignment(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-    auto get_modify_read(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-    auto get_modify_call(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-    auto get_modify_while(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-    auto get_modify_if(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-    auto get_modify_proc(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
 
   public:
     explicit ModifiesTraverser(std::shared_ptr<WriteFacade> write_facade) : write_facade(std::move(write_facade)){};

@@ -1,15 +1,14 @@
 #pragma once
 
+#include "common/ast/ast.hpp"
+#include "common/ast/statement_ast.hpp"
+#include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
-
-#include <memory>
 
 namespace sp {
 
 class DesignEntitiesPopulatorTraverser : public Traverser {
     std::shared_ptr<WriteFacade> write_facade;
-
-    auto add_statement_pkb(uint32_t stmt_num, const std::shared_ptr<StatementNode>& stmt_node) -> void;
 
   public:
     explicit DesignEntitiesPopulatorTraverser(std::shared_ptr<WriteFacade> write_facade)

@@ -3,7 +3,7 @@
 #include "common/ast/ast.hpp"
 
 namespace sp {
-class LogicalNode : public sp::AstNode {
+class LogicalNode : public AstNode {
     using AstNode::AstNode;
 };
 

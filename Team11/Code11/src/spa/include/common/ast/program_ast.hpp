@@ -3,8 +3,7 @@
 #include "common/ast/ast.hpp"
 
 namespace sp {
-class ProgramNode : public sp::AstNode {
-
+class ProgramNode : public AstNode {
   public:
     std::vector<std::shared_ptr<AstNode>> procedures;
 
@@ -13,6 +12,7 @@ class ProgramNode : public sp::AstNode {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
+        // As V[T] is invariant with V[K] given T <: K, C++ cannot automatically upcast them
         return procedures;
     }
 

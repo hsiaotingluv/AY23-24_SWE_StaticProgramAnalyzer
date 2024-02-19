@@ -7,9 +7,9 @@
  * Dummy token to return empty string parsing
  */
 namespace sp {
-class NullNode : public sp::AstNode {
+class NullNode : public AstNode {
   public:
-    explicit NullNode() : AstNode(sp::NodeType::EmptyString) {
+    explicit NullNode() : AstNode(NodeType::EmptyString) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
