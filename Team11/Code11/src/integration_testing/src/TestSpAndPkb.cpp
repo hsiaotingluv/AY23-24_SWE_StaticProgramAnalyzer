@@ -47,6 +47,23 @@ TEST_CASE("Test SP and PKB") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
+    SECTION("Test SP and PKB Parent Website - success") {
+        auto ast = sp->process(input);
+
+        // Taken from
+        // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
+        // computeCentroid starts with stmt 10
+        REQUIRE(read_facade->has_parent("14", "16"));
+        REQUIRE(read_facade->has_parent("14", "17"));
+        REQUIRE(read_facade->has_parent("19", "20"));
+        REQUIRE(read_facade->has_parent_star("14", "16"));
+        REQUIRE(read_facade->has_parent_star("19", "22"));
+
+        REQUIRE_FALSE(read_facade->has_parent("10", "11"));
+        REQUIRE_FALSE(read_facade->has_parent("10", "15"));
+        REQUIRE_FALSE(read_facade->has_parent("14", "19"));
+    }
+
     SECTION("Test SP and PKB Modifies Website - success") {
         auto ast = sp->process(input);
 

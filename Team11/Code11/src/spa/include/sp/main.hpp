@@ -10,6 +10,7 @@
 #include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
+#include "sp/traverser/parent_traverser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
@@ -61,7 +62,8 @@ class SourceProcessor {
                                                     std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                                                     std::make_shared<ModifiesTraverser>(write_facade),
                                                     std::make_shared<AssignmentPopulatorTraverser>(write_facade),
-                                                    std::make_shared<FollowsTraverser>(write_facade)},
+                                                    std::make_shared<FollowsTraverser>(write_facade),
+                                                    std::make_shared<ParentTraverser>(write_facade)},
             write_facade);
     }
 

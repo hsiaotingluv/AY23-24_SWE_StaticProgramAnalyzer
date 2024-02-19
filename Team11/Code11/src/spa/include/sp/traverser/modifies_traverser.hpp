@@ -1,8 +1,8 @@
 #pragma once
 
-#include "common/ast/ast.hpp"
-#include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
+
+#include <memory>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -17,16 +17,7 @@ class ModifiesTraverser : public Traverser {
 
     std::shared_ptr<WriteFacade> write_facade;
 
-    static auto is_read_node(const std::shared_ptr<AstNode>& node) -> bool;
-
-    static auto is_assignment_node(const std::shared_ptr<AstNode>& node) -> bool;
-
     auto traverse_helper(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
-
-    static auto is_while_node(const std::shared_ptr<AstNode>& node) -> bool;
-    static auto is_if_node(const std::shared_ptr<AstNode>& node) -> bool;
-    static auto is_call_node(const std::shared_ptr<AstNode>& node) -> bool;
-    static auto is_proc_node(const std::shared_ptr<AstNode>& node) -> bool;
 
     auto get_modify_assignment(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
     auto get_modify_read(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;

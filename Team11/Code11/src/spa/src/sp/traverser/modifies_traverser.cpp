@@ -1,36 +1,6 @@
 #include "sp/traverser/modifies_traverser.hpp"
-#include "common/ast/ast.hpp"
-#include "common/ast/factor_ast.hpp"
-#include "common/ast/procedure_ast.hpp"
-#include "common/ast/statement_ast.hpp"
-#include "common/ast/statement_list_ast.hpp"
-#include <memory>
 
 namespace sp {
-
-auto ModifiesTraverser::is_read_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<ReadNode>(node) != nullptr);
-}
-
-auto ModifiesTraverser::is_assignment_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<AssignmentNode>(node) != nullptr);
-}
-
-auto ModifiesTraverser::is_call_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<CallNode>(node) != nullptr);
-}
-
-auto ModifiesTraverser::is_while_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<WhileNode>(node) != nullptr);
-}
-
-auto ModifiesTraverser::is_if_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<IfNode>(node) != nullptr);
-}
-
-auto ModifiesTraverser::is_proc_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<ProcedureNode>(node) != nullptr);
-}
 
 /*
  * @brief Traverses proc node to populate the pkb and returns set of vars that are being modified
@@ -38,17 +8,17 @@ auto ModifiesTraverser::is_proc_node(const std::shared_ptr<AstNode>& node) -> bo
  * @Note: there are some side effects such as updating the modifies_map and write_facade
  */
 auto ModifiesTraverser::traverse_helper(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string> {
-    if (is_assignment_node(node)) {
+    if (NodeTypeChecker::is_assignment_node(node)) {
         return get_modify_assignment(node);
-    } else if (is_read_node(node)) {
+    } else if (NodeTypeChecker::is_read_node(node)) {
         return get_modify_read(node);
-    } else if (is_call_node(node)) {
+    } else if (NodeTypeChecker::is_call_node(node)) {
         return get_modify_call(node);
-    } else if (is_while_node(node)) {
+    } else if (NodeTypeChecker::is_while_node(node)) {
         return get_modify_while(node);
-    } else if (is_if_node(node)) {
+    } else if (NodeTypeChecker::is_if_node(node)) {
         return get_modify_if(node);
-    } else if (is_proc_node(node)) {
+    } else if (NodeTypeChecker::is_proc_node(node)) {
         return get_modify_proc(node);
     }
 
