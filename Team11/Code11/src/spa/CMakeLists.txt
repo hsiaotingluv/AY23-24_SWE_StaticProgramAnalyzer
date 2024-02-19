@@ -1,21 +1,5 @@
 file(GLOB_RECURSE srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp")
-add_library(spa ${srcs}
-        include/qps/evaluators/relationship/parent_evaluator.hpp
-        include/qps/evaluators/relationship/clause_evaluator.hpp
-        include/qps/evaluators/relationship/clause_evaluator_selector.hpp
-        src/qps/evaluators/relationship/modifies_s_evaluator.cpp
-        include/qps/evaluators/relationship/parent_t_evaluator.hpp
-        src/qps/evaluators/relationship/parent_evaluator.cpp
-        src/qps/evaluators/relationship/parent_t_evaluator.cpp
-        include/qps/evaluators/relationship/follows_evaluator.hpp
-        include/qps/evaluators/relationship/follows_t_evaluator.hpp
-        include/qps/evaluators/relationship/uses_s_evaluator.hpp
-        src/qps/evaluators/relationship/follows_evaluator.cpp
-        src/qps/evaluators/relationship/follows_t_evaluator.cpp
-        src/qps/evaluators/relationship/uses_s_evaluator.cpp
-        include/qps/evaluators/relationship/pattern_evaluator.hpp
-        src/qps/evaluators/relationship/pattern_evaluator.cpp
-)
+add_library(spa ${srcs})
 target_include_directories(spa PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
