@@ -36,4 +36,5 @@ jobs:
 
       - name: Run System Testing on Push
         run: |
-          python3 Team11/run_autotester.py Team11/Tests11/simple_source.txt Team11/Tests11/simple_queries.txt -i
+          chmod +x ./.github/scripts/run_sys_test.sh
+          ./.github/scripts/run_sys_test.sh
