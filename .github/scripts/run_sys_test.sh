@@ -21,15 +21,6 @@ done
 
 echo -e $accumulated_result
 
-request_body="{ \"body\": \"$accumulated_result\" }"
-
-curl \
-    -X POST \
-    $URL \
-    -H "Content-Type: application/json" \
-    -H "Authorization: token $GITHUB_TOKEN" \
-    --data-raw "$request_body"
-
 # Check if accumulated_result contains "Failed"
 if [[ $accumulated_result == *"Failed"* ]]; then
     echo "Some tests are failing. Exiting with status code 1."
