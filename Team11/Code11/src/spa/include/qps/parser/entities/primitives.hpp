@@ -6,8 +6,7 @@
 
 namespace qps {
 
-class Ref {
-};
+class Ref {};
 
 class WildCard : public Ref {
     std::string value = "_";

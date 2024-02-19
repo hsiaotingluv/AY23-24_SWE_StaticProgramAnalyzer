@@ -6,14 +6,15 @@
 
 namespace qps {
 class ClauseEvaluator {
-protected:
+  protected:
     std::shared_ptr<ReadFacade> read_facade;
 
-public:
+  public:
     virtual ~ClauseEvaluator() = default;
 
-    explicit ClauseEvaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)){}
+    explicit ClauseEvaluator(std::shared_ptr<ReadFacade> read_facade) : read_facade(std::move(read_facade)) {
+    }
 
     virtual auto evaluate() -> std::optional<Table> = 0;
 };
-}
+} // namespace qps

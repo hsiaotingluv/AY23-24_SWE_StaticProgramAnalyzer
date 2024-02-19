@@ -1,7 +1,7 @@
 #include "qps/evaluators/simple_evaluator.hpp"
 #include "qps/evaluators/entities/entity_scanner.hpp"
-#include "qps/parser/entities/synonym.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
+#include "qps/parser/entities/synonym.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -63,8 +63,8 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
     const auto record1 = table1.get_records();
     const auto record2 = table2.get_records();
 
-    for (const auto &record1 : table1.get_records()) {
-        for (const auto &record2 : table2.get_records()) {
+    for (const auto& record1 : table1.get_records()) {
+        for (const auto& record2 : table2.get_records()) {
             auto new_record = std::vector<std::string>(new_column.size(), "");
             auto has_conflict = false;
 
@@ -149,7 +149,8 @@ auto Evaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string
         const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause);
         const auto relationship = such_that_clause->rel_ref;
 
-        const std::shared_ptr<ClauseEvaluator> evaluator = std::visit(clause_evaluator_selector(read_facade), relationship);
+        const std::shared_ptr<ClauseEvaluator> evaluator =
+            std::visit(clause_evaluator_selector(read_facade), relationship);
         const auto maybe_table = evaluator->evaluate();
         if (!maybe_table.has_value()) {
             return {};

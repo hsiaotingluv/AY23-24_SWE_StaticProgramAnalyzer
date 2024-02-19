@@ -1,11 +1,10 @@
 #pragma once
 
 #include "pkb/facades/read_facade.h"
-#include "qps/evaluators/entities/entity_scanner.hpp"
+#include "qps/evaluators/relationship/clause_evaluator.hpp"
+#include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
-#include "clause_evaluator.hpp"
-#include "qps/parser/entities/relationship.hpp"
 
 #include <memory>
 #include <optional>
@@ -19,8 +18,9 @@ class ModifiesSEvaluator : public ClauseEvaluator {
 
     static auto eval_modifies(const std::shared_ptr<ReadFacade>& read_facade);
 
-public:
-    ModifiesSEvaluator(std::shared_ptr<ReadFacade> read_facade, ModifiesS modifies_s) : ClauseEvaluator(std::move(read_facade)), modifies_s(std::move(modifies_s)) {
+  public:
+    ModifiesSEvaluator(std::shared_ptr<ReadFacade> read_facade, ModifiesS modifies_s)
+        : ClauseEvaluator(std::move(read_facade)), modifies_s(std::move(modifies_s)) {
     }
 
     auto evaluate() -> std::optional<Table> override;
