@@ -99,6 +99,16 @@ void measure_evaluation(const std::vector<Query>& query_objects, const std::uniq
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
         measured_times_ms.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count());
+
+        std::cout << "Query: " << obj.query_id << " - " << obj.comment << std::endl;
+        std::cout << "Expected: " << obj.expected_result << std::endl;
+        std::cout << "Result: ";
+        for (const auto& result : results) {
+            std::cout << result << " ";
+        }
+        std::cout << std::endl << std::endl;
+
+        results.clear();
     }
 
     auto measured_time_ms =
@@ -120,8 +130,7 @@ auto main(int argc, char** argv) -> int {
     auto wrapper = std::unique_ptr<AbstractWrapper>(WrapperFactory::createWrapper());
 
     std::cout << "Parsing source file..." << std::endl;
-    measure_parse(wrapper, argv[1]);
-
+    measure_parse(wrapper, argv[1], 0);
     std::cout << std::endl;
 
     std::cout << "Evaluating queries..." << std::endl;
