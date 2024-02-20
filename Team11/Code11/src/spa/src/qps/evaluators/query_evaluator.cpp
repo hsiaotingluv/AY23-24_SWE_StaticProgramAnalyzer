@@ -26,12 +26,16 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 
     // Step 1: populate all synonyms
     for (const auto& clause : query_obj.clauses) {
-
         if (const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
             const auto relationship = such_that_clause->rel_ref;
             evaluator = std::visit(clause_evaluator_selector(read_facade), relationship);
         } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
             evaluator = std::make_shared<PatternEvaluator>(read_facade, *pattern_clause);
+        }
+
+        if (evaluator == nullptr) {
+            std::cerr << "Failed to create evaluator for clause: " << *clause << std::endl;
+            return {};
         }
 
         const auto maybe_table = evaluator->evaluate();
