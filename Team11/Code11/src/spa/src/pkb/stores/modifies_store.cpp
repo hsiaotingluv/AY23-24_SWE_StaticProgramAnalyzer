@@ -18,23 +18,23 @@ bool ModifiesStore::does_procedure_modify_var(const Procedure& p, const Variable
     return procedure_modifies_var_store.contains(p, v);
 }
 
-std::unordered_set<Variable> ModifiesStore::get_vars_modified_by_statement(const StatementNumber& s) {
+ModifiesStore::VariableSet ModifiesStore::get_vars_modified_by_statement(const StatementNumber& s) {
     return statement_modifies_var_store.getValuesByKey(s);
 };
 
-std::unordered_set<Variable> ModifiesStore::get_vars_modified_by_procedure(const Procedure& p) {
+ModifiesStore::VariableSet ModifiesStore::get_vars_modified_by_procedure(const Procedure& p) {
     return procedure_modifies_var_store.getValuesByKey(p);
 };
 
-std::unordered_set<ModifiesStore::StatementNumber> ModifiesStore::get_statements_that_modify_var(const Variable& v) {
+ModifiesStore::StatementSet ModifiesStore::get_statements_that_modify_var(const Variable& v) {
     return statement_modifies_var_store.getKeysByValue(v);
 };
 
-std::unordered_set<Procedure> ModifiesStore::get_procedures_that_modify_var(const Variable& v) {
+ModifiesStore::ProcedureSet ModifiesStore::get_procedures_that_modify_var(const Variable& v) {
     return procedure_modifies_var_store.getKeysByValue(v);
 };
 
-std::unordered_set<ModifiesStore::StatementNumber> ModifiesStore::get_all_statements_that_modify() {
+ModifiesStore::StatementSet ModifiesStore::get_all_statements_that_modify() {
     return statement_modifies_var_store.getAllKeys();
 };
 
@@ -46,7 +46,7 @@ ModifiesStore::StatementNumberVariableTupleSet ModifiesStore::get_all_statements
     return statement_modifies_var_store.getAllPairs();
 };
 
-std::unordered_set<Procedure> ModifiesStore::get_all_procedures_that_modify() {
+ModifiesStore::ProcedureSet ModifiesStore::get_all_procedures_that_modify() {
     return procedure_modifies_var_store.getAllKeys();
 };
 
