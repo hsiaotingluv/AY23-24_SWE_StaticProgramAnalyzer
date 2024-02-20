@@ -88,7 +88,6 @@ variable v;
 Select v such that Parent(v, 4)
 SemanticError
 5000
-5000
 19 - Invalid First Argument (procedure) in Parent Clause
 procedure p;
 Select p such that Parent(p, _)
