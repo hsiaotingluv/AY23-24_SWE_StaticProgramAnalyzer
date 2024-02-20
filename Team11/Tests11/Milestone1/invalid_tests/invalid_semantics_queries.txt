@@ -98,192 +98,172 @@ constant c;
 Select c such that Parent(c, _)
 SemanticError
 5000
-21 - Invalid First Argument (assign) in Parent Clause
-assign a;
-Select a such that Parent(a, _)
-SemanticError
-5000
-22 - Invalid Second Argument (procedure) in Parent Clause
+21 - Invalid Second Argument (procedure) in Parent Clause
 procedure p; variable v;
 Select v such that Parent(4, p)
 SemanticError
 5000
-23 - Undeclared Synonym in Parent* Clause
+22 - Undeclared Synonym in Parent* Clause
 stmt s1;
 Select s1 such that Parent*(s1, undeclaredSynonym)
 SemanticError
 5000
-24 - Invalid First Argument (variable) in Parent* Clause
+23 - Invalid First Argument (variable) in Parent* Clause
 variable v;
 Select v such that Parent*(v, 4)
 SemanticError
 5000
-25 - Invalid First Argument (read) in Parent* Clause
-read r;
-Select r such that Parent*(r, 4)
-SemanticError
-5000
-26 - Invalid First Argument (procedure) in Parent* Clause
+24 - Invalid First Argument (procedure) in Parent* Clause
 procedure p;
 Select p such that Parent(p, _)
 SemanticError
 5000
-27 - Invalid First Argument (print) in Parent* Clause
-print p;
-Select p such that Parent*(p, _)
-SemanticError
-5000
-28 - Invalid First Argument (constant) in Parent* Clause
+25 - Invalid First Argument (constant) in Parent* Clause
 constant c;
 Select c such that Parent*(c, _)
 SemanticError
 5000
-29 - Invalid First Argument (assign) in Parent* Clause
-assign a;
-Select a such that Parent*(a, _)
-SemanticError
-5000
-30 - Invalid Second Argument (procedure) in Parent* Clause
+26 - Invalid Second Argument (procedure) in Parent* Clause
 procedure p; variable v;
 Select v such that Parent*(4, p)
 SemanticError
 5000
-31 - Undeclared Synonym in Uses Clause
+27 - Undeclared Synonym in Uses Clause
 stmt s1;
 Select s1 such that Uses(s1, undeclaredSynonym)
 SemanticError
 5000
-32 - Invalid First Argument (constant) in Uses Clause
+28 - Invalid First Argument (constant) in Uses Clause
 constant c;
 Select c such that Uses(c, "x")
 SemanticError
 5000
-33 - Invalid First Argument (wildcard) in Uses Clause
+29 - Invalid First Argument (wildcard) in Uses Clause
 stmt s;
 Select s such that Uses(_, "x")
 SemanticError
 5000
-34 - Invalid First Argument (variable) in Uses Clause
+30 - Invalid First Argument (variable) in Uses Clause
 variable v;
 Select v such that Uses(v, _)
 SemanticError
 5000
-35 - Invalid First Argument (print) in Uses Clause
+31 - Invalid First Argument (print) in Uses Clause
 print p;
 Select s such that Uses(p, _)
 SemanticError
 5000
-36 - Undeclared Synonym in Modifies Clause
+32 - Undeclared Synonym in Modifies Clause
 stmt s1;
 Select s1 such that Modifies(s1, undeclaredSynonym)
 SemanticError
 5000
-37 - Invalid First Argument (constant) in Modifies Clause
+33 - Invalid First Argument (constant) in Modifies Clause
 constant c;
 Select c such that Modifies(c, "x")
 SemanticError
 5000
-38 - Invalid First Argument (wildcard) in Modifies Clause
+34 - Invalid First Argument (wildcard) in Modifies Clause
 stmt s;
 Select s such that Modifies(_, "x")
 SemanticError
 5000
-39 - Invalid First Argument (variable) in Modifies Clause
+35 - Invalid First Argument (variable) in Modifies Clause
 variable v;
 Select v such that Modifies(v, _)
 SemanticError
 5000
-40 - Invalid Second Argument (read) in Modifies Clause
+36 - Invalid Second Argument (read) in Modifies Clause
 read r;
 Select r such that Modifies(1, r)
 SemanticError
 5000
-41 - Invalid Second Argument (procedure) in Modifies Clause
+37 - Invalid Second Argument (procedure) in Modifies Clause
 procedure p;
 Select p such that Modifies(1, p)
 SemanticError
 5000
-42 - Invalid Second Argument (statement) in Modifies Clause
+38 - Invalid Second Argument (statement) in Modifies Clause
 stmt s;
 Select s such that Modifies(1, s)
 SemanticError
 5000
-43 - Invalid Second Argument (print) in Modifies Clause
+39 - Invalid Second Argument (print) in Modifies Clause
 print p;
 Select p such that Modifies(1, p)
 SemanticError
 5000
-44 - Invalid Second Argument (assign) in Modifies Clause
+40 - Invalid Second Argument (assign) in Modifies Clause
 assign a;
 Select a such that Modifies(1, a)
 SemanticError
 5000
-45 - Invalid Second Argument (while) in Modifies Clause
+41 - Invalid Second Argument (while) in Modifies Clause
 while w;
 Select w such that Modifies(1, w)
 SemanticError
 5000
-46 - Invalid Second Argument (if) in Modifies Clause
+42 - Invalid Second Argument (if) in Modifies Clause
 if i;
 Select i such that Modifies(1, i)
 SemanticError
 5000
-47 - Invalid Second Argument (constant) in Modifies Clause
+43 - Invalid Second Argument (constant) in Modifies Clause
 constant c;
 Select c such that Modifies(1, c)
 SemanticError
 5000
-48 - Not Assign Synonym in Pattern Clause
+44 - Not Assign Synonym in Pattern Clause
 stmt s;
 Select s pattern s(_, _)
 SemanticError
 5000
-49 - Undeclared Synonym in Pattern Clause
+45 - Undeclared Synonym in Pattern Clause
 assign a; variable v;
 Select a pattern a (v1, _)
 SemanticError
 5000
-50 - Invalid First Argument (print) in Pattern Clause
+46 - Invalid First Argument (print) in Pattern Clause
 assign a; print p;
 Select a pattern a(p, _)
 SemanticError
 5000
-51 - Invalid First Argument (procedure) in Pattern Clause
+47 - Invalid First Argument (procedure) in Pattern Clause
 assign a; procedure p;
 Select a pattern a(p, _)
 SemanticError
 5000
-52 - Invalid First Argument (statement) in Pattern Clause
+48 - Invalid First Argument (statement) in Pattern Clause
 assign a; stmt s;
 Select a pattern a(s, _)
 SemanticError
 5000
-53 - Invalid First Argument (read) in Pattern Clause
+49 - Invalid First Argument (read) in Pattern Clause
 assign a; read r;
 Select a pattern a(r, _)
 SemanticError
 5000
-54 - Invalid First Argument (assign) in Pattern Clause
+50 - Invalid First Argument (assign) in Pattern Clause
 assign a;
 Select a pattern a(a, _)
 SemanticError
 5000
-55 - Invalid First Argument (while) in Pattern Clause
+51 - Invalid First Argument (while) in Pattern Clause
 assign a; while w;
 Select a pattern a(w, _)
 SemanticError
 5000
-56 - Invalid First Argument (if) in Pattern Clause
+52 - Invalid First Argument (if) in Pattern Clause
 assign a; if i;
 Select a pattern a(i, _)
 SemanticError
 5000
-57 - Invalid First Argument (constant) in Pattern Clause
+53 - Invalid First Argument (constant) in Pattern Clause
 assign a; constant c;
 Select a pattern a(c, _)
 SemanticError
 5000
-58 - Invalid Second Argument (constant) in Pattern Clause
+54 - Invalid Second Argument (constant) in Pattern Clause
 assign a; constant c;
 Select a pattern a(c, _)
 SemanticError
