@@ -39,30 +39,128 @@ TEST_CASE("Simple Statement Test") {
     }
 }
 
-TEST_CASE("Follows and FollowsStar Test") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+TEST_CASE("Follows and FollowsStar Relationship Test") {
+    SECTION("Follows and FollowsStar Transitive Relationship Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
 
-    write_facade->add_follows("1", "2");
-    write_facade->add_follows("2", "3");
-    write_facade->add_follows("3", "4");
-    write_facade->add_follows("4", "5");
-    write_facade->finalise_pkb();
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->add_follows("4", "5");
+        write_facade->finalise_pkb();
 
-    REQUIRE(read_facade->has_follows("1", "2"));
-    REQUIRE(read_facade->has_follows("2", "3"));
-    REQUIRE(read_facade->has_follows("3", "4"));
-    REQUIRE(read_facade->has_follows("4", "5"));
+        REQUIRE(read_facade->has_follows("1", "2"));
+        REQUIRE(read_facade->has_follows("2", "3"));
+        REQUIRE(read_facade->has_follows("3", "4"));
+        REQUIRE(read_facade->has_follows("4", "5"));
 
-    REQUIRE(read_facade->has_follows_stars("1", "2"));
-    REQUIRE(read_facade->has_follows_stars("1", "3"));
-    REQUIRE(read_facade->has_follows_stars("1", "4"));
-    REQUIRE(read_facade->has_follows_stars("1", "5"));
-    REQUIRE(read_facade->has_follows_stars("2", "3"));
-    REQUIRE(read_facade->has_follows_stars("2", "4"));
-    REQUIRE(read_facade->has_follows_stars("2", "5"));
-    REQUIRE(read_facade->has_follows_stars("3", "4"));
-    REQUIRE(read_facade->has_follows_stars("3", "5"));
-    REQUIRE(read_facade->has_follows_stars("4", "5"));
+        REQUIRE(read_facade->has_follows_stars("1", "2"));
+        REQUIRE(read_facade->has_follows_stars("1", "3"));
+        REQUIRE(read_facade->has_follows_stars("1", "4"));
+        REQUIRE(read_facade->has_follows_stars("1", "5"));
+        REQUIRE(read_facade->has_follows_stars("2", "3"));
+        REQUIRE(read_facade->has_follows_stars("2", "4"));
+        REQUIRE(read_facade->has_follows_stars("2", "5"));
+        REQUIRE(read_facade->has_follows_stars("3", "4"));
+        REQUIRE(read_facade->has_follows_stars("3", "5"));
+        REQUIRE(read_facade->has_follows_stars("4", "5"));
+    }
+
+    SECTION("Get All Followee By Statement Type Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->add_follows("4", "5");
+        write_facade->add_follows("5", "6");
+        write_facade->add_follows("6", "7");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Print);
+        write_facade->add_statement("3", StatementType::While);
+        write_facade->add_statement("4", StatementType::Assign);
+        write_facade->add_statement("5", StatementType::If);
+        write_facade->add_statement("6", StatementType::Call);
+        write_facade->add_statement("7", StatementType::Read);
+
+        REQUIRE(read_facade->get_all_follows_keys(StatementType::Read).size() == 1);
+        REQUIRE(read_facade->get_all_follows_keys(StatementType::Print).size() == 1);
+        REQUIRE(read_facade->get_all_follows_keys(StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_keys(StatementType::Assign).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_keys(StatementType::If).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_keys(StatementType::Call).size() == 1);
+    }
+
+    SECTION("Get All Followers By Statement Type Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->add_follows("4", "5");
+        write_facade->add_follows("5", "6");
+        write_facade->add_follows("6", "7");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Print);
+        write_facade->add_statement("3", StatementType::While);
+        write_facade->add_statement("4", StatementType::Assign);
+        write_facade->add_statement("5", StatementType::If);
+        write_facade->add_statement("6", StatementType::Call);
+        write_facade->add_statement("7", StatementType::Read);
+
+        REQUIRE(read_facade->get_all_follows_values(StatementType::Read).size() == 1);
+        REQUIRE(read_facade->get_all_follows_values(StatementType::Print).size() == 1);
+        REQUIRE(read_facade->get_all_follows_values(StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_values(StatementType::Assign).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_values(StatementType::If).size() == 1);
+        REQUIRE(read_facade->get_all_follows_star_values(StatementType::Call).size() == 1);
+    }
+
+    SECTION("Get All followers Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Print);
+        write_facade->add_statement("3", StatementType::While);
+        write_facade->add_statement("4", StatementType::While);
+
+        REQUIRE(read_facade->get_follows_following("1") == "2");
+        REQUIRE(read_facade->get_follows_stars_following("1").size() == 3);
+        REQUIRE(read_facade->get_follows_following("1", StatementType::Read).empty());
+        REQUIRE(read_facade->get_follows_following("1", StatementType::Print) == "2");
+        REQUIRE(read_facade->get_follows_stars_following("1", StatementType::Read).empty());
+        REQUIRE(read_facade->get_follows_stars_following("1", StatementType::While).size() == 2);
+    }
+
+    SECTION("Get All Followee by Follower Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::While);
+        write_facade->add_statement("3", StatementType::While);
+        write_facade->add_statement("4", StatementType::While);
+
+        REQUIRE(read_facade->get_follows_by("2") == "1");
+        REQUIRE(read_facade->get_follows_stars_by("4").size() == 3);
+        REQUIRE(read_facade->get_follows_by("2", StatementType::Read) == "1");
+        REQUIRE(read_facade->get_follows_by("2", StatementType::Print).empty());
+        REQUIRE(read_facade->get_follows_stars_by("4", StatementType::While).size() == 2);
+        REQUIRE(read_facade->get_follows_stars_by("4", StatementType::If).empty());
+    }
 }
 
 TEST_CASE("Parent Test") {
