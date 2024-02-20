@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "pkb/abstraction/OneToManyStore.h"
+
 /**
  * stores and manages the Parent and Parent* (transitive) relationships
  * between statements in a SIMPLE program.
@@ -15,6 +17,7 @@ class ParentStore {
     using StatementSet = std::unordered_set<StatementNumber>;
     using StatementToSetMap = std::unordered_map<StatementNumber, StatementSet>;
     using StatementToStatementMap = std::unordered_map<StatementNumber, StatementNumber>;
+    using StatementToStatementSetStore = OneToManyStore<StatementNumber, StatementNumber>;
 
     ParentStore();
 
@@ -124,8 +127,6 @@ class ParentStore {
     [[nodiscard]] StatementSet get_star_parent(const StatementNumber& child) const;
 
   private:
-    StatementToSetMap parent_store;
-    StatementToStatementMap reversed_parent_store;
-    StatementToSetMap parent_star_store;
-    StatementToSetMap reversed_parent_star_store;
+    StatementToStatementSetStore parent_store;
+    StatementToStatementSetStore parent_star_store;
 };

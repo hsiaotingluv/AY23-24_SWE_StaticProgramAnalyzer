@@ -9,14 +9,13 @@ ParentStore::ParentStore() = default;
 
 void ParentStore::add_parent(const StatementNumber& parent, const StatementNumber& child) {
     // Add to direct parent-child store
-    parent_store[parent].insert(child);
-    reversed_parent_store[child] = parent;
+    parent_store.add(parent, child);
 }
 
 void ParentStore::populate_parent_and_reverse_parent_star() {
     // Extract all the parent relationships into a vector of tuples
     std::vector<std::tuple<StatementNumber, StatementNumber>> parent_relationships;
-    for (const auto& pair : parent_store) {
+    for (const auto& pair : parent_store.getAll()) {
         for (const auto& child : pair.second) {
             parent_relationships.emplace_back(pair.first, child);
         }
@@ -31,97 +30,63 @@ void ParentStore::populate_parent_and_reverse_parent_star() {
     // parent_relationships
     for (auto it = parent_relationships.rbegin(); it != parent_relationships.rend(); ++it) {
         const auto& [parent, child] = *it;
-        parent_star_store[parent].insert(child);
-        reversed_parent_star_store[child].insert(parent);
+        parent_star_store.add(parent, child);
 
         // Add all the parent_star relationships from child to parent
-        if (parent_star_store.find(child) != parent_star_store.end()) {
-            for (const auto& grandchild : parent_star_store.at(child)) {
-                parent_star_store[parent].insert(grandchild);
-                reversed_parent_star_store[grandchild].insert(parent);
-            }
+        for (const auto& grandchild : parent_star_store.getValuesByKey(child)) {
+            parent_star_store.add(parent, grandchild);
         }
     }
 }
 
 bool ParentStore::has_parent(const StatementNumber& parent, const StatementNumber& child) const {
-    auto it = parent_store.find(parent);
-    return it != parent_store.end() && it->second.find(child) != it->second.end();
+    return parent_store.contains(parent, child);
 }
 
 ParentStore::StatementToSetMap ParentStore::get_all_parent() const {
-    return parent_store;
+    return parent_store.getAll();
 }
 
 ParentStore::StatementSet ParentStore::get_all_parent_keys() const {
-    StatementSet keys;
-    for (const auto& pair : parent_store) {
-        keys.insert(pair.first);
-    }
-    return keys;
+    return parent_store.getAllKeys();
 }
 
 ParentStore::StatementSet ParentStore::get_all_parent_values() const {
-    StatementSet values;
-    for (const auto& pair : parent_store) {
-        values.insert(pair.second.begin(), pair.second.end());
-    }
-    return values;
-};
+    return parent_store.getAllValues();
+}
 
 ParentStore::StatementSet ParentStore::get_parent_children(const StatementNumber& parent) const {
-    auto it = parent_store.find(parent);
-    if (it != parent_store.end()) {
-        return it->second;
-    }
-    return {};
+    return parent_store.getValuesByKey(parent);
 }
 
 ParentStore::StatementNumber ParentStore::get_parent(const StatementNumber& child) const {
-    auto it = reversed_parent_store.find(child);
-    if (it != reversed_parent_store.end()) {
-        return it->second;
+    auto parentSet = parent_store.getKeysByValue(child);
+    if (!parentSet.empty()) {
+        return *parentSet.begin();
     }
-    return ""; // Return an empty string to indicate no parent found
+    return "";
 }
 
 bool ParentStore::has_parent_star(const StatementNumber& parent, const StatementNumber& child) const {
-    auto it = parent_star_store.find(parent);
-    return it != parent_star_store.end() && it->second.find(child) != it->second.end();
+    return parent_star_store.contains(parent, child);
 }
 
 ParentStore::StatementToSetMap ParentStore::get_all_parent_star() const {
-    return parent_star_store;
+    return parent_star_store.getAll();
 }
 
 ParentStore::StatementSet ParentStore::get_all_parent_star_keys() const {
-    StatementSet keys;
-    for (const auto& pair : parent_star_store) {
-        keys.insert(pair.first);
-    }
-    return keys;
+    return parent_star_store.getAllKeys();
 }
 
 ParentStore::StatementSet ParentStore::get_all_parent_star_values() const {
-    StatementSet values;
-    for (const auto& pair : parent_star_store) {
-        values.insert(pair.second.begin(), pair.second.end());
-    }
-    return values;
+    return parent_star_store.getAllValues();
 }
 
 ParentStore::StatementSet ParentStore::get_parent_star_children(const StatementNumber& parent) const {
-    auto it = parent_star_store.find(parent);
-    if (it != parent_star_store.end()) {
-        return it->second;
-    }
-    return {};
+    return parent_star_store.getValuesByKey(parent);
 }
 
 ParentStore::StatementSet ParentStore::get_star_parent(const StatementNumber& child) const {
-    auto it = reversed_parent_star_store.find(child);
-    if (it != reversed_parent_star_store.end()) {
-        return it->second;
-    }
-    return {};
+    return parent_star_store.getKeysByValue(child);
 }
