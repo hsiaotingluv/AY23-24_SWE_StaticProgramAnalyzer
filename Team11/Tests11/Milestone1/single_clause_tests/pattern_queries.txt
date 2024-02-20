@@ -86,7 +86,7 @@ none
 18 - Test pattern (SELECT keyword as var, exact_match_var)
 assign pattern; variable Select;
 Select Select pattern pattern (Select, "x")
-6
+y
 5000
 19 - Test pattern (SELECT keyword as var, partial_match_var)
 assign pattern; variable Select;
