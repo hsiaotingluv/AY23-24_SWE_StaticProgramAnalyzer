@@ -334,8 +334,18 @@ std::unordered_set<std::string> ReadFacade::get_all_follows_keys() const {
     return this->pkb->follows_store->get_all_follows_keys();
 }
 
+std::unordered_set<std::string> ReadFacade::get_all_follows_keys(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_all_follows_keys();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_follows_values() const {
     return this->pkb->follows_store->get_all_follows_values();
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_follows_values(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_all_follows_values();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 bool ReadFacade::has_follows(const std::string& stmt1, const std::string& stmt2) const {
@@ -346,8 +356,32 @@ std::string ReadFacade::get_follows_following(const std::string& s) const {
     return this->pkb->follows_store->get_follows_following(s);
 }
 
+std::string ReadFacade::get_follows_following(const std::string& s, const StatementType& statementType) const {
+    auto stmt = this->pkb->follows_store->get_follows_following(s);
+
+    if (this->pkb->statement_store->get_statement_type(stmt) == statementType) {
+        return stmt;
+    }
+
+    return "";
+}
+
 std::string ReadFacade::get_follows_by(const std::string& s) const {
     return this->pkb->follows_store->get_follows_by(s);
+}
+
+std::string ReadFacade::get_follows_by(const std::string& s, const StatementType& statementType) const {
+    auto stmt = this->pkb->follows_store->get_follows_by(s);
+
+    if (this->pkb->statement_store->get_statement_type(stmt) == statementType) {
+        return stmt;
+    }
+
+    return "";
+}
+
+bool ReadFacade::has_follows_stars(const std::string& stmt1, const std::string& stmt2) const {
+    return this->pkb->follows_store->has_follows_stars(stmt1, stmt2);
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::get_all_follows_star() const {
@@ -358,20 +392,38 @@ std::unordered_set<std::string> ReadFacade::get_all_follows_star_keys() const {
     return this->pkb->follows_store->get_all_follows_star_keys();
 }
 
+std::unordered_set<std::string> ReadFacade::get_all_follows_star_keys(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_all_follows_star_keys();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_follows_star_values() const {
     return this->pkb->follows_store->get_all_follows_star_values();
 }
 
-bool ReadFacade::has_follows_stars(const std::string& stmt1, const std::string& stmt2) const {
-    return this->pkb->follows_store->has_follows_stars(stmt1, stmt2);
+std::unordered_set<std::string> ReadFacade::get_all_follows_star_values(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_all_follows_star_values();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 std::unordered_set<std::string> ReadFacade::get_follows_stars_following(const std::string& stmt) const {
     return this->pkb->follows_store->get_follows_stars_following(stmt);
 }
 
+std::unordered_set<std::string> ReadFacade::get_follows_stars_following(const std::string& stmt,
+                                                                        const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_follows_stars_following(stmt);
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::string& stmt) const {
     return this->pkb->follows_store->get_follows_stars_by(stmt);
+}
+
+std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::string& stmt,
+                                                                 const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->follows_store->get_follows_stars_by(stmt);
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 bool ReadFacade::has_parent(const std::string& parent, const std::string& child) const {

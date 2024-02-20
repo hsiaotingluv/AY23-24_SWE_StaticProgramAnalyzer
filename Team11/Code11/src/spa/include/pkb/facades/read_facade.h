@@ -103,30 +103,43 @@ class ReadFacade {
 
     std::unordered_map<std::string, std::string> get_all_follows() const;
 
-    // Gets all statements followed by another statement from Follows relationship
     std::unordered_set<std::string> get_all_follows_keys() const;
 
-    // Gets all statements following another statement from Follows relationship
+    std::unordered_set<std::string> get_all_follows_keys(const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_all_follows_values() const;
+
+    std::unordered_set<std::string> get_all_follows_values(const StatementType& statementType) const;
 
     std::string get_follows_following(const std::string& s) const;
 
+    std::string get_follows_following(const std::string& s, const StatementType& statementType) const;
+
     std::string get_follows_by(const std::string& s) const;
+
+    std::string get_follows_by(const std::string& s, const StatementType& statementType) const;
 
     bool has_follows_stars(const std::string& stmt1, const std::string& stmt2) const;
 
-    // Gets all transitive Follows relationship
     std::unordered_map<std::string, std::unordered_set<std::string>> get_all_follows_star() const;
 
-    // Gets all statements followed by another statement from Follows relationship
     std::unordered_set<std::string> get_all_follows_star_keys() const;
 
-    // Gets all statements following another statement from Follows relationship
+    std::unordered_set<std::string> get_all_follows_star_keys(const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_all_follows_star_values() const;
+
+    std::unordered_set<std::string> get_all_follows_star_values(const StatementType& statementType) const;
 
     std::unordered_set<std::string> get_follows_stars_following(const std::string& stmt) const;
 
+    std::unordered_set<std::string> get_follows_stars_following(const std::string& stmt,
+                                                                const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_follows_stars_by(const std::string& stmt) const;
+
+    std::unordered_set<std::string> get_follows_stars_by(const std::string& stmt,
+                                                         const StatementType& statementType) const;
 
     // Parent-related Read Operations
     bool has_parent(const std::string& parent, const std::string& child) const;
