@@ -12,17 +12,47 @@ TEST_CASE("Test Junk") {
         const auto& [success, rest] = result.value();
         REQUIRE(success.T == TokenType::Junk);
         REQUIRE(success.content == "\n");
-        REQUIRE(rest == "");
+        REQUIRE(rest.empty());
     }
 
-    SECTION("tab - success") {
+    SECTION("horizontal tab - success") {
         const auto result = junk_tokenizer.tokenize("\t");
         REQUIRE(result.has_value());
 
         const auto& [success, rest] = result.value();
         REQUIRE(success.T == TokenType::Junk);
         REQUIRE(success.content == "\t");
-        REQUIRE(rest == "");
+        REQUIRE(rest.empty());
+    }
+
+    SECTION("vertical tab - success") {
+        const auto result = junk_tokenizer.tokenize("\v");
+        REQUIRE(result.has_value());
+
+        const auto& [success, rest] = result.value();
+        REQUIRE(success.T == TokenType::Junk);
+        REQUIRE(success.content == "\v");
+        REQUIRE(rest.empty());
+    }
+
+    SECTION("form feed - success") {
+        const auto result = junk_tokenizer.tokenize("\f");
+        REQUIRE(result.has_value());
+
+        const auto& [success, rest] = result.value();
+        REQUIRE(success.T == TokenType::Junk);
+        REQUIRE(success.content == "\f");
+        REQUIRE(rest.empty());
+    }
+
+    SECTION("carriage return - success") {
+        const auto result = junk_tokenizer.tokenize("\r");
+        REQUIRE(result.has_value());
+
+        const auto& [success, rest] = result.value();
+        REQUIRE(success.T == TokenType::Junk);
+        REQUIRE(success.content == "\r");
+        REQUIRE(rest.empty());
     }
 
     SECTION("spaces - success") {
