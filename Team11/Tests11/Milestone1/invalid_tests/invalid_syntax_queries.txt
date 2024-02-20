@@ -55,6 +55,7 @@ SyntaxError
 5000
 13 - Missing Select Statement
 assign a;
+
 SyntaxError
 5000
 14 - Extra Characters Before Query
@@ -185,10 +186,5 @@ SyntaxError
 38 - Missing Synonym in Such That Clause
 assign a; variable v;
 Select such that Uses(a,v)
-SyntaxError
-5000
-39 - Invalid IDENT Argument in Modifies Clause
-assign a;
-Select a such that Modifies(a, "ident")
 SyntaxError
 5000
