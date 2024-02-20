@@ -33,7 +33,7 @@ auto ParentTraverser::get_parent_while(const std::shared_ptr<AstNode>& node) -> 
 
     // Traverse the statement list
     const auto stmt_list = while_node->stmt_list;
-    const auto children_stmt_num = get_stmt_nums_from_stmt_lst(stmt_list);
+    auto children_stmt_num = get_stmt_nums_from_stmt_lst(stmt_list);
     for (const auto& child_stmt_num : children_stmt_num) {
         write_facade->add_parent(parent_stmt_number, child_stmt_num);
     }
