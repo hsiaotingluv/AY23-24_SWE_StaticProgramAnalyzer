@@ -30,10 +30,31 @@ class NewlineTokenizer : public Tokenizer {
 /**
  * @brief Tokenizer class for the tab character.
  */
-class TabTokenizer : public Tokenizer {
+class HorizontalTabTokenizer : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "\t", TokenType::Junk);
+    }
+};
+
+class VerticalTabTokenizer : public Tokenizer {
+  public:
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        return tokenize_string(input, "\v", TokenType::Junk);
+    }
+};
+
+class FormFeedTokenizer : public Tokenizer {
+  public:
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        return tokenize_string(input, "\f", TokenType::Junk);
+    }
+};
+
+class CarriageReturnTokenizer : public Tokenizer {
+  public:
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        return tokenize_string(input, "\r", TokenType::Junk);
     }
 };
 
@@ -42,9 +63,10 @@ class TabTokenizer : public Tokenizer {
  */
 class JunkTokenizer : public Tokenizer {
   private:
-    static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 3>{
-        std::make_shared<NewlineTokenizer>(), std::make_shared<WhitespaceTokenizer>(),
-        std::make_shared<TabTokenizer>()};
+    static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 6>{
+        std::make_shared<NewlineTokenizer>(),       std::make_shared<WhitespaceTokenizer>(),
+        std::make_shared<VerticalTabTokenizer>(),   std::make_shared<FormFeedTokenizer>(),
+        std::make_shared<HorizontalTabTokenizer>(), std::make_shared<CarriageReturnTokenizer>()};
 
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
