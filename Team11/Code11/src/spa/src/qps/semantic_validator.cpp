@@ -13,8 +13,55 @@
 #include <unordered_map>
 #include <variant>
 
-namespace qps {
+namespace qps::details {
+// Forward declarations
+auto enforce_unique_declarations(const Synonyms& declarations)
+    -> std::optional<std::unordered_map<std::string, std::shared_ptr<Synonym>>>;
 
+auto is_synonym_declared(const Synonyms& declarations,
+                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                         const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<Synonym>>;
+
+auto validate_clause(const Synonyms& declarations,
+                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                     const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>>;
+} // namespace qps::details
+
+namespace qps {
+auto SemanticValidator::validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
+    -> std::variant<Query, SemanticError> {
+    // Declarations must be unique
+    const auto maybe_mapping = details::enforce_unique_declarations(declarations);
+    if (!maybe_mapping.has_value()) {
+        return SemanticError{"Non-unique mapping"};
+    }
+    const auto& mapping = maybe_mapping.value();
+
+    const auto& [references, clauses] = untyped_query;
+
+    // Reference must be declared
+    const auto maybe_reference = details::is_synonym_declared(declarations, mapping, references);
+    if (!maybe_reference.has_value()) {
+        return SemanticError{"Undeclared reference: " + references.get_name().get_value()};
+    }
+
+    const auto& reference = maybe_reference.value();
+
+    // Clauses must be valid
+    std::vector<std::shared_ptr<Clause>> validated_clauses;
+    for (const auto& clause : clauses) {
+        const auto maybe_validated_clause = details::validate_clause(declarations, mapping, clause);
+        if (!maybe_validated_clause.has_value()) {
+            return SemanticError{"Invalid clause"};
+        }
+        validated_clauses.push_back(maybe_validated_clause.value());
+    }
+
+    return Query{declarations, reference, validated_clauses};
+}
+} // namespace qps
+
+namespace qps ::details {
 auto enforce_unique_declarations(const Synonyms& declarations)
     -> std::optional<std::unordered_map<std::string, std::shared_ptr<Synonym>>> {
     std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping;
@@ -217,36 +264,4 @@ auto validate_clause(const Synonyms& declarations,
 
     return std::visit(untyped_clause_visitor(declarations, mapping), clause);
 }
-
-auto SemanticValidator::validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
-    -> std::variant<Query, SemanticError> {
-    // Declarations must be unique
-    const auto maybe_mapping = enforce_unique_declarations(declarations);
-    if (!maybe_mapping.has_value()) {
-        return SemanticError{"Non-unique mapping"};
-    }
-    const auto& mapping = maybe_mapping.value();
-
-    const auto& [references, clauses] = untyped_query;
-
-    // Reference must be declared
-    const auto maybe_reference = is_synonym_declared(declarations, mapping, references);
-    if (!maybe_reference.has_value()) {
-        return SemanticError{"Undeclared reference: " + references.get_name().get_value()};
-    }
-
-    const auto& reference = maybe_reference.value();
-
-    // Clauses must be valid
-    std::vector<std::shared_ptr<Clause>> validated_clauses;
-    for (const auto& clause : clauses) {
-        const auto maybe_validated_clause = validate_clause(declarations, mapping, clause);
-        if (!maybe_validated_clause.has_value()) {
-            return SemanticError{"Invalid clause"};
-        }
-        validated_clauses.push_back(maybe_validated_clause.value());
-    }
-
-    return Query{declarations, reference, validated_clauses};
-}
-}; // namespace qps
+} // namespace qps::details
