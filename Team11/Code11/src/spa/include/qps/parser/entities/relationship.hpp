@@ -171,7 +171,7 @@ struct UsesP {
     ProcedureRefNoWildcard ent1;
     VarRef ent2;
 
-    static constexpr auto keyword = "Uses";
+    static constexpr auto keyword = UsesS::keyword;
 
     UsesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
     }
@@ -253,7 +253,7 @@ struct ModifiesP {
     ProcedureRefNoWildcard ent1;
     VarRef ent2;
 
-    static constexpr auto keyword = "Modifies";
+    static constexpr auto keyword = ModifiesS::keyword;
 
     ModifiesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
     }

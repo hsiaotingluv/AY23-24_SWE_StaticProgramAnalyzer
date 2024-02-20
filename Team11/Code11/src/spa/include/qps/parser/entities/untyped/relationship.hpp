@@ -6,8 +6,7 @@
 namespace qps::untyped {
 
 using UntypedStmtStmtRel = std::tuple<std::string, UntypedStmtRef, UntypedStmtRef>;
-using UntypedStmtEntRel = std::tuple<std::string, UntypedStmtRef, UntypedEntRef>;
-using UntypedEntEntRel = std::tuple<std::string, UntypedEntRef, UntypedEntRef>;
+using UntypedRefEntRel = std::tuple<std::string, UntypedRef, UntypedEntRef>;
 
-using UntypedRelationship = std::variant<UntypedStmtStmtRel, UntypedStmtEntRel, UntypedEntEntRel>;
+using UntypedRelationship = std::variant<UntypedStmtStmtRel, UntypedRefEntRel>;
 } // namespace qps::untyped

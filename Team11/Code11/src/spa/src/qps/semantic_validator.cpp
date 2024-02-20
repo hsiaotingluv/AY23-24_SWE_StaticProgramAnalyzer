@@ -98,8 +98,9 @@ auto get_stmt_synonym(const Synonyms& declarations,
     return maybe_stmt_syn;
 }
 
+template <typename T>
 auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                 const untyped::UntypedStmtRef& x) -> std::optional<StmtRef> {
+                 const T& x) -> std::optional<StmtRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<StmtRef> {
                        const auto maybe_synonym = get_stmt_synonym(declarations, mapping, syn);
@@ -108,6 +109,9 @@ auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::str
                        }
                        return maybe_synonym.value();
                    },
+                   [](const QuotedIdent&) -> std::optional<StmtRef> {
+                       return std::nullopt;
+                   },
                    [](const auto& arg) -> std::optional<StmtRef> {
                        return arg;
                    }},
@@ -115,8 +119,9 @@ auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::str
         x);
 }
 
+template <typename T>
 auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                const untyped::UntypedEntRef& x) -> std::optional<EntRef> {
+                const T& x) -> std::optional<EntRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<EntRef> {
                        const auto maybe_synonym = is_synonym_declared(declarations, mapping, syn);
@@ -124,6 +129,9 @@ auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::stri
                            return std::nullopt;
                        }
                        return maybe_synonym.value();
+                   },
+                   [](const Integer&) -> std::optional<EntRef> {
+                       return std::nullopt;
                    },
                    [](const auto& arg) -> std::optional<EntRef> {
                        return arg;
@@ -162,6 +170,19 @@ auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, cons
     }
 }
 
+auto validate_stmt_ent(const Synonyms& declarations,
+                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                       const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+    -> std::optional<Relationship> {
+    const auto maybe_stmt_ref = to_stmt_ref(declarations, mapping, ref);
+    if (!maybe_stmt_ref.has_value()) {
+        return std::nullopt;
+    }
+
+    const auto stmt_ref = maybe_stmt_ref.value();
+    return validate_stmt_ent(keyword, stmt_ref, ent_ref, StmtEntList{});
+}
+
 auto validate_ent_ent(const std::string&, const EntRef&, const EntRef&, TypeList<>) -> std::optional<Relationship> {
     return std::nullopt;
 }
@@ -177,6 +198,19 @@ auto validate_ent_ent(const std::string& keyword, const EntRef& ent_ref1, const 
     }
 }
 
+auto validate_ent_ent(const Synonyms& declarations,
+                      const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                      const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+    -> std::optional<Relationship> {
+    const auto maybe_stmt_ref = to_ent_ref(declarations, mapping, ref);
+    if (!maybe_stmt_ref.has_value()) {
+        return std::nullopt;
+    }
+
+    const auto stmt_ref = maybe_stmt_ref.value();
+    return validate_ent_ent(keyword, stmt_ref, ent_ref, EntEntList{});
+}
+
 auto untyped_relationship_visitor(const Synonyms& declarations,
                                   const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping) {
     return overloaded{
@@ -190,27 +224,21 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
             }
             return validate_stmt_stmt(keyword, maybe_stmt_ref1.value(), maybe_stmt_ref2.value(), StmtStmtList{});
         },
-        [&declarations, &mapping](const untyped::UntypedStmtEntRel& stmt_ent_rel) -> std::optional<Relationship> {
-            const auto keyword = std::get<0>(stmt_ent_rel);
-            const auto maybe_stmt_ref = to_stmt_ref(declarations, mapping, std::get<1>(stmt_ent_rel));
-            const auto maybe_ent_ref = to_ent_ref(declarations, mapping, std::get<2>(stmt_ent_rel));
+        [&declarations, &mapping](const untyped::UntypedRefEntRel& ref_ent_rel) -> std::optional<Relationship> {
+            const auto& [keyword, ref, ent] = ref_ent_rel;
+            const auto maybe_ent_ref = to_ent_ref(declarations, mapping, ent);
 
-            if (!maybe_stmt_ref.has_value() || !maybe_ent_ref.has_value()) {
+            if (!maybe_ent_ref.has_value()) {
                 return std::nullopt;
             }
+            const auto ent_ref = maybe_ent_ref.value();
 
-            return validate_stmt_ent(keyword, maybe_stmt_ref.value(), maybe_ent_ref.value(), StmtEntList{});
-        },
-        [&declarations, &mapping](const untyped::UntypedEntEntRel& ent_ent_rel) -> std::optional<Relationship> {
-            const auto keyword = std::get<0>(ent_ent_rel);
-            const auto maybe_ent_ref1 = to_ent_ref(declarations, mapping, std::get<1>(ent_ent_rel));
-            const auto maybe_ent_ref2 = to_ent_ref(declarations, mapping, std::get<2>(ent_ent_rel));
-
-            if (!maybe_ent_ref1.has_value() || !maybe_ent_ref2.has_value()) {
-                return std::nullopt;
+            const auto maybe_stmt_ent = validate_stmt_ent(declarations, mapping, keyword, ref, ent_ref);
+            if (maybe_stmt_ent.has_value()) {
+                return maybe_stmt_ent;
             }
 
-            return validate_ent_ent(keyword, maybe_ent_ref1.value(), maybe_ent_ref2.value(), EntEntList{});
+            return validate_ent_ent(declarations, mapping, keyword, ref, ent_ref);
         }};
 };
 

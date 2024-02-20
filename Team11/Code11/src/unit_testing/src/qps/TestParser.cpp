@@ -105,52 +105,33 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
-            untyped::UntypedStmtEntRel{"Uses", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                       untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+            untyped::UntypedRefEntRel{"Uses", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
         REQUIRE(such_that_clause == reference_clause);
     }
 
-// TODO: Fix this test when UsesP and ModifiesP are implemented
-    // SECTION("Query with ent-ent relationship for procedures") {
-    //     const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
-    //     const auto output = parser.parse(query);
+    SECTION("Query with ent-ent relationship for procedures") {
+        const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
+        const auto output = parser.parse(query);
 
-    //     REQUIRE(output.has_value());
-    //     const auto& [declarations, untyped] = output.value();
+        REQUIRE(output.has_value());
+        const auto& [declarations, untyped] = output.value();
 
-    //     REQUIRE(declarations.size() == 2);
-    //     require_value<ProcSynonym>(declarations[0], "p");
-    //     require_value<VarSynonym>(declarations[1], "v");
+        REQUIRE(declarations.size() == 2);
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<VarSynonym>(declarations[1], "v");
 
-    //     const auto& [reference, clauses] = untyped;
-    //     REQUIRE(reference == untyped::UntypedSynonym{IDENT{"p"}});
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"p"}});
 
-    //     REQUIRE(clauses.size() == 1);
-    //     REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
-    //     const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
-    //     const auto reference_clause = untyped::UntypedSuchThatClause{
-    //         untyped::UntypedEntEntRel{"Uses", untyped::UntypedEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-    //                                   untyped::UntypedEntRef{QuotedIdent{"s"}}}};
-    //     const auto rel_ref = std::get<untyped::UntypedEntEntRel>(such_that_clause.rel_ref);
-    //     REQUIRE(std::get<0>(rel_ref) == "Uses");
-    //     std::visit(overloaded{[](const untyped::UntypedSynonym& ref) {
-    //                               REQUIRE(ref == untyped::UntypedSynonym{IDENT{"p"}});
-    //                           },
-    //                           [](const auto& x) {
-    //                               REQUIRE(false);
-    //                           }},
-    //                std::get<1>(rel_ref));
-
-    //     std::visit(overloaded{[](const QuotedIdent& ref) {
-    //                               REQUIRE(ref == QuotedIdent{"p"});
-    //                           },
-    //                           [](const auto& x) {
-    //                               REQUIRE(false);
-    //                           }},
-    //                std::get<2>(rel_ref));
-
-    //     REQUIRE(such_that_clause == reference_clause);
-    // }
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Uses", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"s"}}}};
+        REQUIRE(such_that_clause == reference_clause);
+    }
 
     SECTION("Query with pattern clause") {
         const auto query = R"(        assign a;

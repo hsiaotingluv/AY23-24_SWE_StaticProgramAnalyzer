@@ -8,6 +8,7 @@
 #include "qps/parser/entities/untyped/synonym.hpp"
 
 #include "qps/template_utils.hpp"
+#include <optional>
 #include <vector>
 
 namespace qps {
@@ -244,6 +245,30 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     }
 }
 
+auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+    const auto token = *it;
+    if (is_stmt_ref(token)) {
+        const auto stmt_ref = parse_stmt_ref(token);
+        return std::visit(
+            [it](auto&& arg) -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+                return std::make_tuple(arg, std::next(it));
+            },
+            stmt_ref);
+    } else {
+        const auto maybe_ent_ref = parse_ent_ref(it, end);
+        if (maybe_ent_ref.has_value()) {
+            const auto& [ent_ref, rest] = maybe_ent_ref.value();
+            return std::visit(
+                [it](auto&& arg) -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+                    return std::make_tuple(arg, std::next(it));
+                },
+                ent_ref);
+        }
+        return std::nullopt;
+    }
+}
+
 auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
     return [keyword, is_direct](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
                -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
@@ -283,24 +308,38 @@ auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
     };
 };
 
-auto parse_stmt_ent(const std::string& keyword) {
+auto parse_ref_ent(const std::string& keyword) {
     return [keyword](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-               -> std::optional<std::tuple<UntypedStmtEntRel, std::vector<Token>::const_iterator>> {
+               -> std::optional<std::tuple<UntypedRefEntRel, std::vector<Token>::const_iterator>> {
         if (std::distance(it, end) < 6) {
             return std::nullopt;
         }
 
         const auto maybe_keyword = *it;
         const auto maybe_open_bracket = *std::next(it, 1);
-        const auto maybe_first_arg = *std::next(it, 2);
-        const auto maybe_comma = *std::next(it, 3);
-
-        if (!is_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket) || !is_comma(maybe_comma)) {
+        if (!is_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket)) {
             return std::nullopt;
         }
 
         // Consume confirmed tokens
-        it = std::next(it, 4);
+        it = std::next(it, 2);
+
+        // Get reference
+        const auto maybe_ref = parse_ref(it, end);
+        if (!maybe_ref.has_value()) {
+            return std::nullopt;
+        }
+
+        // Consume according to reference
+        const auto& [arg1, rest] = maybe_ref.value();
+        it = rest;
+
+        // Check for comma
+        const auto maybe_comma = *it;
+        if (!is_comma(maybe_comma)) {
+            return std::nullopt;
+        }
+        it = std::next(it);
 
         // Get entity reference
         const auto maybe_ent_ref = parse_ent_ref(it, end);
@@ -309,63 +348,7 @@ auto parse_stmt_ent(const std::string& keyword) {
         }
 
         // Consume according to entity reference
-        const auto& [ent_ref, rest] = maybe_ent_ref.value();
-        it = rest;
-
-        // Check for closing bracket
-        if (std::distance(it, end) < 1) {
-            return std::nullopt;
-        }
-        const auto maybe_close_bracket = *it;
-        if (!is_close_bracket(maybe_close_bracket)) {
-            return std::nullopt;
-        }
-        it = std::next(it, 1);
-
-        // Arguments must be a statement synonym (string), an underscore (wildcard), or a number (integer)
-        if (!is_stmt_ref(maybe_first_arg)) {
-            return std::nullopt;
-        }
-        const auto arg1 = parse_stmt_ref(maybe_first_arg);
-        return std::make_tuple(UntypedStmtEntRel{keyword, arg1, ent_ref}, it);
-    };
-}
-
-auto parse_ent_ent(const std::string& keyword) {
-    return [keyword](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-               -> std::optional<std::tuple<UntypedEntEntRel, std::vector<Token>::const_iterator>> {
-        if (std::distance(it, end) < 6) {
-            return std::nullopt;
-        }
-
-        const auto maybe_keyword = *it;
-        const auto maybe_open_bracket = *std::next(it, 1);
-        const auto maybe_first_arg = *std::next(it, 2);
-        const auto maybe_comma = *std::next(it, 3);
-
-        if (!is_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket) || !is_comma(maybe_comma)) {
-            return std::nullopt;
-        }
-
-        // Consume confirmed tokens
-        it = std::next(it, 4);
-
-        // Get first entity reference
-        const auto maybe_ent_ref1 = parse_ent_ref(it, end);
-        if (!maybe_ent_ref1.has_value()) {
-            return std::nullopt;
-        }
-        const auto [arg1, rest1] = maybe_ent_ref1.value();
-        it = rest1;
-
-        // Get second entity reference
-        const auto maybe_ent_ref2 = parse_ent_ref(it, end);
-        if (!maybe_ent_ref2.has_value()) {
-            return std::nullopt;
-        }
-
-        // Consume according to entity reference
-        const auto& [arg2, rest2] = maybe_ent_ref2.value();
+        const auto& [ent_ref, rest2] = maybe_ent_ref.value();
         it = rest2;
 
         // Check for closing bracket
@@ -377,8 +360,7 @@ auto parse_ent_ent(const std::string& keyword) {
             return std::nullopt;
         }
         it = std::next(it, 1);
-
-        return std::make_tuple(UntypedEntEntRel{keyword, arg1, arg2}, it);
+        return std::make_tuple(UntypedRefEntRel{keyword, arg1, ent_ref}, it);
     };
 }
 
@@ -386,10 +368,8 @@ const auto parse_follows = parse_stmt_stmt(Follows::keyword, true);
 const auto parse_follows_star = parse_stmt_stmt(FollowsT::keyword, false);
 const auto parse_parent = parse_stmt_stmt(Parent::keyword, true);
 const auto parse_parent_star = parse_stmt_stmt(ParentT::keyword, false);
-const auto parse_uses = parse_stmt_ent(UsesS::keyword);
-const auto parse_modifies = parse_stmt_ent(ModifiesS::keyword);
-const auto parse_uses_p = parse_ent_ent(UsesP::keyword);
-const auto parse_modifies_p = parse_ent_ent(ModifiesP::keyword);
+const auto parse_uses = parse_ref_ent(UsesS::keyword);
+const auto parse_modifies = parse_ref_ent(ModifiesS::keyword);
 
 auto parse_rel_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>> {
@@ -426,18 +406,6 @@ auto parse_rel_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     const auto maybe_modifies = parse_modifies(it, end);
     if (maybe_modifies.has_value()) {
         const auto [rel, rest] = maybe_modifies.value();
-        return std::make_tuple(UntypedRelationship{rel}, rest);
-    }
-
-    const auto maybe_uses_p = parse_uses_p(it, end);
-    if (maybe_uses_p.has_value()) {
-        const auto [rel, rest] = maybe_uses_p.value();
-        return std::make_tuple(UntypedRelationship{rel}, rest);
-    }
-
-    const auto maybe_modifies_p = parse_modifies_p(it, end);
-    if (maybe_modifies_p.has_value()) {
-        const auto [rel, rest] = maybe_modifies_p.value();
         return std::make_tuple(UntypedRelationship{rel}, rest);
     }
 
