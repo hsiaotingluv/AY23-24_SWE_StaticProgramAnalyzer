@@ -11,7 +11,7 @@ namespace sp {
 
 /**
  * @class StatementParser
- * @brief Parses differetn types of statements in the SIMPLE language. *
+ * @brief Parses different types of statements in the SIMPLE language. *
  *
  * @note stmt: read | print | call | while | if | assign
  *
@@ -43,8 +43,7 @@ class StatementParser : public Parser {
      * @return Parsed Read statement.
      * @note read: 'read' var_name';'
      */
-    // TODO: Add Return output type for consistency.
-    static std::shared_ptr<AstNode> parseReadStmt(Iterator& token_start, const Token& next_token);
+    static auto parseReadStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a Print statement.
@@ -53,7 +52,7 @@ class StatementParser : public Parser {
      * @return Parsed Print statement.
      * @note print: 'print' var_name';'
      */
-    static std::shared_ptr<AstNode> parsePrintStmt(Iterator& token_start, const Token& next_token);
+    static auto parsePrintStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a Call statement.
@@ -62,7 +61,7 @@ class StatementParser : public Parser {
      * @return Parsed Call statement.
      * @note call: 'call' proc_name';'
      */
-    static std::shared_ptr<AstNode> parseCallStmt(Iterator& token_start, const Token& next_token);
+    static auto parseCallStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a If statement.
@@ -71,8 +70,8 @@ class StatementParser : public Parser {
      * @return Parsed If statement.
      * @note if: 'if' '(' cond_expr ')' 'then' '{' stmtLst '}' 'else' '{' stmtLst '}'
      */
-    std::shared_ptr<AstNode> parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end,
-                                         const Token& next_token);
+    auto parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end,
+                                         const Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a While statement.
@@ -81,8 +80,8 @@ class StatementParser : public Parser {
      * @return Parsed While statement.
      * @note while: 'while' '(' cond_expr ')' '{' stmtLst '}'
      */
-    std::shared_ptr<AstNode> parseWhileStmt(Iterator& token_start, const Parser::Iterator& token_end,
-                                            const Token& next_token);
+    auto parseWhileStmt(Iterator& token_start, const Parser::Iterator& token_end, const Token& next_token)
+        -> std::shared_ptr<AstNode>;
 
   public:
     /**
