@@ -163,30 +163,120 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 }
 
-TEST_CASE("Parent Test") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+TEST_CASE("Parent and ParentStar Relationship Test") {
+    SECTION("Parent and ParentStar Transitive Relationship Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
 
-    write_facade->add_parent("1", "2");
-    write_facade->add_parent("1", "3");
-    write_facade->add_parent("3", "4");
-    write_facade->add_parent("3", "5");
-    write_facade->add_parent("3", "6");
-    write_facade->add_parent("6", "7");
-    write_facade->finalise_pkb();
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("1", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->add_parent("3", "5");
+        write_facade->add_parent("3", "6");
+        write_facade->add_parent("6", "7");
+        write_facade->finalise_pkb();
 
-    REQUIRE(read_facade->has_parent("1", "2"));
-    REQUIRE(read_facade->has_parent("1", "3"));
-    REQUIRE(read_facade->has_parent("3", "4"));
-    REQUIRE(read_facade->has_parent("3", "5"));
-    REQUIRE(read_facade->has_parent("3", "6"));
-    REQUIRE(read_facade->has_parent("6", "7"));
+        REQUIRE(read_facade->has_parent("1", "2"));
+        REQUIRE(read_facade->has_parent("1", "3"));
+        REQUIRE(read_facade->has_parent("3", "4"));
+        REQUIRE(read_facade->has_parent("3", "5"));
+        REQUIRE(read_facade->has_parent("3", "6"));
+        REQUIRE(read_facade->has_parent("6", "7"));
 
-    REQUIRE(read_facade->has_parent_star("1", "2"));
-    REQUIRE(read_facade->has_parent_star("1", "3"));
-    REQUIRE(read_facade->has_parent_star("1", "4"));
-    REQUIRE(read_facade->has_parent_star("1", "5"));
-    REQUIRE(read_facade->has_parent_star("1", "6"));
-    REQUIRE(read_facade->has_parent_star("1", "7"));
+        REQUIRE(read_facade->has_parent_star("1", "2"));
+        REQUIRE(read_facade->has_parent_star("1", "3"));
+        REQUIRE(read_facade->has_parent_star("1", "4"));
+        REQUIRE(read_facade->has_parent_star("1", "5"));
+        REQUIRE(read_facade->has_parent_star("1", "6"));
+        REQUIRE(read_facade->has_parent_star("1", "7"));
+    }
+
+    SECTION("Get All Parents By Statement Type Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->add_parent("4", "5");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::If);
+        write_facade->add_statement("2", StatementType::While);
+        write_facade->add_statement("3", StatementType::If);
+        write_facade->add_statement("4", StatementType::If);
+        write_facade->add_statement("5", StatementType::If);
+
+        REQUIRE(read_facade->get_all_parent_keys(StatementType::If).size() == 3);
+        REQUIRE(read_facade->get_all_parent_keys(StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_all_parent_star_keys(StatementType::If).size() == 3);
+        REQUIRE(read_facade->get_all_parent_star_keys(StatementType::While).size() == 1);
+    }
+
+    SECTION("Get All Children By Statement Type Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->add_parent("4", "5");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::If);
+        write_facade->add_statement("2", StatementType::While);
+        write_facade->add_statement("3", StatementType::If);
+        write_facade->add_statement("4", StatementType::If);
+        write_facade->add_statement("5", StatementType::While);
+
+        REQUIRE(read_facade->get_all_parent_values(StatementType::If).size() == 2);
+        REQUIRE(read_facade->get_all_parent_values(StatementType::While).size() == 2);
+        REQUIRE(read_facade->get_all_parent_star_values(StatementType::If).size() == 2);
+        REQUIRE(read_facade->get_all_parent_star_values(StatementType::While).size() == 2);
+    }
+
+    SECTION("Get All Children Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->add_parent("4", "5");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::If);
+        write_facade->add_statement("2", StatementType::While);
+        write_facade->add_statement("3", StatementType::If);
+        write_facade->add_statement("4", StatementType::If);
+        write_facade->add_statement("5", StatementType::While);
+
+        REQUIRE(read_facade->get_parent_children("1").size() == 1);
+        REQUIRE(read_facade->get_parent_star_children("1").size() == 4);
+        REQUIRE(read_facade->get_parent_children("1", StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_parent_children("1", StatementType::If).empty());
+        REQUIRE(read_facade->get_parent_star_children("1", StatementType::While).size() == 2);
+        REQUIRE(read_facade->get_parent_star_children("1", StatementType::If).size() == 2);
+    }
+
+    SECTION("Get All Parent by Children Test") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->add_parent("4", "5");
+        write_facade->finalise_pkb();
+
+        write_facade->add_statement("1", StatementType::If);
+        write_facade->add_statement("2", StatementType::While);
+        write_facade->add_statement("3", StatementType::If);
+        write_facade->add_statement("4", StatementType::If);
+        write_facade->add_statement("5", StatementType::While);
+
+        REQUIRE(read_facade->get_parent("2") == "1");
+        REQUIRE(read_facade->get_star_parent("4").size() == 3);
+        REQUIRE(read_facade->get_parent("2", StatementType::If) == "1");
+        REQUIRE(read_facade->get_parent("2", StatementType::While).empty());
+        REQUIRE(read_facade->get_star_parent("5", StatementType::If).size() == 3);
+        REQUIRE(read_facade->get_star_parent("5", StatementType::While).size() == 1);
+    }
 }
 
 TEST_CASE("Modify Test") {
