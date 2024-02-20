@@ -9,5 +9,3 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     target_compile_options(integration_testing PRIVATE -fsanitize=address -fsanitize=undefined)
     target_link_options(integration_testing PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
-
-target_compile_definitions(integration_testing PRIVATE MILESTONE1)

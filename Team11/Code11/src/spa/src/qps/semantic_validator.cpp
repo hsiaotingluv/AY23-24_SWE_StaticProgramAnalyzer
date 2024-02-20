@@ -115,6 +115,21 @@ auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, cons
     }
 }
 
+auto validate_ent_ent(const std::string&, const EntRef&, const EntRef&, TypeList<>) -> std::optional<Relationship> {
+    return std::nullopt;
+}
+
+template <typename Head, typename... Tails>
+auto validate_ent_ent(const std::string& keyword, const EntRef& ent_ref1, const EntRef& ent_ref2,
+                      TypeList<Head, Tails...>) -> std::optional<Relationship> {
+
+    if (Head::keyword != keyword) {
+        return validate_ent_ent(keyword, ent_ref1, ent_ref2, TypeList<Tails...>{});
+    } else {
+        return Head::construct(ent_ref1, ent_ref2);
+    }
+}
+
 auto untyped_relationship_visitor(const Synonyms& declarations,
                                   const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping) {
     return overloaded{
@@ -138,6 +153,17 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
             }
 
             return validate_stmt_ent(keyword, maybe_stmt_ref.value(), maybe_ent_ref.value(), StmtEntList{});
+        },
+        [&declarations, &mapping](const untyped::UntypedEntEntRel& ent_ent_rel) -> std::optional<Relationship> {
+            const auto keyword = std::get<0>(ent_ent_rel);
+            const auto maybe_ent_ref1 = to_ent_ref(declarations, mapping, std::get<1>(ent_ent_rel));
+            const auto maybe_ent_ref2 = to_ent_ref(declarations, mapping, std::get<2>(ent_ent_rel));
+
+            if (!maybe_ent_ref1.has_value() || !maybe_ent_ref2.has_value()) {
+                return std::nullopt;
+            }
+
+            return validate_ent_ent(keyword, maybe_ent_ref1.value(), maybe_ent_ref2.value(), EntEntList{});
         }};
 };
 

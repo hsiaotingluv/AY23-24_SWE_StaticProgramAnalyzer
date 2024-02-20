@@ -20,6 +20,18 @@ auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard
         stmt_ref);
 }
 
+auto reject_wildcard(const EntRef& ent_ref) -> std::optional<EntRefNoWildcard> {
+    return std::visit(overloaded{
+                          [](const WildCard&) -> std::optional<EntRefNoWildcard> {
+                              return std::nullopt;
+                          },
+                          [](const auto& x) -> std::optional<EntRefNoWildcard> {
+                              return x;
+                          },
+                      },
+                      ent_ref);
+}
+
 auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef> {
     return std::visit(overloaded{[](const std::shared_ptr<Synonym>& x) -> std::optional<VarRef> {
                                      auto try_ptr = std::dynamic_pointer_cast<VarSynonym>(x);
@@ -29,6 +41,20 @@ auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef> {
                                      return VarRef{try_ptr};
                                  },
                                  [](const auto& x) -> std::optional<VarRef> {
+                                     return x;
+                                 }},
+                      ent_ref);
+}
+
+auto to_proc_ref(const EntRefNoWildcard& ent_ref) -> std::optional<ProcedureRefNoWildcard> {
+    return std::visit(overloaded{[](const std::shared_ptr<Synonym>& x) -> std::optional<ProcedureRefNoWildcard> {
+                                     auto try_ptr = std::dynamic_pointer_cast<ProcSynonym>(x);
+                                     if (!try_ptr) {
+                                         return std::nullopt;
+                                     }
+                                     return ProcedureRefNoWildcard{try_ptr};
+                                 },
+                                 [](const auto& x) -> std::optional<ProcedureRefNoWildcard> {
                                      return x;
                                  }},
                       ent_ref);
@@ -59,23 +85,19 @@ auto operator<<(std::ostream& os, const UsesS& uses) -> std::ostream& {
     return os;
 }
 
-#ifndef MILESTONE1
 auto operator<<(std::ostream& os, const UsesP& uses) -> std::ostream& {
     os << "UsesP(" << uses.ent1 << ", " << uses.ent2 << ")";
     return os;
 }
-#endif
 
 auto operator<<(std::ostream& os, const ModifiesS& modifies) -> std::ostream& {
     os << "ModifiesS(" << modifies.stmt << ", " << modifies.ent << ")";
     return os;
 }
 
-#ifndef MILESTONE1
 auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream& {
     os << "ModifiesP(" << modifies.ent1 << ", " << modifies.ent2 << ")";
     return os;
 }
-#endif
 
 } // namespace qps

@@ -216,7 +216,6 @@ TEST_CASE("Text Expression Spec") {
         }
     }
 
-#ifndef MILESTONE1
     SECTION("expression spec success - exact match") {
         for (const auto& [query, expected] : exprs) {
             const auto query2 = "\"" + query + "\"";
@@ -226,11 +225,12 @@ TEST_CASE("Text Expression Spec") {
             REQUIRE(result2.has_value());
             const auto& [success2, rest2] = result2.value();
             REQUIRE(std::holds_alternative<ExactMatch>(success2));
-            REQUIRE(success2 == expected);
+
+            const auto exact_match = std::get<ExactMatch>(success2);
+            REQUIRE(exact_match.expr.value == expected);
             REQUIRE(rest2 == tokens2.end());
         }
     }
-#endif
 
     SECTION("expression spec success - partial match") {
         for (const auto& [query, expected] : exprs) {

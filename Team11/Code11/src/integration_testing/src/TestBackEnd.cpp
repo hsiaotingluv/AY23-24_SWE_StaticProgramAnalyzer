@@ -152,7 +152,6 @@ TEST_CASE("Test pkb and QPS - Statements") {
         }
     }
 
-#ifndef MILESTONE1
     SECTION("Test Query - all call") {
         const auto query = "call c; Select c";
         const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
@@ -170,7 +169,6 @@ TEST_CASE("Test pkb and QPS - Statements") {
             REQUIRE(expected.find(x) != expected.end());
         }
     }
-#endif
 
     SECTION("Test Query - all read") {
         const auto query = "read r; Select r";

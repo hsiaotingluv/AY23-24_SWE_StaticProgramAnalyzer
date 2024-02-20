@@ -5,16 +5,9 @@
 
 namespace qps::untyped {
 
-#ifdef MILESTONE1
 using UntypedStmtStmtRel = std::tuple<std::string, UntypedStmtRef, UntypedStmtRef>;
-using UntypedStmtEntRel = std::tuple<std::string, UntypedStmtRef, UntypedEntRef>;
-using UntypedRelationship = std::variant<UntypedStmtStmtRel, UntypedStmtEntRel>;
-#else
-using AnyStmtSynonymtmtRel = std::tuple<std::string, UntypedStmtRef, UntypedStmtRef>;
 using UntypedStmtEntRel = std::tuple<std::string, UntypedStmtRef, UntypedEntRef>;
 using UntypedEntEntRel = std::tuple<std::string, UntypedEntRef, UntypedEntRef>;
 
-using UntypedRelationship = std::variant<AnyStmtSynonymtmtRel, UntypedStmtEntRel, UntypedEntEntRel>;
-#endif
-
+using UntypedRelationship = std::variant<UntypedStmtStmtRel, UntypedStmtEntRel, UntypedEntEntRel>;
 } // namespace qps::untyped

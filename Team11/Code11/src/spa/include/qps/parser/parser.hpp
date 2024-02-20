@@ -36,14 +36,11 @@ class QPSParser {
     static auto parse(std::string query) -> std::optional<std::tuple<Synonyms, untyped::UntypedQuery>>;
 };
 
-#ifndef MILESTONE1
-using SupportedSynonyms = TypeList<ProcSynonym, VarSynonym, ConstSynonym, AnyStmtSynonym, ReadSynonym, CallSynonym,
-                                   WhileSynonym, IfSynonym, AssignSynonym, PrintSynonym>;
-#else
-// design-entity : 'stmt' | 'read' | 'print' | 'while' | 'if' | 'assign' | 'variable' | 'constant' | 'procedure'
+// design-entity : 'stmt' | 'read' | 'print' | 'while' | 'if' | 'assign' | 'call' | 'variable' | 'constant' |
+// 'procedure'
+
 using SupportedSynonyms = TypeList<AnyStmtSynonym, ReadSynonym, PrintSynonym, WhileSynonym, IfSynonym, AssignSynonym,
-                                   VarSynonym, ConstSynonym, ProcSynonym>;
-#endif
+                                   CallSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
 
 auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>>;

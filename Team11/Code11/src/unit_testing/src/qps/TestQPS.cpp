@@ -73,27 +73,6 @@ TEST_CASE("Test Declaration Parser") {
 
 TEST_CASE("Test QPS - Basic Functionality") {
     const auto qps = QueryProcessingSystem{};
-
-#ifndef MILESTONE1
-    SECTION("Query with stmt-stmt relationship") {
-        const auto query = " procedure p; stmt s; Select s such that Follows(s, 13) such that Follows*(13, s) such "
-                           "that Parent (s, 12) such that Parent*(12, s) ";
-        const auto output = parser.parse(query);
-
-        REQUIRE(output.has_value());
-        const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
-
-        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.declared[1]));
-        REQUIRE(std::get<AnyStmtSynonymynonym>(result.declared[1]).get_name() == "s");
-
-        REQUIRE(std::holds_alternative<AnyStmtSynonymynonym>(result.reference));
-        REQUIRE(std::get<AnyStmtSynonymynonym>(result.reference).get_name() == "s");
-    }
-#else
     SECTION("Query with stmt-stmt relationship") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
         const auto output = to_query(qps.parse(query));
@@ -144,16 +123,9 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto reference_clause = std::make_shared<SuchThatClause>(
             ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
     }
-#endif
+
     SECTION("Query with stmt-ent relationship") {
 
-#ifndef MILESTONE1
-        const auto query =
-            R"(stmt s; Select s such that Uses(s, "v") such that Modifies(s, "q") such that Modifies("x", "y"))";
-        const auto result = parser.parse(query);
-
-        REQUIRE(result.has_value());
-#else
         const auto query = R"(stmt s; Select s such that Uses(s, "v"))";
         const auto result = to_query(qps.parse(query));
 
@@ -165,7 +137,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
         REQUIRE(result->clauses.size() == 1);
         const auto reference_clause =
             std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), QuotedIdent{"v"}});
-#endif
     }
 
     SECTION("Query with stmt-ent relationship") {
@@ -185,26 +156,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
             std::make_shared<SuchThatClause>(UsesS{Integer{1}, std::make_shared<VarSynonym>(IDENT{"v"})});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
-
-#ifndef MILESTONE1
-    SECTION("Query with ent-ent relationship for procedures") {
-        const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
-        const auto output = parser.parse(query);
-
-        REQUIRE(output.has_value());
-        const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.declared[0]));
-        REQUIRE(std::get<ProcSynonym>(result.declared[0]).get_name() == "p");
-
-        REQUIRE(std::holds_alternative<VarSynonym>(result.declared[1]));
-        REQUIRE(std::get<VarSynonym>(result.declared[1]).get_name() == "v");
-
-        REQUIRE(std::holds_alternative<ProcSynonym>(result.reference));
-        REQUIRE(std::get<ProcSynonym>(result.reference).get_name() == "p");
-    }
-#endif
 
     SECTION("Query with pattern clause") {
         const auto query = R"(        assign a;
@@ -241,34 +192,6 @@ Select a pattern a ( _ , _"count + 1"_))";
             std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX *"});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
-
-#ifndef MILESTONE1
-    SECTION("Query with such that clause and pattern clause") {
-        const auto query = R"(assign a; while w; Select w such that Parent* (w, a) pattern a ("count", _))";
-        const auto output = parser.parse(query);
-
-        REQUIRE(output.has_value());
-        const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        REQUIRE(std::holds_alternative<AssignSynonym>(result.declared[0]));
-        REQUIRE(std::get<AssignSynonym>(result.declared[0]).get_name() == "a");
-        REQUIRE(std::holds_alternative<WhileSynonym>(result.declared[1]));
-        REQUIRE(std::get<WhileSynonym>(result.declared[1]).get_name() == "w");
-
-        REQUIRE(std::holds_alternative<WhileSynonym>(result.reference));
-        REQUIRE(std::get<WhileSynonym>(result.reference).get_name() == "w");
-
-        REQUIRE(result.clauses.size() == 2);
-        const auto reference_clause = std::make_shared<SuchThatClause>(
-            ParentT{StmtSynonym{WhileSynonym{IDENT{"w"}}}, StmtSynonym{AssignSynonym{IDENT{"a"}}}});
-        REQUIRE(*(result.clauses[0]) == *reference_clause);
-
-        const auto reference_clause2 =
-            std::make_shared<PatternClause>(AssignSynonym{IDENT{"a"}}, QuotedIdent{"count"}, ExpressionSpec{"_"});
-        REQUIRE(*(result.clauses[1]) == *reference_clause2);
-    }
-#endif
 }
 
 TEST_CASE("Test QPS - Syntax") {
