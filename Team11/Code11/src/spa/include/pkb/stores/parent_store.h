@@ -16,7 +16,7 @@ class ParentStore {
     using StatementNumber = std::string;
     using StatementSet = std::unordered_set<StatementNumber>;
     using StatementToSetMap = std::unordered_map<StatementNumber, StatementSet>;
-    using StatementToStatementMap = std::unordered_map<StatementNumber, StatementNumber>;
+    using StatementStatementTupleSet = std::unordered_set<std::tuple<StatementNumber, StatementNumber>>;
     using StatementToStatementSetStore = OneToManyStore<StatementNumber, StatementNumber>;
 
     ParentStore();
@@ -64,6 +64,9 @@ class ParentStore {
      */
     [[nodiscard]] StatementSet get_all_parent_values() const;
 
+    // TODO
+    [[nodiscard]] StatementStatementTupleSet get_all_parent_pairs() const;
+
     /**
      * Retrieves the direct children of a given parent statement.
      *
@@ -109,6 +112,9 @@ class ParentStore {
      * @return A set of descendant statement numbers.
      */
     [[nodiscard]] StatementSet get_all_parent_star_values() const;
+
+    // TODO
+    [[nodiscard]] StatementStatementTupleSet get_all_parent_star_pairs() const;
 
     /**
      * Retrieves all descendants of a given ancestor statement in the Parent* relationship.
