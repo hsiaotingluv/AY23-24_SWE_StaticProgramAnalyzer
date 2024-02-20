@@ -11,9 +11,6 @@ struct UntypedSynonym {
     explicit UntypedSynonym(IDENT name) : name(std::move(name)) {
     }
 
-    explicit UntypedSynonym(std::string name) : name(std::move(name)) {
-    }
-
     auto operator==(const UntypedSynonym& rhs) const -> bool {
         return name == rhs.name;
     }
