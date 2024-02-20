@@ -438,16 +438,42 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_keys() const {
     return this->pkb->parent_store->get_all_parent_keys();
 }
 
+std::unordered_set<std::string> ReadFacade::get_all_parent_keys(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_all_parent_keys();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_parent_values() const {
     return this->pkb->parent_store->get_all_parent_values();
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_parent_values(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_all_parent_values();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 std::unordered_set<std::string> ReadFacade::get_parent_children(const std::string& parent) const {
     return this->pkb->parent_store->get_parent_children(parent);
 }
 
+std::unordered_set<std::string> ReadFacade::get_parent_children(const std::string& parent,
+                                                                const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_parent_children(parent);
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::string ReadFacade::get_parent(const std::string& child) const {
     return this->pkb->parent_store->get_parent(child);
+}
+
+std::string ReadFacade::get_parent(const std::string& child, const StatementType& statementType) const {
+    auto stmt = this->pkb->parent_store->get_parent(child);
+
+    if (this->pkb->statement_store->get_statement_type(stmt) == statementType) {
+        return stmt;
+    }
+
+    return "";
 }
 
 bool ReadFacade::has_parent_star(const std::string& parent, const std::string& child) const {
@@ -462,16 +488,38 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_star_keys() const {
     return this->pkb->parent_store->get_all_parent_star_keys();
 }
 
+std::unordered_set<std::string> ReadFacade::get_all_parent_star_keys(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_all_parent_star_keys();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_parent_star_values() const {
     return this->pkb->parent_store->get_all_parent_star_values();
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_parent_star_values(const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_all_parent_star_values();
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 std::unordered_set<std::string> ReadFacade::get_parent_star_children(const std::string& parent) const {
     return this->pkb->parent_store->get_parent_star_children(parent);
 }
 
+std::unordered_set<std::string> ReadFacade::get_parent_star_children(const std::string& parent,
+                                                                     const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_parent_star_children(parent);
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
+}
+
 std::unordered_set<std::string> ReadFacade::get_star_parent(const std::string& child) const {
     return this->pkb->parent_store->get_star_parent(child);
+}
+
+std::unordered_set<std::string> ReadFacade::get_star_parent(const std::string& child,
+                                                            const StatementType& statementType) const {
+    auto stmts_pool = this->pkb->parent_store->get_star_parent(child);
+    return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
 bool ReadFacade::has_next(const std::string& before, const std::string& after) const {

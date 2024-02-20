@@ -148,11 +148,20 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_all_parent_keys() const;
 
+    std::unordered_set<std::string> get_all_parent_keys(const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_all_parent_values() const;
+
+    std::unordered_set<std::string> get_all_parent_values(const StatementType& statementType) const;
 
     std::unordered_set<std::string> get_parent_children(const std::string& parent) const;
 
+    std::unordered_set<std::string> get_parent_children(const std::string& parent,
+                                                        const StatementType& statementType) const;
+
     std::string get_parent(const std::string& child) const;
+
+    std::string get_parent(const std::string& child, const StatementType& statementType) const;
 
     bool has_parent_star(const std::string& parent, const std::string& child) const;
 
@@ -160,11 +169,20 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_all_parent_star_keys() const;
 
+    std::unordered_set<std::string> get_all_parent_star_keys(const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_all_parent_star_values() const;
+
+    std::unordered_set<std::string> get_all_parent_star_values(const StatementType& statementType) const;
 
     std::unordered_set<std::string> get_parent_star_children(const std::string& parent) const;
 
+    std::unordered_set<std::string> get_parent_star_children(const std::string& parent,
+                                                             const StatementType& statementType) const;
+
     std::unordered_set<std::string> get_star_parent(const std::string& child) const;
+
+    std::unordered_set<std::string> get_star_parent(const std::string& child, const StatementType& statementType) const;
 
     // Next-related Read Operations
     bool has_next(const std::string& before, const std::string& after) const;
