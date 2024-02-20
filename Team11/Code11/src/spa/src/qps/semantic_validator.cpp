@@ -270,7 +270,17 @@ auto untyped_clause_visitor(const Synonyms& declarations,
 
             const auto maybe_ent_ref = std::visit(
                 overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<EntRef> {
-                               return is_synonym_declared(declarations, mapping, synonym);
+                               const auto& maybe_synonym = is_synonym_declared(declarations, mapping, synonym);
+                               if (!maybe_synonym.has_value()) {
+                                   return std::nullopt;
+                               }
+
+                               const auto& maybe_variable =
+                                   std::dynamic_pointer_cast<VarSynonym>(maybe_synonym.value());
+                               if (!maybe_variable) {
+                                   return std::nullopt;
+                               }
+                               return maybe_variable;
                            },
                            [](const auto& x) -> std::optional<EntRef> {
                                return x;
