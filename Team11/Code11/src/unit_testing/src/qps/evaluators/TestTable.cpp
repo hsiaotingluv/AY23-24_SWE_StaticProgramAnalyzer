@@ -37,9 +37,9 @@ auto init_column_names(int num_col) -> std::vector<std::shared_ptr<Synonym>> {
 
     for (int i = 0; i < num_col; i++) {
         // Randomly generate a string
-        // Pick a character from the set {a, b, c, d, e, f, g, h, i, j} 10 times
+        // Pick a character from the set {a, b, c, d, e, f, g, h, i, j} 5 times
         std::string name;
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 5; j++) {
             name.push_back('a' + (std::rand() % 10));
         }
         column.push_back(std::make_shared<T>(name));
