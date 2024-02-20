@@ -17,6 +17,7 @@ class FollowsStore {
     using StatementSet = std::unordered_set<StatementNumber>;
     using StatementToStatementMap = std::unordered_map<StatementNumber, StatementNumber>;
     using StatementToSetMap = std::unordered_map<StatementNumber, StatementSet>;
+    using StatementStatementTupleSet = std::unordered_set<std::tuple<StatementNumber, StatementNumber>>;
     using StatementToStatementStore = OneToOneStore<StatementNumber, StatementNumber>;
     using StatementToStatementSetStore = OneToManyStore<StatementNumber, StatementNumber>;
 
@@ -65,6 +66,9 @@ class FollowsStore {
      */
     [[nodiscard]] StatementSet get_all_follows_values() const;
 
+    // TODO
+    [[nodiscard]] StatementStatementTupleSet get_all_follows_pairs() const;
+
     /**
      * Retrieves the statement number that directly follows the given statement.
      *
@@ -111,6 +115,9 @@ class FollowsStore {
      * @return A set of all statement numbers that transitively follow another statement.
      */
     [[nodiscard]] StatementSet get_all_follows_star_values() const;
+
+    // TODO
+    [[nodiscard]] StatementStatementTupleSet get_all_follows_star_pairs() const;
 
     /**
      * Retrieves all statement numbers that transitively follow the given statement.

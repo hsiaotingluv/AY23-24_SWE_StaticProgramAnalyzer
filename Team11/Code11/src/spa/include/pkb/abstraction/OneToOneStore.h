@@ -15,6 +15,7 @@ class OneToOneStore {
     ValueType getValueByKey(const KeyType& key) const;
     KeyType getKeyByValue(const ValueType& value) const;
     std::unordered_map<KeyType, ValueType> getAll() const;
+    std::unordered_set<std::tuple<KeyType, ValueType>> getAllPairs() const;
     std::unordered_set<KeyType> getAllKeys() const;
     std::unordered_set<ValueType> getAllValues() const;
 

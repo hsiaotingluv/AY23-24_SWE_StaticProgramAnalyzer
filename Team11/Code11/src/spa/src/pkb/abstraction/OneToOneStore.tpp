@@ -42,6 +42,17 @@ std::unordered_map<KeyType, ValueType> OneToOneStore<KeyType, ValueType>::getAll
     return forward_map;
 }
 
+template <class KeyType, class ValueType>
+std::unordered_set<std::tuple<KeyType, ValueType>> OneToOneStore<KeyType, ValueType>::getAllPairs() const {
+    std::unordered_set<std::tuple<KeyType, ValueType>> allPairs;
+
+    for (const auto& [key, val] : forward_map) {
+        allPairs.insert(std::make_tuple(key, val));
+    }
+
+    return allPairs;
+}
+
 template <typename KeyType, typename ValueType>
 std::unordered_set<KeyType> OneToOneStore<KeyType, ValueType>::getAllKeys() const {
     std::unordered_set<KeyType> keys;
