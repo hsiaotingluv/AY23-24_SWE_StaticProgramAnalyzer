@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-template<class KeyType, class ValueType>
+template <class KeyType, class ValueType>
 class OneToOneStore {
   public:
     OneToOneStore();

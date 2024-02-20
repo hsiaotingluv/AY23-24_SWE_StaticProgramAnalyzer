@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-template<class KeyType, class ValueType>
+template <class KeyType, class ValueType>
 class OneToManyStore {
   public:
     OneToManyStore();
@@ -15,6 +15,7 @@ class OneToManyStore {
     std::unordered_set<ValueType> getValuesByKey(const KeyType& key) const;
     std::unordered_set<KeyType> getKeysByValue(const ValueType& value) const;
     std::unordered_map<KeyType, std::unordered_set<ValueType>> getAll() const;
+    std::unordered_set<std::tuple<KeyType, ValueType>> getAllPairs() const;
     std::unordered_set<KeyType> getAllKeys() const;
     std::unordered_set<ValueType> getAllValues() const;
 

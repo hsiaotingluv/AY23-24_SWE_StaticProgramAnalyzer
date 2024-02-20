@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "pkb/abstraction/OneToOneStore.h"
 #include "pkb/abstraction/OneToManyStore.h"
+#include "pkb/abstraction/OneToOneStore.h"
 
 /**
  * stores and manages the Follows and Follows* (transitive Follows) relationships
