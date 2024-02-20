@@ -70,8 +70,8 @@ class StatementParser : public Parser {
      * @return Parsed If statement.
      * @note if: 'if' '(' cond_expr ')' 'then' '{' stmtLst '}' 'else' '{' stmtLst '}'
      */
-    auto parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end,
-                                         const Token& next_token) -> std::shared_ptr<AstNode>;
+    auto parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end, const Token& next_token)
+        -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a While statement.
