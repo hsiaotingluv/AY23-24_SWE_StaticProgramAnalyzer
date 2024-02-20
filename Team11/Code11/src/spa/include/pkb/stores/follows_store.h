@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "pkb/abstraction/OneToOneStore.h"
+#include "pkb/abstraction/OneToManyStore.h"
+
 /**
  * stores and manages the Follows and Follows* (transitive Follows) relationships
  * between statements in a SIMPLE program.
@@ -14,6 +17,8 @@ class FollowsStore {
     using StatementSet = std::unordered_set<StatementNumber>;
     using StatementToStatementMap = std::unordered_map<StatementNumber, StatementNumber>;
     using StatementToSetMap = std::unordered_map<StatementNumber, StatementSet>;
+    using StatementToStatementStore = OneToOneStore<StatementNumber, StatementNumber>;
+    using StatementToStatementSetStore = OneToManyStore<StatementNumber, StatementNumber>;
 
     FollowsStore();
 
@@ -108,31 +113,25 @@ class FollowsStore {
     [[nodiscard]] StatementSet get_all_follows_star_values() const;
 
     /**
-     * Retrieves all statement numbers that are transitively followed by the given statement.
-     *
-     * @param s The statement number to find descendants for in the transitive Follows relationships.
-     * @return A set of all statement numbers that are transitively followed by s.
-     */
-    [[nodiscard]] StatementSet get_follows_stars_following(const StatementNumber& s) const;
-
-    /**
      * Retrieves all statement numbers that transitively follow the given statement.
      *
      * @param s The statement number to find ancestors for in the transitive Follows relationships.
      * @return A set of all statement numbers that transitively follow s.
      */
+    [[nodiscard]] StatementSet get_follows_stars_following(const StatementNumber& s) const;
+
+    /**
+     * Retrieves all statement numbers that are transitively followed by the given statement.
+     *
+     * @param s The statement number to find descendants for in the transitive Follows relationships.
+     * @return A set of all statement numbers that are transitively followed by s.
+     */
     [[nodiscard]] StatementSet get_follows_stars_by(const StatementNumber& s) const;
 
   private:
     // Direct Follows relationships: statement -> following statement
-    StatementToStatementMap follows_store;
-
-    // Reverse mapping for Direct Follows: following statement -> statement
-    StatementToStatementMap reversed_follows_store;
+    StatementToStatementStore follows_store;
 
     // Transitive Follows relationships: statement -> set of transitively following statements
-    StatementToSetMap follows_star_store;
-
-    // Reverse mapping for Transitive Follows: transitively following statement -> set of statements
-    StatementToSetMap reversed_follows_star_store;
+    StatementToStatementSetStore follows_star_store;
 };

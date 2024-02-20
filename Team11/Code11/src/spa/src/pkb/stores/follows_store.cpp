@@ -7,14 +7,13 @@
 FollowsStore::FollowsStore() = default;
 
 void FollowsStore::add_follows(const StatementNumber& s1, const StatementNumber& s2) {
-    follows_store[s1] = s2;
-    reversed_follows_store[s2] = s1;
+    follows_store.add(s1, s2);
 }
 
 void FollowsStore::populate_follows_and_reverse_follows_star() {
     // extract all the follows relationships into a vector of tuples
     std::vector<std::tuple<StatementNumber, StatementNumber>> follows_relationships;
-    for (const auto& pair : follows_store) {
+    for (const auto& pair : follows_store.getAll()) {
         follows_relationships.emplace_back(pair.first, pair.second);
     }
 
@@ -27,98 +26,60 @@ void FollowsStore::populate_follows_and_reverse_follows_star() {
     // follows_relationships
     for (auto it = follows_relationships.rbegin(); it != follows_relationships.rend(); ++it) {
         const auto& [s1, s2] = *it;
-        follows_star_store[s1].insert(s2);
-        reversed_follows_star_store[s2].insert(s1);
+        follows_star_store.add(s1, s2);
 
         // add all the follows_star relationships from s2 to s1
-        if (follows_star_store.find(s2) != follows_star_store.end()) {
-            for (const auto& s3 : follows_star_store.at(s2)) {
-                follows_star_store[s1].insert(s3);
-                reversed_follows_star_store[s3].insert(s1);
-            }
+        for (const auto& s3 : follows_star_store.getValuesByKey(s2)) {
+            follows_star_store.add(s1, s3);
         }
     }
 }
 
 bool FollowsStore::has_follows(const StatementNumber& s1, const StatementNumber& s2) const {
-    auto it = follows_store.find(s1);
-    return it != follows_store.end() && it->second == s2;
+    return follows_store.contains(s1, s2);
 }
 
 FollowsStore::StatementToStatementMap FollowsStore::get_all_follows() const {
-    return follows_store;
+    return follows_store.getAll();
 }
 
 FollowsStore::StatementSet FollowsStore::get_all_follows_keys() const {
-    StatementSet keys;
-    for (const auto& pair : follows_store) {
-        keys.insert(pair.first);
-    }
-    return keys;
+    return follows_store.getAllKeys();
 }
 
 FollowsStore::StatementSet FollowsStore::get_all_follows_values() const {
-    StatementSet values;
-    for (const auto& pair : follows_store) {
-        values.insert(pair.second);
-    }
-    return values;
+    return follows_store.getAllValues();
 }
 
 FollowsStore::StatementNumber FollowsStore::get_follows_following(const StatementNumber& s) const {
-    auto it = follows_store.find(s);
-    if (it != follows_store.end()) {
-        return it->second;
-    }
-    return "";
+    return follows_store.getValueByKey(s);
 }
 
 FollowsStore::StatementNumber FollowsStore::get_follows_by(const StatementNumber& s) const {
-    auto it = reversed_follows_store.find(s);
-    if (it != reversed_follows_store.end()) {
-        return it->second;
-    }
-    return "";
+    return follows_store.getKeyByValue(s);
 }
 
 bool FollowsStore::has_follows_stars(const StatementNumber& s1, const StatementNumber& s2) const {
-    if (follows_star_store.find(s1) == follows_star_store.end()) {
-        return false;
-    }
-    return follows_star_store.at(s1).find(s2) != follows_star_store.at(s1).end();
+    return follows_star_store.contains(s1, s2);
 }
 
 FollowsStore::StatementToSetMap FollowsStore::get_all_follows_star() const {
-    return follows_star_store;
+    return follows_star_store.getAll();
 }
 
 FollowsStore::StatementSet FollowsStore::get_all_follows_star_keys() const {
-    StatementSet keys;
-    for (const auto& pair : follows_star_store) {
-        keys.insert(pair.first);
-    }
-    return keys;
+    return follows_star_store.getAllKeys();
 }
 
 FollowsStore::StatementSet FollowsStore::get_all_follows_star_values() const {
-    StatementSet values;
-    for (const auto& pair : follows_star_store) {
-        values.insert(pair.second.begin(), pair.second.end());
-    }
-    return values;
+    return follows_star_store.getAllValues();
 }
 
 std::unordered_set<FollowsStore::StatementNumber>
 FollowsStore::get_follows_stars_following(const StatementNumber& s) const {
-    if (follows_star_store.find(s) == follows_star_store.end()) {
-        return {};
-    }
-    return follows_star_store.at(s);
+    return follows_star_store.getValuesByKey(s);
 }
 
 std::unordered_set<FollowsStore::StatementNumber> FollowsStore::get_follows_stars_by(const StatementNumber& s) const {
-    if (reversed_follows_star_store.find(s) == reversed_follows_star_store.end()) {
-        return {};
-    }
-    return reversed_follows_star_store.at(s);
+    return follows_star_store.getKeysByValue(s);
 }
