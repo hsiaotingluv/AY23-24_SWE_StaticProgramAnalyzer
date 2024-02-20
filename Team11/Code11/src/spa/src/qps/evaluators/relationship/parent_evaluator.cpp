@@ -30,6 +30,10 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                     table.add_row({parent_child_set.first, child});
                 }
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -41,6 +45,10 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
             const auto parent_candidate = read_facade->get_parent(std::to_string(stmt_num_2.value));
             if (relevant_stmts.find(parent_candidate) != relevant_stmts.end()) {
                 table.add_row({parent_candidate});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -56,6 +64,10 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                 }
                 table.add_row({parent_name});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -70,6 +82,10 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                     continue;
                 }
                 table.add_row({child_name});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -110,6 +126,10 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                     continue;
                 }
                 table.add_row({child_name});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },

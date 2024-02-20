@@ -115,6 +115,10 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
                 }
                 table.add_row({descendant_name});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 

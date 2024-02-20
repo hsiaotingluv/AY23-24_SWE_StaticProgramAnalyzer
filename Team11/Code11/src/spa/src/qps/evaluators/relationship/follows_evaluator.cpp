@@ -26,6 +26,10 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
                 }
                 table.add_row({follows_pair.first, follows_pair.second});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -37,6 +41,10 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
             const auto candidate = read_facade->get_follows_by(std::to_string(stmt_num_2.value));
             if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
                 table.add_row({candidate});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -52,6 +60,10 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
                 }
                 table.add_row({stmt});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -63,6 +75,10 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
             const auto candidate = read_facade->get_follows_following(std::to_string(stmt_num_1.value));
             if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
                 table.add_row({candidate});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -103,6 +119,10 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
                     continue;
                 }
                 table.add_row({stmt});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },

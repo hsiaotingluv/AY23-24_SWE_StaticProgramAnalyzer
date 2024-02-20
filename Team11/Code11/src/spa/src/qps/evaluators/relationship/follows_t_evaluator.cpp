@@ -29,6 +29,10 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                     table.add_row({stmt_and_followers.first, follower});
                 }
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -44,6 +48,10 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                 }
                 table.add_row({stmt});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -57,6 +65,10 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                     continue;
                 }
                 table.add_row({stmt});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -73,6 +85,10 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                     continue;
                 }
                 table.add_row({follower});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -131,6 +147,10 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<ReadFacade>& read_f
                     continue;
                 }
                 table.add_row({stmt});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },

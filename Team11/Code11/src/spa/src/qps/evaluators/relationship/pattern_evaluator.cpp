@@ -14,6 +14,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
                     table.add_row({assign_stmt, var});
                 }
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -25,6 +29,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
                 for (const auto& var : read_facade->get_vars_modified_by_statement(assign_stmt)) {
                     table.add_row({assign_stmt, var});
                 }
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -38,6 +46,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
             for (const auto& assign_stmt : all_partial_matches) {
                 table.add_row({assign_stmt});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -50,6 +62,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
             for (const auto& stmt : stmts_that_modify) {
                 table.add_row({stmt});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -61,6 +77,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
             for (const auto& stmt : all_partial_matches) {
                 table.add_row({stmt});
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -71,6 +91,10 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<ReadFacade>& read_faca
             const auto all_assign_stmts = read_facade->get_assign_statements();
             for (const auto& stmt : all_assign_stmts) {
                 table.add_row({stmt});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
