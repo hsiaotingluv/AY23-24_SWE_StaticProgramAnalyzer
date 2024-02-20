@@ -1,6 +1,5 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
-#include "qps/evaluators/entities/entity_scanner.hpp"
 
 #include <algorithm>
 #include <iterator>

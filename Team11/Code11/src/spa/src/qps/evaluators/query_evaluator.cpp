@@ -1,5 +1,4 @@
 #include "qps/evaluators/query_evaluator.hpp"
-#include "qps/evaluators/entities/entity_scanner.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/relationship/pattern_evaluator.hpp"
 #include "qps/evaluators/results_table.hpp"
@@ -13,7 +12,7 @@ namespace qps {
 
 auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
-    const auto results = scan_entities(read_facade, reference);
+    const auto results = reference->scan(read_facade);
 
     auto curr_table = Table{{reference}};
     for (const auto& result : results) {

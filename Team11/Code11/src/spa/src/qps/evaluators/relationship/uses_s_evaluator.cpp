@@ -1,5 +1,4 @@
 #include "qps/evaluators/relationship/uses_s_evaluator.hpp"
-#include "qps/evaluators/entities/entity_scanner.hpp"
 
 namespace qps {
 
@@ -10,7 +9,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_synonym,
                       const std::shared_ptr<VarSynonym>& var_synonym) -> std::optional<Table> {
             auto table = Table{{stmt_synonym, var_synonym}};
-            const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
+            const auto relevant_stmts = stmt_synonym->scan(read_facade);
 
             const auto all_stmt_var_use_pairs = read_facade->get_all_statements_and_var_use_pairs();
             for (const auto& pair : all_stmt_var_use_pairs) {
@@ -53,7 +52,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_synonym,
                       const qps::WildCard& wild_card) -> std::optional<Table> {
             auto table = Table{{stmt_synonym}};
-            const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
+            const auto relevant_stmts = stmt_synonym->scan(read_facade);
 
             const auto all_using_stmts = read_facade->get_all_statements_that_use();
             for (const auto& stmt_candidate : all_using_stmts) {

@@ -1,5 +1,4 @@
 #include "qps/evaluators/relationship/parent_t_evaluator.hpp"
-#include "qps/evaluators/entities/entity_scanner.hpp"
 
 namespace qps {
 
@@ -12,8 +11,8 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
             if (stmt_syn_1 == stmt_syn_2) {
                 return std::nullopt;
             }
-            const auto relevant_stmts_1 = scan_entities(read_facade, stmt_syn_1);
-            const auto relevant_stmts_2 = scan_entities(read_facade, stmt_syn_2);
+            const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
+            const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
 
             auto table = Table{{stmt_syn_1, stmt_syn_2}};
             // TODO: Improve pkb API: Get all parent-star-child pairs
@@ -36,7 +35,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
         // e.g. Parent*(s1, 3)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                       const qps::Integer& stmt_num_2) -> std::optional<Table> {
-            const auto relevant_stmts = scan_entities(read_facade, stmt_syn_1);
+            const auto relevant_stmts = stmt_syn_1->scan(read_facade);
             auto table = Table{{stmt_syn_1}};
             const auto ancestors = read_facade->get_star_parent(std::to_string(stmt_num_2.value));
             for (const auto& ancestor : ancestors) {
@@ -50,7 +49,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
 
         // e.g. Parent*(s1, _)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::WildCard&) -> std::optional<Table> {
-            const auto relevant_stmts = scan_entities(read_facade, stmt_syn_1);
+            const auto relevant_stmts = stmt_syn_1->scan(read_facade);
             auto table = Table{{stmt_syn_1}};
             const auto all_parents = read_facade->get_all_parent_star_keys();
             for (const auto& parent_name : all_parents) {
@@ -65,7 +64,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
         // e.g. Parent*(3, s2)
         [read_facade](const qps::Integer& stmt_num_1,
                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
-            const auto relevant_stmts = scan_entities(read_facade, stmt_syn_2);
+            const auto relevant_stmts = stmt_syn_2->scan(read_facade);
             auto table = Table({stmt_syn_2});
             const auto all_descendants_of_stmt =
                 read_facade->get_parent_star_children(std::to_string(stmt_num_1.value));
@@ -106,7 +105,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
 
         // e.g. Parent*(_, s2)
         [read_facade](const qps::WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
-            const auto relevant_stmts = scan_entities(read_facade, stmt_syn_2);
+            const auto relevant_stmts = stmt_syn_2->scan(read_facade);
             auto table = Table({stmt_syn_2});
             const auto all_descendants = read_facade->get_all_parent_star_values();
             for (const auto& descendant_name : all_descendants) {

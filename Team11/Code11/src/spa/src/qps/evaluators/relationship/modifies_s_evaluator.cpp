@@ -1,5 +1,4 @@
 #include "qps/evaluators/relationship/modifies_s_evaluator.hpp"
-#include "qps/evaluators/entities/entity_scanner.hpp"
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
@@ -14,7 +13,7 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
         [read_facade](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
                       const qps::WildCard&) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies
-            const auto relevant_stmts = scan_entities(read_facade, stmt_synonym);
+            const auto relevant_stmts = stmt_synonym->scan(read_facade);
             auto table = Table{{stmt_synonym}};
 
             const auto variables = read_facade->get_variables();
@@ -56,8 +55,8 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
         [read_facade](const std::shared_ptr<qps::StmtSynonym>& synonym,
                       const std::shared_ptr<qps::VarSynonym>& var_syn) -> std::optional<Table> {
             // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
-            const auto relevant_stmts = scan_entities(read_facade, synonym);
-            const auto relevant_variables = scan_entities(read_facade, var_syn);
+            const auto relevant_stmts = synonym->scan(read_facade);
+            const auto relevant_variables = var_syn->scan(read_facade);
 
             const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
             const auto var_vec = std::vector<std::string>{relevant_variables.begin(), relevant_variables.end()};
@@ -92,7 +91,7 @@ auto ModifiesSEvaluator::eval_modifies(const std::shared_ptr<ReadFacade>& read_f
         },
         [read_facade](const std::shared_ptr<qps::StmtSynonym>& synonym,
                       const qps::QuotedIdent& identifier) -> std::optional<Table> {
-            const auto relevant_stmts = scan_entities(read_facade, synonym);
+            const auto relevant_stmts = synonym->scan(read_facade);
             const auto relevant_stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
 
             const auto stmts = read_facade->get_statements_that_modify_var(identifier.get_value());
