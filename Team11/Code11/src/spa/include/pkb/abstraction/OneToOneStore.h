@@ -1,10 +1,26 @@
-//
-// Created by Chen Hsiao Ting on 20/2/24.
-//
+#pragma once
 
-#ifndef SPA_ONETOONESTORE_H
-#define SPA_ONETOONESTORE_H
+#include <unordered_map>
+#include <unordered_set>
 
-class OneToOneStore {};
+template<class KeyType, class ValueType>
+class OneToOneStore {
+  public:
+    OneToOneStore();
 
-#endif // SPA_ONETOONESTORE_H
+    void add(const KeyType& key, const ValueType& value);
+    bool contains(const KeyType& key, const ValueType& value) const;
+    bool containsKey(const KeyType& key) const;
+    bool containsValue(const ValueType& value) const;
+    ValueType getValueByKey(const KeyType& key) const;
+    KeyType getKeyByValue(const ValueType& value) const;
+    std::unordered_map<KeyType, ValueType> getAll() const;
+    std::unordered_set<KeyType> getAllKeys() const;
+    std::unordered_set<ValueType> getAllValues() const;
+
+  private:
+    std::unordered_map<KeyType, ValueType> forward_map;
+    std::unordered_map<ValueType, KeyType> reverse_map;
+};
+
+#include "../../../src/pkb/abstraction/OneToOneStore.tpp"
