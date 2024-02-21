@@ -1,4 +1,7 @@
 #include "qps/evaluators/relationship/uses_s_evaluator.hpp"
+#include "qps/parser/entities/synonym.hpp"
+#include <memory>
+#include <optional>
 
 namespace qps {
 
@@ -26,23 +29,18 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade)
         [read_facade](const std::shared_ptr<StmtSynonym>& stmt_synonym,
                       const qps::QuotedIdent& quoted_ident) -> std::optional<Table> {
             auto table = Table{{stmt_synonym}};
+            const auto relevant_stmts = stmt_synonym->scan(read_facade);
 
-            StatementType statement_type;
-            if (const auto assign_stmt = std::dynamic_pointer_cast<AssignSynonym>(stmt_synonym)) {
-                statement_type = StatementType::Assign;
-            } else if (const auto print_stmt = std::dynamic_pointer_cast<PrintSynonym>(stmt_synonym)) {
-                statement_type = StatementType::Print;
-            } else if (const auto if_stmt = std::dynamic_pointer_cast<IfSynonym>(stmt_synonym)) {
-                statement_type = StatementType::If;
-            } else if (const auto while_stmt = std::dynamic_pointer_cast<WhileSynonym>(stmt_synonym)) {
-                statement_type = StatementType::While;
-            } else {
-                statement_type = StatementType::Raw;
+            const auto statements = read_facade->get_statements_that_use_var(quoted_ident.get_value());
+
+            for (const auto& stmt : statements) {
+                if (relevant_stmts.find(stmt) != relevant_stmts.end()) {
+                    table.add_row({stmt});
+                }
             }
 
-            const auto statements = read_facade->get_statements_that_use_var(quoted_ident.get_value(), statement_type);
-            for (const auto& stmt : statements) {
-                table.add_row({stmt});
+            if (table.empty()) {
+                return std::nullopt;
             }
 
             return table;
