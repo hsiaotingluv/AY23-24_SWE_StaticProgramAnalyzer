@@ -1,0 +1,90 @@
+1 - Test statement uses variable
+stmt s; variable v;
+Select v such that Uses(s, v)
+x, y
+5000
+2 - Test statement Uses 'x'
+stmt s;
+Select s such that Uses(s, "x")
+2, 3, 4, 5, 6, 7, 9
+5000
+3 - Test statement uses wildcard
+stmt s;
+Select s such that Uses(s, _)
+2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+5000
+4 - Test statement number uses variable
+variable v;
+Select v such that Uses(4, v)
+x, y
+5000
+5 - Test statement number uses 'x'
+variable v;
+Select v such that Uses(4, "x")
+x, y
+5000
+6 - Test statement number uses wildcard
+variable v;
+Select v such that Uses (4, _)
+x, y
+5000
+7 - Test assignment uses variable
+assign a; variable v;
+Select a such that uses(a, v)
+4, 9, 12
+5000
+8 - Test assignment uses 'x'
+assign a;
+Select a such that Uses(a, "x")
+4, 9
+5000
+9 - Test assignment uses wildcard
+assign a;
+Select a such that Uses(a, _)
+4, 9, 12
+5000
+10 - Test print uses variable
+print pn; variable v;
+Select v such that Uses(pn, v)
+3, 6, 8, 11, 14
+5000
+11 - Test print uses 'x'
+print pn;
+Select pn such that Uses(pn, "x")
+3, 6
+5000
+12 - Test print uses wildcard
+print pn;
+Select pn such that Uses(pn, _)
+3, 6, 8, 11, 14
+5000
+13 - Test while uses variable
+while w; variable v;
+Select w such that Uses(w, v)
+2, 7, 10
+5000
+14 - Test while uses 'x'
+while w;
+Select w such that Uses(w, "x")
+2, 7
+5000
+15 - Test while uses wildcard
+while w;
+Select w such that Uses(w, _)
+2, 7, 10
+5000
+16 - Test if uses variable
+if i; variable v;
+Select i such that Uses(i, v)
+13
+5000
+17 - Test if uses 'x'
+if i;
+Select i such that Uses(i, "x")
+
+5000
+18 - Test if uses wildcard
+if i;
+Select i such that Modifies(i, _)
+13
+5000
