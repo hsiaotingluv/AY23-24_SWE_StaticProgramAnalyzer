@@ -29,6 +29,10 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
                     table.add_row({parent_child_set.first, child});
                 }
             }
+
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -44,6 +48,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
                 }
                 table.add_row({ancestor});
             }
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -57,6 +64,9 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
                     continue;
                 }
                 table.add_row({parent_name});
+            }
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
@@ -73,6 +83,10 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<ReadFacade>& read_fac
                     continue;
                 }
                 table.add_row({descendant});
+            }
+
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },

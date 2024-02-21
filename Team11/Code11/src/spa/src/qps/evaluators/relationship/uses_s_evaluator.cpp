@@ -22,6 +22,9 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade)
                     table.add_row({stmt_candidate, var_candidate});
                 }
             }
+            if (table.empty()) {
+                return std::nullopt;
+            }
             return table;
         },
 
@@ -68,6 +71,9 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<ReadFacade>& read_facade)
             const auto used_vars = read_facade->get_vars_used_by_statement(std::to_string(stmt_num.value));
             for (const auto& var : used_vars) {
                 table.add_row({var});
+            }
+            if (table.empty()) {
+                return std::nullopt;
             }
             return table;
         },
