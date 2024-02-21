@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Run the autotester.")
     parser.add_argument("source", help="The source file to test.")
-    parser.add_argument("query", help="The query file.")
+    parser.add_argument("--query", help="The query file.", default="")
     parser.add_argument("-i", "--ignore_exists", action="store_true")
     parser.add_argument("--output", help="Output xml", default="out.xml")
     parser.add_argument(
@@ -31,6 +31,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     assert is_file(args.source)
+
+    if not is_file(args.query):
+        deduced_name = args.source.replace("_source.txt", "_queries.txt")
+        print(f"Query file {args.query} does not exist. Trying {deduced_name}")
+        args.query = deduced_name
+
     assert is_file(args.query)
 
     output_name = os.path.basename(args.output)
@@ -79,7 +85,9 @@ if __name__ == "__main__":
         )
 
     if errors:
-        print(f"[{args.source} - {args.query}] Failed test cases: {','.join(map(str, errors))}")
+        print(
+            f"[{args.source} - {args.query}] Failed test cases: {','.join(map(str, errors))}"
+        )
         exit(1)
     else:
         print(f"[{args.source} - {args.query}] Pass all system testing")
