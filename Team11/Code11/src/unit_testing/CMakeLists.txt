@@ -10,4 +10,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     target_link_options(unit_testing PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
 
-target_compile_definitions(unit_testing PRIVATE ENABLE_BENCHMARK)
+if(TEST_WITH_BENCHMARK)
+    target_compile_definitions(unit_testing PRIVATE ENABLE_BENCHMARK)
+endif()
