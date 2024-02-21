@@ -15,7 +15,7 @@ class ParentTraverser : public Traverser {
 
     // Helper function
     auto traverse_helper(const std::shared_ptr<AstNode>& node) -> void;
-    auto get_stmt_nums_from_stmt_lst(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
+    static auto get_stmt_nums_from_stmt_lst(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string>;
 
   public:
     explicit ParentTraverser(std::shared_ptr<WriteFacade> write_facade) : write_facade(std::move(write_facade)) {

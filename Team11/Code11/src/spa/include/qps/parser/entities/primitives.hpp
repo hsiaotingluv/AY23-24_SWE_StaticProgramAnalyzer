@@ -1,10 +1,16 @@
 #pragma once
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 
 namespace qps {
-class WildCard {
+
+class Ref {};
+
+class WildCard : public Ref {
+    std::string value = "_";
+
   public:
     friend auto operator<<(std::ostream& os, const WildCard&) -> std::ostream& {
         os << "_";
@@ -46,7 +52,7 @@ class IDENT {
     }
 };
 
-class QuotedIdent {
+class QuotedIdent : public Ref {
     std::string value;
 
   public:
@@ -71,6 +77,27 @@ class QuotedIdent {
     }
 
     friend auto operator==(const std::string& lhs, const QuotedIdent& rhs) -> bool {
+        return lhs == rhs.value;
+    }
+};
+
+struct Integer {
+    uint32_t value;
+
+    friend auto operator<<(std::ostream& os, const Integer& integer) -> std::ostream& {
+        os << integer.value;
+        return os;
+    }
+
+    friend auto operator==(const Integer& lhs, const Integer& rhs) -> bool {
+        return lhs.value == rhs.value;
+    }
+
+    friend auto operator==(const Integer& lhs, const uint32_t& rhs) -> bool {
+        return lhs.value == rhs;
+    }
+
+    friend auto operator==(const uint32_t& lhs, const Integer& rhs) -> bool {
         return lhs == rhs.value;
     }
 };

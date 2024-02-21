@@ -34,7 +34,6 @@ class SourceProcessor {
     std::vector<std::shared_ptr<Traverser>> traversers;
     std::shared_ptr<WriteFacade> write_facade;
     SemanticValidator semantic_validator{};
-    static int counter;
 
   public:
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
@@ -67,6 +66,7 @@ class SourceProcessor {
     }
 
     static auto output_xml(const std::shared_ptr<AstNode>& ast_node) -> std::string {
+        static int counter = 0;
         auto ast_xml = ast_node->to_xml();
         auto current_path = std::filesystem::current_path();
 

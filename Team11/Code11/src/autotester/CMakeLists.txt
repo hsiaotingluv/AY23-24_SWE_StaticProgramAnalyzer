@@ -1,5 +1,4 @@
-file(GLOB srcs "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-add_executable(autotester ${srcs})
+add_executable(autotester "src/TestWrapper.cpp")
 target_include_directories(autotester PUBLIC include)
 target_link_libraries(autotester spa ${AUTOTESTER_LIBRARIES})
 
@@ -8,6 +7,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     target_compile_options(autotester PRIVATE -fsanitize=address -fsanitize=undefined)
     target_link_options(autotester PRIVATE -fsanitize=address -fsanitize=undefined)
 endif()
+
+message(STATUS "Building local runner")
+add_executable(local_runner "src/main.cpp" "src/TestWrapper.cpp")
+target_include_directories(local_runner PUBLIC include)
+target_link_libraries(local_runner spa)
+
+target_compile_options(local_runner PRIVATE -fsanitize=address -fsanitize=undefined)
+target_link_options(local_runner PRIVATE -fsanitize=address -fsanitize=undefined)
 
 if(NOT WIN32)
     target_link_libraries(autotester pthread)

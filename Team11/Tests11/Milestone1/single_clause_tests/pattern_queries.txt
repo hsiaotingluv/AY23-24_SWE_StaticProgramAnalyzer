@@ -1,0 +1,125 @@
+1 - Test pattern (var, wildcard)
+assign a; variable v;
+Select a pattern a (v, _)
+4,6,9,10
+5000
+2 - Test pattern (var, exact_non_existing_var)
+assign a; variable v;
+Select a pattern a (v, "nonExisting")
+none
+5000
+3 - Test pattern (var, exact_match_var)
+assign a; variable v;
+Select a pattern a (v, "x")
+6
+5000
+4 - Test pattern (var, partial_match_var)
+assign a; variable v;
+Select a pattern a (v, _"x"_)
+4,6,10
+5000
+5 - Test pattern (var, partial_match_const)
+assign a; variable v;
+Select a pattern a (v, _"1"_)
+4,9
+5000
+6 - Test pattern (wildcard, wildcard)
+assign a;
+Select a pattern a (_, _)
+4,6,9,10
+5000
+7 - Test pattern (wildcard, partial_non_existing_var)
+assign a;
+Select a pattern a (_, _"nonExisting"_)
+none
+5000
+8 - Test pattern (wildcard, exact_match_var)
+assign a;
+Select a pattern a (_, "x")
+6
+5000
+9 - Test pattern (wildcard, partial_match_var)
+assign a;
+Select a pattern a (_, _"y"_)
+9
+5000
+10 - Test pattern (wildcard, partial_match_const)
+assign a;
+Select a pattern a (_, _"2"_)
+none
+5000
+11 - Test pattern (char_string, wildcard)
+assign a;
+Select a pattern a ("x", _)
+4
+5000
+12 - Test pattern (char_string, exact_non_existing_var)
+assign a;
+Select a pattern a ("x", "nonExisting")
+none
+5000
+13 - Test pattern (char_string, exact_match_var)
+assign a;
+Select a pattern a ("y", "x")
+6
+5000
+14 - Test pattern (char_string, partial_match_var)
+assign a;
+Select a pattern a ("y", _"x"_)
+6
+5000
+15 - Test pattern (char_string, partial_match_const)
+assign a;
+Select a pattern a ("z", _"3"_)
+10
+5000
+16 - Test pattern (SELECT keyword as var, wildcard)
+assign pattern; variable Select;
+Select Select pattern pattern (Select, _)
+x,y,z
+5000
+17 - Test pattern (SELECT keyword as var, partial_non_existing_var)
+assign pattern; variable Select;
+Select Select pattern pattern (Select, _"nonExisting"_)
+none
+5000
+18 - Test pattern (SELECT keyword as var, exact_match_var)
+assign pattern; variable Select;
+Select Select pattern pattern (Select, "x")
+y
+5000
+19 - Test pattern (SELECT keyword as var, partial_match_var)
+assign pattern; variable Select;
+Select Select pattern pattern (Select, _"x"_)
+x,y,z
+5000
+20 - Test pattern (SELECT keyword as var, partial_match_const)
+assign pattern; variable Select;
+Select Select pattern pattern (Select, _"1"_)
+x,y
+5000
+21 - Test pattern (char_string, wildcard) with keyword as assign synonym
+assign pattern;
+Select pattern pattern pattern("x", _)
+4
+5000
+22 - Test pattern (char_string, exact_non_existing_var) with keyword as assign synonym
+assign pattern;
+Select pattern pattern pattern("x", "nonExisting")
+none
+5000
+23 - Test pattern (char_string, exact_match_var) with keyword as assign synonym
+assign pattern;
+Select pattern pattern pattern("y", "x")
+6
+5000
+24 - Test pattern (char_string, partial_match_var) with keyword as assign synonym
+assign pattern;
+Select pattern pattern pattern("z", _"x"_)
+10
+5000
+25 - Test pattern (char_string, partial_match_const) with keyword as assign synonym
+assign pattern;
+Select pattern pattern pattern("y", _"1"_)
+9
+5000

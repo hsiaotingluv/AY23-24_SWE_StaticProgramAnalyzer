@@ -46,19 +46,4 @@ auto is(const Token& token, const std::string& content) -> bool {
     return token.content == content;
 }
 
-auto get_stmt_ref(const Synonyms& declared, const Token& token) -> std::optional<StmtRef> {
-    if (is_string(token)) {
-        return find_stmt_syn(declared, token.content);
-    } else if (is_wildcard(token)) {
-        return WildCard{};
-    } else {
-        const auto integer = std::stoi(token.content);
-        if (integer > 0) {
-            return Integer{static_cast<uint32_t>(integer)};
-        } else {
-            return std::nullopt;
-        }
-    }
-}
-
 } // namespace qps

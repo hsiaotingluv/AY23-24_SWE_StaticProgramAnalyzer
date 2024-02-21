@@ -2,16 +2,27 @@
 
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 
+#include <memory>
+#include <optional>
 #include <ostream>
 #include <utility>
 #include <variant>
 
 namespace qps {
 
-using StmtRefNoWildcard = std::variant<StmtSynonym, Integer>;
-using ProcedureRefNoWildcard = std::variant<ProcSynonym, QuotedIdent>;
-using VarRef = std::variant<WildCard, VarSynonym, QuotedIdent>;
+using StmtRef = std::variant<WildCard, std::shared_ptr<StmtSynonym>, Integer>;
+using EntRef = std::variant<WildCard, std::shared_ptr<Synonym>, QuotedIdent>;
+using StmtRefNoWildcard = std::variant<std::shared_ptr<StmtSynonym>, Integer>;
+using EntRefNoWildcard = std::variant<std::shared_ptr<Synonym>, QuotedIdent>;
+using ProcedureRefNoWildcard = std::variant<std::shared_ptr<ProcSynonym>, QuotedIdent>;
+using VarRef = std::variant<WildCard, std::shared_ptr<VarSynonym>, QuotedIdent>;
+
+auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard>;
+auto reject_wildcard(const EntRef& ent_ref) -> std::optional<EntRefNoWildcard>;
+auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef>;
+auto to_proc_ref(const EntRefNoWildcard& ent_ref) -> std::optional<ProcedureRefNoWildcard>;
 
 struct Follows {
     /**
@@ -48,7 +59,7 @@ struct FollowsT {
     StmtRef stmt1;
     StmtRef stmt2;
 
-    static constexpr auto keyword = "Follows";
+    static constexpr auto keyword = "Follows*";
 
   public:
     FollowsT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
@@ -98,7 +109,7 @@ struct ParentT {
     StmtRef stmt1;
     StmtRef stmt2;
 
-    static constexpr auto keyword = "Parent";
+    static constexpr auto keyword = "Parent*";
 
     ParentT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
     }
@@ -124,6 +135,20 @@ struct UsesS {
 
     static constexpr auto keyword = "Uses";
 
+    static auto construct(const StmtRef& stmt_ref, const EntRef& ent_ref) -> std::optional<UsesS> {
+        const auto maybe_stmt = reject_wildcard(stmt_ref);
+        if (!maybe_stmt.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return UsesS{maybe_stmt.value(), maybe_var.value()};
+    }
+
     UsesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
 
@@ -146,9 +171,28 @@ struct UsesP {
     ProcedureRefNoWildcard ent1;
     VarRef ent2;
 
-    static constexpr auto keyword = "Uses";
+    static constexpr auto keyword = UsesS::keyword;
 
     UsesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
+    }
+
+    static auto construct(const EntRef& proc_ref, const EntRef& ent_ref) -> std::optional<UsesP> {
+        const auto maybe_ent_ref = reject_wildcard(proc_ref);
+        if (!maybe_ent_ref.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_proc = to_proc_ref(maybe_ent_ref.value());
+        if (!maybe_proc.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return UsesP{maybe_proc.value(), maybe_var.value()};
     }
 
     friend auto operator<<(std::ostream& os, const UsesP& usesP) -> std::ostream&;
@@ -171,6 +215,20 @@ struct ModifiesS {
     VarRef ent;
 
     static constexpr auto keyword = "Modifies";
+
+    static auto construct(const StmtRef& stmt_ref, const EntRef& ent_ref) -> std::optional<ModifiesS> {
+        const auto maybe_stmt = reject_wildcard(stmt_ref);
+        if (!maybe_stmt.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return ModifiesS{maybe_stmt.value(), maybe_var.value()};
+    }
 
     ModifiesS(StmtRefNoWildcard stmt, VarRef ent) : stmt(std::move(stmt)), ent(std::move(ent)) {
     }
@@ -195,10 +253,28 @@ struct ModifiesP {
     ProcedureRefNoWildcard ent1;
     VarRef ent2;
 
-    static constexpr auto keyword = "Modifies";
+    static constexpr auto keyword = ModifiesS::keyword;
 
-  public:
     ModifiesP(ProcedureRefNoWildcard ent1, VarRef ent2) : ent1(std::move(ent1)), ent2(std::move(ent2)) {
+    }
+
+    static auto construct(const EntRef& proc_ref, const EntRef& ent_ref) -> std::optional<ModifiesP> {
+        const auto maybe_ent_ref = reject_wildcard(proc_ref);
+        if (!maybe_ent_ref.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_proc = to_proc_ref(maybe_ent_ref.value());
+        if (!maybe_proc.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_var = to_var_ref(ent_ref);
+        if (!maybe_var.has_value()) {
+            return std::nullopt;
+        }
+
+        return ModifiesP{maybe_proc.value(), maybe_var.value()};
     }
 
     friend auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream&;
@@ -208,14 +284,9 @@ struct ModifiesP {
     }
 };
 
-using Relationship = std::variant<Follows, FollowsT, Parent, ParentT, UsesS, UsesP, ModifiesS, ModifiesP>;
+using StmtStmtList = TypeList<Follows, FollowsT, Parent, ParentT>;
+using StmtEntList = TypeList<UsesS, ModifiesS>;
+using EntEntList = TypeList<UsesP, ModifiesP>;
 
-inline auto operator<<(std::ostream& os, const Relationship& relationship) -> std::ostream& {
-    std::visit(
-        [&os](auto&& relationship) {
-            os << relationship;
-        },
-        relationship);
-    return os;
-}
+using Relationship = TypeListToVariant<Concat<Concat<StmtStmtList, StmtEntList>::type, EntEntList>::type>::type;
 } // namespace qps

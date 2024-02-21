@@ -8,7 +8,7 @@
 
 namespace tokenizer {
 class TokenizerRunner {
-    const std::unique_ptr<Tokenizer> tokenizer;
+    std::unique_ptr<Tokenizer> tokenizer;
 
     static void push_token(bool debug, std::vector<Token>& result, const Token& res_success);
     bool include_done;

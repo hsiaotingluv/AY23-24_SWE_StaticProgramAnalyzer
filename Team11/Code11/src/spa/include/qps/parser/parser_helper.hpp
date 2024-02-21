@@ -1,6 +1,5 @@
 #pragma once
 #include "common/tokeniser/tokenizer.hpp"
-#include "qps/parser/entities/synonym.hpp"
 
 using Token = tokenizer::Token;
 
@@ -14,8 +13,6 @@ auto is_stmt_ref(const Token& token) -> bool;
 auto is_keyword(const Token& token, const std::string& keyword) -> bool;
 
 auto is(const Token& token, std::string content) -> bool;
-
-auto get_stmt_ref(const Synonyms& declared, const Token& token) -> std::optional<StmtRef>;
 
 template <char c>
 auto is_char(const Token& token) -> bool {
