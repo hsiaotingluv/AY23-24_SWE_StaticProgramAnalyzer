@@ -6,17 +6,17 @@ x, y
 2 - Test statement Uses 'x'
 stmt s;
 Select s such that Uses(s, "x")
-2, 3, 4, 5, 6, 7, 9
+2, 3, 4, 5, 6, 7, 9, 13
 5000
 3 - Test statement uses wildcard
 stmt s;
 Select s such that Uses(s, _)
-2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 5000
 4 - Test statement number uses variable
 variable v;
 Select v such that Uses(4, v)
-x, y
+x
 5000
 5 - Test statement number uses 'x'
 variable v;
@@ -30,7 +30,7 @@ x, y
 5000
 7 - Test assignment uses variable
 assign a; variable v;
-Select a such that uses(a, v)
+Select a such that Uses(a, v)
 4, 9, 12
 5000
 8 - Test assignment uses 'x'
@@ -46,7 +46,7 @@ Select a such that Uses(a, _)
 10 - Test print uses variable
 print pn; variable v;
 Select v such that Uses(pn, v)
-3, 6, 8, 11, 14
+x, y
 5000
 11 - Test print uses 'x'
 print pn;
@@ -81,7 +81,7 @@ Select i such that Uses(i, v)
 17 - Test if uses 'x'
 if i;
 Select i such that Uses(i, "x")
-
+13
 5000
 18 - Test if uses wildcard
 if i;
