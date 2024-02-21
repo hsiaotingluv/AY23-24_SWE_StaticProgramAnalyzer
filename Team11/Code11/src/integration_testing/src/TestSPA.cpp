@@ -4,8 +4,8 @@
 
 #include "pkb/pkb.h"
 
-#include "qps/evaluators/simple_evaluator.hpp"
-#include "qps/parser/parser.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
+#include "qps/qps.hpp"
 
 #include <unordered_set>
 
@@ -62,7 +62,7 @@ TEST_CASE("Test SPA - Entities") {
 
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
-    const auto qps_parser = qps::QueryProcessingSystemParser{};
+    const auto qps_parser = qps::QueryProcessingSystem{};
 
     SECTION("Test SP - complex program Code 4 - success") {
         auto input = input_generator();
@@ -79,42 +79,42 @@ TEST_CASE("Test SPA - Entities") {
         // Stage 2: Answer queries
         SECTION("Test Query - all variables") {
             const auto query = "variable v; Select v";
-            const auto maybe_query_obj = qps_parser.parse(query);
+            const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
             REQUIRE(maybe_query_obj.has_value());
             const auto query_obj = maybe_query_obj.value();
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_variables);
         }
 
         SECTION("Test Query - all procedures") {
             const auto query = "procedure p; Select p";
-            const auto maybe_query_obj = qps_parser.parse(query);
+            const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
             REQUIRE(maybe_query_obj.has_value());
             const auto query_obj = maybe_query_obj.value();
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_procedures);
         }
 
         SECTION("Test Query - all constants") {
             const auto query = "constant c; Select c";
-            const auto maybe_query_obj = qps_parser.parse(query);
+            const auto maybe_query_obj = qps::to_query(qps_parser.parse(query));
 
             REQUIRE(maybe_query_obj.has_value());
             const auto query_obj = maybe_query_obj.value();
 
             REQUIRE(query_obj.clauses.empty());
 
-            auto evaluator = qps::Evaluator{read_facade};
+            auto evaluator = qps::QueryEvaluator{read_facade};
             const auto results = evaluator.evaluate(query_obj);
             require_overlap(results, expected_constants);
         }

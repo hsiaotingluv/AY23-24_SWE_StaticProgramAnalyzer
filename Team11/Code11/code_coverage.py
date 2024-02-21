@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     os.chdir(BUILD_PATH)
     os.system("cmake -DCMAKE_BUILD_TYPE=Debug ..")
-    os.system("make SPA_coverage")
+    os.system("make -j10 SPA_coverage")
 
     # Run http server
     os.chdir(os.path.join(BUILD_PATH, "SPA_coverage"))

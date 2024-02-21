@@ -1,0 +1,18 @@
+procedure Modifies {
+  read x;
+  read y;
+
+  if (x==1) then {
+    y = x - 1;
+  } else {
+    z = x + y;
+    print x;
+  }
+
+  while (x>0) {
+    x = y + 1;
+    read z;
+  }
+
+  x = z;
+}
