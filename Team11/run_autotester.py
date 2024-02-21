@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Run the autotester.")
     parser.add_argument("source", help="The source file to test.")
-    parser.add_argument("--query", help="The query file.", default="")
+    parser.add_argument("query", nargs="?", help="The query file.", default="")
     parser.add_argument("-i", "--ignore_exists", action="store_true")
     parser.add_argument("--output", help="Output xml", default="out.xml")
     parser.add_argument(
