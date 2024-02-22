@@ -8,36 +8,30 @@ auto FollowsTEvaluator::select_eval_method() {
                const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             return eval_follows_t(stmt_syn_1, stmt_syn_2);
         },
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-               const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
             return eval_follows_t(stmt_syn_1, stmt_num_2);
         },
         [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                const qps::WildCard& wild_card_2) -> std::optional<Table> {
             return eval_follows_t(stmt_syn_1, wild_card_2);
         },
-        [this](const qps::Integer& stmt_num_1,
-               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             return eval_follows_t(stmt_num_1, stmt_syn_2);
         },
-        [this](const qps::Integer& stmt_num_1,
-               const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
             return eval_follows_t(stmt_num_1, stmt_num_2);
         },
-        [this](const qps::Integer& stmt_num_1,
-               const qps::WildCard& wild_card_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const qps::WildCard& wild_card_2) -> std::optional<Table> {
             return eval_follows_t(stmt_num_1, wild_card_2);
         },
         [this](const qps::WildCard& wild_card_1,
                const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             return eval_follows_t(wild_card_1, stmt_syn_2);
         },
-        [this](const qps::WildCard& wild_card_1,
-               const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const qps::WildCard& wild_card_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
             return eval_follows_t(wild_card_1, stmt_num_2);
         },
-        [this](const qps::WildCard& wild_card_1,
-               const qps::WildCard& wild_card_2) -> std::optional<Table> {
+        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> std::optional<Table> {
             return eval_follows_t(wild_card_1, wild_card_2);
         }};
 }
@@ -46,8 +40,8 @@ auto FollowsTEvaluator::evaluate() -> std::optional<Table> {
     return std::visit(select_eval_method(), follows_t.stmt1, follows_t.stmt2);
 }
 
-auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_syn_1,
-                                       const std::shared_ptr<StmtSynonym> &stmt_syn_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
+                                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
     if (stmt_syn_1 == stmt_syn_2) {
         return std::nullopt;
     }
@@ -75,8 +69,8 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_
     return table;
 }
 
-auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_syn_1,
-                                       const Integer &stmt_num_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2)
+    -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto followed_stmts = read_facade->get_follows_stars_by(std::to_string(stmt_num_2.value));
@@ -93,8 +87,8 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_
     return table;
 }
 
-auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_syn_1,
-                                       const WildCard&) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&)
+    -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto all_followed_stmts = read_facade->get_all_follows_star_keys();
@@ -111,12 +105,11 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym> &stmt_
     return table;
 }
 
-auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
-                                       const std::shared_ptr<StmtSynonym> &stmt_syn_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2)
+    -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
-    const auto all_followers_of_stmt =
-            read_facade->get_follows_stars_following(std::to_string(stmt_num_1.value));
+    const auto all_followers_of_stmt = read_facade->get_follows_stars_following(std::to_string(stmt_num_1.value));
     for (const auto& follower : all_followers_of_stmt) {
         if (relevant_stmts.find(follower) == relevant_stmts.end()) {
             continue;
@@ -130,8 +123,7 @@ auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
     return table;
 }
 
-auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
-                                       const Integer &stmt_num_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const Integer& stmt_num_2) -> std::optional<Table> {
     // TODO: improve pkv API, has_follows_star
     const auto follows_star_map = read_facade->get_all_follows_star();
     bool stmt_1_is_followed = false;
@@ -156,8 +148,7 @@ auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
     return Table{};
 }
 
-auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
-                                       const WildCard&) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const WildCard&) -> std::optional<Table> {
     // TODO: Improve pkb API: bool is_followed_by_something
     const auto all_followed_stmts = read_facade->get_all_follows_star_keys();
     bool is_followed = false;
@@ -174,8 +165,8 @@ auto FollowsTEvaluator::eval_follows_t(const Integer &stmt_num_1,
     return Table{};
 }
 
-auto FollowsTEvaluator::eval_follows_t(const WildCard &,
-                                       const std::shared_ptr<StmtSynonym> &stmt_syn_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2)
+    -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
     const auto all_following = read_facade->get_all_follows_star_values();
@@ -192,8 +183,7 @@ auto FollowsTEvaluator::eval_follows_t(const WildCard &,
     return table;
 }
 
-auto FollowsTEvaluator::eval_follows_t(const WildCard &,
-                                       const Integer &stmt_num_2) -> std::optional<Table> {
+auto FollowsTEvaluator::eval_follows_t(const WildCard&, const Integer& stmt_num_2) -> std::optional<Table> {
     // TODO: Improve pkb API: bool is_following_star_something
     const auto all_following_stmts = read_facade->get_all_follows_star_values();
     bool is_following = false;
