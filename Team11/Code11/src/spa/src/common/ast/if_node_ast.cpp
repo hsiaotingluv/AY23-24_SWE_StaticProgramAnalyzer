@@ -67,4 +67,31 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_fac
 auto IfNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
     write_facade->add_statement(std::to_string(get_statement_number()), StatementType::If);
 }
+
+auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+    // Consider only level-1 children. Processing further nested children are handled by PKB.
+    auto statement_nums = std::unordered_set<std::string>{};
+    auto statements = node->statements;
+    for (const auto& statement: statements) {
+        auto statement_node = std::dynamic_pointer_cast<StatementNode>(statement);
+        auto statement_num = std::to_string(statement_node->get_statement_number());
+        statement_nums.insert(statement_num);
+    }
+    return statement_nums;
+}
+
+auto IfNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+    auto parent_statement_num = std::to_string(get_statement_number());
+
+    auto then_statement_nums = get_stmt_nums(then_stmt_list);
+    for (const auto& child_statement_num : then_statement_nums) {
+        write_facade->add_parent(parent_statement_num, child_statement_num);
+    }
+
+    auto else_statement_nums = get_stmt_nums(else_stmt_list);
+    for (const auto& child_statement_num : else_statement_nums) {
+        write_facade->add_parent(parent_statement_num, child_statement_num);
+    }
+}
+
 } // namespace sp
