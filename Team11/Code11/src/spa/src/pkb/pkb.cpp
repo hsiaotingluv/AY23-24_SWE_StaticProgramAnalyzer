@@ -12,10 +12,10 @@ PKB::PKB()
       direct_parent_store(std::make_shared<DirectParentStore>()),
       parent_star_store(std::make_shared<ParentStarStore>()),
       procedure_modifies_store(std::make_shared<ProcedureModifiesStore>()),
-      statement_modifies_store(std::make_shared<StatementModifiesStore>()), next_store(std::make_shared<NextStore>()),
+      statement_modifies_store(std::make_shared<StatementModifiesStore>()),
       procedure_uses_store(std::make_shared<ProcedureUsesStore>()),
-      statement_uses_store(std::make_shared<StatementUsesStore>()), calls_store(std::make_shared<CallsStore>()),
-      assignment_store(std::make_shared<AssignmentStore>()) {
+      statement_uses_store(std::make_shared<StatementUsesStore>()), next_store(std::make_shared<NextStore>()),
+      calls_store(std::make_shared<CallsStore>()), assignment_store(std::make_shared<AssignmentStore>()) {
 }
 
 auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
