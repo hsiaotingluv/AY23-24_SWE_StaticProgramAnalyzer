@@ -574,7 +574,7 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
     const auto& [new_column, ordering1, ordering2, common_column_idxs] =
         double_pointer_merge_with_ordering(table1_column_names, table2_column_names);
 
-    if (common_column_idxs.size() == 0) {
+    if (common_column_idxs.empty()) {
         return cross_join(std::move(tableA), std::move(tableB));
     } else {
         return merge_join(tableA, tableB);

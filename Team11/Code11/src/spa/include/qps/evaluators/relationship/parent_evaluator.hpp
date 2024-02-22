@@ -8,13 +8,14 @@
 
 namespace qps {
 class ParentEvaluator : public ClauseEvaluator {
+    std::shared_ptr<ReadFacade> read_facade;
     Parent parent;
 
     static auto eval_parent(const std::shared_ptr<ReadFacade>& read_facade);
 
   public:
     ParentEvaluator(std::shared_ptr<ReadFacade> read_facade, Parent parent)
-        : ClauseEvaluator(std::move(read_facade)), parent(std::move(parent)) {
+        : ClauseEvaluator(), read_facade(std::move(read_facade)), parent(std::move(parent)) {
     }
 
     auto evaluate() -> std::optional<Table> override;

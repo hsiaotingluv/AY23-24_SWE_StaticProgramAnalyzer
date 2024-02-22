@@ -11,13 +11,14 @@
 namespace qps {
 
 class ModifiesSEvaluator : public ClauseEvaluator {
+    std::shared_ptr<ReadFacade> read_facade;
     ModifiesS modifies_s;
 
     static auto eval_modifies(const std::shared_ptr<ReadFacade>& read_facade);
 
   public:
     ModifiesSEvaluator(std::shared_ptr<ReadFacade> read_facade, ModifiesS modifies_s)
-        : ClauseEvaluator(std::move(read_facade)), modifies_s(std::move(modifies_s)) {
+        : ClauseEvaluator(), read_facade(std::move(read_facade)), modifies_s(std::move(modifies_s)) {
     }
 
     auto evaluate() -> std::optional<Table> override;
