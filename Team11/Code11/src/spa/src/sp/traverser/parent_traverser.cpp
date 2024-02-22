@@ -1,10 +1,10 @@
 #include "sp/traverser/parent_traverser.hpp"
 
 namespace sp {
-    
+
 auto ParentTraverser::traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>&)
     -> std::shared_ptr<AstNode> {
-    
+
     if (NodeTypeChecker::is_if_node(node)) {
         auto if_node = std::dynamic_pointer_cast<IfNode>(node);
         if_node->populate_pkb_parent(write_facade);

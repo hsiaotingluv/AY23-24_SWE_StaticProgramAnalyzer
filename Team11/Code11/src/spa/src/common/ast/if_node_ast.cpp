@@ -72,7 +72,7 @@ auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
     // Consider only level-1 children. Processing further nested children are handled by PKB.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
-    for (const auto& statement: statements) {
+    for (const auto& statement : statements) {
         auto statement_node = std::dynamic_pointer_cast<StatementNode>(statement);
         auto statement_num = std::to_string(statement_node->get_statement_number());
         statement_nums.insert(statement_num);

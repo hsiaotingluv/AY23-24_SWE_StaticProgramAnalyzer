@@ -3,7 +3,6 @@
 #include "common/ast/ast.hpp"
 #include "pkb/facades/write_facade.h"
 
-
 namespace sp {
 
 class ParentMixin {
@@ -12,4 +11,4 @@ class ParentMixin {
 
     virtual ~ParentMixin() = default;
 };
-} // namespace sp 
+} // namespace sp

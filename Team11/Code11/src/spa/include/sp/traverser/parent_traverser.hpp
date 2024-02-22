@@ -8,7 +8,7 @@ namespace sp {
 
 class ParentTraverser : public Traverser {
     std::shared_ptr<WriteFacade> write_facade;
-    
+
   public:
     explicit ParentTraverser(std::shared_ptr<WriteFacade> write_facade) : write_facade(std::move(write_facade)) {
     }
