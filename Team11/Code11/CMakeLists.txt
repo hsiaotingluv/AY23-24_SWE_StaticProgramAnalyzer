@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20.2)
 project(SPA)
 
+option(TEST_WITH_BENCHMARK "Enable benchmarks on test suites" OFF)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${PROJECT_SOURCE_DIR}/cmake")
