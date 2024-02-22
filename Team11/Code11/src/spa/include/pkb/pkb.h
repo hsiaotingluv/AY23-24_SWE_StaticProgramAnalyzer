@@ -24,8 +24,8 @@ class PKB {
   public:
     static std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> create_facades();
 
-    std::unordered_set<std::string> filterStatementsByType(const std::unordered_set<std::string>& stmts,
-                                                           StatementType statementType) const;
+    std::unordered_set<std::string> filter_statements_by_type(const std::unordered_set<std::string>& stmts,
+                                                              StatementType statementType) const;
 
     void finalise_pkb();
 

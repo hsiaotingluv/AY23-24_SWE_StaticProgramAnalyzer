@@ -27,8 +27,8 @@ auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::share
     return {std::move(read_facade), std::move(write_facade)};
 };
 
-std::unordered_set<std::string> PKB::filterStatementsByType(const std::unordered_set<std::string>& stmts,
-                                                            StatementType statementType) const {
+std::unordered_set<std::string> PKB::filter_statements_by_type(const std::unordered_set<std::string>& stmts,
+                                                               StatementType statementType) const {
     std::unordered_set<std::string> filtered;
     for (const auto& stmt : stmts) {
         if (statement_store->get_val_by_key(stmt) == statementType) {

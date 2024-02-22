@@ -60,9 +60,14 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_all_statements_that_modify();
 
+    std::unordered_set<std::string> get_all_statements_that_modify(const StatementType& statementType);
+
     bool does_statement_modify_any_var(const std::string& statement_number);
 
     std::unordered_set<std::tuple<std::string, std::string>> get_all_statements_and_var_modify_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_all_statements_and_var_modify_pairs(const StatementType& statementType);
 
     std::unordered_set<std::string> get_all_procedures_that_modify();
 
@@ -88,9 +93,14 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_all_statements_that_use();
 
+    std::unordered_set<std::string> get_all_statements_that_use(const StatementType& statementType);
+
     bool does_statement_use_any_var(const std::string& statement_number);
 
     std::unordered_set<std::tuple<std::string, std::string>> get_all_statements_and_var_use_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_all_statements_and_var_use_pairs(const StatementType& statementType);
 
     std::unordered_set<std::string> get_all_procedures_that_use();
 
@@ -157,7 +167,7 @@ class ReadFacade {
     std::unordered_set<std::string> get_children_of(const std::string& parent) const;
 
     std::unordered_set<std::string> get_children_of(const std::string& parent,
-                                                        const StatementType& statementType) const;
+                                                    const StatementType& statementType) const;
 
     std::string get_parent_of(const std::string& child) const;
 
@@ -178,11 +188,12 @@ class ReadFacade {
     std::unordered_set<std::string> get_children_star_of(const std::string& parent) const;
 
     std::unordered_set<std::string> get_children_star_of(const std::string& parent,
-                                                             const StatementType& statementType) const;
+                                                         const StatementType& statementType) const;
 
     std::unordered_set<std::string> get_parent_star_of(const std::string& child) const;
 
-    std::unordered_set<std::string> get_parent_star_of(const std::string& child, const StatementType& statementType) const;
+    std::unordered_set<std::string> get_parent_star_of(const std::string& child,
+                                                       const StatementType& statementType) const;
 
     // Next-related Read Operations
     bool has_next(const std::string& before, const std::string& after) const;
