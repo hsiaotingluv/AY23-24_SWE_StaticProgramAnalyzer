@@ -84,7 +84,8 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
 
         // e.g. Follows(3, 4)
         [read_facade](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
-            if (!read_facade->has_follows_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
+            if (!read_facade->has_follows_relation(std::to_string(stmt_num_1.value),
+                                                   std::to_string(stmt_num_2.value))) {
                 return std::nullopt;
             }
             return Table{};
