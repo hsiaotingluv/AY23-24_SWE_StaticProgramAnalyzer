@@ -2,6 +2,9 @@
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
+#include <tuple>
+#include <vector>
+
 PKB::PKB()
     : entity_store(std::make_shared<EntityStore>()), statement_store(std::make_shared<StatementStore>()),
       direct_follows_store(std::make_shared<DirectFollowsStore>()),
@@ -10,9 +13,9 @@ PKB::PKB()
       parent_star_store(std::make_shared<ParentStarStore>()),
       procedure_modifies_store(std::make_shared<ProcedureModifiesStore>()),
       statement_modifies_store(std::make_shared<StatementModifiesStore>()), next_store(std::make_shared<NextStore>()),
-      calls_store(std::make_shared<CallsStore>()), assignment_store(std::make_shared<AssignmentStore>()),
       procedure_uses_store(std::make_shared<ProcedureUsesStore>()),
-      statement_uses_store(std::make_shared<StatementUsesStore>()) {
+      statement_uses_store(std::make_shared<StatementUsesStore>()), calls_store(std::make_shared<CallsStore>()),
+      assignment_store(std::make_shared<AssignmentStore>()) {
 }
 
 auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
