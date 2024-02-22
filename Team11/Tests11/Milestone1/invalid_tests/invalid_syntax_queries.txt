@@ -170,12 +170,12 @@ SyntaxError
 5000
 35 - Invalid IDENT as Statement Reference in Follow Clause
 assign a;
-Select a such that Follow("ident", 3)
+Select a such that Follow("1dent", 3)
 SyntaxError
 5000
 36 - Invalid IDENT as Statement Reference in Follow* Clause
 assign a;
-Select a such that Follow*("ident", 3)
+Select a such that Follow*("1dent", 3)
 SyntaxError
 5000
 37 - Extra characters at start of statement
@@ -188,3 +188,7 @@ assign a; variable v;
 Select such that Uses(a,v)
 SyntaxError
 5000
+39 - Invalid IDENT Argument in Modifies Clause
+assign a;
+Select a such that Modifies(a, "1dent")
+SyntaxError
