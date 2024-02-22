@@ -4,39 +4,11 @@
 
 namespace sp {
 
-auto UsesTraverser::is_assignment_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<AssignmentNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_print_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<PrintNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_while_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<WhileNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_if_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<IfNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_proc_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<ProcedureNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_call_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<CallNode>(node) != nullptr);
-}
-
-auto UsesTraverser::is_var_node(const std::shared_ptr<AstNode>& node) -> bool {
-    return (std::dynamic_pointer_cast<VarNode>(node) != nullptr);
-}
-
 auto UsesTraverser::traverse_expression(const std::shared_ptr<AstNode>& expr_node) -> std::unordered_set<std::string> {
     // Return a set of used variables in an expression.
     auto combined_set = std::unordered_set<std::string>();
 
-    if (is_var_node(expr_node)) {
+    if (NodeTypeChecker::is_var_node(expr_node)) {
         // If expression is a variable, add to combined set.
         auto var_node = std::dynamic_pointer_cast<VarNode>(expr_node);
         auto var_name = var_node->name;
@@ -70,17 +42,17 @@ auto UsesTraverser::traverse_stmt_lst(const std::shared_ptr<StatementListNode>& 
 }
 
 auto UsesTraverser::traverse_helper(const std::shared_ptr<AstNode>& node) -> std::unordered_set<std::string> {
-    if (is_assignment_node(node)) {
+    if (NodeTypeChecker::is_assignment_node(node)) {
         return get_use_assignment(node);
-    } else if (is_print_node(node)) {
+    } else if (NodeTypeChecker::is_print_node(node)) {
         return get_use_print(node);
-    } else if (is_while_node(node)) {
+    } else if (NodeTypeChecker::is_while_node(node)) {
         return get_use_while(node);
-    } else if (is_if_node(node)) {
+    } else if (NodeTypeChecker::is_if_node(node)) {
         return get_use_if(node);
-    } else if (is_proc_node(node)) {
+    } else if (NodeTypeChecker::is_proc_node(node)) {
         return get_use_proc(node);
-    } else if (is_call_node(node)) {
+    } else if (NodeTypeChecker::is_call_node(node)) {
         return get_use_call(node);
     }
     return {};
