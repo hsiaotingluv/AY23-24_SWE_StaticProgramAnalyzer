@@ -161,6 +161,137 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         REQUIRE(read_facade->get_follows_stars_by("4", StatementType::While).size() == 2);
         REQUIRE(read_facade->get_follows_stars_by("4", StatementType::If).empty());
     }
+
+    SECTION("Simple follows star relationship") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->finalise_pkb();
+
+        REQUIRE(read_facade->has_follows_stars("1", "2"));
+        REQUIRE(read_facade->has_follows_stars("1", "3"));
+        REQUIRE(read_facade->has_follows_stars("2", "3"));
+    }
+
+    SECTION("Verifying absence of non-existent Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->finalise_pkb();
+
+        REQUIRE_FALSE(read_facade->has_follows_stars("1", "4"));
+        REQUIRE_FALSE(read_facade->has_follows_stars("3", "1"));
+    }
+
+    SECTION("Retrieving all Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->finalise_pkb();
+
+        auto all_keys = read_facade->get_all_follows_star_keys();
+        REQUIRE(all_keys.size() == 2);
+        REQUIRE(read_facade->get_follows_stars_following("1").size() == 2);
+        REQUIRE(read_facade->get_follows_stars_following("2").size() == 1);
+        REQUIRE(read_facade->get_follows_stars_following("3").empty());
+    }
+
+    SECTION("Getting keys from all follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->finalise_pkb();
+
+        auto keys = read_facade->get_all_follows_star_keys();
+        REQUIRE(keys.size() == 2);
+        REQUIRE(keys.find("1") != keys.end());
+        REQUIRE(keys.find("2") != keys.end());
+    }
+
+    SECTION("Getting values frm all Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "3");
+        write_facade->add_follows("2", "4");
+        write_facade->finalise_pkb();
+
+        auto values = read_facade->get_all_follows_star_values();
+        REQUIRE(values.size() == 2);
+        REQUIRE(values.find("3") != values.end());
+        REQUIRE(values.find("4") != values.end());
+    }
+
+    SECTION("Retrieving statements followed by in Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "3");
+        write_facade->finalise_pkb();
+
+        auto following = read_facade->get_follows_stars_following("1");
+
+        REQUIRE(!following.empty());
+        REQUIRE(following.find("3") != following.end());
+
+        auto noFollowing = read_facade->get_follows_stars_following("3");
+
+        REQUIRE(noFollowing.empty());
+    }
+
+    SECTION("Retrieving statements following in Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "3");
+        write_facade->finalise_pkb();
+
+        auto by = read_facade->get_follows_stars_by("3");
+
+        REQUIRE(!by.empty());
+        REQUIRE(by.find("1") != by.end());
+
+        auto noBy = read_facade->get_follows_stars_by("1");
+
+        REQUIRE(noBy.empty());
+    }
+
+    SECTION("Adding and Verifying Complex Follows* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_follows("1", "2");
+        write_facade->add_follows("2", "3");
+        write_facade->add_follows("3", "4");
+        write_facade->add_follows("4", "12");
+        write_facade->add_follows("5", "6");
+        write_facade->add_follows("6", "9");
+        write_facade->add_follows("9", "10");
+        write_facade->add_follows("10", "11");
+        write_facade->finalise_pkb();
+
+        auto allFollowsStar = read_facade->get_all_follows_star();
+
+        REQUIRE(allFollowsStar.size() == 8);
+        REQUIRE(allFollowsStar["1"].find("2") != allFollowsStar["1"].end());
+        REQUIRE(allFollowsStar["1"].find("3") != allFollowsStar["1"].end());
+        REQUIRE(allFollowsStar["1"].find("4") != allFollowsStar["1"].end());
+        REQUIRE(allFollowsStar["1"].find("12") != allFollowsStar["1"].end());
+
+        REQUIRE(allFollowsStar["2"].find("3") != allFollowsStar["2"].end());
+        REQUIRE(allFollowsStar["2"].find("4") != allFollowsStar["2"].end());
+        REQUIRE(allFollowsStar["2"].find("12") != allFollowsStar["2"].end());
+
+        REQUIRE(allFollowsStar["3"].find("4") != allFollowsStar["3"].end());
+        REQUIRE(allFollowsStar["3"].find("12") != allFollowsStar["3"].end());
+
+        REQUIRE(allFollowsStar["4"].find("12") != allFollowsStar["4"].end());
+
+        REQUIRE(allFollowsStar["5"].find("6") != allFollowsStar["5"].end());
+        REQUIRE(allFollowsStar["5"].find("9") != allFollowsStar["5"].end());
+        REQUIRE(allFollowsStar["5"].find("10") != allFollowsStar["5"].end());
+        REQUIRE(allFollowsStar["5"].find("11") != allFollowsStar["5"].end());
+    }
 }
 
 TEST_CASE("Parent and ParentStar Relationship Test") {
@@ -276,6 +407,152 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         REQUIRE(read_facade->get_parent("2", StatementType::While).empty());
         REQUIRE(read_facade->get_star_parent("5", StatementType::If).size() == 3);
         REQUIRE(read_facade->get_star_parent("5", StatementType::While).size() == 1);
+    }
+
+    SECTION("Adding and Verifying Parent* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->finalise_pkb();
+
+        REQUIRE(read_facade->has_parent_star("1", "2"));
+        REQUIRE(read_facade->has_parent_star("1", "3"));
+        REQUIRE(read_facade->has_parent_star("1", "4"));
+        REQUIRE(read_facade->has_parent_star("2", "3"));
+        REQUIRE(read_facade->has_parent_star("2", "4"));
+        REQUIRE(read_facade->has_parent_star("3", "4"));
+    }
+
+    SECTION("Verifying Absence of Non-existent Parent* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->finalise_pkb();
+
+        REQUIRE_FALSE(read_facade->has_parent_star("1", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star("2", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star("2", "2"));
+        REQUIRE_FALSE(read_facade->has_parent_star("3", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star("3", "2"));
+        REQUIRE_FALSE(read_facade->has_parent_star("3", "3"));
+    }
+
+    SECTION("Retrieving all parent* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->finalise_pkb();
+
+        auto allParentStars = read_facade->get_all_parent_star();
+
+        REQUIRE(allParentStars.size() == 3);
+        REQUIRE(allParentStars["1"].find("2") != allParentStars["1"].end());
+        REQUIRE(allParentStars["1"].find("3") != allParentStars["1"].end());
+        REQUIRE(allParentStars["1"].find("4") != allParentStars["1"].end());
+        REQUIRE(allParentStars["2"].find("3") != allParentStars["2"].end());
+        REQUIRE(allParentStars["2"].find("4") != allParentStars["2"].end());
+        REQUIRE(allParentStars["3"].find("4") != allParentStars["3"].end());
+    }
+
+    SECTION("Getting keys from all parent* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("2", "3");
+        write_facade->add_parent("3", "4");
+        write_facade->finalise_pkb();
+
+        auto keys = read_facade->get_all_parent_star_keys();
+
+        REQUIRE(keys.size() == 3);
+        REQUIRE(keys.find("1") != keys.end());
+        REQUIRE(keys.find("2") != keys.end());
+        REQUIRE(keys.find("3") != keys.end());
+    }
+
+    SECTION("Getting Descendant Values from All Parent* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("1", "3");
+        write_facade->finalise_pkb();
+
+        auto parentStarValues = read_facade->get_all_parent_star_values();
+
+        REQUIRE(parentStarValues.size() == 2);
+        REQUIRE(parentStarValues.find("1") == parentStarValues.end());
+        REQUIRE(parentStarValues.find("2") != parentStarValues.end());
+        REQUIRE(parentStarValues.find("3") != parentStarValues.end());
+    }
+
+    SECTION("Retrieving All Descendants of a Specific Ancestor in Parent* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "2");
+        write_facade->add_parent("1", "3");
+        write_facade->finalise_pkb();
+
+        auto descendants = read_facade->get_parent_star_children("1");
+
+        REQUIRE(descendants.size() == 2);
+        REQUIRE(descendants.find("1") == descendants.end());
+        REQUIRE(descendants.find("2") != descendants.end());
+        REQUIRE(descendants.find("3") != descendants.end());
+    }
+
+    SECTION("Retrieving All Ancestors of a Specific Descendant in Parent* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("1", "3");
+        write_facade->add_parent("2", "3");
+        write_facade->finalise_pkb();
+
+        auto ancestors = read_facade->get_star_parent("3");
+
+        REQUIRE(ancestors.size() == 2);
+        REQUIRE(ancestors.find("1") != ancestors.end());
+        REQUIRE(ancestors.find("2") != ancestors.end());
+        REQUIRE(ancestors.find("3") == ancestors.end());
+    }
+
+    SECTION("Adding and Verifying Complex Parent* relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_parent("4", "5");
+        write_facade->add_parent("4", "6");
+        write_facade->add_parent("6", "7");
+        write_facade->add_parent("6", "8");
+        write_facade->add_parent("6", "10");
+        write_facade->add_parent("4", "11");
+        write_facade->add_parent("4", "12");
+        write_facade->add_parent("4", "13");
+        write_facade->add_parent("8", "9");
+        write_facade->finalise_pkb();
+
+        auto allParentStar = read_facade->get_all_parent_star();
+
+        REQUIRE(read_facade->has_parent_star("4", "5"));
+        REQUIRE(read_facade->has_parent_star("4", "6"));
+        REQUIRE(read_facade->has_parent_star("4", "7"));
+        REQUIRE(read_facade->has_parent_star("4", "8"));
+        REQUIRE(read_facade->has_parent_star("4", "9"));
+        REQUIRE(read_facade->has_parent_star("4", "10"));
+        REQUIRE(read_facade->has_parent_star("4", "11"));
+        REQUIRE(read_facade->has_parent_star("4", "12"));
+        REQUIRE(read_facade->has_parent_star("4", "13"));
+
+        REQUIRE(read_facade->has_parent_star("6", "7"));
+        REQUIRE(read_facade->has_parent_star("6", "8"));
+        REQUIRE(read_facade->has_parent_star("6", "9"));
+        REQUIRE(read_facade->has_parent_star("6", "10"));
+
+        REQUIRE(read_facade->has_parent_star("8", "9"));
     }
 }
 

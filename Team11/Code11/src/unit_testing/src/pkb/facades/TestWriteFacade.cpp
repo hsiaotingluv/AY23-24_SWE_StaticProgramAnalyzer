@@ -3,7 +3,7 @@
 #include "pkb/pkb.h"
 #include <memory>
 
-// Mock PKB for testing
+// Mock pkb for testing
 class MockPKB : public PKB {};
 
 std::shared_ptr<PKB> createMockPKB() {
