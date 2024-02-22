@@ -195,56 +195,6 @@ class ReadFacade {
     std::unordered_set<std::string> get_parent_star_of(const std::string& child,
                                                        const StatementType& statementType) const;
 
-    // Next-related Read Operations
-    bool has_next(const std::string& before, const std::string& after) const;
-
-    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_next() const;
-
-    std::unordered_set<std::string> get_all_next_keys() const;
-
-    std::unordered_set<std::string> get_all_next_values() const;
-
-    std::unordered_set<std::string> get_next(const std::string& before) const;
-
-    std::unordered_set<std::string> get_next_previous(const std::string& after) const;
-
-    bool has_next_star(const std::string& before, const std::string& after) const;
-
-    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_next_star() const;
-
-    std::unordered_set<std::string> get_all_next_star_keys() const;
-
-    std::unordered_set<std::string> get_all_next_star_values() const;
-
-    std::unordered_set<std::string> get_next_star(const std::string& before) const;
-
-    std::unordered_set<std::string> get_next_star_previous(const std::string& after) const;
-
-    // Calls-related Read Operations
-    bool has_calls(const std::string& caller, const std::string& callee) const;
-
-    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_calls() const;
-
-    std::unordered_set<std::string> get_all_calls_values() const;
-
-    std::unordered_set<std::string> get_all_calls_keys() const;
-
-    std::unordered_set<std::string> get_callees(const std::string& caller) const;
-
-    std::unordered_set<std::string> get_callers(const std::string& callee) const;
-
-    bool has_calls_star(const std::string& caller, const std::string& callee) const;
-
-    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_calls_star() const;
-
-    std::unordered_set<std::string> get_all_calls_star_values() const;
-
-    std::unordered_set<std::string> get_all_calls_star_keys() const;
-
-    std::unordered_set<std::string> get_calls_star_callees(const std::string& caller) const;
-
-    std::unordered_set<std::string> get_calls_star_callers(const std::string& callee) const;
-
     // Pattern-related Read Operations
     std::unordered_set<std::string> get_all_assignments_rhs(const std::string& rhs);
 

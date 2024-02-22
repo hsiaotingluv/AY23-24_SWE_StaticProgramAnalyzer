@@ -57,22 +57,6 @@ void WriteFacade::add_parent(const std::string& parent, const std::string& child
     this->pkb->direct_parent_store->add(parent, child);
 }
 
-void WriteFacade::add_next(const std::string& before, const std::string& after) {
-    this->pkb->next_store->add_next(before, after);
-}
-
-void WriteFacade::add_next_star(const std::string& before, const std::string& after) {
-    this->pkb->next_store->add_next_star(before, after);
-}
-
-void WriteFacade::add_calls(const std::string& caller, const std::string& callee) {
-    this->pkb->calls_store->add_calls(caller, callee);
-}
-
-void WriteFacade::add_calls_star(const std::string& caller, const std::string& callee) {
-    this->pkb->calls_store->add_calls_star(caller, callee);
-}
-
 void WriteFacade::add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs) {
     auto v = Variable(lhs);
     this->pkb->assignment_store->add_assignment(statement_number, v, rhs);

@@ -1,13 +1,11 @@
 #pragma once
 
 #include "pkb/stores/assignment_store.h"
-#include "pkb/stores/calls_store.h"
 #include "pkb/stores/entity_store.h"
 #include "pkb/stores/follows_store/direct_follows_store.h"
 #include "pkb/stores/follows_store/follows_star_store.h"
 #include "pkb/stores/modifies_store/procedure_modifies_store.h"
 #include "pkb/stores/modifies_store/statement_modifies_store.h"
-#include "pkb/stores/next_store.h"
 #include "pkb/stores/parent_store/direct_parent_store.h"
 #include "pkb/stores/parent_store/parent_star_store.h"
 #include "pkb/stores/statement_store.h"
@@ -42,8 +40,6 @@ class PKB {
     std::shared_ptr<StatementModifiesStore> statement_modifies_store;
     std::shared_ptr<ProcedureUsesStore> procedure_uses_store;
     std::shared_ptr<StatementUsesStore> statement_uses_store;
-    std::shared_ptr<NextStore> next_store;
-    std::shared_ptr<CallsStore> calls_store;
     std::shared_ptr<AssignmentStore> assignment_store;
 
     template <class DirectStore, class StarStore>

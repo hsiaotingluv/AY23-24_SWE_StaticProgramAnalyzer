@@ -35,14 +35,6 @@ class WriteFacade {
 
     void add_parent(const std::string& parent, const std::string& child);
 
-    void add_next(const std::string& before, const std::string& after);
-
-    void add_next_star(const std::string& before, const std::string& after);
-
-    void add_calls(const std::string& caller, const std::string& callee);
-
-    void add_calls_star(const std::string& caller, const std::string& callee);
-
     void add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs);
 
     void finalise_pkb();

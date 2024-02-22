@@ -53,20 +53,4 @@ TEST_CASE("WriteFacade add_procedure Test") {
     SECTION("add_parent") {
         REQUIRE_NOTHROW(writeFacade.add_parent("1", "4"));
     }
-
-    SECTION("add_next") {
-        REQUIRE_NOTHROW(writeFacade.add_next("1", "6"));
-    }
-
-    SECTION("add_next_star") {
-        REQUIRE_NOTHROW(writeFacade.add_next_star("1", "7"));
-    }
-
-    SECTION("add_calls") {
-        REQUIRE_NOTHROW(writeFacade.add_calls("CallerProcedure", "CalleeProcedure"));
-    }
-
-    SECTION("add_calls_star") {
-        REQUIRE_NOTHROW(writeFacade.add_calls_star("CallerProcedure", "CalleeProcedureStar"));
-    }
 }
