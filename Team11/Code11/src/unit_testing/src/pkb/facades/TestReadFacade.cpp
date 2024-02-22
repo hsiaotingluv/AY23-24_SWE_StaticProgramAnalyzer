@@ -49,21 +49,21 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_follows("4", "5");
         write_facade->finalise_pkb();
 
-        REQUIRE(read_facade->has_follows("1", "2"));
-        REQUIRE(read_facade->has_follows("2", "3"));
-        REQUIRE(read_facade->has_follows("3", "4"));
-        REQUIRE(read_facade->has_follows("4", "5"));
+        REQUIRE(read_facade->has_follows_relation("1", "2"));
+        REQUIRE(read_facade->has_follows_relation("2", "3"));
+        REQUIRE(read_facade->has_follows_relation("3", "4"));
+        REQUIRE(read_facade->has_follows_relation("4", "5"));
 
-        REQUIRE(read_facade->has_follows_stars("1", "2"));
-        REQUIRE(read_facade->has_follows_stars("1", "3"));
-        REQUIRE(read_facade->has_follows_stars("1", "4"));
-        REQUIRE(read_facade->has_follows_stars("1", "5"));
-        REQUIRE(read_facade->has_follows_stars("2", "3"));
-        REQUIRE(read_facade->has_follows_stars("2", "4"));
-        REQUIRE(read_facade->has_follows_stars("2", "5"));
-        REQUIRE(read_facade->has_follows_stars("3", "4"));
-        REQUIRE(read_facade->has_follows_stars("3", "5"));
-        REQUIRE(read_facade->has_follows_stars("4", "5"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "2"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "3"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "4"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "5"));
+        REQUIRE(read_facade->has_follows_star_relation("2", "3"));
+        REQUIRE(read_facade->has_follows_star_relation("2", "4"));
+        REQUIRE(read_facade->has_follows_star_relation("2", "5"));
+        REQUIRE(read_facade->has_follows_star_relation("3", "4"));
+        REQUIRE(read_facade->has_follows_star_relation("3", "5"));
+        REQUIRE(read_facade->has_follows_star_relation("4", "5"));
     }
 
     SECTION("Get All Followee By Statement Type Test") {
@@ -133,10 +133,10 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_statement("3", StatementType::While);
         write_facade->add_statement("4", StatementType::While);
 
-        REQUIRE(read_facade->get_follows_following("1") == "2");
+        REQUIRE(read_facade->get_statement_following("1") == "2");
         REQUIRE(read_facade->get_follows_stars_following("1").size() == 3);
-        REQUIRE(read_facade->get_follows_following("1", StatementType::Read).empty());
-        REQUIRE(read_facade->get_follows_following("1", StatementType::Print) == "2");
+        REQUIRE(read_facade->get_statement_following("1", StatementType::Read).empty());
+        REQUIRE(read_facade->get_statement_following("1", StatementType::Print) == "2");
         REQUIRE(read_facade->get_follows_stars_following("1", StatementType::Read).empty());
         REQUIRE(read_facade->get_follows_stars_following("1", StatementType::While).size() == 2);
     }
@@ -154,10 +154,10 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_statement("3", StatementType::While);
         write_facade->add_statement("4", StatementType::While);
 
-        REQUIRE(read_facade->get_follows_by("2") == "1");
+        REQUIRE(read_facade->get_statement_followed_by("2") == "1");
         REQUIRE(read_facade->get_follows_stars_by("4").size() == 3);
-        REQUIRE(read_facade->get_follows_by("2", StatementType::Read) == "1");
-        REQUIRE(read_facade->get_follows_by("2", StatementType::Print).empty());
+        REQUIRE(read_facade->get_statement_followed_by("2", StatementType::Read) == "1");
+        REQUIRE(read_facade->get_statement_followed_by("2", StatementType::Print).empty());
         REQUIRE(read_facade->get_follows_stars_by("4", StatementType::While).size() == 2);
         REQUIRE(read_facade->get_follows_stars_by("4", StatementType::If).empty());
     }
@@ -169,9 +169,9 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_follows("2", "3");
         write_facade->finalise_pkb();
 
-        REQUIRE(read_facade->has_follows_stars("1", "2"));
-        REQUIRE(read_facade->has_follows_stars("1", "3"));
-        REQUIRE(read_facade->has_follows_stars("2", "3"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "2"));
+        REQUIRE(read_facade->has_follows_star_relation("1", "3"));
+        REQUIRE(read_facade->has_follows_star_relation("2", "3"));
     }
 
     SECTION("Verifying absence of non-existent Follows* relationships") {
@@ -181,8 +181,8 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_follows("2", "3");
         write_facade->finalise_pkb();
 
-        REQUIRE_FALSE(read_facade->has_follows_stars("1", "4"));
-        REQUIRE_FALSE(read_facade->has_follows_stars("3", "1"));
+        REQUIRE_FALSE(read_facade->has_follows_star_relation("1", "4"));
+        REQUIRE_FALSE(read_facade->has_follows_star_relation("3", "1"));
     }
 
     SECTION("Retrieving all Follows* relationships") {
@@ -306,19 +306,19 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("6", "7");
         write_facade->finalise_pkb();
 
-        REQUIRE(read_facade->has_parent("1", "2"));
-        REQUIRE(read_facade->has_parent("1", "3"));
-        REQUIRE(read_facade->has_parent("3", "4"));
-        REQUIRE(read_facade->has_parent("3", "5"));
-        REQUIRE(read_facade->has_parent("3", "6"));
-        REQUIRE(read_facade->has_parent("6", "7"));
+        REQUIRE(read_facade->has_parent_relation("1", "2"));
+        REQUIRE(read_facade->has_parent_relation("1", "3"));
+        REQUIRE(read_facade->has_parent_relation("3", "4"));
+        REQUIRE(read_facade->has_parent_relation("3", "5"));
+        REQUIRE(read_facade->has_parent_relation("3", "6"));
+        REQUIRE(read_facade->has_parent_relation("6", "7"));
 
-        REQUIRE(read_facade->has_parent_star("1", "2"));
-        REQUIRE(read_facade->has_parent_star("1", "3"));
-        REQUIRE(read_facade->has_parent_star("1", "4"));
-        REQUIRE(read_facade->has_parent_star("1", "5"));
-        REQUIRE(read_facade->has_parent_star("1", "6"));
-        REQUIRE(read_facade->has_parent_star("1", "7"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "2"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "3"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "4"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "5"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "6"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "7"));
     }
 
     SECTION("Get All Parents By Statement Type Test") {
@@ -378,12 +378,12 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_statement("4", StatementType::If);
         write_facade->add_statement("5", StatementType::While);
 
-        REQUIRE(read_facade->get_parent_children("1").size() == 1);
-        REQUIRE(read_facade->get_parent_star_children("1").size() == 4);
-        REQUIRE(read_facade->get_parent_children("1", StatementType::While).size() == 1);
-        REQUIRE(read_facade->get_parent_children("1", StatementType::If).empty());
-        REQUIRE(read_facade->get_parent_star_children("1", StatementType::While).size() == 2);
-        REQUIRE(read_facade->get_parent_star_children("1", StatementType::If).size() == 2);
+        REQUIRE(read_facade->get_children_of("1").size() == 1);
+        REQUIRE(read_facade->get_children_star_of("1").size() == 4);
+        REQUIRE(read_facade->get_children_of("1", StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_children_of("1", StatementType::If).empty());
+        REQUIRE(read_facade->get_children_star_of("1", StatementType::While).size() == 2);
+        REQUIRE(read_facade->get_children_star_of("1", StatementType::If).size() == 2);
     }
 
     SECTION("Get All Parent by Children Test") {
@@ -401,12 +401,12 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_statement("4", StatementType::If);
         write_facade->add_statement("5", StatementType::While);
 
-        REQUIRE(read_facade->get_parent("2") == "1");
-        REQUIRE(read_facade->get_star_parent("4").size() == 3);
-        REQUIRE(read_facade->get_parent("2", StatementType::If) == "1");
-        REQUIRE(read_facade->get_parent("2", StatementType::While).empty());
-        REQUIRE(read_facade->get_star_parent("5", StatementType::If).size() == 3);
-        REQUIRE(read_facade->get_star_parent("5", StatementType::While).size() == 1);
+        REQUIRE(read_facade->get_parent_of("2") == "1");
+        REQUIRE(read_facade->get_parent_star_of("4").size() == 3);
+        REQUIRE(read_facade->get_parent_of("2", StatementType::If) == "1");
+        REQUIRE(read_facade->get_parent_of("2", StatementType::While).empty());
+        REQUIRE(read_facade->get_parent_star_of("5", StatementType::If).size() == 3);
+        REQUIRE(read_facade->get_parent_star_of("5", StatementType::While).size() == 1);
     }
 
     SECTION("Adding and Verifying Parent* Relationships") {
@@ -417,12 +417,12 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("3", "4");
         write_facade->finalise_pkb();
 
-        REQUIRE(read_facade->has_parent_star("1", "2"));
-        REQUIRE(read_facade->has_parent_star("1", "3"));
-        REQUIRE(read_facade->has_parent_star("1", "4"));
-        REQUIRE(read_facade->has_parent_star("2", "3"));
-        REQUIRE(read_facade->has_parent_star("2", "4"));
-        REQUIRE(read_facade->has_parent_star("3", "4"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "2"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "3"));
+        REQUIRE(read_facade->has_parent_star_relation("1", "4"));
+        REQUIRE(read_facade->has_parent_star_relation("2", "3"));
+        REQUIRE(read_facade->has_parent_star_relation("2", "4"));
+        REQUIRE(read_facade->has_parent_star_relation("3", "4"));
     }
 
     SECTION("Verifying Absence of Non-existent Parent* Relationships") {
@@ -433,12 +433,12 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("3", "4");
         write_facade->finalise_pkb();
 
-        REQUIRE_FALSE(read_facade->has_parent_star("1", "1"));
-        REQUIRE_FALSE(read_facade->has_parent_star("2", "1"));
-        REQUIRE_FALSE(read_facade->has_parent_star("2", "2"));
-        REQUIRE_FALSE(read_facade->has_parent_star("3", "1"));
-        REQUIRE_FALSE(read_facade->has_parent_star("3", "2"));
-        REQUIRE_FALSE(read_facade->has_parent_star("3", "3"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("1", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("2", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("2", "2"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("3", "1"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("3", "2"));
+        REQUIRE_FALSE(read_facade->has_parent_star_relation("3", "3"));
     }
 
     SECTION("Retrieving all parent* relationships") {
@@ -498,7 +498,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("1", "3");
         write_facade->finalise_pkb();
 
-        auto descendants = read_facade->get_parent_star_children("1");
+        auto descendants = read_facade->get_children_star_of("1");
 
         REQUIRE(descendants.size() == 2);
         REQUIRE(descendants.find("1") == descendants.end());
@@ -513,7 +513,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("2", "3");
         write_facade->finalise_pkb();
 
-        auto ancestors = read_facade->get_star_parent("3");
+        auto ancestors = read_facade->get_parent_star_of("3");
 
         REQUIRE(ancestors.size() == 2);
         REQUIRE(ancestors.find("1") != ancestors.end());
@@ -537,22 +537,22 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
 
         auto allParentStar = read_facade->get_all_parent_star();
 
-        REQUIRE(read_facade->has_parent_star("4", "5"));
-        REQUIRE(read_facade->has_parent_star("4", "6"));
-        REQUIRE(read_facade->has_parent_star("4", "7"));
-        REQUIRE(read_facade->has_parent_star("4", "8"));
-        REQUIRE(read_facade->has_parent_star("4", "9"));
-        REQUIRE(read_facade->has_parent_star("4", "10"));
-        REQUIRE(read_facade->has_parent_star("4", "11"));
-        REQUIRE(read_facade->has_parent_star("4", "12"));
-        REQUIRE(read_facade->has_parent_star("4", "13"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "5"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "6"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "7"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "8"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "9"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "10"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "11"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "12"));
+        REQUIRE(read_facade->has_parent_star_relation("4", "13"));
 
-        REQUIRE(read_facade->has_parent_star("6", "7"));
-        REQUIRE(read_facade->has_parent_star("6", "8"));
-        REQUIRE(read_facade->has_parent_star("6", "9"));
-        REQUIRE(read_facade->has_parent_star("6", "10"));
+        REQUIRE(read_facade->has_parent_star_relation("6", "7"));
+        REQUIRE(read_facade->has_parent_star_relation("6", "8"));
+        REQUIRE(read_facade->has_parent_star_relation("6", "9"));
+        REQUIRE(read_facade->has_parent_star_relation("6", "10"));
 
-        REQUIRE(read_facade->has_parent_star("8", "9"));
+        REQUIRE(read_facade->has_parent_star_relation("8", "9"));
     }
 }
 

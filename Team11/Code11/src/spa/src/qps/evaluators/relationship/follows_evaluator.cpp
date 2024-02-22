@@ -37,7 +37,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
                       const qps::Integer& stmt_num_2) -> std::optional<Table> {
             const auto relevant_stmts = stmt_syn_1->scan(read_facade);
             auto table = Table{{stmt_syn_1}};
-            const auto candidate = read_facade->get_follows_by(std::to_string(stmt_num_2.value));
+            const auto candidate = read_facade->get_statement_followed_by(std::to_string(stmt_num_2.value));
             if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
                 table.add_row({candidate});
             }
@@ -71,7 +71,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             const auto relevant_stmts = stmt_syn_2->scan(read_facade);
             auto table = Table{{stmt_syn_2}};
-            const auto candidate = read_facade->get_follows_following(std::to_string(stmt_num_1.value));
+            const auto candidate = read_facade->get_statement_following(std::to_string(stmt_num_1.value));
             if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
                 table.add_row({candidate});
             }
@@ -84,7 +84,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<ReadFacade>& read_faca
 
         // e.g. Follows(3, 4)
         [read_facade](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
-            if (!read_facade->has_follows(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
+            if (!read_facade->has_follows_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
                 return std::nullopt;
             }
             return Table{};

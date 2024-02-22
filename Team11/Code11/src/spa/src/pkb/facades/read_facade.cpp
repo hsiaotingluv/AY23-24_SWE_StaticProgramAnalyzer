@@ -349,15 +349,15 @@ std::unordered_set<std::string> ReadFacade::get_all_follows_values(const Stateme
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-bool ReadFacade::has_follows(const std::string& stmt1, const std::string& stmt2) const {
+bool ReadFacade::has_follows_relation(const std::string& stmt1, const std::string& stmt2) const {
     return this->pkb->direct_follows_store->contains_key_val_pair(stmt1, stmt2);
 }
 
-std::string ReadFacade::get_follows_following(const std::string& s) const {
+std::string ReadFacade::get_statement_following(const std::string& s) const {
     return this->pkb->direct_follows_store->get_val_by_key(s);
 }
 
-std::string ReadFacade::get_follows_following(const std::string& s, const StatementType& statementType) const {
+std::string ReadFacade::get_statement_following(const std::string& s, const StatementType& statementType) const {
     auto stmt = this->pkb->direct_follows_store->get_val_by_key(s);
 
     if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
@@ -367,11 +367,11 @@ std::string ReadFacade::get_follows_following(const std::string& s, const Statem
     return "";
 }
 
-std::string ReadFacade::get_follows_by(const std::string& s) const {
+std::string ReadFacade::get_statement_followed_by(const std::string& s) const {
     return this->pkb->direct_follows_store->get_key_by_val(s);
 }
 
-std::string ReadFacade::get_follows_by(const std::string& s, const StatementType& statementType) const {
+std::string ReadFacade::get_statement_followed_by(const std::string& s, const StatementType& statementType) const {
     auto stmt = this->pkb->direct_follows_store->get_key_by_val(s);
 
     if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
@@ -381,7 +381,7 @@ std::string ReadFacade::get_follows_by(const std::string& s, const StatementType
     return "";
 }
 
-bool ReadFacade::has_follows_stars(const std::string& stmt1, const std::string& stmt2) const {
+bool ReadFacade::has_follows_star_relation(const std::string& stmt1, const std::string& stmt2) const {
     return this->pkb->follows_star_store->contains_key_val_pair(stmt1, stmt2);
 }
 
@@ -429,7 +429,7 @@ std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::stri
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-bool ReadFacade::has_parent(const std::string& parent, const std::string& child) const {
+bool ReadFacade::has_parent_relation(const std::string& parent, const std::string& child) const {
     return this->pkb->direct_parent_store->contains_key_val_pair(parent, child);
 }
 
@@ -455,22 +455,22 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_values(const Statemen
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-std::unordered_set<std::string> ReadFacade::get_parent_children(const std::string& parent) const {
+std::unordered_set<std::string> ReadFacade::get_children_of(const std::string& parent) const {
     return this->pkb->direct_parent_store->get_vals_by_key(parent);
 }
 
-std::unordered_set<std::string> ReadFacade::get_parent_children(const std::string& parent,
+std::unordered_set<std::string> ReadFacade::get_children_of(const std::string& parent,
                                                                 const StatementType& statementType) const {
-    auto stmts_pool = get_parent_children(parent);
+    auto stmts_pool = get_children_of(parent);
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-std::string ReadFacade::get_parent(const std::string& child) const {
+std::string ReadFacade::get_parent_of(const std::string& child) const {
     return this->pkb->direct_parent_store->get_key_by_val(child);
 }
 
-std::string ReadFacade::get_parent(const std::string& child, const StatementType& statementType) const {
-    auto stmt = get_parent(child);
+std::string ReadFacade::get_parent_of(const std::string& child, const StatementType& statementType) const {
+    auto stmt = get_parent_of(child);
 
     if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
         return stmt;
@@ -479,7 +479,7 @@ std::string ReadFacade::get_parent(const std::string& child, const StatementType
     return "";
 }
 
-bool ReadFacade::has_parent_star(const std::string& parent, const std::string& child) const {
+bool ReadFacade::has_parent_star_relation(const std::string& parent, const std::string& child) const {
     return this->pkb->parent_star_store->contains_key_val_pair(parent, child);
 }
 
@@ -506,23 +506,23 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_star_values(const Sta
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-std::unordered_set<std::string> ReadFacade::get_parent_star_children(const std::string& parent) const {
+std::unordered_set<std::string> ReadFacade::get_children_star_of(const std::string& parent) const {
     return this->pkb->parent_star_store->get_vals_by_key(parent);
 }
 
-std::unordered_set<std::string> ReadFacade::get_parent_star_children(const std::string& parent,
+std::unordered_set<std::string> ReadFacade::get_children_star_of(const std::string& parent,
                                                                      const StatementType& statementType) const {
-    auto stmts_pool = get_parent_star_children(parent);
+    auto stmts_pool = get_children_star_of(parent);
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 
-std::unordered_set<std::string> ReadFacade::get_star_parent(const std::string& child) const {
+std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string& child) const {
     return this->pkb->parent_star_store->get_keys_by_val(child);
 }
 
-std::unordered_set<std::string> ReadFacade::get_star_parent(const std::string& child,
+std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string& child,
                                                             const StatementType& statementType) const {
-    auto stmts_pool = get_star_parent(child);
+    auto stmts_pool = get_parent_star_of(child);
     return this->pkb->filterStatementsByType(stmts_pool, statementType);
 }
 

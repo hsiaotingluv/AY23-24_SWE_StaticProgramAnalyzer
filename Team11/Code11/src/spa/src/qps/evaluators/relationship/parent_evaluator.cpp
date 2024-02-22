@@ -41,7 +41,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                       const qps::Integer& stmt_num_2) -> std::optional<Table> {
             const auto relevant_stmts = stmt_syn_1->scan(read_facade);
             auto table = Table{{stmt_syn_1}};
-            const auto parent_candidate = read_facade->get_parent(std::to_string(stmt_num_2.value));
+            const auto parent_candidate = read_facade->get_parent_of(std::to_string(stmt_num_2.value));
             if (relevant_stmts.find(parent_candidate) != relevant_stmts.end()) {
                 table.add_row({parent_candidate});
             }
@@ -75,7 +75,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
                       const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
             const auto relevant_stmts = stmt_syn_2->scan(read_facade);
             auto table = Table({stmt_syn_2});
-            const auto all_children_of_stmt = read_facade->get_parent_children(std::to_string(stmt_num_1.value));
+            const auto all_children_of_stmt = read_facade->get_children_of(std::to_string(stmt_num_1.value));
             for (const auto& child_name : all_children_of_stmt) {
                 if (relevant_stmts.find(child_name) == relevant_stmts.end()) {
                     continue;
@@ -91,7 +91,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<ReadFacade>& read_facade
 
         // e.g. Parent(3, 4)
         [read_facade](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
-            if (!read_facade->has_parent(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
+            if (!read_facade->has_parent_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
                 return std::nullopt;
             }
             return Table{};
