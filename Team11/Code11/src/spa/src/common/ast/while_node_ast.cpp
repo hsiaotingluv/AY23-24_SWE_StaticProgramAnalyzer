@@ -55,4 +55,20 @@ auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_
 
     return combined_set;
 }
+
+auto WhileNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
+    auto facade = node;
+    return {};
+}
+
+auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
+    auto facade = node;
+    return {};
+}
+
+auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+    auto facade = write_facade;
+    auto facad2 = uses_map;
+    return {};
+}
 } // namespace sp
