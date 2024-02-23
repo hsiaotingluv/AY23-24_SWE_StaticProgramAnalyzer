@@ -1,5 +1,5 @@
-#include "common/ast/statement_ast.hpp"
 #include "common/ast/node_type_checker.hpp"
+#include "common/ast/statement_ast.hpp"
 
 namespace sp {
 auto WhileNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -58,7 +58,8 @@ auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_
 }
 
 auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
-    // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e. Parent* relationship) are handled by PKB.
+    // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
+    // Parent* relationship) are handled by PKB.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
     std::for_each(statements.begin(), statements.end(), [&statement_nums](const auto& statement) {

@@ -44,7 +44,7 @@ class ReadNode : public StatementNode, public ModifiesMixin {
         -> std::unordered_set<std::string> override;
 };
 
-class PrintNode : public StatementNode {  
+class PrintNode : public StatementNode {
   public:
     std::string variable;
 
@@ -76,7 +76,8 @@ class CallNode : public StatementNode, public ModifiesMixin {
 
 class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin {
   private:
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> override;
+    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
+        -> std::unordered_set<std::string> override;
 
   public:
     std::shared_ptr<AstNode> cond_expr;
@@ -101,7 +102,9 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin {
 
 class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin {
   private:
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> override;
+    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
+        -> std::unordered_set<std::string> override;
+
   public:
     std::shared_ptr<AstNode> cond_expr;
     std::shared_ptr<StatementListNode> stmt_list;
