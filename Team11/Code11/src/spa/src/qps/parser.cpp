@@ -9,11 +9,11 @@ namespace qps {
 auto Parser::parse(std::string query) -> std::variant<Query, SyntaxError, SemanticError> {
     const auto maybe_parsed = qps::untyped::UntypedParser::parse(std::move(query));
 
-    if (!maybe_parsed.has_value()) {
-        return SyntaxError{"Syntax error in query!"};
+    if (std::holds_alternative<SyntaxError>(maybe_parsed)) {
+        return std::get<SyntaxError>(maybe_parsed);
     }
 
-    const auto& [declared_synonyms, untyped_query] = maybe_parsed.value();
+    const auto& [declared_synonyms, untyped_query] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(maybe_parsed);
     const auto maybe_query = qps::SemanticValidator::validate(declared_synonyms, untyped_query);
 
     if (std::holds_alternative<SemanticError>(maybe_query)) {

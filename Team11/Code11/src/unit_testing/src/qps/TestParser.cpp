@@ -21,8 +21,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(13, s)";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -44,8 +44,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -68,8 +68,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -92,8 +92,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(stmt s; Select s such that Uses(s, "v"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AnyStmtSynonym>(declarations[0], "s");
@@ -114,8 +114,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -138,9 +138,8 @@ TEST_CASE("Test QPSParser") {
 Select a pattern a ( _ , _"count + 1"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto result = output.value();
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "a");
@@ -160,10 +159,8 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(output.has_value());
-        const auto result = output.value();
-
-        const auto& [declarations, untyped] = output.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
@@ -182,10 +179,10 @@ Select a pattern a ( _ , _"count + 1"_))";
 
     SECTION("Query with undefined synonym") {
         const auto query = "procedure p; Select v";
-        const auto result = parser.parse(query);
+        const auto output = parser.parse(query);
 
-        REQUIRE(result.has_value());
-        const auto& [declarations, untyped] = result.value();
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -199,20 +196,19 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = R"(procedure p; variable v; Select p such that Modifies("x", v))";
         const auto output = parser.parse(query);
 
-        REQUIRE(!output.has_value());
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
     }
 
     SECTION("Uses cannot start with quoted ident") {
         const auto query = R"(procedure p; variable v; Select p such that Uses("s", p))";
         const auto output = parser.parse(query);
-
-        REQUIRE(!output.has_value());
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
     }
 
     SECTION("Uses cannot start with integer") {
-        const auto query3 = "variable v; Select v such that Uses(v, 1)";
-        const auto output3 = parser.parse(query3);
-        REQUIRE(!output3.has_value());
+        const auto query = "variable v; Select v such that Uses(v, 1)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
     }
 }
 
@@ -221,32 +217,32 @@ TEST_CASE("Test Parser - Basic Syntax Issues") {
     SECTION("Missing synonym") {
         const auto query = "variable v,";
         const auto output = parser.parse(query);
-        REQUIRE(!output.has_value());
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
 
         const auto query2 = "variable v,+";
         const auto output2 = parser.parse(query);
-        REQUIRE(!output2.has_value());
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
     }
 
     SECTION("Wrong Keyword") {
         const auto query = "variable v; select v such that Uses(v, 1)";
         const auto output = parser.parse(query);
-        REQUIRE(!output.has_value()); // Select should be in uppercase
+        REQUIRE(std::holds_alternative<SyntaxError>(output)); // Select should be in uppercase
 
         const auto query2 = "variable v; Select + such that Uses(v, 1) such that Uses(v, 1)";
         const auto output2 = parser.parse(query2);
-        REQUIRE(!output2.has_value()); // + is not a valid keyword
+        REQUIRE(std::holds_alternative<SyntaxError>(output)); // + is not a valid keyword
 
         const auto query3 = "variable v; Select s such that Uses(v, 1";
         const auto output3 = parser.parse(query3);
-        REQUIRE(!output3.has_value()); // Missing closing bracket
+        REQUIRE(std::holds_alternative<SyntaxError>(output)); // Missing closing bracket
 
         const auto query4 = "variable v; Select s such that Uses(v, 1(";
         const auto output4 = parser.parse(query4);
-        REQUIRE(!output4.has_value()); // Wrong closing bracket
+        REQUIRE(std::holds_alternative<SyntaxError>(output)); // Wrong closing bracket
 
         const auto query5 = R"(variable v; Select s such that Uses("v", 1))";
         const auto output5 = parser.parse(query5);
-        REQUIRE(!output5.has_value()); // "v" is not a valid synonym
+        REQUIRE(std::holds_alternative<SyntaxError>(output)); // "v" is not a valid synonym
     }
 }

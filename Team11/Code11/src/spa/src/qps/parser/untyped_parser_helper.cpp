@@ -69,7 +69,7 @@ auto try_declare_synonym(Synonyms& synonyms, std::vector<Token>::const_iterator 
     return std::nullopt;
 }
 
-auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end, TypeList<>)
+auto parse_clause(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
     -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
     return std::nullopt;
 }
@@ -133,7 +133,7 @@ auto parse_synonym(std::vector<Token>::const_iterator it, const std::vector<Toke
     return std::make_tuple(UntypedSynonym{IDENT{maybe_synonym.content}}, std::next(it));
 }
 
-auto parse_references(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end, TypeList<>)
+auto parse_references(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
     -> std::optional<std::tuple<UntypedReference, std::vector<Token>::const_iterator>> {
     return std::nullopt;
 }

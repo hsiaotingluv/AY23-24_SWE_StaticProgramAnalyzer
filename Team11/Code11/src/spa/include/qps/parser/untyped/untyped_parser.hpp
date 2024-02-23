@@ -2,6 +2,7 @@
 
 #include "common/tokeniser/runner.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/parser/errors.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/entities/query.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
@@ -17,7 +18,7 @@ class UntypedParser {
         tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
 
   public:
-    static auto parse(std::string query) -> std::optional<std::tuple<Synonyms, untyped::UntypedQuery>>;
+    static auto parse(std::string query) -> std::variant<std::tuple<Synonyms, untyped::UntypedQuery>, SyntaxError>;
 };
 
 class SelectSynonymParser {

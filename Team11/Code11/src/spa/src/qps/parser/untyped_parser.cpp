@@ -1,6 +1,7 @@
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
 
+#include "qps/parser/errors.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
@@ -9,26 +10,26 @@
 #include <vector>
 
 namespace qps::untyped {
-auto UntypedParser::parse(std::string query) -> std::optional<std::tuple<Synonyms, untyped::UntypedQuery>> {
-    const auto maybe_tokens = [&query]() -> std::optional<std::vector<Token>> {
+auto UntypedParser::parse(std::string query) -> std::variant<std::tuple<Synonyms, untyped::UntypedQuery>, SyntaxError> {
+    const auto maybe_tokens = [&query]() -> std::variant<std::vector<Token>, SyntaxError> {
         try {
             return tokeniser_runner.apply_tokeniser(std::move(query));
         } catch (const std::exception& e) {
-            return std::nullopt;
+            return SyntaxError{e.what()};
         }
     }();
 
-    if (!maybe_tokens.has_value()) {
-        return std::nullopt;
+    if (std::holds_alternative<SyntaxError>(maybe_tokens)) {
+        return std::get<SyntaxError>(maybe_tokens);
     }
-    const auto& tokens = maybe_tokens.value();
+    const auto& tokens = std::get<std::vector<Token>>(maybe_tokens);
     auto begin = tokens.begin();
     const auto end = tokens.end();
 
     // Parse declarations
     const auto maybe_declared_synonyms = detail::parse_declarations(begin, end);
     if (!maybe_declared_synonyms.has_value()) {
-        return std::nullopt;
+        return SyntaxError{"Syntax error in synonym declaration!"};
     }
 
     const auto& [declared_synonyms, rest] = maybe_declared_synonyms.value();
@@ -38,9 +39,17 @@ auto UntypedParser::parse(std::string query) -> std::optional<std::tuple<Synonym
     const auto maybe_remaining = detail::build_untyped_query(begin, end);
 
     if (!maybe_remaining.has_value()) {
-        return std::nullopt;
+        const auto remaining_str = [begin, end]() -> std::string {
+            const auto remaining = std::vector<Token>(begin, end);
+            std::string str;
+            for (const auto& token : remaining) {
+                str += token.content;
+            }
+            return str;
+        }();
+        return SyntaxError{"Syntax error: unable to parse remaining: " + remaining_str};
     }
-    return std::make_optional(std::make_tuple(declared_synonyms, maybe_remaining.value()));
+    return std::make_tuple(declared_synonyms, maybe_remaining.value());
 }
 
 auto SelectSynonymParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
