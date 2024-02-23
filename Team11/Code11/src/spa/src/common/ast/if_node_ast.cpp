@@ -69,14 +69,14 @@ auto IfNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_fac
 }
 
 auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
-    // Consider only level-1 children. Processing further nested children are handled by PKB.
+    // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e. Parent* relationship) are handled by PKB.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
-    for (const auto& statement : statements) {
+    std::for_each(statements.begin(), statements.end(), [&statement_nums](const auto& statement) {
         auto statement_node = std::dynamic_pointer_cast<StatementNode>(statement);
         auto statement_num = std::to_string(statement_node->get_statement_number());
         statement_nums.insert(statement_num);
-    }
+    });
     return statement_nums;
 }
 
