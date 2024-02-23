@@ -138,6 +138,8 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
     }
 
     return combined_set;
+}
+
 auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
     // Parent* relationship) are handled by PKB.
