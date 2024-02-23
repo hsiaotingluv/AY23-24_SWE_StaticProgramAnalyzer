@@ -12,7 +12,6 @@
 
 class ReadFacade {
   public:
-
     explicit ReadFacade(std::shared_ptr<PKB> pkb);
 
     // Entity-related Read Operations
