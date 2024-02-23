@@ -1,4 +1,6 @@
 #include "common/ast/statement_ast.hpp"
+#include "common/ast/node_type_checker.hpp"
+#include "common/ast/mixin/mixin_type_checker.hpp"
 
 namespace sp {
 auto IfNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -67,4 +69,71 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_fac
 auto IfNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
     write_facade->add_statement(std::to_string(get_statement_number()), StatementType::If);
 }
+
+auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
+    // Get all variable names from an expression.
+    if (NodeTypeChecker::is_var_node(node)) {
+        // If expression is a variable, add to combined set.
+        auto var_node = std::dynamic_pointer_cast<VarNode>(node);
+        return {var_node->name};
+    }
+
+    auto combined_set = std::unordered_set<std::string>();
+    auto children = node->get_children();
+    std::for_each(children.begin(), children.end(), [&](const auto& child) {
+        auto child_var_names = get_vars_from_expr(child); // Extract variable names from each child.
+        std::for_each(child_var_names.begin(), child_var_names.end(), [&](const auto& var_name) {
+            combined_set.insert(var_name); // Add each variable from each child to the combined set.
+        });
+    });
+    return combined_set;
+}
+
+auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map, const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+    auto combined_set = std::unordered_set<std::string>();
+    auto stmts = node->statements;
+    std::for_each(stmts.begin(), stmts.end(), [&](const auto& stmt_node) {
+        if (!MixinTypeChecker::is_uses_mixin_node(stmt_node)) {
+            return;
+        }
+        auto uses_mixin_node = std::dynamic_pointer_cast<UsesMixin>(stmt_node);
+        auto vars_set = uses_mixin_node->populate_pkb_uses(write_facade, uses_map);
+        std::for_each(vars_set.begin(), vars_set.end(), [&](const auto& var_name) {
+            combined_set.insert(var_name);
+        });
+    });
+    return combined_set;
+}
+
+auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+    // Uses(s, v) for s = If
+    auto stmt_number = std::to_string(get_statement_number());
+    auto combined_set = std::unordered_set<std::string>();
+
+    // Traverse the conditional expression
+    auto var_names_cond_expr = get_vars_from_expr(cond_expr);
+    std::for_each(var_names_cond_expr.begin(), var_names_cond_expr.end(), [&](const auto& var_name) {
+        combined_set.insert(var_name);
+    });
+
+    // Traverse then statement list
+    auto var_names_then_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, then_stmt_list);
+    std::for_each(var_names_then_stmt_list.begin(), var_names_then_stmt_list.end(), [&](const auto& var_name) {
+        combined_set.insert(var_name);
+    });
+
+    // Traverse else statement list
+    auto var_names_else_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, else_stmt_list);
+    std::for_each(var_names_else_stmt_list.begin(), var_names_else_stmt_list.end(), [&](const auto& var_name) {
+        combined_set.insert(var_name);
+    });
+    
+    // Add all variables to the PKB.
+    for (const auto& var_name : combined_set) {
+        write_facade->add_statement_uses_var(stmt_number, var_name);
+    }
+
+    return combined_set;
+}
+
 } // namespace sp
