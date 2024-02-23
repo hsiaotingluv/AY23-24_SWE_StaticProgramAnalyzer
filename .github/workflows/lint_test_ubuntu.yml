@@ -60,11 +60,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run System Testing on Push
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          python3 Team11/run_autotester.py Team11/Tests11/simple_source.txt Team11/Tests11/simple_queries.txt -i
-
       - name: Run System Testing
         if: ${{ github.event_name == 'pull_request' }}
         run: |

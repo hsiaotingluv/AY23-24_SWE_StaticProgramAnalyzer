@@ -1,16 +1,17 @@
+
 procedure Example {
-  x = 2;
+  x = 2;
   z = 3;
   i = 5;
   while (i!=0) {
-    x = x - 1;
+    x = x - 1;
     if (x==1) then {
       z = x + 1; }
     else {
       y = z + x; }
     z = z + x + i;
     call q;
-    i = i - 1; }
+    i = i - 1; }
   call p; }
 
 procedure p {
@@ -23,7 +24,7 @@ procedure p {
     z = x + z; }
   else {
     z = 1; }
-  z = z + x + i; }
+  z = z + x + i; }
 
 procedure q {
   if (x==1) then {
