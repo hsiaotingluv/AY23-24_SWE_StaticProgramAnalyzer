@@ -1,51 +1,10 @@
-#include "qps/parser/parser.hpp"
-#include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/relationship.hpp"
-#include "qps/parser/entities/synonym.hpp"
-
-#include "qps/parser/entities/untyped/clause.hpp"
-#include "qps/parser/entities/untyped/relationship.hpp"
-#include "qps/parser/entities/untyped/synonym.hpp"
+#include "qps/parser/untyped/entities/query.hpp"
+#include "qps/parser/untyped/untyped_parser.hpp"
 
 #include "qps/template_utils.hpp"
-#include <optional>
-#include <vector>
 
-namespace qps {
-auto QPSParser::parse(std::string query) -> std::optional<std::tuple<Synonyms, untyped::UntypedQuery>> {
-    const auto maybe_tokens = [&query]() -> std::optional<std::vector<Token>> {
-        try {
-            return tokeniser_runner.apply_tokeniser(std::move(query));
-        } catch (const std::exception& e) {
-            return std::nullopt;
-        }
-    }();
-
-    if (!maybe_tokens.has_value()) {
-        return std::nullopt;
-    }
-    const auto tokens = maybe_tokens.value();
-    auto begin = tokens.begin();
-    const auto end = tokens.end();
-
-    // Parse declarations
-    const auto maybe_declared_synonyms = parse_declarations(begin, end);
-    if (!maybe_declared_synonyms.has_value()) {
-        return std::nullopt;
-    }
-
-    const auto& [declared_synonyms, rest] = maybe_declared_synonyms.value();
-    begin = rest;
-
-    // Parse remaining
-    const auto maybe_remaining = untyped::parse(begin, end);
-
-    if (!maybe_remaining.has_value()) {
-        return std::nullopt;
-    }
-    return std::make_optional(std::make_tuple(declared_synonyms, maybe_remaining.value()));
-}
-
+namespace qps::untyped::detail {
 template <typename SynonymType>
 auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>> {
@@ -54,7 +13,6 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
     }
 
     // Match keyword
-    // TODO: find a better way to build this thing
     constexpr auto expected = SynonymType::keyword;
     const auto keyword = *it;
     if (!is_keyword(keyword, expected)) {
@@ -111,53 +69,29 @@ auto try_declare_synonym(Synonyms& synonyms, std::vector<Token>::const_iterator 
     return std::nullopt;
 }
 
-auto parse_declarations(Synonyms&, std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&,
-                        TypeList<>) -> std::optional<std::vector<Token>::const_iterator> {
+auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end, TypeList<>)
+    -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
     return std::nullopt;
 }
 
 template <typename Head, typename... Tails>
-auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
-                        const std::vector<Token>::const_iterator& end, TypeList<Head, Tails...>)
-    -> std::optional<std::vector<Token>::const_iterator> {
-    auto maybe_it = try_declare_synonym<Head>(synonyms, it, end);
-    return maybe_it.has_value() ? maybe_it.value() : parse_declarations(synonyms, it, end, TypeList<Tails...>{});
-}
-
-auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>> {
-    auto declared_synonyms = Synonyms{};
-    while (true) {
-        const auto maybe_it = parse_declarations(declared_synonyms, it, end, SupportedSynonyms());
-        if (!maybe_it.has_value()) {
-            break;
-        }
-        it = maybe_it.value();
+auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
+                  TypeList<Head, Tails...>)
+    -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
+    const auto maybe_clause = Head::parse(it, end);
+    if (maybe_clause.has_value()) {
+        return maybe_clause;
     }
-    return !declared_synonyms.empty() ? std::make_optional(std::make_tuple(declared_synonyms, it)) : std::nullopt;
+
+    return parse_clause(it, end, TypeList<Tails...>{});
 }
 
-} // namespace qps
-
-namespace qps::untyped {
 auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
-    const auto maybe_such_that_clause = parse_such_that_clause(it, end);
-    if (maybe_such_that_clause.has_value()) {
-        const auto& [clause, rest] = maybe_such_that_clause.value();
-        return std::make_tuple(UntypedClause{clause}, rest);
-    }
-
-    const auto maybe_pattern_clause = parse_pattern_clause(it, end);
-    if (maybe_pattern_clause.has_value()) {
-        const auto& [clause, rest] = maybe_pattern_clause.value();
-        return std::make_tuple(UntypedClause{clause}, rest);
-    }
-
-    return std::nullopt;
+    return parse_clause(it, end, SupportedClauseParsers{});
 }
 
-auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<UntypedQuery> {
     const auto maybe_reference = parse_references(it, end);
     if (!maybe_reference.has_value()) {
@@ -185,25 +119,41 @@ auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::cons
     return std::nullopt;
 }
 
-auto parse_references(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+auto parse_synonym(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedSynonym, std::vector<Token>::const_iterator>> {
-    if (std::distance(it, end) < 2) {
+    if (it == end) {
         return std::nullopt;
     }
 
-    const auto keyword = *it;
-    if (!is_keyword(keyword, "Select")) {
-        return std::nullopt;
-    }
-    it = std::next(it);
-
-    const auto maybe_synonym_str = *it;
-    if (!is_string(maybe_synonym_str)) {
+    const auto& maybe_synonym = *it;
+    if (!is_string(maybe_synonym)) {
         return std::nullopt;
     }
 
-    it = std::next(it);
-    return std::make_tuple(UntypedSynonym{IDENT{maybe_synonym_str.content}}, it);
+    return std::make_tuple(UntypedSynonym{IDENT{maybe_synonym.content}}, std::next(it));
+}
+
+auto parse_references(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end, TypeList<>)
+    -> std::optional<std::tuple<UntypedReference, std::vector<Token>::const_iterator>> {
+    return std::nullopt;
+}
+
+template <typename Head, typename... Tails>
+auto parse_references(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
+                      TypeList<Head, Tails...>)
+    -> std::optional<std::tuple<UntypedReference, std::vector<Token>::const_iterator>> {
+    const auto maybe_select = Head::parse(it, end);
+    if (maybe_select.has_value()) {
+        const auto& [synonym, rest] = maybe_select.value();
+        return std::make_tuple(synonym, rest);
+    }
+    return parse_references(it, end, TypeList<Tails...>{});
+}
+
+auto parse_references(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedReference, std::vector<Token>::const_iterator>> {
+
+    return parse_references(it, end, SupportedSelectParsers{});
 }
 
 auto parse_stmt_ref(const Token& token) -> UntypedStmtRef {
@@ -247,9 +197,9 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
 
 auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
-    const auto token = *it;
+    const auto& token = *it;
     if (is_stmt_ref(token)) {
-        const auto stmt_ref = parse_stmt_ref(token);
+        const auto& stmt_ref = parse_stmt_ref(token);
         return std::visit(
             [it](auto&& arg) -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
                 return std::make_tuple(arg, std::next(it));
@@ -272,8 +222,9 @@ auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::
 auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
     return [keyword, is_direct](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
                -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
+        constexpr auto EXPECTED_LENGTH = 6;
         const auto offset = is_direct ? 0 : 1;
-        if (std::distance(it, end) < 6 + offset) {
+        if (std::distance(it, end) < EXPECTED_LENGTH + offset) {
             return std::nullopt;
         }
 
@@ -304,14 +255,15 @@ auto parse_stmt_stmt(const std::string& keyword, bool is_direct) {
 
         return std::make_tuple(
             UntypedStmtStmtRel{keyword, parse_stmt_ref(maybe_first_arg), parse_stmt_ref(maybe_second_arg)},
-            std::next(it, 6 + offset));
+            std::next(it, EXPECTED_LENGTH + offset));
     };
 };
 
 auto parse_ref_ent(const std::string& keyword) {
     return [keyword](std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
                -> std::optional<std::tuple<UntypedRefEntRel, std::vector<Token>::const_iterator>> {
-        if (std::distance(it, end) < 6) {
+        constexpr auto EXPECTED_LENGTH = 6;
+        if (std::distance(it, end) < EXPECTED_LENGTH) {
             return std::nullopt;
         }
 
@@ -412,90 +364,29 @@ auto parse_rel_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     return std::nullopt;
 }
 
-auto parse_such_that_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedSuchThatClause, std::vector<Token>::const_iterator>> {
-    if (std::distance(it, end) < 3) {
-        return std::nullopt;
-    }
-
-    if (!is_keyword(*it, "such")) {
-        return std::nullopt;
-    }
-    it = std::next(it);
-
-    if (!is_keyword(*it, "that")) {
-        return std::nullopt;
-    }
-    it = std::next(it);
-
-    const auto maybe_rel_ref = parse_rel_ref(it, end);
-    if (!maybe_rel_ref.has_value()) {
-        return std::nullopt;
-    }
-    const auto& [rel_ref, rest] = maybe_rel_ref.value();
-    return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+auto parse_declarations(Synonyms&, std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&,
+                        TypeList<>) -> std::optional<std::vector<Token>::const_iterator> {
+    return std::nullopt;
 }
 
-auto parse_pattern_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
-
-    // pattern_cl := pattern <assign_synonym> ( <ent_ref> , <pattern_expr> )
-    if (std::distance(it, end) < 6) {
-        return std::nullopt;
-    }
-
-    const auto maybe_keyword = *it;
-    const auto maybe_syn_assign = *std::next(it);
-    const auto maybe_open_bracket = *std::next(it, 2);
-
-    if (!is_keyword(maybe_keyword, "pattern") || !is_string(maybe_syn_assign) || !is_open_bracket(maybe_open_bracket)) {
-        return std::nullopt;
-    }
-
-    const auto syn_assign = UntypedSynonym{IDENT{maybe_syn_assign.content}};
-
-    // Consume confirmed tokens
-    it = std::next(it, 3);
-
-    // Get entity reference
-    const auto maybe_ent_ref = parse_ent_ref(it, end);
-    if (!maybe_ent_ref.has_value()) {
-        return std::nullopt;
-    }
-    // Consume according to entity reference
-    const auto& [ent_ref, rest] = maybe_ent_ref.value();
-    it = rest;
-
-    // Check for comma
-    if (std::distance(it, end) < 1) {
-        return std::nullopt;
-    }
-    const auto maybe_comma = *it;
-    if (!is_comma(maybe_comma)) {
-        return std::nullopt;
-    }
-    it = std::next(it, 1);
-
-    // Check for expression spec
-    const auto maybe_expr_spec = parse_expression_spec(it, end);
-    if (!maybe_expr_spec.has_value()) {
-        return std::nullopt;
-    }
-    const auto& [expr_spec, rest2] = maybe_expr_spec.value();
-    it = rest2;
-
-    // Check for closing bracket
-    if (std::distance(it, end) < 1) {
-        return std::nullopt;
-    }
-
-    const auto maybe_close_bracket = *it;
-    if (!is_close_bracket(maybe_close_bracket)) {
-        return std::nullopt;
-    }
-    it = std::next(it, 1);
-
-    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+template <typename Head, typename... Tails>
+auto parse_declarations(Synonyms& synonyms, std::vector<Token>::const_iterator it,
+                        const std::vector<Token>::const_iterator& end, TypeList<Head, Tails...>)
+    -> std::optional<std::vector<Token>::const_iterator> {
+    auto maybe_it = try_declare_synonym<Head>(synonyms, it, end);
+    return maybe_it.has_value() ? maybe_it.value() : parse_declarations(synonyms, it, end, TypeList<Tails...>{});
 }
 
-} // namespace qps::untyped
+auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>> {
+    auto declared_synonyms = Synonyms{};
+    while (true) {
+        const auto maybe_it = parse_declarations(declared_synonyms, it, end, SupportedSynonyms());
+        if (!maybe_it.has_value()) {
+            break;
+        }
+        it = maybe_it.value();
+    }
+    return !declared_synonyms.empty() ? std::make_optional(std::make_tuple(declared_synonyms, it)) : std::nullopt;
+}
+} // namespace qps::untyped::detail

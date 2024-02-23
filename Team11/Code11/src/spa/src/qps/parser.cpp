@@ -1,4 +1,4 @@
-#include "qps/qps.hpp"
+#include "qps/parser.hpp"
 #include "qps/parser/errors.hpp"
 #include "qps/parser/semantic_validator.hpp"
 
@@ -6,8 +6,8 @@
 #include <variant>
 
 namespace qps {
-auto QueryProcessingSystem::parse(std::string query) -> std::variant<Query, SyntaxError, SemanticError> {
-    const auto maybe_parsed = qps::QPSParser::parse(std::move(query));
+auto Parser::parse(std::string query) -> std::variant<Query, SyntaxError, SemanticError> {
+    const auto maybe_parsed = qps::untyped::UntypedParser::parse(std::move(query));
 
     if (!maybe_parsed.has_value()) {
         return SyntaxError{"Syntax error in query!"};

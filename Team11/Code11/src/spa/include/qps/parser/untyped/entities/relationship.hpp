@@ -1,6 +1,6 @@
 #pragma once
 
-#include "qps/parser/entities/untyped/synonym.hpp"
+#include "qps/parser/untyped/entities/synonym.hpp"
 #include <tuple>
 
 namespace qps::untyped {

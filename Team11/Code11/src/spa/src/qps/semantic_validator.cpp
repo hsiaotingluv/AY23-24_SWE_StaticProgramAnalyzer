@@ -3,9 +3,9 @@
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/entities/untyped/relationship.hpp"
-#include "qps/parser/entities/untyped/synonym.hpp"
 #include "qps/parser/errors.hpp"
+#include "qps/parser/untyped/entities/relationship.hpp"
+#include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
 #include <memory>

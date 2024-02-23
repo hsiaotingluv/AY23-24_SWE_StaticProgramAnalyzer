@@ -5,7 +5,7 @@
 #include "pkb/pkb.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
-#include "qps/qps.hpp"
+#include "qps/parser.hpp"
 
 #include <unordered_set>
 
@@ -62,7 +62,7 @@ TEST_CASE("Test SPA - Entities") {
 
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
-    const auto qps_parser = qps::QueryProcessingSystem{};
+    const auto qps_parser = qps::Parser{};
 
     SECTION("Test SP - complex program Code 4 - success") {
         auto input = input_generator();

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "qps/parser/entities/untyped/relationship.hpp"
-#include "qps/parser/entities/untyped/synonym.hpp"
 #include "qps/parser/expression_parser.hpp"
+#include "qps/parser/untyped/entities/relationship.hpp"
+#include "qps/parser/untyped/entities/synonym.hpp"
 #include <variant>
 
 namespace qps::untyped {

@@ -4,7 +4,7 @@
 #include "qps/parser/semantic_validator.hpp"
 
 namespace qps {
-class QueryProcessingSystem {
+class Parser {
   public:
     static auto parse(std::string query) -> std::variant<Query, SyntaxError, SemanticError>;
 };

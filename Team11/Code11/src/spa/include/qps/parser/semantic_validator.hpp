@@ -3,7 +3,7 @@
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/parser.hpp"
+#include "qps/parser/untyped/untyped_parser.hpp"
 
 #include <memory>
 

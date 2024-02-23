@@ -4,18 +4,18 @@
 
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/entities/untyped/clause.hpp"
-#include "qps/parser/entities/untyped/relationship.hpp"
-#include "qps/parser/entities/untyped/synonym.hpp"
+#include "qps/parser/untyped/entities/clause.hpp"
+#include "qps/parser/untyped/entities/relationship.hpp"
+#include "qps/parser/untyped/entities/synonym.hpp"
 
-#include "qps/parser/parser.hpp"
+#include "qps/parser/untyped/untyped_parser.hpp"
 
 #include <variant>
 
 using namespace qps;
 
 TEST_CASE("Test QPSParser") {
-    const auto parser = QPSParser{};
+    const auto parser = untyped::UntypedParser{};
 
     SECTION("Query with stmt-stmt relationship") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(13, s)";
@@ -217,7 +217,7 @@ Select a pattern a ( _ , _"count + 1"_))";
 }
 
 TEST_CASE("Test Parser - Basic Syntax Issues") {
-    const auto parser = QPSParser{};
+    const auto parser = untyped::UntypedParser{};
     SECTION("Missing synonym") {
         const auto query = "variable v,";
         const auto output = parser.parse(query);
