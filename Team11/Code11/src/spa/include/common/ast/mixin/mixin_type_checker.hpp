@@ -6,7 +6,7 @@
 namespace sp {
 class MixinTypeChecker {
   public:
-    static auto is_parent_mixin(const std::shared_ptr<AstNode>& node) -> bool {
+    static auto is_parent_mixin_node(const std::shared_ptr<AstNode>& node) -> bool {
         return std::dynamic_pointer_cast<ParentMixin>(node) != nullptr;
     }
 };

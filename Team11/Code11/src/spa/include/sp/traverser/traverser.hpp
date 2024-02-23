@@ -1,8 +1,8 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
-#include "pkb/facades/write_facade.h"
 #include "common/ast/node_type_checker.hpp"
+#include "pkb/facades/write_facade.h"
 
 // A Traverser is a class that is used to traverse the AST with possible some side effects
 // Traverser: AST -> AST
