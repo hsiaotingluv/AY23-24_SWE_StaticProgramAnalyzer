@@ -73,16 +73,16 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         -> std::unordered_set<std::string> {
         auto combined_set = std::unordered_set<std::string>();
         auto stmts = node->statements;
-        std::for_each(stmts.begin(), stmts.end(), [&](const auto& stmt_node) {
+        for (const auto& stmt_node : stmts) {
             if (!MixinTypeChecker::is_uses_mixin_node(stmt_node)) {
-                return;
+                continue;
             }
             auto uses_mixin_node = std::dynamic_pointer_cast<UsesMixin>(stmt_node);
             auto vars_set = uses_mixin_node->populate_pkb_uses(write_facade, uses_map);
-            std::for_each(vars_set.begin(), vars_set.end(), [&](const auto& var_name) {
+            for (const auto& var_name : vars_set) {
                 combined_set.insert(var_name);
-            });
-        });
+            }
+        }
         return combined_set;
     }
 
@@ -90,9 +90,9 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         -> std::unordered_set<std::string> override {
         // Uses(p, v) holds if there is a statement s in p
         auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
-        std::for_each(var_names_stmt_list.begin(), var_names_stmt_list.end(), [&](const auto& var_name) {
+        for (const auto& var_name : var_names_stmt_list) {
             write_facade->add_procedure_uses_var(proc_name, var_name);
-        });
+        }
         uses_map->insert(std::make_pair(proc_name, var_names_stmt_list)); // Memoisation
         return var_names_stmt_list;
     }

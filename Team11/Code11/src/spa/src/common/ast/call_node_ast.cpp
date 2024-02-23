@@ -42,9 +42,9 @@ auto CallNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facad
     // Uses(p, v) holds if there is a statement s in p.
     auto stmt_number = std::to_string(get_statement_number());
     auto var_names_proc_name = uses_map->at(proc_name);
-    std::for_each(var_names_proc_name.begin(), var_names_proc_name.end(), [&](const auto& var) {
+    for (const auto& var : var_names_proc_name) {
         write_facade->add_statement_uses_var(stmt_number, var);
-    });
+    }
     return var_names_proc_name;
 }
 
