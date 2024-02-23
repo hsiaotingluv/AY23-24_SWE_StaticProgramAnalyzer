@@ -100,7 +100,7 @@ class IfNode : public StatementNode, public ModifiesMixin {
 class WhileNode : public StatementNode, public ModifiesMixin, public UsesMixin {
   private:
     auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
-    auto get_vars_from_stmt_list(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
+    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map, const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string>;
   public:
     std::shared_ptr<AstNode> cond_expr;
     std::shared_ptr<StatementListNode> stmt_list;
