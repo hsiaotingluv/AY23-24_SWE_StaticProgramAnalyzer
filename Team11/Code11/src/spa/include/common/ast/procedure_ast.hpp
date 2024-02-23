@@ -84,7 +84,7 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         return combined_set;
     }
 
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> override {
         // Uses(p, v) holds if there is a statement s in p
         auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
         std::for_each(var_names_stmt_list.begin(), var_names_stmt_list.end(), [&](const auto& var_name) {
