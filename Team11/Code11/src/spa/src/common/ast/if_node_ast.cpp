@@ -1,6 +1,6 @@
-#include "common/ast/statement_ast.hpp"
-#include "common/ast/node_type_checker.hpp"
 #include "common/ast/mixin/mixin_type_checker.hpp"
+#include "common/ast/node_type_checker.hpp"
+#include "common/ast/statement_ast.hpp"
 
 namespace sp {
 auto IfNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -89,7 +89,10 @@ auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> s
     return combined_set;
 }
 
-auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map, const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+                                     std::shared_ptr<UsesMap> uses_map,
+                                     const std::shared_ptr<StatementListNode>& node) const
+    -> std::unordered_set<std::string> {
     auto combined_set = std::unordered_set<std::string>();
     auto stmts = node->statements;
     std::for_each(stmts.begin(), stmts.end(), [&](const auto& stmt_node) {
@@ -105,7 +108,8 @@ auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_f
     return combined_set;
 }
 
-auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                               std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
     // Uses(s, v) for s = If
     auto stmt_number = std::to_string(get_statement_number());
     auto combined_set = std::unordered_set<std::string>();
@@ -127,7 +131,7 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
     std::for_each(var_names_else_stmt_list.begin(), var_names_else_stmt_list.end(), [&](const auto& var_name) {
         combined_set.insert(var_name);
     });
-    
+
     // Add all variables to the PKB.
     for (const auto& var_name : combined_set) {
         write_facade->add_statement_uses_var(stmt_number, var_name);

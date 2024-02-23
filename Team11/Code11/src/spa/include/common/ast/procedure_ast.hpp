@@ -2,9 +2,9 @@
 
 #include "common/ast/ast.hpp"
 #include "common/ast/mixin/design_entities_mixin.hpp"
+#include "common/ast/mixin/mixin_type_checker.hpp"
 #include "common/ast/mixin/modifies_mixin.hpp"
 #include "common/ast/mixin/uses_mixin.hpp"
-#include "common/ast/mixin/mixin_type_checker.hpp"
 #include "common/ast/statement_list_ast.hpp"
 
 namespace sp {
@@ -68,7 +68,9 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         return combined_set;
     }
 
-    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map, const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map,
+                                 const std::shared_ptr<StatementListNode>& node) const
+        -> std::unordered_set<std::string> {
         auto combined_set = std::unordered_set<std::string>();
         auto stmts = node->statements;
         std::for_each(stmts.begin(), stmts.end(), [&](const auto& stmt_node) {
@@ -84,13 +86,15 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         return combined_set;
     }
 
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> override {
+    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
+        -> std::unordered_set<std::string> override {
         // Uses(p, v) holds if there is a statement s in p
         auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
         std::for_each(var_names_stmt_list.begin(), var_names_stmt_list.end(), [&](const auto& var_name) {
             write_facade->add_procedure_uses_var(proc_name, var_name);
         });
-        uses_map->insert(std::make_pair(proc_name, var_names_stmt_list)); //Memoisation
+        uses_map->insert(std::make_pair(proc_name, var_names_stmt_list)); // Memoisation
         return var_names_stmt_list;
-    }};
+    }
+};
 } // namespace sp

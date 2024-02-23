@@ -1,5 +1,5 @@
-#include "common/ast/statement_ast.hpp"
 #include "common/ast/node_type_checker.hpp"
+#include "common/ast/statement_ast.hpp"
 
 namespace sp {
 auto AssignmentNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -62,7 +62,8 @@ auto AssignmentNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) co
     return combined_set;
 }
 
-auto AssignmentNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap>) const -> std::unordered_set<std::string> {
+auto AssignmentNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap>) const
+    -> std::unordered_set<std::string> {
     // Uses(a, v) holds if v appears on the right hand side of a.
     auto stmt_number = std::to_string(get_statement_number());
     auto var_names = get_vars_from_expr(expr);
