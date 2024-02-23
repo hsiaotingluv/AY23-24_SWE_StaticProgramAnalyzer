@@ -75,6 +75,9 @@ class CallNode : public StatementNode, public ModifiesMixin {
 };
 
 class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin {
+  private:
+    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> override;
+
   public:
     std::shared_ptr<AstNode> cond_expr;
     std::shared_ptr<StatementListNode> then_stmt_list;
@@ -94,10 +97,12 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin {
         -> std::unordered_set<std::string> override;
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string>;
 };
 
 class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin {
+  private:
+    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> override;
+
   public:
     std::shared_ptr<AstNode> cond_expr;
     std::shared_ptr<StatementListNode> stmt_list;
@@ -114,7 +119,6 @@ class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
         -> std::unordered_set<std::string> override;
     auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string>;
 };
 
 class AssignmentNode : public StatementNode, public ModifiesMixin {
