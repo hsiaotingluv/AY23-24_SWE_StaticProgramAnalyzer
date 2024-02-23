@@ -1,7 +1,5 @@
 #include "sp/traverser/uses_traverser.hpp"
 
-// TODO: File is getting big. To split into individual uses_by_statements.cpp
-
 namespace sp {
 
 auto UsesTraverser::traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>& proc_topo_sort)
