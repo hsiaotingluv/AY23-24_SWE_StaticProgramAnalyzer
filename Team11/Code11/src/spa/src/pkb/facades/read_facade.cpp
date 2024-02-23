@@ -62,10 +62,6 @@ std::unordered_set<std::string> ReadFacade::get_all_statements() {
     return this->pkb->statement_store->get_all_keys();
 }
 
-std::unordered_set<std::string> ReadFacade::get_raw_statements() {
-    return this->pkb->statement_store->get_keys_by_val(StatementType::Raw);
-}
-
 std::unordered_set<std::string> ReadFacade::get_assign_statements() {
     return this->pkb->statement_store->get_keys_by_val(StatementType::Assign);
 }

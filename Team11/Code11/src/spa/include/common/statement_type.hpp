@@ -7,7 +7,4 @@ enum class StatementType {
     While,
     Read,
     Print,
-
-    // PKB and QPS Usage
-    Raw,
 };

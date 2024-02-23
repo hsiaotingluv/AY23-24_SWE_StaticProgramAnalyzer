@@ -26,16 +26,14 @@ TEST_CASE("Simple Statement Test") {
         write_facade->add_statement("4", StatementType::If);
         write_facade->add_statement("5", StatementType::While);
         write_facade->add_statement("6", StatementType::Call);
-        write_facade->add_statement("7", StatementType::Raw);
 
-        REQUIRE(read_facade->get_all_statements().size() == 7);
+        REQUIRE(read_facade->get_all_statements().size() == 6);
         REQUIRE(read_facade->get_read_statements().size() == 1);
         REQUIRE(read_facade->get_assign_statements().size() == 1);
         REQUIRE(read_facade->get_print_statements().size() == 1);
         REQUIRE(read_facade->get_if_statements().size() == 1);
         REQUIRE(read_facade->get_while_statements().size() == 1);
         REQUIRE(read_facade->get_call_statements().size() == 1);
-        REQUIRE(read_facade->get_raw_statements().size() == 1);
     }
 }
 

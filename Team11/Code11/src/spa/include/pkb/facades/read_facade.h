@@ -12,7 +12,6 @@
 
 class ReadFacade {
   public:
-    using StatementNumber = std::string;
 
     explicit ReadFacade(std::shared_ptr<PKB> pkb);
 
@@ -27,8 +26,6 @@ class ReadFacade {
 
     // Statement-related Read Operations
     std::unordered_set<std::string> get_all_statements();
-
-    std::unordered_set<std::string> get_raw_statements();
 
     std::unordered_set<std::string> get_assign_statements();
 
