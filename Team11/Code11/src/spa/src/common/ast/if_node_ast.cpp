@@ -95,44 +95,4 @@ auto IfNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facad
     }
 }
 
-auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& expr) const -> std::unordered_set<std::string> {
-    if (NodeTypeChecker::is_var_node(expr)) {
-        // If expression is a variable, add to combined set.
-        auto var_node = std::dynamic_pointer_cast<VarNode>(expr);
-        return {var_node->name};
-    }
-
-    auto combined_set = std::unordered_set<std::string>();
-    auto children = expr->get_children();
-    std::for_each(children.begin(), children.end(), [&](const auto& child) { // Iterate through each child.
-        auto child_var_names = get_vars_from_expr(child);
-        std::for_each(child_var_names.begin(), child_var_names.end(), [&](const auto& var_name) {
-            combined_set.insert(var_name); // Add each variable of a child to the combined set.
-        });
-    });
-    return combined_set;
-}
-
-auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
-    // Uses(s, v) holds if v appears in the condition of s
-    auto stmt_number = std::to_string(get_statement_number());
-    auto stmt_lsts = std::vector<std::shared_ptr<AstNode>>{cond_expr, then_stmt_list, else_stmt_list};
-    auto combined_set = std::unordered_set<std::string>();
-
-    // Traverse the conditional expression
-    std::for_each(stmt_lsts.begin(), stmt_lsts.end(), [&](const auto& stmt_lst) {
-        auto var_names = get_vars_from_expr(stmt_lst);
-        std::for_each(var_names.begin(), var_names.end(), [&](const auto& var_name) {
-            combined_set.insert(var_name);
-        });
-    });
-
-    // Return consolidated variables
-    std::for_each(combined_set.begin(), combined_set.end(), [&](const auto& var_name) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
-    });
-
-    return combined_set;
-}
-
 } // namespace sp
