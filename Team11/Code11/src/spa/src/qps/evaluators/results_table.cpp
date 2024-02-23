@@ -301,6 +301,36 @@ auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_m
     return new_table;
 }
 
+auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
+                    std::vector<std::vector<std::string>>& table2_contents,
+                    const std::vector<std::tuple<int, int>>& common_column_idxs) -> void {
+    auto first_idxs = std::vector<int>{};
+    first_idxs.reserve(common_column_idxs.size());
+    auto second_idxs = std::vector<int>{};
+    second_idxs.reserve(common_column_idxs.size());
+
+    for (auto [idx1, idx2] : common_column_idxs) {
+        first_idxs.push_back(idx1);
+        second_idxs.push_back(idx2);
+    }
+
+    std::sort(table1_contents.begin(), table1_contents.end(),
+              [&first_idxs](const auto& row1, const auto& row2) -> bool {
+                  return compare_rows(row1, row2, first_idxs);
+              });
+
+    std::sort(table2_contents.begin(), table2_contents.end(),
+              [&second_idxs](const auto& row1, const auto& row2) -> bool {
+                  return compare_rows(row1, row2, second_idxs);
+              });
+}
+
+auto reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
+    for (auto& row : table_contents) {
+        reorder(row, order);
+    }
+}
+
 auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table> {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
@@ -325,39 +355,18 @@ auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table
     const auto table1_mask = build_mapping_sorted(table1_column_names, new_column);
     const auto table2_mask = build_mapping_sorted(table2_column_names, new_column);
 
-    for (auto& row : table1_contents) {
-        reorder(row, ordering1);
-    }
-    for (auto& row : table2_contents) {
-        reorder(row, ordering2);
-    }
+    reorder_contents(table1_contents, ordering1);
+    reorder_contents(table2_contents, ordering2);
 
     // Sort based on values in the common column
-    auto first_idxs = std::vector<int>{};
-    first_idxs.reserve(common_column_idxs.size());
-    auto second_idxs = std::vector<int>{};
-    second_idxs.reserve(common_column_idxs.size());
-
-    for (auto [idx1, idx2] : common_column_idxs) {
-        first_idxs.push_back(idx1);
-        second_idxs.push_back(idx2);
-    }
-
-    std::sort(table1_contents.begin(), table1_contents.end(),
-              [&first_idxs](const auto& row1, const auto& row2) -> bool {
-                  return compare_rows(row1, row2, first_idxs);
-              });
-
-    std::sort(table2_contents.begin(), table2_contents.end(),
-              [&second_idxs](const auto& row1, const auto& row2) -> bool {
-                  return compare_rows(row1, row2, second_idxs);
-              });
+    sort_on_column(table1_contents, table2_contents, common_column_idxs);
 
     // Step 2: join records
     auto curr_row1 = table1_contents.begin();
     auto curr_row2 = table2_contents.begin();
 
     while (curr_row1 != table1_contents.end() && curr_row2 != table2_contents.end()) {
+        // Shift row pointers to the first row with the same value in the common column
         auto all_same = true;
         for (auto [col_idx1, col_idx2] : common_column_idxs) {
             if ((*curr_row1)[col_idx1] < (*curr_row2)[col_idx2]) {
