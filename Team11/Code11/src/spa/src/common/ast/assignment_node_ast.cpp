@@ -52,7 +52,7 @@ auto AssignmentNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) co
     }
 
     auto combined_set = std::unordered_set<std::string>();
-    auto children = expr->get_children();
+    auto children = node->get_children();
     std::for_each(children.begin(), children.end(), [&](const auto& child) {
         auto child_var_names = get_vars_from_expr(child); // Extract variable names from each child.
         std::for_each(child_var_names.begin(), child_var_names.end(), [&](const auto& var_name) {
