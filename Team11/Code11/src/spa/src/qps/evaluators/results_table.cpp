@@ -700,8 +700,7 @@ auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
     return detail::join(table1, table2, detail::unordered_set_merge, detail::nested_loop_join_records);
 }
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
-             const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
+auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
     if (table.get_column().empty()) {
         // Table is empty --> contradiction
         return {};

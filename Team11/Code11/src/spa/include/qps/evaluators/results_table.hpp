@@ -54,8 +54,7 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
 }
 
 auto join(const Table& table1, const Table& table2) -> std::optional<Table>;
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const Table& table,
-             const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string>;
+auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string>;
 void print(const Table& table);
 
 namespace detail {
