@@ -1,4 +1,5 @@
 #include "common/ast/statement_ast.hpp"
+#include "common/ast/node_type_checker.hpp"
 
 namespace sp {
 auto AssignmentNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -41,4 +42,34 @@ auto AssignmentNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& w
 
     return {var_node->name};
 }
+
+auto AssignmentNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
+    // Get all variable names from an expression.
+    if (NodeTypeChecker::is_var_node(node)) {
+        // If expression is a variable, add to combined set.
+        auto var_node = std::dynamic_pointer_cast<VarNode>(node);
+        return {var_node->name};
+    }
+
+    auto combined_set = std::unordered_set<std::string>();
+    auto children = expr->get_children();
+    std::for_each(children.begin(), children.end(), [&](const auto& child) {
+        auto child_var_names = get_vars_from_expr(child); // Extract variable names from each child.
+        std::for_each(child_var_names.begin(), child_var_names.end(), [&](const auto& var_name) {
+            combined_set.insert(var_name); // Add each variable from each child to the combined set.
+        });
+    });
+    return combined_set;
+}
+
+auto AssignmentNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap>) const -> std::unordered_set<std::string> {
+    // Uses(a, v) holds if v appears on the right hand side of a.
+    auto stmt_number = std::to_string(get_statement_number());
+    auto var_names = get_vars_from_expr(expr);
+    std::for_each(var_names.begin(), var_names.end(), [&](const auto& var_name) {
+        write_facade->add_statement_uses_var(stmt_number, var_name);
+    });
+    return var_names;
+}
+
 } // namespace sp
