@@ -60,7 +60,7 @@ class PrintNode : public StatementNode, public UsesMixin {
         -> std::unordered_set<std::string> override;
 };
 
-class CallNode : public StatementNode, public ModifiesMixin {
+class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
   public:
     std::string proc_name;
 
@@ -74,6 +74,7 @@ class CallNode : public StatementNode, public ModifiesMixin {
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
         -> std::unordered_set<std::string> override;
+    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> override;
 };
 
 class IfNode : public StatementNode, public ModifiesMixin, public UsesMixin {
