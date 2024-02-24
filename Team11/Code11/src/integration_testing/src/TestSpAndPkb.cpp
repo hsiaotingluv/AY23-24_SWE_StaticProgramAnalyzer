@@ -71,15 +71,15 @@ TEST_CASE("Test SP and PKB") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->has_parent("14", "16"));
-        REQUIRE(read_facade->has_parent("14", "17"));
-        REQUIRE(read_facade->has_parent("19", "20"));
-        REQUIRE(read_facade->has_parent_star("14", "16"));
-        REQUIRE(read_facade->has_parent_star("19", "22"));
+        REQUIRE(read_facade->has_parent_relation("14", "16"));
+        REQUIRE(read_facade->has_parent_relation("14", "17"));
+        REQUIRE(read_facade->has_parent_relation("19", "20"));
+        REQUIRE(read_facade->has_parent_star_relation("14", "16"));
+        REQUIRE(read_facade->has_parent_star_relation("19", "22"));
 
-        REQUIRE_FALSE(read_facade->has_parent("10", "11"));
-        REQUIRE_FALSE(read_facade->has_parent("10", "15"));
-        REQUIRE_FALSE(read_facade->has_parent("14", "19"));
+        REQUIRE_FALSE(read_facade->has_parent_relation("10", "11"));
+        REQUIRE_FALSE(read_facade->has_parent_relation("10", "15"));
+        REQUIRE_FALSE(read_facade->has_parent_relation("14", "19"));
     }
 
     SECTION("Test SP and PKB Modifies Website - success") {
@@ -105,16 +105,16 @@ TEST_CASE("Test SP and PKB") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#follows--follows
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->has_follows("10", "11"));
-        REQUIRE(read_facade->has_follows("13", "14"));
-        REQUIRE(read_facade->has_follows("14", "19"));
-        REQUIRE(read_facade->has_follows_stars("12", "19"));
-        REQUIRE(read_facade->has_follows_stars("10", "23"));
+        REQUIRE(read_facade->has_follows_relation("10", "11"));
+        REQUIRE(read_facade->has_follows_relation("13", "14"));
+        REQUIRE(read_facade->has_follows_relation("14", "19"));
+        REQUIRE(read_facade->has_follows_star_relation("12", "19"));
+        REQUIRE(read_facade->has_follows_star_relation("10", "23"));
 
-        REQUIRE_FALSE(read_facade->has_follows("14", "15"));
-        REQUIRE_FALSE(read_facade->has_follows("18", "19"));
-        REQUIRE_FALSE(read_facade->has_follows("20", "21"));
-        REQUIRE_FALSE(read_facade->has_follows_stars("21", "23"));
+        REQUIRE_FALSE(read_facade->has_follows_relation("14", "15"));
+        REQUIRE_FALSE(read_facade->has_follows_relation("18", "19"));
+        REQUIRE_FALSE(read_facade->has_follows_relation("20", "21"));
+        REQUIRE_FALSE(read_facade->has_follows_star_relation("21", "23"));
     }
 
     SECTION("Test SP and PKB Assignment Pattern - success") {

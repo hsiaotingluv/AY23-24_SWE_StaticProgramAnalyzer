@@ -14,8 +14,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
     message(STATUS " Building SPA with coverage ")
     setup_target_for_coverage_lcov(
-        NAME ${PROJECT_NAME}_coverage
-        EXECUTABLE unit_testing
-        DEPENDENCIES unit_testing spa
-        EXCLUDE "/usr/include/*")
+            NAME ${PROJECT_NAME}_coverage
+            EXECUTABLE unit_testing
+            DEPENDENCIES unit_testing spa
+            EXCLUDE "/usr/include/*")
 endif()
