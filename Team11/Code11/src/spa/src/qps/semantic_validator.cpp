@@ -31,7 +31,7 @@ namespace qps {
 auto SemanticValidator::validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
     -> std::variant<Query, SemanticError> {
     // Declarations must be unique
-    const auto maybe_mapping = details::enforce_unique_declarations(declarations);
+    const auto& maybe_mapping = details::enforce_unique_declarations(declarations);
     if (!maybe_mapping.has_value()) {
         return SemanticError{"Non-unique mapping"};
     }
@@ -40,7 +40,7 @@ auto SemanticValidator::validate(const Synonyms& declarations, const untyped::Un
     const auto& [references, clauses] = untyped_query;
 
     // Reference must be declared
-    const auto maybe_reference = details::is_synonym_declared(declarations, mapping, references);
+    const auto& maybe_reference = details::is_synonym_declared(declarations, mapping, references);
     if (!maybe_reference.has_value()) {
         return SemanticError{"Undeclared reference: " + references.get_name().get_value()};
     }
@@ -50,7 +50,7 @@ auto SemanticValidator::validate(const Synonyms& declarations, const untyped::Un
     // Clauses must be valid
     std::vector<std::shared_ptr<Clause>> validated_clauses;
     for (const auto& clause : clauses) {
-        const auto maybe_validated_clause = details::validate_clause(declarations, mapping, clause);
+        const auto& maybe_validated_clause = details::validate_clause(declarations, mapping, clause);
         if (!maybe_validated_clause.has_value()) {
             return SemanticError{"Invalid clause"};
         }
@@ -85,13 +85,13 @@ auto is_synonym_declared(const Synonyms&, const std::unordered_map<std::string, 
 auto get_stmt_synonym(const Synonyms& declarations,
                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                       const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<StmtSynonym>> {
-    const auto maybe_syn = is_synonym_declared(declarations, mapping, reference);
+    const auto& maybe_syn = is_synonym_declared(declarations, mapping, reference);
 
     if (!maybe_syn.has_value()) {
         return std::nullopt;
     }
 
-    const auto maybe_stmt_syn = std::dynamic_pointer_cast<StmtSynonym>(maybe_syn.value());
+    const auto& maybe_stmt_syn = std::dynamic_pointer_cast<StmtSynonym>(maybe_syn.value());
     if (!maybe_stmt_syn) {
         return std::nullopt;
     }
@@ -103,7 +103,7 @@ auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::str
                  const T& x) -> std::optional<StmtRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<StmtRef> {
-                       const auto maybe_synonym = get_stmt_synonym(declarations, mapping, syn);
+                       const auto& maybe_synonym = get_stmt_synonym(declarations, mapping, syn);
                        if (!maybe_synonym.has_value()) {
                            return std::nullopt;
                        }
@@ -124,7 +124,7 @@ auto to_ent_ref(const Synonyms& declarations, const std::unordered_map<std::stri
                 const T& x) -> std::optional<EntRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& syn) -> std::optional<EntRef> {
-                       const auto maybe_synonym = is_synonym_declared(declarations, mapping, syn);
+                       const auto& maybe_synonym = is_synonym_declared(declarations, mapping, syn);
                        if (!maybe_synonym.has_value()) {
                            return std::nullopt;
                        }
@@ -174,12 +174,12 @@ auto validate_stmt_ent(const Synonyms& declarations,
                        const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                        const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
-    const auto maybe_stmt_ref = to_stmt_ref(declarations, mapping, ref);
+    const auto& maybe_stmt_ref = to_stmt_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {
         return std::nullopt;
     }
 
-    const auto stmt_ref = maybe_stmt_ref.value();
+    const auto& stmt_ref = maybe_stmt_ref.value();
     return validate_stmt_ent(keyword, stmt_ref, ent_ref, StmtEntList{});
 }
 
@@ -202,12 +202,12 @@ auto validate_ent_ent(const Synonyms& declarations,
                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                       const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
-    const auto maybe_stmt_ref = to_ent_ref(declarations, mapping, ref);
+    const auto& maybe_stmt_ref = to_ent_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {
         return std::nullopt;
     }
 
-    const auto stmt_ref = maybe_stmt_ref.value();
+    const auto& stmt_ref = maybe_stmt_ref.value();
     return validate_ent_ent(keyword, stmt_ref, ent_ref, EntEntList{});
 }
 
@@ -215,9 +215,9 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
                                   const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping) {
     return overloaded{
         [&declarations, &mapping](const untyped::UntypedStmtStmtRel& stmt_stmt_rel) -> std::optional<Relationship> {
-            const auto keyword = std::get<0>(stmt_stmt_rel);
-            const auto maybe_stmt_ref1 = to_stmt_ref(declarations, mapping, std::get<1>(stmt_stmt_rel));
-            const auto maybe_stmt_ref2 = to_stmt_ref(declarations, mapping, std::get<2>(stmt_stmt_rel));
+            const auto& keyword = std::get<0>(stmt_stmt_rel);
+            const auto& maybe_stmt_ref1 = to_stmt_ref(declarations, mapping, std::get<1>(stmt_stmt_rel));
+            const auto& maybe_stmt_ref2 = to_stmt_ref(declarations, mapping, std::get<2>(stmt_stmt_rel));
 
             if (!maybe_stmt_ref1.has_value() || !maybe_stmt_ref2.has_value()) {
                 return std::nullopt;
@@ -226,14 +226,14 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         },
         [&declarations, &mapping](const untyped::UntypedRefEntRel& ref_ent_rel) -> std::optional<Relationship> {
             const auto& [keyword, ref, ent] = ref_ent_rel;
-            const auto maybe_ent_ref = to_ent_ref(declarations, mapping, ent);
+            const auto& maybe_ent_ref = to_ent_ref(declarations, mapping, ent);
 
             if (!maybe_ent_ref.has_value()) {
                 return std::nullopt;
             }
-            const auto ent_ref = maybe_ent_ref.value();
+            const auto& ent_ref = maybe_ent_ref.value();
 
-            const auto maybe_stmt_ent = validate_stmt_ent(declarations, mapping, keyword, ref, ent_ref);
+            const auto& maybe_stmt_ent = validate_stmt_ent(declarations, mapping, keyword, ref, ent_ref);
             if (maybe_stmt_ent.has_value()) {
                 return maybe_stmt_ent;
             }
@@ -257,7 +257,7 @@ auto untyped_clause_visitor(const Synonyms& declarations,
         },
         [&declarations,
          &mapping](const untyped::UntypedPatternClause& pattern) -> std::optional<std::shared_ptr<Clause>> {
-            const auto maybe_syn = is_synonym_declared(declarations, mapping, pattern.assign_synonym);
+            const auto& maybe_syn = is_synonym_declared(declarations, mapping, pattern.assign_synonym);
 
             if (!maybe_syn.has_value()) {
                 return std::nullopt;
@@ -266,9 +266,9 @@ auto untyped_clause_visitor(const Synonyms& declarations,
             if (!maybe_assign_syn) {
                 return std::nullopt;
             }
-            const auto assign_syn = maybe_assign_syn;
+            const auto& assign_syn = maybe_assign_syn;
 
-            const auto maybe_ent_ref = std::visit(
+            const auto& maybe_ent_ref = std::visit(
                 overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<EntRef> {
                                const auto& maybe_synonym = is_synonym_declared(declarations, mapping, synonym);
                                if (!maybe_synonym.has_value()) {
