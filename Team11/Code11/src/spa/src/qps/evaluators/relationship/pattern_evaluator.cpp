@@ -62,7 +62,7 @@ auto PatternEvaluator::eval_pattern(const std::shared_ptr<Synonym>& synonym, con
     return table;
 }
 
-auto PatternEvaluator::eval_pattern(const std::shared_ptr<Synonym>& synonym, const WildCard& wild_card) const
+auto PatternEvaluator::eval_pattern(const std::shared_ptr<Synonym>& synonym, const WildCard&) const
     -> std::optional<Table> {
     auto table = Table{{pattern.assign_synonym, synonym}};
     for (const auto& assign_stmt : read_facade->get_assign_statements()) {
@@ -92,8 +92,7 @@ auto PatternEvaluator::eval_pattern(const QuotedIdent& quoted_ident, const Parti
     return table;
 }
 
-auto PatternEvaluator::eval_pattern(const QuotedIdent& quoted_ident, const WildCard& wild_card) const
-    -> std::optional<Table> {
+auto PatternEvaluator::eval_pattern(const QuotedIdent& quoted_ident, const WildCard&) const -> std::optional<Table> {
     auto table = Table{{pattern.assign_synonym}};
     const auto stmts_that_modify =
         read_facade->get_statements_that_modify_var(quoted_ident.get_value(), StatementType::Assign);
@@ -107,8 +106,7 @@ auto PatternEvaluator::eval_pattern(const QuotedIdent& quoted_ident, const WildC
     return table;
 }
 
-auto PatternEvaluator::eval_pattern(const WildCard& wild_card, const PartialMatch& partial_match) const
-    -> std::optional<Table> {
+auto PatternEvaluator::eval_pattern(const WildCard&, const PartialMatch& partial_match) const -> std::optional<Table> {
     auto table = Table{{pattern.assign_synonym}};
     const auto all_partial_matches = read_facade->get_all_assignments_rhs_partial(partial_match.expr.value);
     for (const auto& stmt : all_partial_matches) {
@@ -121,8 +119,7 @@ auto PatternEvaluator::eval_pattern(const WildCard& wild_card, const PartialMatc
     return table;
 }
 
-auto PatternEvaluator::eval_pattern(const WildCard& wild_card_1, const WildCard& wild_card_2) const
-    -> std::optional<Table> {
+auto PatternEvaluator::eval_pattern(const WildCard&, const WildCard&) const -> std::optional<Table> {
     auto table = Table{{pattern.assign_synonym}};
     const auto all_assign_stmts = read_facade->get_assign_statements();
     for (const auto& stmt : all_assign_stmts) {
