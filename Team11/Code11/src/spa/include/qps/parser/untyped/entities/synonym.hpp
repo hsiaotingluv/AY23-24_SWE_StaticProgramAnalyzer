@@ -19,6 +19,10 @@ struct UntypedSynonym {
         return name;
     }
 
+    [[nodiscard]] auto get_name_string() const -> std::string {
+        return name.get_value();
+    }
+
     auto operator<<(std::ostream& os) const -> std::ostream& {
         os << name;
         return os;

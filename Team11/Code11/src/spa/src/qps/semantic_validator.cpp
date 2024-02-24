@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <optional>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 #include <variant>
 
@@ -42,7 +44,7 @@ auto SemanticValidator::validate(const Synonyms& declarations, const untyped::Un
     // Reference must be declared
     const auto& maybe_reference = details::is_synonym_declared(declarations, mapping, references);
     if (!maybe_reference.has_value()) {
-        return SemanticError{"Undeclared reference: " + references.get_name().get_value()};
+        return SemanticError{"Undeclared reference: " + references.get_name_string()};
     }
 
     const auto& reference = maybe_reference.value();
@@ -67,7 +69,7 @@ auto enforce_unique_declarations(const Synonyms& declarations)
     std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping;
 
     for (const auto& declaration : declarations) {
-        mapping.insert({declaration->get_name().get_value(), declaration});
+        mapping.insert({declaration->get_name_string(), declaration});
     }
 
     return mapping.size() == declarations.size() ? std::make_optional(mapping) : std::nullopt;
@@ -76,10 +78,10 @@ auto enforce_unique_declarations(const Synonyms& declarations)
 auto is_synonym_declared(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                          const untyped::UntypedSynonym& reference) -> std::optional<std::shared_ptr<Synonym>> {
 
-    if (mapping.find(reference.get_name().get_value()) == mapping.end()) {
+    if (mapping.find(reference.get_name_string()) == mapping.end()) {
         return std::nullopt;
     }
-    return mapping.at(reference.get_name().get_value());
+    return mapping.at(reference.get_name_string());
 }
 
 auto get_stmt_synonym(const Synonyms& declarations,
