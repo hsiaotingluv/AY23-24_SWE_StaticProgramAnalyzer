@@ -1,9 +1,10 @@
 #include "catch.hpp"
 
+#include "qps/parser/untyped/untyped_parser.hpp"
 #include "utils.hpp"
 
-#include "qps/parser/expression_parser.hpp"
 #include "qps/parser.hpp"
+#include "qps/parser/expression_parser.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include "qps/parser/entities/clause.hpp"
@@ -23,7 +24,8 @@ TEST_CASE("Test Declaration Parser") {
     SECTION("Declaration with one synonym") {
         const auto query = "procedure p;";
         const auto tokens = runner.apply_tokeniser(query);
-        const auto output = untyped::detail::parse_declarations(tokens.begin(), tokens.end());
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
         REQUIRE(output.has_value());
         const auto& [result, rest] = output.value();
@@ -36,7 +38,8 @@ TEST_CASE("Test Declaration Parser") {
     SECTION("Declaration with multiple synonyms") {
         const auto query = "procedure p, q, r; Select p";
         const auto tokens = runner.apply_tokeniser(query);
-        const auto output = untyped::detail::parse_declarations(tokens.begin(), tokens.end());
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
         REQUIRE(output.has_value());
         const auto& [result, rest] = output.value();
@@ -51,7 +54,8 @@ TEST_CASE("Test Declaration Parser") {
     SECTION("Multiple declarations") {
         const auto query = "procedure p ; variable v; Select p";
         const auto tokens = runner.apply_tokeniser(query);
-        const auto output = untyped::detail::parse_declarations(tokens.begin(), tokens.end());
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
         REQUIRE(output.has_value());
         const auto& [result, rest] = output.value();
@@ -65,7 +69,8 @@ TEST_CASE("Test Declaration Parser") {
     SECTION("Declaration with invalid keyword") {
         const auto query = "proc p;";
         auto tokens = runner.apply_tokeniser(query);
-        const auto result = untyped::detail::parse_declarations(tokens.begin(), tokens.end());
+        const auto result =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
         REQUIRE(!result.has_value());
     }
