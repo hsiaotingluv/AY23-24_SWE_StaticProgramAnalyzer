@@ -81,7 +81,7 @@ auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> s
     auto combined_set = std::unordered_set<std::string>();
     auto children = node->get_children();
     for (const auto& child : children) {
-        auto child_var_names = get_vars_from_expr(child); //Extract variable names from each child.
+        auto child_var_names = get_vars_from_expr(child); // Extract variable names from each child.
         for (const auto& var_name : child_var_names) {
             combined_set.insert(var_name); // Add each variable from each child to the combined set.
         }
