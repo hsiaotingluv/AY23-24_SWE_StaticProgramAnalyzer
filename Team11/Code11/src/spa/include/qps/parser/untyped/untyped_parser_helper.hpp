@@ -1,7 +1,6 @@
 #pragma once
 
 #include "qps/parser/parser_helper.hpp"
-#include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 
 namespace qps::untyped::detail {
@@ -13,8 +12,8 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
 
 auto parse_stmt_ref(const Token& token) -> UntypedStmtRef;
 
-auto parse_rel_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>>;
+auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>>;
 
 template <unsigned long N>
 auto parse_keywords(std::array<std::string_view, N> keywords, std::vector<Token>::const_iterator it,

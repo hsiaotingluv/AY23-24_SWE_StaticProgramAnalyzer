@@ -1,6 +1,7 @@
 #include "qps/parser.hpp"
 #include "qps/parser/errors.hpp"
 #include "qps/parser/semantic_validator.hpp"
+#include "qps/parser/untyped/untyped_parser.hpp"
 
 #include <optional>
 #include <variant>

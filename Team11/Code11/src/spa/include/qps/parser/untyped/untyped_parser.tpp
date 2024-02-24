@@ -4,6 +4,7 @@
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/entities/query.hpp"
+#include "qps/template_utils.hpp"
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include "qps/parser/errors.hpp"
@@ -138,8 +139,11 @@ auto try_declare_synonyms(Synonyms& synonyms, std::vector<Token>::const_iterator
     return std::nullopt;
 }
 
-auto parse_declarations_rec(Synonyms&, std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&,
-                            TypeList<>) -> std::optional<std::vector<Token>::const_iterator>;
+inline auto parse_declarations_rec(Synonyms&, std::vector<Token>::const_iterator,
+                                   const std::vector<Token>::const_iterator&, TypeList<>)
+    -> std::optional<std::vector<Token>::const_iterator> {
+    return std::nullopt;
+}
 
 template <typename Head, typename... Tails>
 auto parse_declarations_rec(Synonyms& synonyms, std::vector<Token>::const_iterator it,

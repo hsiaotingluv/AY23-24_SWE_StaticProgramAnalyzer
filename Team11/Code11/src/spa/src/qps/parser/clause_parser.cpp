@@ -72,24 +72,4 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
     return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
 }
 
-auto SuchThatClausesParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedSuchThatClause, std::vector<Token>::const_iterator>> {
-    constexpr auto EXPECTED_LENGTH = 3;
-    if (std::distance(it, end) < EXPECTED_LENGTH) {
-        return std::nullopt;
-    }
-
-    const auto maybe_it = detail::parse_keywords(keywords, it, end);
-    if (!maybe_it.has_value()) {
-        return std::nullopt;
-    }
-    it = maybe_it.value();
-
-    const auto maybe_rel_ref = detail::parse_rel_ref(it, end);
-    if (!maybe_rel_ref.has_value()) {
-        return std::nullopt;
-    }
-    const auto& [rel_ref, rest] = maybe_rel_ref.value();
-    return std::make_tuple(rel_ref, rest);
-}
 } // namespace qps::untyped
