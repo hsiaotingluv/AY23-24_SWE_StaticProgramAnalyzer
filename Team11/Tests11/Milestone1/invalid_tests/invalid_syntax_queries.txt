@@ -193,3 +193,43 @@ assign a;
 Select a such that Modifies(a, "1dent")
 SyntaxError
 5000
+40 - Invalid Second Argument (print) in Pattern Clause
+assign a; print p;
+Select a pattern a(_, p)
+SyntaxError
+5000
+41 - Invalid Second Argument (procedure) in Pattern Clause
+assign a; procedure p;
+Select a pattern a(_, p)
+SyntaxError
+5000
+42 - Invalid Second Argument (statement) in Pattern Clause
+assign a; stmt s;
+Select a pattern a(_, s)
+SyntaxError
+5000
+43 - Invalid Second Argument (read) in Pattern Clause
+assign a; read r;
+Select a pattern a(_, r)
+SyntaxError
+5000
+44 - Invalid Second Argument (assign) in Pattern Clause
+assign a;
+Select a pattern a(_, a)
+SyntaxError
+5000
+45 - Invalid Second Argument (while) in Pattern Clause
+assign a; while w;
+Select a pattern a(_, w)
+SyntaxError
+5000
+46 - Invalid Second Argument (if) in Pattern Clause
+assign a; if i;
+Select a pattern a(_, i)
+SyntaxError
+5000
+47 - Invalid Second Argument (constant) in Pattern Clause
+assign a; constant c;
+Select a pattern a(_, c)
+SyntaxError
+5000
