@@ -96,7 +96,6 @@ TEST_CASE("Test pkb and QPS - Statements") {
     write_facade->add_statement("4", StatementType::Call);
     write_facade->add_statement("5", StatementType::Read);
     write_facade->add_statement("6", StatementType::Print);
-    write_facade->add_statement("7", StatementType::Raw);
 
     SECTION("Test Query - all assign") {
         const auto query = "assign a; Select a";
