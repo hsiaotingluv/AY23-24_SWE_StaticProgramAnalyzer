@@ -2,7 +2,7 @@
 
 namespace qps {
 
-auto ParentEvaluator::select_eval_method() {
+auto ParentEvaluator::select_eval_method() const {
     return overloaded{
         // e.g. Parent(s1, s2)
         [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
@@ -45,12 +45,12 @@ auto ParentEvaluator::select_eval_method() {
         }};
 }
 
-auto ParentEvaluator::evaluate() -> std::optional<Table> {
+auto ParentEvaluator::evaluate() const -> std::optional<Table> {
     return std::visit(select_eval_method(), parent.stmt1, parent.stmt2);
 }
 
 auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                                  const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+                                  const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> std::optional<Table> {
     if (stmt_syn_1 == stmt_syn_2) {
         return std::nullopt;
     }
@@ -79,7 +79,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1
     return table;
 }
 
-auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2)
+auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2) const
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
@@ -94,7 +94,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1
     return table;
 }
 
-auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&)
+auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
@@ -112,7 +112,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1
     return table;
 }
 
-auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2)
+auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
@@ -130,14 +130,14 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const std::shared_p
     return table;
 }
 
-auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const Integer& stmt_num_2) -> std::optional<Table> {
+auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> std::optional<Table> {
     if (!read_facade->has_parent_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
         return std::nullopt;
     }
     return Table{};
 }
 
-auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const WildCard&) -> std::optional<Table> {
+auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const WildCard&) const -> std::optional<Table> {
     // TODO: Improve pkb API: bool is_a_parent
     const auto all_parents = read_facade->get_all_parent_keys();
     bool is_parent = false;
@@ -154,7 +154,7 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const WildCard&) ->
     return Table{};
 }
 
-auto ParentEvaluator::eval_parent(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2)
+auto ParentEvaluator::eval_parent(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
@@ -172,7 +172,7 @@ auto ParentEvaluator::eval_parent(const WildCard&, const std::shared_ptr<StmtSyn
     return table;
 }
 
-auto ParentEvaluator::eval_parent(const WildCard&, const Integer& stmt_num_2) -> std::optional<Table> {
+auto ParentEvaluator::eval_parent(const WildCard&, const Integer& stmt_num_2) const -> std::optional<Table> {
     // TODO: Improve pkb API: bool has_a_parent
     const auto all_children = read_facade->get_all_parent_values();
     bool has_a_parent = false;
@@ -189,7 +189,7 @@ auto ParentEvaluator::eval_parent(const WildCard&, const Integer& stmt_num_2) ->
     return Table{};
 }
 
-auto ParentEvaluator::eval_parent(const WildCard&, const WildCard&) -> std::optional<Table> {
+auto ParentEvaluator::eval_parent(const WildCard&, const WildCard&) const -> std::optional<Table> {
     if (read_facade->get_all_parent_keys().empty()) {
         return std::nullopt;
     }

@@ -5,7 +5,7 @@
 
 namespace qps {
 
-auto UsesSEvaluator::select_eval_method() {
+auto UsesSEvaluator::select_eval_method() const {
     return overloaded{
         // e.g. Uses(a/pn/s, v)
         [this](const std::shared_ptr<StmtSynonym>& stmt_synonym,
@@ -36,12 +36,12 @@ auto UsesSEvaluator::select_eval_method() {
         }};
 }
 
-auto UsesSEvaluator::evaluate() -> std::optional<Table> {
+auto UsesSEvaluator::evaluate() const -> std::optional<Table> {
     return std::visit(select_eval_method(), uses_s.stmt, uses_s.ent);
 }
 
 auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym,
-                                 const std::shared_ptr<VarSynonym>& var_synonym) -> std::optional<Table> {
+                                 const std::shared_ptr<VarSynonym>& var_synonym) const -> std::optional<Table> {
     auto table = Table{{stmt_synonym, var_synonym}};
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
 
@@ -59,8 +59,8 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
     return table;
 }
 
-auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym, const QuotedIdent& quoted_ident)
-    -> std::optional<Table> {
+auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym,
+                                 const QuotedIdent& quoted_ident) const -> std::optional<Table> {
     auto table = Table{{stmt_synonym}};
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
 
@@ -79,7 +79,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
     return table;
 }
 
-auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym, const WildCard&)
+auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym, const WildCard&) const
     -> std::optional<Table> {
     auto table = Table{{stmt_synonym}};
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
@@ -93,7 +93,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
     return table;
 }
 
-auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const std::shared_ptr<VarSynonym>& var_synonym)
+auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const std::shared_ptr<VarSynonym>& var_synonym) const
     -> std::optional<Table> {
     auto table = Table{{var_synonym}};
     const auto used_vars = read_facade->get_vars_used_by_statement(std::to_string(stmt_num.value));
@@ -106,7 +106,8 @@ auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const std::shared_ptr<
     return table;
 }
 
-auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quoted_ident) -> std::optional<Table> {
+auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quoted_ident) const
+    -> std::optional<Table> {
     const auto stmt_num_string = std::to_string(stmt_num.value);
     const auto var_string = quoted_ident.get_value();
     bool stmt_uses_var = read_facade->does_statement_use_var(stmt_num_string, var_string);
@@ -117,7 +118,7 @@ auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quo
     return Table{};
 }
 
-auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const WildCard&) -> std::optional<Table> {
+auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const WildCard&) const -> std::optional<Table> {
     const auto stmt_num_string = std::to_string(stmt_num.value);
     bool stmt_uses_var = read_facade->does_statement_use_any_var(stmt_num_string);
 
