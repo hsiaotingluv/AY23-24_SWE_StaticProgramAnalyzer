@@ -1,12 +1,16 @@
 #include "TestWrapper.h"
+#include "qps/parser/errors.hpp"
+#include "qps/template_utils.hpp"
 #include "sp/main.hpp"
 
-#include "qps/evaluators/simple_evaluator.hpp"
+#include "qps/evaluators/query_evaluator.hpp"
 
 #include <filesystem>
 #include <fstream>
 #include <memory>
+#include <optional>
 #include <stdexcept>
+#include <variant>
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper* WrapperFactory::wrapper = nullptr;
@@ -28,8 +32,8 @@ TestWrapper::TestWrapper()
     auto [read_facade, write_facade] = PKB::create_facades();
 
     source_processor = sp::SourceProcessor::get_complete_sp(write_facade);
-    qps_parser = std::make_shared<qps::QueryProcessingSystemParser>();
-    qps_evaluator = std::make_shared<qps::Evaluator>(read_facade);
+    qps_parser = std::make_shared<qps::QueryProcessingSystem>();
+    qps_evaluator = std::make_shared<qps::QueryEvaluator>(read_facade);
 }
 
 auto TestWrapper::load_file(const std::string& filename) -> std::string {
@@ -53,9 +57,21 @@ void TestWrapper::parse(std::string filename) {
 }
 
 void TestWrapper::evaluate(std::string query, std::list<std::string>& results) {
-    const auto maybe_query_obj = qps_parser->parse(query);
-    if (!maybe_query_obj) {
-        results.emplace_back("Error: Invalid query");
+    const auto output = qps_parser->parse(query);
+    const auto maybe_query_obj =
+        std::visit(qps::overloaded{[&results](const qps::SyntaxError& e) -> std::optional<qps::Query> {
+                                       results.emplace_back("SyntaxError");
+                                       return std::nullopt;
+                                   },
+                                   [&results](const qps::SemanticError& e) -> std::optional<qps::Query> {
+                                       results.emplace_back("SemanticError");
+                                       return std::nullopt;
+                                   },
+                                   [&results, this](const qps::Query& query_obj) -> std::optional<qps::Query> {
+                                       return std::make_optional(query_obj);
+                                   }},
+                   output);
+    if (!maybe_query_obj.has_value()) {
         return;
     }
 

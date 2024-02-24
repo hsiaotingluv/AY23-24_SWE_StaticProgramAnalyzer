@@ -29,6 +29,7 @@ auto StatementParser::parseIfStmt(Parser::Iterator& token_start, const Parser::I
     }
 
     auto then_stmt_list_tree = statement_list_parser.parse(token_start, token_end);
+    auto then_node = std::dynamic_pointer_cast<StatementListNode>(then_stmt_list_tree);
 
     auto rcurly_token = get_next_token(token_start);
     if (rcurly_token.T != TokenType::RCurly) {
@@ -46,12 +47,13 @@ auto StatementParser::parseIfStmt(Parser::Iterator& token_start, const Parser::I
     }
 
     auto else_stmt_list_tree = statement_list_parser.parse(token_start, token_end);
+    auto else_node = std::dynamic_pointer_cast<StatementListNode>(else_stmt_list_tree);
 
     rcurly_token = get_next_token(token_start);
     if (rcurly_token.T != TokenType::RCurly) {
         throw ParsingError("Expecting else } keyword in if but found other token");
     }
 
-    return std::make_shared<IfNode>(cond_expr_tree, then_stmt_list_tree, else_stmt_list_tree);
+    return std::make_shared<IfNode>(cond_expr_tree, then_node, else_node);
 }
 } // namespace sp

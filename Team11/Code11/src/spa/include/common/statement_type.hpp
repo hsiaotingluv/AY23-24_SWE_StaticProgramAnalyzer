@@ -7,5 +7,4 @@ enum class StatementType {
     While,
     Read,
     Print,
-    Raw,
 };

@@ -4,11 +4,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "pkb/common_types/statement_number.h"
 #include "pkb/common_types/variable.h"
 
 class AssignmentStore {
   public:
-    using StatementNumber = std::string;
     using AssignmentStoreType =
         std::unordered_map<std::string, std::unordered_map<Variable, std::unordered_set<std::string>>>;
 

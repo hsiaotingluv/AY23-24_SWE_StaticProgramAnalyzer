@@ -5,16 +5,17 @@
 namespace sp {
 auto TermParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end) -> std::shared_ptr<AstNode> {
     auto factor_tree = factor_parser.parse(token_start, token_end);
+    auto expr_node = std::dynamic_pointer_cast<ExprNode>(factor_tree);
     auto bottom_top_node = this->parseTermPrime(token_start, token_end);
 
     auto bottom_node = std::get<0>(bottom_top_node);
     auto top_node = std::get<1>(bottom_top_node);
 
     if (bottom_node->T == NodeType::EmptyString) {
-        return factor_tree;
+        return expr_node;
     } else {
         auto casted_node = std::dynamic_pointer_cast<BinopNode>(bottom_node);
-        casted_node->left = factor_tree;
+        casted_node->left = expr_node;
         return top_node;
     }
 }
@@ -45,7 +46,8 @@ auto TermParser::parseTermPrime(Parser::Iterator& token_start, // NOLINT(*-no-re
 
     new_partial_bottom->left = nullptr;
     auto factor_node = factor_parser.parse(token_start, token_end);
-    new_partial_bottom->right = factor_node;
+    auto expr_node = std::dynamic_pointer_cast<ExprNode>(factor_node);
+    new_partial_bottom->right = expr_node;
 
     auto bottom_top_node = this->parseTermPrime(token_start, token_end);
     auto bottom_node = std::get<0>(bottom_top_node);

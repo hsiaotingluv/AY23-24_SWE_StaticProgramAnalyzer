@@ -153,17 +153,17 @@ stmt s1;
 Select s1 such that Uses(s1, undeclaredSynonym)
 SemanticError
 5000
-32 - Invalid First Argument (constant) in Uses Clause
+28 - Invalid First Argument (constant) in Uses Clause
 constant c;
 Select c such that Uses(c, "x")
 SemanticError
 5000
-33 - Invalid First Argument (wildcard) in Uses Clause
+29 - Invalid First Argument (wildcard) in Uses Clause
 stmt s;
 Select s such that Uses(_, "x")
 SemanticError
 5000
-34 - Invalid First Argument (variable) in Uses Clause
+30 - Invalid First Argument (variable) in Uses Clause
 variable v;
 Select v such that Uses(v, _)
 SemanticError
