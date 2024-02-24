@@ -18,12 +18,35 @@
 class ReadFacade;
 class WriteFacade;
 
+static constexpr auto identity_fun = [](const auto& s) {
+    return s;
+};
+
+static constexpr auto tuple_stmt_no_extractor = [](const auto& p) {
+    return std::get<0>(p);
+};
+
 class PKB {
   public:
     static std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> create_facades();
 
-    std::unordered_set<std::string> filter_statements_by_type(const std::unordered_set<std::string>& stmts,
-                                                              StatementType statementType) const;
+    template <class T, class Extractor>
+    std::unordered_set<T> filter_by_statement_type(const std::unordered_set<T>& set, StatementType statement_type,
+                                                   Extractor extractor) const {
+        std::unordered_set<T> filtered;
+        for (const auto& elem : set) {
+            if (statement_store->get_val_by_key(extractor(elem)) == statement_type) {
+                filtered.insert(elem);
+            }
+        }
+        return filtered;
+    }
+
+    template <class T>
+    std::unordered_set<T> filter_by_statement_type(const std::unordered_set<T>& set,
+                                                   StatementType statement_type) const {
+        return filter_by_statement_type(set, statement_type, identity_fun);
+    }
 
     void finalise_pkb();
 

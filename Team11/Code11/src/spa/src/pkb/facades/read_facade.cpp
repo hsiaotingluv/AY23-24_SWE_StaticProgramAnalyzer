@@ -104,9 +104,9 @@ std::unordered_set<std::string> ReadFacade::get_statements_that_modify_var(const
 }
 
 std::unordered_set<std::string> ReadFacade::get_statements_that_modify_var(const std::string& variable,
-                                                                           const StatementType& statementType) {
+                                                                           const StatementType& statement_type) {
     auto stmts_pool = get_statements_that_modify_var(variable);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 bool ReadFacade::does_statement_modify_var(const std::string& statement, const std::string& variable) {
@@ -119,9 +119,9 @@ std::unordered_set<std::string> ReadFacade::get_all_statements_that_modify() {
     return this->pkb->statement_modifies_store->get_all_keys();
 };
 
-std::unordered_set<std::string> ReadFacade::get_all_statements_that_modify(const StatementType& statementType) {
+std::unordered_set<std::string> ReadFacade::get_all_statements_that_modify(const StatementType& statement_type) {
     auto stmts_pool = get_all_statements_that_modify();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 };
 
 bool ReadFacade::does_statement_modify_any_var(const std::string& statement_number) {
@@ -140,15 +140,10 @@ std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_sta
 }
 
 std::unordered_set<std::tuple<std::string, std::string>>
-ReadFacade::get_all_statements_and_var_modify_pairs(const StatementType& statementType) {
+ReadFacade::get_all_statements_and_var_modify_pairs(const StatementType& statement_type) {
     auto pairs = get_all_statements_and_var_modify_pairs();
-    std::unordered_set<std::tuple<std::string, std::string>> temp;
-    for (const auto& [s, v] : pairs) {
-        if (this->pkb->statement_store->get_val_by_key(s) == statementType) {
-            temp.insert(std::make_tuple(s, v));
-        }
-    }
-    return temp;
+
+    return pkb->filter_by_statement_type(pairs, statement_type, tuple_stmt_no_extractor);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_procedures_that_modify() {
@@ -230,9 +225,9 @@ std::unordered_set<std::string> ReadFacade::get_statements_that_use_var(const st
 }
 
 std::unordered_set<std::string> ReadFacade::get_statements_that_use_var(const std::string& variable,
-                                                                        const StatementType& statementType) {
+                                                                        const StatementType& statement_type) {
     auto stmts_pool = get_statements_that_use_var(variable);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 bool ReadFacade::does_statement_use_var(const std::string& statement, const std::string& variable) {
@@ -278,9 +273,9 @@ std::unordered_set<std::string> ReadFacade::get_all_statements_that_use() {
     return this->pkb->statement_uses_store->get_all_keys();
 };
 
-std::unordered_set<std::string> ReadFacade::get_all_statements_that_use(const StatementType& statementType) {
+std::unordered_set<std::string> ReadFacade::get_all_statements_that_use(const StatementType& statement_type) {
     auto stmts_pool = get_all_statements_that_use();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 };
 
 bool ReadFacade::does_statement_use_any_var(const std::string& statement_number) {
@@ -299,15 +294,10 @@ std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_sta
 }
 
 std::unordered_set<std::tuple<std::string, std::string>>
-ReadFacade::get_all_statements_and_var_use_pairs(const StatementType& statementType) {
+ReadFacade::get_all_statements_and_var_use_pairs(const StatementType& statement_type) {
     auto pairs = get_all_statements_and_var_use_pairs();
-    std::unordered_set<std::tuple<std::string, std::string>> temp;
-    for (const auto& [s, v] : pairs) {
-        if (this->pkb->statement_store->get_val_by_key(s) == statementType) {
-            temp.insert(std::make_tuple(s, v));
-        }
-    }
-    return temp;
+
+    return pkb->filter_by_statement_type(pairs, statement_type, tuple_stmt_no_extractor);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_procedures_that_use() {
@@ -347,18 +337,18 @@ std::unordered_set<std::string> ReadFacade::get_all_follows_keys() const {
     return this->pkb->direct_follows_store->get_all_keys();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_follows_keys(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_follows_keys(const StatementType& statement_type) const {
     auto stmts_pool = this->pkb->direct_follows_store->get_all_keys();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_follows_values() const {
     return this->pkb->direct_follows_store->get_all_vals();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_follows_values(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_follows_values(const StatementType& statement_type) const {
     auto stmts_pool = this->pkb->direct_follows_store->get_all_vals();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 bool ReadFacade::has_follows_relation(const std::string& stmt1, const std::string& stmt2) const {
@@ -369,10 +359,10 @@ std::string ReadFacade::get_statement_following(const std::string& s) const {
     return this->pkb->direct_follows_store->get_val_by_key(s);
 }
 
-std::string ReadFacade::get_statement_following(const std::string& s, const StatementType& statementType) const {
+std::string ReadFacade::get_statement_following(const std::string& s, const StatementType& statement_type) const {
     auto stmt = this->pkb->direct_follows_store->get_val_by_key(s);
 
-    if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
+    if (this->pkb->statement_store->get_val_by_key(stmt) == statement_type) {
         return stmt;
     }
 
@@ -383,10 +373,10 @@ std::string ReadFacade::get_statement_followed_by(const std::string& s) const {
     return this->pkb->direct_follows_store->get_key_by_val(s);
 }
 
-std::string ReadFacade::get_statement_followed_by(const std::string& s, const StatementType& statementType) const {
+std::string ReadFacade::get_statement_followed_by(const std::string& s, const StatementType& statement_type) const {
     auto stmt = this->pkb->direct_follows_store->get_key_by_val(s);
 
-    if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
+    if (this->pkb->statement_store->get_val_by_key(stmt) == statement_type) {
         return stmt;
     }
 
@@ -405,19 +395,19 @@ std::unordered_set<std::string> ReadFacade::get_all_follows_star_keys() const {
     return this->pkb->follows_star_store->get_all_keys();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_follows_star_keys(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_follows_star_keys(const StatementType& statement_type) const {
     auto stmts_pool = get_all_follows_star_keys();
 
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_follows_star_values() const {
     return this->pkb->follows_star_store->get_all_vals();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_follows_star_values(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_follows_star_values(const StatementType& statement_type) const {
     auto stmts_pool = get_all_follows_star_values();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_follows_stars_following(const std::string& stmt) const {
@@ -425,10 +415,10 @@ std::unordered_set<std::string> ReadFacade::get_follows_stars_following(const st
 }
 
 std::unordered_set<std::string> ReadFacade::get_follows_stars_following(const std::string& stmt,
-                                                                        const StatementType& statementType) const {
+                                                                        const StatementType& statement_type) const {
     auto stmts_pool = get_follows_stars_following(stmt);
 
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::string& stmt) const {
@@ -436,9 +426,9 @@ std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::stri
 }
 
 std::unordered_set<std::string> ReadFacade::get_follows_stars_by(const std::string& stmt,
-                                                                 const StatementType& statementType) const {
+                                                                 const StatementType& statement_type) const {
     auto stmts_pool = get_follows_stars_by(stmt);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 bool ReadFacade::has_parent_relation(const std::string& parent, const std::string& child) const {
@@ -453,18 +443,18 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_keys() const {
     return this->pkb->direct_parent_store->get_all_keys();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_parent_keys(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_parent_keys(const StatementType& statement_type) const {
     auto stmts_pool = get_all_parent_keys();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_parent_values() const {
     return this->pkb->direct_parent_store->get_all_vals();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_parent_values(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_parent_values(const StatementType& statement_type) const {
     auto stmts_pool = get_all_parent_values();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_children_of(const std::string& parent) const {
@@ -472,19 +462,19 @@ std::unordered_set<std::string> ReadFacade::get_children_of(const std::string& p
 }
 
 std::unordered_set<std::string> ReadFacade::get_children_of(const std::string& parent,
-                                                            const StatementType& statementType) const {
+                                                            const StatementType& statement_type) const {
     auto stmts_pool = get_children_of(parent);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::string ReadFacade::get_parent_of(const std::string& child) const {
     return this->pkb->direct_parent_store->get_key_by_val(child);
 }
 
-std::string ReadFacade::get_parent_of(const std::string& child, const StatementType& statementType) const {
+std::string ReadFacade::get_parent_of(const std::string& child, const StatementType& statement_type) const {
     auto stmt = get_parent_of(child);
 
-    if (this->pkb->statement_store->get_val_by_key(stmt) == statementType) {
+    if (this->pkb->statement_store->get_val_by_key(stmt) == statement_type) {
         return stmt;
     }
 
@@ -503,19 +493,19 @@ std::unordered_set<std::string> ReadFacade::get_all_parent_star_keys() const {
     return this->pkb->parent_star_store->get_all_keys();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_parent_star_keys(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_parent_star_keys(const StatementType& statement_type) const {
     auto stmts_pool = get_all_parent_star_keys();
 
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_parent_star_values() const {
     return this->pkb->parent_star_store->get_all_vals();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_parent_star_values(const StatementType& statementType) const {
+std::unordered_set<std::string> ReadFacade::get_all_parent_star_values(const StatementType& statement_type) const {
     auto stmts_pool = get_all_parent_star_values();
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_children_star_of(const std::string& parent) const {
@@ -523,9 +513,9 @@ std::unordered_set<std::string> ReadFacade::get_children_star_of(const std::stri
 }
 
 std::unordered_set<std::string> ReadFacade::get_children_star_of(const std::string& parent,
-                                                                 const StatementType& statementType) const {
+                                                                 const StatementType& statement_type) const {
     auto stmts_pool = get_children_star_of(parent);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string& child) const {
@@ -533,9 +523,9 @@ std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string
 }
 
 std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string& child,
-                                                               const StatementType& statementType) const {
+                                                               const StatementType& statement_type) const {
     auto stmts_pool = get_parent_star_of(child);
-    return this->pkb->filter_statements_by_type(stmts_pool, statementType);
+    return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_assignments_rhs(const std::string& rhs) {
