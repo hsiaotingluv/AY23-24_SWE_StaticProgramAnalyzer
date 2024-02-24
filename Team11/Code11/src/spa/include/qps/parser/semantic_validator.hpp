@@ -3,9 +3,18 @@
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
+#include "qps/parser/semantic_validator_helper.hpp"
 #include "qps/parser/untyped/entities/query.hpp"
 
 #include <memory>
+
+namespace qps::details {
+// Forward declarations
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+auto validate_clause(const Synonyms& declarations,
+                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                     const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>>;
+} // namespace qps::details
 
 namespace qps {
 struct Query {
@@ -32,10 +41,47 @@ struct Query {
         return os;
     };
 };
+} // namespace qps
 
-class SemanticValidator {
+#include "qps/parser/semantic_validator.tpp"
+
+namespace qps {
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+class ConcreteSemanticValidator {
   public:
     static auto validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
-        -> std::variant<Query, SemanticError>;
+        -> std::variant<Query, SemanticError> {
+        // Declarations must be unique
+        const auto& maybe_mapping = details::enforce_unique_declarations(declarations);
+        if (!maybe_mapping.has_value()) {
+            return SemanticError{"Non-unique mapping"};
+        }
+        const auto& mapping = maybe_mapping.value();
+
+        const auto& [references, clauses] = untyped_query;
+
+        // Reference must be declared
+        const auto& maybe_reference = details::is_synonym_declared(declarations, mapping, references);
+        if (!maybe_reference.has_value()) {
+            return SemanticError{"Undeclared reference: " + references.get_name_string()};
+        }
+
+        const auto& reference = maybe_reference.value();
+
+        // Clauses must be valid
+        std::vector<std::shared_ptr<Clause>> validated_clauses;
+        for (const auto& clause : clauses) {
+            const auto& maybe_validated_clause =
+                details::validate_clause<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping, clause);
+            if (!maybe_validated_clause.has_value()) {
+                return SemanticError{"Invalid clause"};
+            }
+            validated_clauses.push_back(maybe_validated_clause.value());
+        }
+
+        return Query{declarations, reference, validated_clauses};
+    }
 };
+
+using SemanticValidator = ConcreteSemanticValidator<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>;
 } // namespace qps
