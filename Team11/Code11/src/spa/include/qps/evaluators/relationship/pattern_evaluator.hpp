@@ -52,7 +52,7 @@ class PatternEvaluator : public ClauseEvaluator {
         : ClauseEvaluator(), read_facade(std::move(read_facade)), pattern(std::move(pattern)) {
     }
 
-    auto evaluate() const -> std::optional<Table> override;
+    [[nodiscard]] auto evaluate() const -> std::optional<Table> override;
 };
 
 } // namespace qps
