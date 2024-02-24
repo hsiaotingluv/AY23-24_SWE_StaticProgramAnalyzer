@@ -209,7 +209,10 @@ namespace {
 //     http://stackoverflow.com/questions/4948780
 template <class T>
 inline void hash_combine(std::size_t& seed, T const& v) {
-    seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    constexpr auto phi_reciprocal = 0x9e3779b9;
+    constexpr auto bit_shift1 = 6;
+    constexpr auto bit_shift2 = 2;
+    seed ^= std::hash<T>()(v) + phi_reciprocal + (seed << bit_shift1) + (seed >> bit_shift2);
 }
 } // namespace
 

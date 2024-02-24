@@ -65,7 +65,7 @@ auto parse_stmt_stmt(std::vector<Token>::const_iterator it, const std::vector<To
     -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
     constexpr auto EXPECTED_LENGTH = 6;
     const auto keyword = std::string{T::keyword};
-    const auto is_direct = keyword.find("*") == std::string::npos;
+    const auto is_direct = keyword.find('*') == std::string::npos;
     const auto offset = is_direct ? 0 : 1;
     if (std::distance(it, end) < EXPECTED_LENGTH + offset) {
         return std::nullopt;
