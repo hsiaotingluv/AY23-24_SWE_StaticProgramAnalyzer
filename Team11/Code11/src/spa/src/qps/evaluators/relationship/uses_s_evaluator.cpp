@@ -99,7 +99,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
 auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const std::shared_ptr<VarSynonym>& var_synonym) const
     -> std::optional<Table> {
     auto table = Table{{var_synonym}};
-    const auto used_vars = read_facade->get_vars_used_by_statement(std::to_string(stmt_num.value));
+    const auto used_vars = read_facade->get_vars_used_by_statement(stmt_num.value);
     for (const auto& var : used_vars) {
         table.add_row({var});
     }
@@ -111,7 +111,7 @@ auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const std::shared_ptr<
 
 auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quoted_ident) const
     -> std::optional<Table> {
-    const auto stmt_num_string = std::to_string(stmt_num.value);
+    const auto stmt_num_string = stmt_num.value;
     const auto var_string = quoted_ident.get_value();
     bool stmt_uses_var = read_facade->does_statement_use_var(stmt_num_string, var_string);
 
@@ -122,7 +122,7 @@ auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quo
 }
 
 auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const WildCard&) const -> std::optional<Table> {
-    const auto stmt_num_string = std::to_string(stmt_num.value);
+    const auto stmt_num_string = stmt_num.value;
     bool stmt_uses_var = read_facade->does_statement_use_any_var(stmt_num_string);
 
     if (!stmt_uses_var) {

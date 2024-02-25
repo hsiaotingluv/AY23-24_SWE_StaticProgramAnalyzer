@@ -83,7 +83,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_sy
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
-    const auto ancestors = read_facade->get_parent_star_of(std::to_string(stmt_num_2.value));
+    const auto ancestors = read_facade->get_parent_star_of(stmt_num_2.value);
     for (const auto& ancestor : ancestors) {
         if (relevant_stmts.find(ancestor) == relevant_stmts.end()) {
             continue;
@@ -117,7 +117,7 @@ auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const std::share
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
-    const auto all_descendants_of_stmt = read_facade->get_children_star_of(std::to_string(stmt_num_1.value));
+    const auto all_descendants_of_stmt = read_facade->get_children_star_of(stmt_num_1.value);
     for (const auto& descendant : all_descendants_of_stmt) {
         if (relevant_stmts.find(descendant) == relevant_stmts.end()) {
             continue;
@@ -133,7 +133,7 @@ auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const std::share
 
 auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const Integer& stmt_num_2) const
     -> std::optional<Table> {
-    if (!read_facade->has_parent_star_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
+    if (!read_facade->has_parent_star_relation(stmt_num_1.value, stmt_num_2.value)) {
         return std::nullopt;
     }
     return Table{};
@@ -143,7 +143,7 @@ auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const WildCard&)
     // TODO: Improve pkb API: bool is_a_parent_star
     const auto all_ancestors = read_facade->get_all_parent_star_keys();
     bool is_ancestor = false;
-    const auto stmt_num = std::to_string(stmt_num_1.value);
+    const auto stmt_num = stmt_num_1.value;
     for (const auto& ancestor_name : all_ancestors) {
         if (stmt_num == ancestor_name) {
             is_ancestor = true;
@@ -178,7 +178,7 @@ auto ParentTEvaluator::eval_parent_t(const WildCard&, const Integer& stmt_num_2)
     // TODO: Improve pkb API: bool has_a_parent_star
     const auto all_children = read_facade->get_all_parent_values();
     bool has_a_parent = false;
-    const auto stmt_num = std::to_string(stmt_num_2.value);
+    const auto stmt_num = stmt_num_2.value;
     for (const auto& child_name : all_children) {
         if (stmt_num == child_name) {
             has_a_parent = true;

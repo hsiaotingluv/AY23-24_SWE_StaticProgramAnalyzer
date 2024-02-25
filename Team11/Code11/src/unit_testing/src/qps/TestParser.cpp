@@ -35,7 +35,7 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
-            untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{Integer{13}},
+            untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{Integer{"13"}},
                                         untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}}}};
         REQUIRE(such_that_clause == reference_clause);
     }
@@ -60,7 +60,7 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{13}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}}};
         REQUIRE(such_that_clause == reference_clause);
     };
 
@@ -84,7 +84,7 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{13}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}}};
         REQUIRE(such_that_clause == reference_clause);
     };
 
@@ -172,8 +172,9 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
-        const auto reference_clause = untyped::UntypedPatternClause{
-            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+        const auto reference_clause =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
         REQUIRE(pattern_clause == reference_clause);
     }
 

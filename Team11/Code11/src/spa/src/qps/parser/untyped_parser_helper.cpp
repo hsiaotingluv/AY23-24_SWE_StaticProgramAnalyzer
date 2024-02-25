@@ -21,8 +21,7 @@ auto parse_stmt_ref(const Token& token) -> UntypedStmtRef {
     } else if (is_wildcard(token)) {
         return WildCard{};
     } else {
-        const auto integer = std::stoi(token.content);
-        return Integer{static_cast<uint32_t>(integer)};
+        return Integer{token.content};
     }
 }
 

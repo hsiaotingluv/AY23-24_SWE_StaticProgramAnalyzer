@@ -92,7 +92,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
     }
 
     SECTION("Query with stmt-stmt relationship - Follows*") {
@@ -109,7 +109,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
     }
 
     SECTION("Query with stmt-stmt relationship - Parent*") {
@@ -126,7 +126,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{13}});
+            ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
     }
 
     SECTION("Query with stmt-ent relationship") {
@@ -158,7 +158,7 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause =
-            std::make_shared<SuchThatClause>(UsesS{Integer{1}, std::make_shared<VarSynonym>(IDENT{"v"})});
+            std::make_shared<SuchThatClause>(UsesS{Integer{"1"}, std::make_shared<VarSynonym>(IDENT{"v"})});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 

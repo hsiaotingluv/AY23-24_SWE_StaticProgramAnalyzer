@@ -73,7 +73,7 @@ auto FollowsTEvaluator::eval_follows_t(const std::shared_ptr<StmtSynonym>& stmt_
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
-    const auto followed_stmts = read_facade->get_follows_stars_by(std::to_string(stmt_num_2.value));
+    const auto followed_stmts = read_facade->get_follows_stars_by(stmt_num_2.value);
     for (const auto& stmt : followed_stmts) {
         if (relevant_stmts.find(stmt) == relevant_stmts.end()) {
             continue;
@@ -109,7 +109,7 @@ auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const std::sha
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
-    const auto all_followers_of_stmt = read_facade->get_follows_stars_following(std::to_string(stmt_num_1.value));
+    const auto all_followers_of_stmt = read_facade->get_follows_stars_following(stmt_num_1.value);
     for (const auto& follower : all_followers_of_stmt) {
         if (relevant_stmts.find(follower) == relevant_stmts.end()) {
             continue;
@@ -129,8 +129,8 @@ auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const Integer&
     const auto follows_star_map = read_facade->get_all_follows_star();
     bool stmt_1_is_followed = false;
     bool stmt_2_is_following = false;
-    const auto stmt_1_string = std::to_string(stmt_num_1.value);
-    const auto stmt_2_string = std::to_string(stmt_num_2.value);
+    const auto stmt_1_string = stmt_num_1.value;
+    const auto stmt_2_string = stmt_num_2.value;
     for (const auto& stmt_and_followers : follows_star_map) {
         if (stmt_and_followers.first != stmt_1_string) {
             continue;
@@ -153,7 +153,7 @@ auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const WildCard
     // TODO: Improve pkb API: bool is_followed_by_something
     const auto all_followed_stmts = read_facade->get_all_follows_star_keys();
     bool is_followed = false;
-    const auto stmt_num = std::to_string(stmt_num_1.value);
+    const auto stmt_num = stmt_num_1.value;
     for (const auto& stmt : all_followed_stmts) {
         if (stmt_num == stmt) {
             is_followed = true;
@@ -188,7 +188,7 @@ auto FollowsTEvaluator::eval_follows_t(const WildCard&, const Integer& stmt_num_
     // TODO: Improve pkb API: bool is_following_star_something
     const auto all_following_stmts = read_facade->get_all_follows_star_values();
     bool is_following = false;
-    const auto stmt_num = std::to_string(stmt_num_2.value);
+    const auto stmt_num = stmt_num_2.value;
     for (const auto& stmt : all_following_stmts) {
         if (stmt_num == stmt) {
             is_following = true;
