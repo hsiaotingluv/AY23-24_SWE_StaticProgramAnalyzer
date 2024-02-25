@@ -192,6 +192,9 @@ auto ParentTEvaluator::eval_parent_t(const WildCard&, const Integer& stmt_num_2)
 }
 
 auto ParentTEvaluator::eval_parent_t(const WildCard&, const WildCard&) const -> std::optional<Table> {
+    if (read_facade->get_all_parent_star_keys().empty()) {
+        return std::nullopt;
+    }
     return Table{};
 }
 } // namespace qps
