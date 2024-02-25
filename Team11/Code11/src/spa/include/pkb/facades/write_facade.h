@@ -4,7 +4,6 @@
 #include "pkb/common_types/constant.h"
 #include "pkb/common_types/entity.h"
 #include "pkb/common_types/procedure.h"
-#include "pkb/common_types/statement.h"
 #include "pkb/common_types/variable.h"
 #include "pkb/pkb.h"
 #include <unordered_set>
