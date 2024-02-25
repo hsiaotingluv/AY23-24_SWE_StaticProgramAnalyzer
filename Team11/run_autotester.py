@@ -89,7 +89,7 @@ if __name__ == "__main__":
             text=True,
         )
 
-        prefix = source.split('.')[0]
+        prefix = source.split(".")[0]
         try:
             tree = ET.parse(f"{output_path}")
             root = tree.getroot()
@@ -117,13 +117,10 @@ if __name__ == "__main__":
                     for child in node:
                         traverse(child)
 
-
             traverse(root)
         except Exception:
             if should_fail_early(source):
-                print(
-                    f"[{prefix}] Pass all system testing (1/1)"
-                )
+                print(f"[{prefix}] Pass all system testing (1/1)")
 
                 exit(0)
             else:
@@ -134,9 +131,7 @@ if __name__ == "__main__":
                 exit(1)
 
         if should_fail_early(source):
-            print(
-                f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program"
-            )
+            print(f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program")
 
             exit(1)
 
@@ -146,7 +141,9 @@ if __name__ == "__main__":
             )
             exit(1)
         else:
-            print(f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})")
+            print(
+                f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
+            )
             exit(0)
 
     if run_server:
