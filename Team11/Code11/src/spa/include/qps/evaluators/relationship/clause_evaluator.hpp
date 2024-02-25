@@ -8,6 +8,6 @@ class ClauseEvaluator {
   public:
     virtual ~ClauseEvaluator() = default;
 
-    virtual auto evaluate() -> std::optional<Table> = 0;
+    [[nodiscard]] virtual auto evaluate() const -> std::optional<Table> = 0;
 };
 } // namespace qps

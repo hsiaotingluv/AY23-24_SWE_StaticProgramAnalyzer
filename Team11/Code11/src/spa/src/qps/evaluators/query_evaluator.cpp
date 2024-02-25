@@ -53,7 +53,7 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
     }
 
     // Step 2: project to relevant synonym
-    return project(read_facade, curr_table, query_obj.reference);
+    return project(curr_table, query_obj.reference);
 };
 
 } // namespace qps

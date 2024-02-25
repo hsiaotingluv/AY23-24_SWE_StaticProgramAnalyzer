@@ -6,6 +6,10 @@ auto Synonym::get_name() const -> IDENT {
     return name;
 }
 
+auto Synonym::get_name_string() const -> std::string {
+    return name.get_value();
+}
+
 auto Synonym::operator==(const Synonym& rhs) const noexcept -> bool {
     return typeid(*this) == typeid(rhs) && name == rhs.name;
 }

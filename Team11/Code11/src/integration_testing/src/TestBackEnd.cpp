@@ -6,14 +6,14 @@
 
 #include "common/statement_type.hpp"
 #include "qps/evaluators/query_evaluator.hpp"
-#include "qps/qps.hpp"
+#include "qps/parser.hpp"
 
 #include <memory>
 #include <unordered_set>
 
 TEST_CASE("Test pkb and QPS - Entities") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::QueryProcessingSystem{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -81,7 +81,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
 TEST_CASE("Test pkb and QPS - Statements") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::QueryProcessingSystem{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -208,7 +208,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
     auto [read_facade, write_facade] = PKB::create_facades();
 
-    const auto qps_parser = qps::QueryProcessingSystem{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
