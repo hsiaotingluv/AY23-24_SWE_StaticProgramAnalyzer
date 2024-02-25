@@ -90,6 +90,7 @@ if __name__ == "__main__":
         )
 
         prefix = source.split(".")[0]
+        found_exception = None
         try:
             tree = ET.parse(f"{output_path}")
             root = tree.getroot()
@@ -119,31 +120,28 @@ if __name__ == "__main__":
 
             traverse(root)
         except Exception:
-            if should_fail_early(source):
-                print(f"[{prefix}] Pass all system testing (1/1)")
+            found_exception = result.stderr.replace("\n", " ")
 
-                exit(0)
-            else:
-                sanitized_stderr = result.stderr.replace("\n", " ")
-                print(
-                    f"[{prefix}] Failed to parse the SIMPLE program due to {sanitized_stderr}"
-                )
-                exit(1)
-
-        if should_fail_early(source):
-            print(f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program")
-
-            exit(1)
-
-        if errors:
+        if found_exception and should_fail_early(source):
+            print(f"[{prefix}] Pass all system testing (1/1)")
+        elif found_exception and not should_fail_early(source):
             print(
-                f"[{prefix}] Failed test cases: {','.join(map(str, errors))} ({total_tc_file - len(errors)}/{total_tc_file})"
+                f"[{prefix}] Failed to parse the SIMPLE program due to {found_exception}"
             )
+            exit(1)
+        elif not found_exception and should_fail_early(source):
+            print(f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program")
             exit(1)
         else:
-            print(
-                f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
-            )
+            if errors:
+                print(
+                    f"[{prefix}] Failed test cases: {','.join(map(str, errors))} ({total_tc_file - len(errors)}/{total_tc_file})"
+                )
+                exit(1)
+            else:
+                print(
+                    f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
+                )
 
     if run_server:
         path = os.path.join(FILE_PATH, "Code11", "tests")
