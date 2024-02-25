@@ -144,7 +144,6 @@ if __name__ == "__main__":
             print(
                 f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
             )
-            exit(0)
 
     if run_server:
         path = os.path.join(FILE_PATH, "Code11", "tests")
