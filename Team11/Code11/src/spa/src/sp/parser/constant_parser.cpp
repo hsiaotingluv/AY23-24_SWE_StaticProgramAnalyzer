@@ -12,8 +12,7 @@ auto ConstantParser::parse(Iterator& token_start, const Iterator& token_end) -> 
         throw ParsingError("Token found is not of Integer type");
     }
 
-    int integer_value = std::stoi(next_token.content);
-    return std::make_shared<ConstantNode>(integer_value);
+    return std::make_shared<ConstantNode>(next_token.content);
 }
 
 } // namespace sp

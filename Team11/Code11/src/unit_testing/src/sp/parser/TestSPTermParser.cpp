@@ -19,7 +19,7 @@ TEST_CASE("Test SP Term Parser") {
         auto node = term_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
-        REQUIRE(casted_node->integer == 123);
+        REQUIRE(casted_node->integer == "123");
     }
 
     SECTION("single binop term - success") {
@@ -61,7 +61,7 @@ TEST_CASE("Test SP Term Parser") {
         auto node = term_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(casted_node->T == NodeType::Constant);
-        REQUIRE(casted_node->integer == 123);
+        REQUIRE(casted_node->integer == "123");
     }
 
     SECTION("invalid binop form end - failure") {
