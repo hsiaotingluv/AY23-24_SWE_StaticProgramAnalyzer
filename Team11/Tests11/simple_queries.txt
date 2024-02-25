@@ -1,0 +1,5 @@
+1 - select all variables
+variable v;
+Select v
+var, test
+5000

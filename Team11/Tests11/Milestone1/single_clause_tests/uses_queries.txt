@@ -1,7 +1,7 @@
 1 - Test statement uses variable
 stmt s; variable v;
 Select v such that Uses(s, v)
-x, y
+x, y, a
 5000
 2 - Test statement Uses 'x'
 stmt s;
@@ -87,4 +87,9 @@ Select i such that Uses(i, "x")
 if i;
 Select i such that Modifies(i, _)
 13
+5000
+19 - Test read uses wildcard
+read r;
+Select r such that Uses(r, _)
+
 5000

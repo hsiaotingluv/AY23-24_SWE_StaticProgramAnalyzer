@@ -13,4 +13,6 @@ procedure Pattern {
       z = x + 3;
     }
   }
+
+  y = 1 + var * vir / vur % 50;
 }
