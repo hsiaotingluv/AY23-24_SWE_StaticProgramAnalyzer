@@ -47,7 +47,7 @@ struct Query {
 
 namespace qps {
 template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
-class ConcreteSemanticValidator {
+class SemanticAnalyser {
   public:
     static auto validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
         -> std::variant<Query, SemanticError> {
@@ -83,5 +83,5 @@ class ConcreteSemanticValidator {
     }
 };
 
-using SemanticValidator = ConcreteSemanticValidator<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>;
+using DefaultSemanticAnalyser = SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>;
 } // namespace qps
