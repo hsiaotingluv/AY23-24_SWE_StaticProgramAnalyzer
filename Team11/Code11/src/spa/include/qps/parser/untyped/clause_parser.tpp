@@ -24,7 +24,7 @@ auto parse_stmt_stmt_rel(std::vector<Token>::const_iterator it, const std::vecto
 
 namespace qps::untyped {
 template <typename SupportedStmtStmtParsers, typename SupportedRefEntParsers>
-class ConcreteSuchThatClausesParser {
+class SuchThatClausesParser {
     static constexpr auto keywords = std::array<std::string_view, 2>{"such", "that"};
 
   public:

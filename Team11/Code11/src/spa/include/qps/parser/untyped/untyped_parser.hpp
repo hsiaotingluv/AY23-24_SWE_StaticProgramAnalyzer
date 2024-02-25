@@ -13,10 +13,10 @@ using DefaultSupportedSynonyms = TypeList<AnyStmtSynonym, ReadSynonym, PrintSyno
 
 using DefaultSupportedStmtStmtRelationships = TypeList<Follows, FollowsT, Parent, ParentT>;
 using DefaultSupportedRefEntRelationships = TypeList<ModifiesS, UsesS>;
-using SuchThatClausesParser =
-    ConcreteSuchThatClausesParser<DefaultSupportedStmtStmtRelationships, DefaultSupportedRefEntRelationships>;
+using DefaultSuchThatClausesParser =
+    SuchThatClausesParser<DefaultSupportedStmtStmtRelationships, DefaultSupportedRefEntRelationships>;
 
-using DefaultSupportedClauseParsers = TypeList<SuchThatClausesParser, PatternClausesParser>;
+using DefaultSupportedClauseParsers = TypeList<DefaultSuchThatClausesParser, PatternClausesParser>;
 
 using DefaultUntypedParser =
     UntypedParser<DefaultSupportedSynonyms, DefaultSupportedSelectParsers, DefaultSupportedClauseParsers>;
