@@ -77,7 +77,7 @@ TEST_CASE("Test Declaration Parser") {
 }
 
 TEST_CASE("Test QPS - Basic Functionality") {
-    const auto qps = Parser{};
+    const auto qps = qps::DefaultParser{};
     SECTION("Query with stmt-stmt relationship") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
         const auto output = to_query(qps.parse(query));
@@ -200,7 +200,7 @@ Select a pattern a ( _ , _"count + 1"_))";
 }
 
 TEST_CASE("Test QPS - Syntax") {
-    const auto qps = Parser{};
+    const auto qps = qps::DefaultParser{};
     SECTION("Query with invalid keyword") {
         const auto query = "proc p;";
         const auto output = qps.parse(query);
@@ -232,7 +232,7 @@ TEST_CASE("Test QPS - Syntax") {
 }
 
 TEST_CASE("Test QPS - Semantics") {
-    const auto qps = Parser{};
+    const auto qps = qps::DefaultParser{};
     SECTION("Query with undefined synonym") {
         const auto query = "procedure p; Select v";
         const auto result = qps.parse(query);
@@ -283,7 +283,7 @@ TEST_CASE("Test QPS - Semantics") {
 }
 
 TEST_CASE("Test QPS - long queries") {
-    const auto qps = Parser{};
+    const auto qps = qps::DefaultParser{};
 
     SECTION("Long Query") {
         const auto query = "stmt s, s1, s2; assign a, a1; while w; if ifs; variable v; procedure p, q; constant c; "

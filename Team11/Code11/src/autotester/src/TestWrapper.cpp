@@ -32,7 +32,7 @@ TestWrapper::TestWrapper()
     auto [read_facade, write_facade] = PKB::create_facades();
 
     source_processor = sp::SourceProcessor::get_complete_sp(write_facade);
-    qps_parser = std::make_shared<qps::Parser>();
+    qps_parser = std::make_shared<qps::DefaultParser>();
     qps_evaluator = std::make_shared<qps::QueryEvaluator>(read_facade);
 }
 

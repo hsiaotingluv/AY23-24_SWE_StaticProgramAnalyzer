@@ -13,7 +13,7 @@
 
 TEST_CASE("Test pkb and QPS - Entities") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::Parser{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -81,7 +81,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 
 TEST_CASE("Test pkb and QPS - Statements") {
     auto [read_facade, write_facade] = PKB::create_facades();
-    const auto qps_parser = qps::Parser{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");
@@ -208,7 +208,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
     auto [read_facade, write_facade] = PKB::create_facades();
 
-    const auto qps_parser = qps::Parser{};
+    const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
     write_facade->add_procedure("procedure1");

@@ -62,7 +62,7 @@ TEST_CASE("Test SPA - Entities") {
 
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
-    const auto qps_parser = qps::Parser{};
+    const auto qps_parser = qps::DefaultParser{};
 
     SECTION("Test SP - complex program Code 4 - success") {
         auto input = input_generator();
