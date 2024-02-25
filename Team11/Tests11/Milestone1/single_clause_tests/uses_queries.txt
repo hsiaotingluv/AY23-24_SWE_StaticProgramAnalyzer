@@ -1,7 +1,7 @@
 1 - Test statement uses variable
 stmt s; variable v;
 Select v such that Uses(s, v)
-x, y, a
+x, y
 5000
 2 - Test statement Uses 'x'
 stmt s;
