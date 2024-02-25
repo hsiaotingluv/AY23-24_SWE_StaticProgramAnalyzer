@@ -29,7 +29,7 @@ class Parser {
 } // namespace qps
 
 namespace qps {
-using DefaultParser = Parser<untyped::UntypedParser, DefaultSemanticAnalyser>;
+using DefaultParser = Parser<untyped::DefaultUntypedParser, DefaultSemanticAnalyser>;
 
 auto to_query(const std::variant<qps::Query, qps::SyntaxError, qps::SemanticError>& maybe_query)
     -> std::optional<qps::Query>;

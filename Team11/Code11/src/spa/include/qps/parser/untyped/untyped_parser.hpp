@@ -18,7 +18,7 @@ using SuchThatClausesParser =
 
 using DefaultSupportedClauseParsers = TypeList<SuchThatClausesParser, PatternClausesParser>;
 
-using UntypedParser =
-    ConcreteUntypedParser<DefaultSupportedSynonyms, DefaultSupportedSelectParsers, DefaultSupportedClauseParsers>;
+using DefaultUntypedParser =
+    UntypedParser<DefaultSupportedSynonyms, DefaultSupportedSelectParsers, DefaultSupportedClauseParsers>;
 
 } // namespace qps::untyped

@@ -23,7 +23,7 @@ auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vecto
 
 namespace qps::untyped {
 template <typename SupportedSynonyms, typename SupportedSelectParsers, typename SupportedClauseParsers>
-class ConcreteUntypedParser {
+class UntypedParser {
   private:
     static inline const auto tokeniser_runner =
         tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};

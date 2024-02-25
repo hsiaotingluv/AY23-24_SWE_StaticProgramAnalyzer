@@ -15,7 +15,7 @@
 using namespace qps;
 
 TEST_CASE("Test QPSParser") {
-    const auto parser = untyped::UntypedParser{};
+    const auto parser = untyped::DefaultUntypedParser{};
 
     SECTION("Query with stmt-stmt relationship") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(13, s)";
@@ -213,7 +213,7 @@ Select a pattern a ( _ , _"count + 1"_))";
 }
 
 TEST_CASE("Test Parser - Basic Syntax Issues") {
-    const auto parser = untyped::UntypedParser{};
+    const auto parser = untyped::DefaultUntypedParser{};
     SECTION("Missing synonym") {
         const auto query = "variable v,";
         const auto output = parser.parse(query);
