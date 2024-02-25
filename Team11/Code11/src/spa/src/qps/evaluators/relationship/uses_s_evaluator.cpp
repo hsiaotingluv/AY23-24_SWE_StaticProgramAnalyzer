@@ -90,6 +90,9 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
             table.add_row({stmt_candidate});
         }
     }
+    if (table.empty()) {
+        return std::nullopt;
+    }
     return table;
 }
 
