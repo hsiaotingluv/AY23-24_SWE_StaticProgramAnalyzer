@@ -28,8 +28,10 @@ class SuchThatClausesParser {
     static constexpr auto keywords = std::array<std::string_view, 2>{"such", "that"};
 
   public:
+    using ClauseType = UntypedSuchThatClause;
+
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-        -> std::optional<std::tuple<UntypedSuchThatClause, std::vector<Token>::const_iterator>> {
+        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
         constexpr auto EXPECTED_LENGTH = 3;
         if (std::distance(it, end) < EXPECTED_LENGTH) {
             return std::nullopt;

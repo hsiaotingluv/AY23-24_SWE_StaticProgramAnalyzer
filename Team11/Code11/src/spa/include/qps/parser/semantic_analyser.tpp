@@ -3,7 +3,7 @@
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_validator.hpp"
+#include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/template_utils.hpp"

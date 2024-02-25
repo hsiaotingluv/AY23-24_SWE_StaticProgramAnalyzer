@@ -289,5 +289,5 @@ using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
 using DefaultEntEntList = TypeList<UsesP, ModifiesP>;
 
 using Relationship =
-    TypeListToVariant<Concat<Concat<DefaultStmtStmtList, DefaultStmtEntList>::type, DefaultEntEntList>::type>::type;
+    type_list_to_variant_t<concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>>;
 } // namespace qps

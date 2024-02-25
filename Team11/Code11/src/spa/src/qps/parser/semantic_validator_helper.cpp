@@ -1,4 +1,4 @@
-#include "qps/parser/semantic_validator_helper.hpp"
+#include "qps/parser/semantic_analyser_helper.hpp"
 
 namespace qps ::details {
 auto enforce_unique_declarations(const Synonyms& declarations)

@@ -16,9 +16,25 @@ auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector
                         TypeList<Head, Tails...> supported_synonyms)
     -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>>;
 
-template <typename SupportedResultParsers, typename SupportedClauseParsers>
+template <typename SupportedResultParsers, typename SupportedClauseParsers, typename UntypedClauseType>
 auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<UntypedQuery>;
+    -> std::optional<std::tuple<UntypedReference, std::vector<UntypedClauseType>>>;
+
+template <typename... T>
+struct get_return_type;
+
+template <>
+struct get_return_type<TypeList<>> {
+    using type = TypeList<>;
+};
+
+template <typename Head, typename... Tails>
+struct get_return_type<TypeList<Head, Tails...>> {
+    using type = concat_t<TypeList<typename Head::ClauseType>, typename get_return_type<TypeList<Tails...>>::type>;
+};
+
+template <typename T>
+using get_return_type_t = typename get_return_type<T>::type;
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
@@ -28,8 +44,11 @@ class UntypedParser {
     static inline const auto tokeniser_runner =
         tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
 
+    using UntypedClauseType = type_list_to_variant_t<detail::get_return_type_t<SupportedClauseParsers>>;
+    using UntypedQueryType = std::tuple<UntypedReference, std::vector<UntypedClauseType>>;
+
   public:
-    static auto parse(std::string query) -> std::variant<std::tuple<Synonyms, untyped::UntypedQuery>, SyntaxError> {
+    static auto parse(std::string query) -> std::variant<std::tuple<Synonyms, UntypedQueryType>, SyntaxError> {
         const auto maybe_tokens = [&query]() -> std::variant<std::vector<Token>, SyntaxError> {
             try {
                 return tokeniser_runner.apply_tokeniser(std::move(query));
@@ -56,7 +75,7 @@ class UntypedParser {
 
         // Parse remaining
         const auto maybe_remaining =
-            detail::build_untyped_query<SupportedSelectParsers, SupportedClauseParsers>(begin, end);
+            detail::build_untyped_query<SupportedSelectParsers, SupportedClauseParsers, UntypedClauseType>(begin, end);
 
         if (!maybe_remaining.has_value()) {
             const auto remaining_str = [begin, end]() -> std::string {
@@ -185,24 +204,27 @@ auto parse_result_cl(std::vector<Token>::const_iterator it, const std::vector<To
     return parse_result_cl(it, end, TypeList<Tails...>{});
 }
 
+template <typename UntypedClauseType>
 auto parse_clause(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
-    -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>>;
+    -> std::optional<std::tuple<UntypedClauseType, std::vector<Token>::const_iterator>> {
+    return std::nullopt;
+}
 
-template <typename Head, typename... Tails>
+template <typename UntypedClauseType, typename Head, typename... Tails>
 auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                   TypeList<Head, Tails...>)
-    -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<UntypedClauseType, std::vector<Token>::const_iterator>> {
     const auto maybe_clause = Head::parse(it, end);
     if (maybe_clause.has_value()) {
         return maybe_clause;
     }
 
-    return parse_clause(it, end, TypeList<Tails...>{});
+    return parse_clause<UntypedClauseType>(it, end, TypeList<Tails...>{});
 }
 
-template <typename SupportedResultParsers, typename SupportedClauseParsers>
+template <typename SupportedResultParsers, typename SupportedClauseParsers, typename UntypedClauseType>
 auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<UntypedQuery> {
+    -> std::optional<std::tuple<UntypedReference, std::vector<UntypedClauseType>>> {
     const auto maybe_reference = parse_result_cl(it, end, SupportedResultParsers{});
     if (!maybe_reference.has_value()) {
         return std::nullopt;
@@ -211,9 +233,9 @@ auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vecto
     const auto& [reference, rest] = maybe_reference.value();
     it = rest;
 
-    auto clauses = std::vector<UntypedClause>{};
+    auto clauses = std::vector<UntypedClauseType>{};
     while (it != end) {
-        const auto maybe_clause = parse_clause(it, end, SupportedClauseParsers{});
+        const auto maybe_clause = parse_clause<UntypedClauseType>(it, end, SupportedClauseParsers{});
         if (!maybe_clause.has_value()) {
             break;
         }
