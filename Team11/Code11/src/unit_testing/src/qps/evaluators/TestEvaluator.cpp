@@ -329,7 +329,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{4}}),
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{"4"}}),
                 },
         };
 
@@ -344,7 +344,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{5}}),
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{"5"}}),
                 },
         };
 
@@ -375,7 +375,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s2"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{Integer{3}, std::make_shared<AnyStmtSynonym>("s2")}),
+                                Parent{Integer{"3"}, std::make_shared<AnyStmtSynonym>("s2")}),
                 },
         };
 
@@ -390,7 +390,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{Integer{3}, Integer{4}}),
+                                Parent{Integer{"3"}, Integer{"4"}}),
                 },
         };
 
@@ -405,7 +405,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                     std::make_shared<SuchThatClause>(
-                    Parent{Integer{3}, Integer{5}}),
+                    Parent{Integer{"3"}, Integer{"5"}}),
                 },
         };
 
@@ -421,7 +421,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{Integer{3}, WildCard{}}),
+                                Parent{Integer{"3"}, WildCard{}}),
                 },
         };
 
@@ -451,7 +451,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{WildCard{}, Integer{2}}),
+                                Parent{WildCard{}, Integer{"2"}}),
                 },
         };
 
@@ -466,7 +466,7 @@ TEST_CASE("Test Evaluator Parent") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                Parent{WildCard{}, Integer{3}}),
+                                Parent{WildCard{}, Integer{"3"}}),
                 },
         };
 
@@ -604,7 +604,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{3}}),
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
                 },
         };
 
@@ -619,7 +619,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{7}}),
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"7"}}),
                 },
         };
 
@@ -650,7 +650,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s2"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{Integer{1}, std::make_shared<AnyStmtSynonym>("s2")}),
+                                ParentT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}),
                 },
         };
 
@@ -665,7 +665,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{Integer{1}, Integer{3}}),
+                                ParentT{Integer{"1"}, Integer{"3"}}),
                 },
         };
 
@@ -680,7 +680,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{Integer{1}, Integer{7}}),
+                                ParentT{Integer{"1"}, Integer{"7"}}),
                 },
         };
 
@@ -696,7 +696,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{Integer{1}, WildCard{}}),
+                                ParentT{Integer{"1"}, WildCard{}}),
                 },
         };
 
@@ -726,7 +726,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{WildCard{}, Integer{2}}),
+                                ParentT{WildCard{}, Integer{"2"}}),
                 },
         };
 
@@ -741,7 +741,7 @@ TEST_CASE("Test Evaluator Parent*") {
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                ParentT{WildCard{}, Integer{7}}),
+                                ParentT{WildCard{}, Integer{"7"}}),
                 },
         };
 
@@ -1310,7 +1310,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{std::make_shared<AnyStmtSynonym>("s1"), Integer{3}}),
+                                FollowsT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
                 },
         };
 
@@ -1340,7 +1340,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{1}, std::make_shared<AnyStmtSynonym>("s1")}),
+                                FollowsT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}),
                 },
         };
 
@@ -1355,7 +1355,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{1}, Integer{3}}),
+                                FollowsT{Integer{"1"}, Integer{"3"}}),
                 },
         };
 
@@ -1370,7 +1370,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{1}, Integer{5}}),
+                                FollowsT{Integer{"1"}, Integer{"5"}}),
                 },
         };
 
@@ -1385,7 +1385,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{1}, WildCard{}}),
+                                FollowsT{Integer{"1"}, WildCard{}}),
                 },
         };
 
@@ -1400,7 +1400,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{5}, WildCard{}}),
+                                FollowsT{Integer{"5"}, WildCard{}}),
                 },
         };
 
@@ -1415,7 +1415,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{Integer{10}, WildCard{}}),
+                                FollowsT{Integer{"10"}, WildCard{}}),
                 },
         };
 
@@ -1445,7 +1445,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{ WildCard{}, Integer{3}}),
+                                FollowsT{ WildCard{}, Integer{"3"}}),
                 },
         };
 
@@ -1460,7 +1460,7 @@ TEST_CASE("Test Evaluator Follows*"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                FollowsT{ WildCard{}, Integer{1}}),
+                                FollowsT{ WildCard{}, Integer{"1"}}),
                 },
         };
 
@@ -1621,7 +1621,7 @@ TEST_CASE("Test Evaluator UsesS"){
                 std::make_shared<VarSynonym>("v"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                UsesS{Integer{3}, std::make_shared<VarSynonym>("v")}),
+                                UsesS{Integer{"3"}, std::make_shared<VarSynonym>("v")}),
                 },
         };
 
@@ -1636,7 +1636,7 @@ TEST_CASE("Test Evaluator UsesS"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                UsesS{Integer{3}, QuotedIdent{"a"}}),
+                                UsesS{Integer{"3"}, QuotedIdent{"a"}}),
                 },
         };
 
@@ -1650,7 +1650,7 @@ TEST_CASE("Test Evaluator UsesS"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                UsesS{Integer{3}, QuotedIdent{"b"}}),
+                                UsesS{Integer{"3"}, QuotedIdent{"b"}}),
                 },
         };
 
@@ -1665,7 +1665,7 @@ TEST_CASE("Test Evaluator UsesS"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                UsesS{Integer{3}, WildCard{}}),
+                                UsesS{Integer{"3"}, WildCard{}}),
                 },
         };
 
@@ -1680,7 +1680,7 @@ TEST_CASE("Test Evaluator UsesS"){
                 std::make_shared<AnyStmtSynonym>("s1"),
                 std::vector<std::shared_ptr<Clause>>{
                         std::make_shared<SuchThatClause>(
-                                UsesS{Integer{5}, WildCard{}}),
+                                UsesS{Integer{"5"}, WildCard{}}),
                 },
         };
 
