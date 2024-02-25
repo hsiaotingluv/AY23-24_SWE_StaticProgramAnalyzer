@@ -2,16 +2,22 @@
 
 AssignmentStore::AssignmentStore() = default;
 
+std::string transform_rhs(const std::string& rhs) {
+    return " " + rhs;
+}
+
 void AssignmentStore::add_assignment(const StatementNumber& s, const Variable& lhs, const std::string& rhs) {
-    assignment_store[rhs][lhs].insert(s);
+    assignment_store[transform_rhs(rhs)][lhs].insert(s);
 }
 
 std::unordered_set<std::string> AssignmentStore::get_all_assignments_rhs(const std::string& rhs) {
-    if (assignment_store.find(rhs) == assignment_store.end()) {
+    auto rhs_transformed = transform_rhs(rhs);
+
+    if (assignment_store.find(rhs_transformed) == assignment_store.end()) {
         return {};
     }
 
-    auto lhs_stmt_map = assignment_store.at(rhs);
+    auto lhs_stmt_map = assignment_store.at(rhs_transformed);
 
     std::unordered_set<std::string> result;
 
@@ -40,25 +46,26 @@ std::unordered_set<std::string> AssignmentStore::get_all_assignments_lhs(const V
 
 std::unordered_set<std::string> AssignmentStore::get_all_assignments_lhs_rhs(const Variable& lhs,
                                                                              const std::string& rhs) {
-    if (assignment_store.find(rhs) == assignment_store.end()) {
+    auto rhs_transformed = transform_rhs(rhs);
+
+    if (assignment_store.find(rhs_transformed) == assignment_store.end()) {
         return {};
     }
 
-    if (assignment_store.at(rhs).find(lhs) == assignment_store.at(rhs).end()) {
+    if (assignment_store.at(rhs_transformed).find(lhs) == assignment_store.at(rhs_transformed).end()) {
         return {};
     }
 
-    return assignment_store.at(rhs).at(lhs);
+    return assignment_store.at(rhs_transformed).at(lhs);
 }
 
 std::unordered_set<std::string> AssignmentStore::get_all_assignments_rhs_partial(const std::string& rhs) {
     std::unordered_set<std::string> result;
 
-    auto rhs_padded = " " + rhs + " ";
+    auto rhs_transformed = transform_rhs(rhs);
 
     for (const auto& [rhs_key, lhs_stmts] : assignment_store) {
-        auto rhs_key_padded = " " + rhs_key + " ";
-        if (rhs_key_padded.find(rhs_padded) != std::string::npos) {
+        if (rhs_key.find(rhs_transformed) != std::string::npos) {
             for (const auto& [lhs, stmts] : lhs_stmts) {
                 for (const auto& s : stmts) {
                     result.insert(s);
@@ -74,11 +81,10 @@ std::unordered_set<std::string> AssignmentStore::get_all_assignments_lhs_rhs_par
                                                                                      const std::string& rhs) {
     std::unordered_set<std::string> result;
 
-    auto rhs_padded = " " + rhs + " ";
+    auto rhs_transformed = transform_rhs(rhs);
 
     for (const auto& [rhs_key, lhs_stmts] : assignment_store) {
-        auto rhs_key_padded = " " + rhs_key + " ";
-        if (rhs_key_padded.find(rhs_padded) != std::string::npos) {
+        if (rhs_key.find(rhs_transformed) != std::string::npos) {
             if (lhs_stmts.find(lhs) != lhs_stmts.end()) {
                 for (const auto& s : lhs_stmts.at(lhs)) {
                     result.insert(s);
