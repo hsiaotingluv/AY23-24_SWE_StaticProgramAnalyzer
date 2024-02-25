@@ -151,7 +151,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}}, WildCard{},
-                                                                    ExpressionSpec{PartialMatch{"count 1 +"}}};
+                                                                    ExpressionSpec{PartialMatch{"count 1 + "}}};
         REQUIRE(pattern_clause == reference_clause);
     }
 
@@ -173,7 +173,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedPatternClause{
-            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX cenX *"}}};
+            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX cenX * "}}};
         REQUIRE(pattern_clause == reference_clause);
     }
 
