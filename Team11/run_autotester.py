@@ -120,19 +120,25 @@ if __name__ == "__main__":
 
             traverse(root)
         except Exception:
-            if should_fail_early(args.source):
+            if should_fail_early(source):
                 print(
                     f"[{prefix}] Pass all system testing (1/1)"
                 )
 
                 exit(0)
             else:
-                print('here')
                 sanitized_stderr = result.stderr.replace("\n", " ")
                 print(
                     f"[{prefix}] Failed to parse the SIMPLE program due to {sanitized_stderr}"
                 )
                 exit(1)
+
+        if should_fail_early(source):
+            print(
+                f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program"
+            )
+
+            exit(1)
 
         if errors:
             print(
