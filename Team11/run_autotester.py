@@ -92,7 +92,7 @@ if __name__ == "__main__":
             text=True,
         )
 
-        prefix = source.split(".")[0]
+        prefix = os.path.abspath(source).split(".")[0]
         found_exception = None
         try:
             tree = ET.parse(f"{output_path}")
