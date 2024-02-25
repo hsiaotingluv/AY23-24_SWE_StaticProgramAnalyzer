@@ -11,7 +11,7 @@ for source_file in $(find "Team11/Tests11" -type f -name "*_source.txt"); do
   result=$(echo "$output" | tail -n 1)
 
   # Accumulate the result
-  accumulated_result="${accumulated_result}\n\n${result}"
+  accumulated_result="${accumulated_result}\n${result}"
 done
 
 echo -e $accumulated_result

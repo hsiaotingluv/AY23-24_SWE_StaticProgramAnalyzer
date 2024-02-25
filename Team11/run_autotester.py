@@ -55,6 +55,9 @@ if __name__ == "__main__":
     exec_args = [args.autotester, args.source, args.query, output_path]
     result = subprocess.run(exec_args, check=False, stderr=subprocess.PIPE, text=True)
 
+    total_tc = 0
+    fix_folder = "Team11/Tests11/"
+    prefix = args.source.split('.')[0].replace(fix_folder, "")
     try:
         tree = ET.parse(f"{output_path}")
         root = tree.getroot()
@@ -63,6 +66,7 @@ if __name__ == "__main__":
 
 
         def traverse(node):
+            global total_tc
             # do something with node
             if node.tag == "query":
                 is_passing = False
@@ -70,6 +74,7 @@ if __name__ == "__main__":
                     # Using Python vars quirks here for fast, hackish style
                     if child.tag == "id":
                         test_case_number = child.text
+                        total_tc += 1
                     elif child.tag == "failed":
                         is_passing = False
                     elif child.tag == "passed":
@@ -86,20 +91,20 @@ if __name__ == "__main__":
     except Exception:
         if should_fail_early(args.source):
             print(
-                f"[{args.source} - {args.query}] Pass all system testing"
+                f"[{prefix}] Pass all system testing (1/1)"
             )
 
             exit(0)
         else:
             sanitized_stderr = result.stderr.replace("\n", " ")
             print(
-                f"[{args.source} - {args.query}] Failed to parse the SIMPLE program due to {sanitized_stderr}"
+                f"[{prefix}] Failed to parse the SIMPLE program due to {sanitized_stderr}"
             )
             exit(1)
 
     if should_fail_early(args.source):
         print(
-            f"[{args.source} - {args.query}] Failed, SPA successfully parsed invalid SIMPLE program"
+            f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program"
         )
 
         exit(1)
@@ -114,9 +119,9 @@ if __name__ == "__main__":
 
     if errors:
         print(
-            f"[{args.source} - {args.query}] Failed test cases: {','.join(map(str, errors))}"
+            f"[{prefix}] Failed test cases: {','.join(map(str, errors))} ({total_tc - len(errors)}/{total_tc})"
         )
         exit(1)
     else:
-        print(f"[{args.source} - {args.query}] Pass all system testing")
+        print(f"[{prefix}] Pass all system testing ({total_tc}/{total_tc})")
         exit(0)
