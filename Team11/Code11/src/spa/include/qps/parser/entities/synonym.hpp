@@ -5,6 +5,7 @@
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/template_utils.hpp" // NOLINT
 
+#include <cstddef>
 #include <memory>
 #include <ostream>
 #include <type_traits>
@@ -29,6 +30,8 @@ class Synonym : public Ref {
     [[nodiscard]] virtual auto get_keyword() const -> std::string = 0;
 
     [[nodiscard]] auto get_name() const -> IDENT;
+
+    [[nodiscard]] auto get_name_string() const -> std::string;
 
     [[nodiscard]] virtual auto scan(const std::shared_ptr<ReadFacade>& read_facade) const
         -> std::unordered_set<std::string> = 0;
@@ -199,10 +202,27 @@ template auto operator< <Synonym>(const std::shared_ptr<Synonym>& lhs, const std
 } // namespace qps
 
 namespace std {
+
+namespace {
+// From boost/container_hash/hash.hpp
+// See Mike Seymour in magic-numbers-in-boosthash-combine:
+//     http://stackoverflow.com/questions/4948780
+template <class T>
+inline void hash_combine(std::size_t& seed, T const& v) {
+    constexpr auto phi_reciprocal = 0x9e3779b9;
+    constexpr auto bit_shift1 = 6;
+    constexpr auto bit_shift2 = 2;
+    seed ^= std::hash<T>()(v) + phi_reciprocal + (seed << bit_shift1) + (seed >> bit_shift2);
+}
+} // namespace
+
 template <>
 struct hash<qps::Synonym> {
     auto operator()(const qps::Synonym& syn) const -> size_t {
-        return hash<std::string>{}(syn.get_keyword() + syn.get_name().get_value());
+        size_t hash_value = 0;
+        hash_combine(hash_value, syn.get_keyword());
+        hash_combine(hash_value, syn.get_name());
+        return hash_value;
     }
 };
 

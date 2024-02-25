@@ -33,20 +33,26 @@ template <typename... T>
 struct TypeList {};
 
 template <typename... Lists>
-struct Concat;
+struct concat;
 
 template <typename... Ts, typename... Us>
-struct Concat<TypeList<Ts...>, TypeList<Us...>> {
+struct concat<TypeList<Ts...>, TypeList<Us...>> {
     using type = TypeList<Ts..., Us...>;
 };
 
+template <typename T, typename U>
+using concat_t = typename concat<T, U>::type;
+
 template <typename TypeList>
-struct TypeListToVariant;
+struct type_list_to_variant;
 
 template <typename... Types>
-struct TypeListToVariant<TypeList<Types...>> {
+struct type_list_to_variant<TypeList<Types...>> {
     using type = std::variant<Types...>;
 };
+
+template <typename T>
+using type_list_to_variant_t = typename type_list_to_variant<T>::type;
 
 template <typename... Ts, typename = std::enable_if_t<(sizeof...(Ts) > 0)>>
 auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> std::ostream& {
