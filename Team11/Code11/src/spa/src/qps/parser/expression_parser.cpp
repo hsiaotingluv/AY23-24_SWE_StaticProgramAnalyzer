@@ -27,7 +27,7 @@ auto to_string(TokenType T) -> std::string {
 }
 
 auto order_traversal(const Expression& lhs, TokenType op, const Expression& rhs) -> std::string {
-    return lhs.value + " " + rhs.value + " " + to_string(op);
+    return lhs.value + " " + rhs.value + " " + to_string(op) + " ";
 }
 
 auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
