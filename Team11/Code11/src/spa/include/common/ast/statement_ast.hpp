@@ -31,9 +31,10 @@ class StatementNode : public AstNode, public DesignEntitiesMixin {
 
 class ReadNode : public StatementNode, public ModifiesMixin {
   public:
-    std::string variable;
+    std::shared_ptr<VarNode> var_node;
 
-    explicit ReadNode(std::string variable) : StatementNode(sp::NodeType::Read), variable(std::move(variable)) {
+    explicit ReadNode(std::shared_ptr<VarNode> var_node)
+        : StatementNode(sp::NodeType::Read), var_node(std::move(var_node)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -47,9 +48,10 @@ class ReadNode : public StatementNode, public ModifiesMixin {
 
 class PrintNode : public StatementNode, public UsesMixin {
   public:
-    std::string variable;
+    std::shared_ptr<VarNode> var_node;
 
-    explicit PrintNode(std::string variable) : StatementNode(sp::NodeType::Print), variable(std::move(variable)) {
+    explicit PrintNode(std::shared_ptr<VarNode> var_node)
+        : StatementNode(sp::NodeType::Print), var_node(std::move(var_node)) {
     }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -57,8 +59,8 @@ class PrintNode : public StatementNode, public UsesMixin {
     [[nodiscard]] auto identifier() const -> std::stringstream override;
     [[nodiscard]] auto to_xml() const -> std::string override;
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap>) const
-        -> std::unordered_set<std::string> override;
+    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                                         std::shared_ptr<UsesMap>) const -> std::unordered_set<std::string> override;
 };
 
 class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {

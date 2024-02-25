@@ -8,6 +8,10 @@ def is_file(filename):
     return os.path.isfile(filename) and os.path.exists(filename)
 
 
+def should_fail_early(filename):
+    return "invalid" in filename and "simple" in filename
+
+
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 if __name__ == "__main__":
     import argparse
@@ -49,32 +53,56 @@ if __name__ == "__main__":
         )
 
     exec_args = [args.autotester, args.source, args.query, output_path]
-    subprocess.run(exec_args, check=False)
-    tree = ET.parse(f"{output_path}")
-    root = tree.getroot()
+    result = subprocess.run(exec_args, check=False, stderr=subprocess.PIPE, text=True)
 
-    errors = []
+    try:
+        tree = ET.parse(f"{output_path}")
+        root = tree.getroot()
 
-    def traverse(node):
-        # do something with node
-        if node.tag == "query":
-            is_passing = False
-            for child in node:
-                # Using Python vars quirks here for fast, hackish style
-                if child.tag == "id":
-                    test_case_number = child.text
-                elif child.tag == "failed":
-                    is_passing = False
-                elif child.tag == "passed":
-                    is_passing = True
+        errors = []
 
-            if not is_passing:
-                errors.append(test_case_number)
+
+        def traverse(node):
+            # do something with node
+            if node.tag == "query":
+                is_passing = False
+                for child in node:
+                    # Using Python vars quirks here for fast, hackish style
+                    if child.tag == "id":
+                        test_case_number = child.text
+                    elif child.tag == "failed":
+                        is_passing = False
+                    elif child.tag == "passed":
+                        is_passing = True
+
+                if not is_passing:
+                    errors.append(test_case_number)
+            else:
+                for child in node:
+                    traverse(child)
+
+
+        traverse(root)
+    except Exception:
+        if should_fail_early(args.source):
+            print(
+                f"[{args.source} - {args.query}] Pass all system testing"
+            )
+
+            exit(0)
         else:
-            for child in node:
-                traverse(child)
+            sanitized_stderr = result.stderr.replace("\n", " ")
+            print(
+                f"[{args.source} - {args.query}] Failed to parse the SIMPLE program due to {sanitized_stderr}"
+            )
+            exit(1)
 
-    traverse(root)
+    if should_fail_early(args.source):
+        print(
+            f"[{args.source} - {args.query}] Failed, SPA successfully parsed invalid SIMPLE program"
+        )
+
+        exit(1)
 
     if run_server:
         path = os.path.join(FILE_PATH, "Code11", "tests")
@@ -91,3 +119,4 @@ if __name__ == "__main__":
         exit(1)
     else:
         print(f"[{args.source} - {args.query}] Pass all system testing")
+        exit(0)
