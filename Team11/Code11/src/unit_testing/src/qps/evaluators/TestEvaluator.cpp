@@ -1494,6 +1494,8 @@ TEST_CASE("Test Evaluator UsesS"){
     write_facade->add_statement("4", StatementType::While);
     write_facade->add_statement("5", StatementType::Assign);
 
+    write_facade->add_variable("a");
+    write_facade->add_variable("b");
     write_facade->add_statement_uses_var("1", "a");
     write_facade->add_statement_uses_var("2", "b");
     write_facade->add_statement_uses_var("3", "a");
@@ -1699,6 +1701,8 @@ TEST_CASE("Test Evaluator ModifiesS") {
     write_facade->add_statement("4", StatementType::While);
     write_facade->add_statement("5", StatementType::Assign);
 
+    write_facade->add_variable("a");
+    write_facade->add_variable("b");
     write_facade->add_statement_modifies_var("1", "a");
     write_facade->add_statement_modifies_var("2", "b");
     write_facade->add_statement_modifies_var("3", "a");
