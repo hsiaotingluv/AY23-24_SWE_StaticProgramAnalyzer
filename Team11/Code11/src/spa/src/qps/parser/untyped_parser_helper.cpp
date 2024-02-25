@@ -1,13 +1,6 @@
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
-#include "qps/parser/untyped/entities/clause.hpp"
-#include "qps/template_utils.hpp"
 
 namespace qps::untyped::detail {
-auto parse_clause(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
-    -> std::optional<std::tuple<UntypedClause, std::vector<Token>::const_iterator>> {
-    return std::nullopt;
-}
-
 auto parse_synonym(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedSynonym, std::vector<Token>::const_iterator>> {
     if (it == end) {
