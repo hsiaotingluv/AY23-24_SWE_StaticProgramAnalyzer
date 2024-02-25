@@ -54,8 +54,11 @@ std::unordered_set<std::string> AssignmentStore::get_all_assignments_lhs_rhs(con
 std::unordered_set<std::string> AssignmentStore::get_all_assignments_rhs_partial(const std::string& rhs) {
     std::unordered_set<std::string> result;
 
+    auto rhs_padded = " " + rhs + " ";
+
     for (const auto& [rhs_key, lhs_stmts] : assignment_store) {
-        if (rhs_key.find(rhs) != std::string::npos) {
+        auto rhs_key_padded = " " + rhs_key + " ";
+        if (rhs_key_padded.find(rhs_padded) != std::string::npos) {
             for (const auto& [lhs, stmts] : lhs_stmts) {
                 for (const auto& s : stmts) {
                     result.insert(s);
@@ -71,8 +74,11 @@ std::unordered_set<std::string> AssignmentStore::get_all_assignments_lhs_rhs_par
                                                                                      const std::string& rhs) {
     std::unordered_set<std::string> result;
 
+    auto rhs_padded = " " + rhs + " ";
+
     for (const auto& [rhs_key, lhs_stmts] : assignment_store) {
-        if (rhs_key.find(rhs) != std::string::npos) {
+        auto rhs_key_padded = " " + rhs_key + " ";
+        if (rhs_key_padded.find(rhs_padded) != std::string::npos) {
             if (lhs_stmts.find(lhs) != lhs_stmts.end()) {
                 for (const auto& s : lhs_stmts.at(lhs)) {
                     result.insert(s);
