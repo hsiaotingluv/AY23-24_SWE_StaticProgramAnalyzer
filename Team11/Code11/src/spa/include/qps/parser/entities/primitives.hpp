@@ -103,3 +103,12 @@ struct Integer {
 };
 
 } // namespace qps
+
+namespace std {
+template <>
+struct hash<qps::IDENT> {
+    auto operator()(const qps::IDENT& syn) const -> size_t {
+        return hash<std::string>{}(syn.get_value());
+    }
+};
+} // namespace std

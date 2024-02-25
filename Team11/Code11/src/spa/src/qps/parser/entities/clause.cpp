@@ -16,7 +16,7 @@ auto SuchThatClause::operator==(const SuchThatClause& other) const -> bool {
 
 auto PatternClause::representation() const -> std::string {
     std::stringstream ss;
-    ss << "Pattern(" << assign_synonym->get_name().get_value() << ", " << ent_ref << ", " << expression_spec << ")";
+    ss << "Pattern(" << assign_synonym << ", " << ent_ref << ", " << expression_spec << ")";
     return ss.str();
 }
 

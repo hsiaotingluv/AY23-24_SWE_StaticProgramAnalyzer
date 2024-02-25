@@ -8,7 +8,7 @@
 
 namespace qps {
 
-auto ModifiesSEvaluator::select_eval_method() {
+auto ModifiesSEvaluator::select_eval_method() const {
     return overloaded{
         // e.g. Modifies(s1, v)
         [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
@@ -39,12 +39,13 @@ auto ModifiesSEvaluator::select_eval_method() {
         }};
 }
 
-auto ModifiesSEvaluator::evaluate() -> std::optional<Table> {
+auto ModifiesSEvaluator::evaluate() const -> std::optional<Table> {
     return std::visit(select_eval_method(), modifies_s.stmt, modifies_s.ent);
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                         const std::shared_ptr<qps::VarSynonym>& var_syn) -> std::optional<Table> {
+                                         const std::shared_ptr<qps::VarSynonym>& var_syn) const
+    -> std::optional<Table> {
     // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     const auto relevant_variables = var_syn->scan(read_facade);
@@ -69,7 +70,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                         const QuotedIdent& identifier) -> std::optional<Table> {
+                                         const QuotedIdent& identifier) const -> std::optional<Table> {
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     const auto relevant_stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
 
@@ -87,7 +88,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
     return table;
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const WildCard&)
+auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const WildCard&) const
     -> std::optional<Table> {
     // TODO: Improve pkb API: Get all statement that modifies
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
@@ -113,7 +114,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
     return table;
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var_syn)
+auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var_syn) const
     -> std::optional<Table> {
     const auto variables = read_facade->get_vars_modified_by_statement(std::to_string(stmt_num.value));
     auto table = Table{{var_syn}};
@@ -127,7 +128,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::sha
     return table;
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier)
+auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier) const
     -> std::optional<Table> {
     const auto does_modify =
         read_facade->does_statement_modify_var(std::to_string(stmt_num.value), identifier.get_value());
@@ -138,7 +139,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedId
     return Table{};
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard&) -> std::optional<Table> {
+auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard&) const -> std::optional<Table> {
     auto does_statement_modify_var = false;
     const auto variables = read_facade->get_variables();
     const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
