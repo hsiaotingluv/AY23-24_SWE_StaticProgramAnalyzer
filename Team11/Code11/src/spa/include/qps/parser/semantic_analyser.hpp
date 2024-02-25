@@ -3,7 +3,7 @@
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/semantic_validator_helper.hpp"
+#include "qps/parser/semantic_analyser_helper.hpp"
 #include "qps/parser/untyped/entities/query.hpp"
 
 #include <memory>
@@ -43,7 +43,7 @@ struct Query {
 };
 } // namespace qps
 
-#include "qps/parser/semantic_validator.tpp"
+#include "qps/parser/semantic_analyser.tpp"
 
 namespace qps {
 template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
