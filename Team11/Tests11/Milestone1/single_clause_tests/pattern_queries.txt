@@ -1,7 +1,7 @@
 1 - Test pattern (var, wildcard)
 assign a; variable v;
 Select a pattern a (v, _)
-4,6,9,10
+4,6,9,10,11
 5000
 2 - Test pattern (var, exact_non_existing_var)
 assign a; variable v;
@@ -21,12 +21,12 @@ Select a pattern a (v, _"x"_)
 5 - Test pattern (var, partial_match_const)
 assign a; variable v;
 Select a pattern a (v, _"1"_)
-4,9
+4,9,11
 5000
 6 - Test pattern (wildcard, wildcard)
 assign a;
 Select a pattern a (_, _)
-4,6,9,10
+4,6,9,10,11
 5000
 7 - Test pattern (wildcard, partial_non_existing_var)
 assign a;
@@ -121,5 +121,20 @@ Select pattern pattern pattern("z", _"x"_)
 25 - Test pattern (char_string, partial_match_const) with keyword as assign synonym
 assign pattern;
 Select pattern pattern pattern("y", _"1"_)
-9
+9,11
+5000
+26 - Test pattern with substring of constant
+assign pattern;
+Select pattern pattern pattern("y", _"5"_)
+
+5000
+27 - Test pattern with substring of variable
+assign pattern;
+Select pattern pattern pattern("y", _"va"_)
+
+5000
+28 - Test pattern with substring of expression
+assign pattern;
+Select pattern pattern pattern("y", _"ar * vir"_)
+
 5000

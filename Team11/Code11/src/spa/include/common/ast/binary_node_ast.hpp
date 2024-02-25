@@ -38,7 +38,7 @@ class BinopNode : public ExprNode {
     [[nodiscard]] auto get_postfix() const -> std::string override {
         auto left_postfix = left->get_postfix();
         auto right_postfix = right->get_postfix();
-        return left_postfix + " " + right_postfix + " " + operator_token;
+        return left_postfix + right_postfix + operator_token + " ";
     }
 };
 

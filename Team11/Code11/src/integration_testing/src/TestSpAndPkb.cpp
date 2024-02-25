@@ -125,13 +125,13 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE(read_facade->get_all_assignments_lhs("cenX").size() == 3);
         REQUIRE(read_facade->get_all_assignments_lhs("cenY").size() == 3);
 
-        REQUIRE(read_facade->get_all_assignments_rhs("0").size() == 4);
-        REQUIRE(read_facade->get_all_assignments_rhs("cenX").empty());
+        REQUIRE(read_facade->get_all_assignments_rhs("0 ").size() == 4);
+        REQUIRE(read_facade->get_all_assignments_rhs("cenX ").empty());
 
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX").size() == 3);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX cenX *").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX ").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("cenX cenX * ").size() == 1);
 
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs("flag", "1").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("cenX", "cenX").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("flag", "1 ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("cenX", "cenX ").size() == 2);
     }
 }

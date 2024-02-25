@@ -8,6 +8,10 @@ def is_file(filename):
     return os.path.isfile(filename) and os.path.exists(filename)
 
 
+def should_fail_early(filename):
+    return "invalid" in filename and "simple" in filename
+
+
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 if __name__ == "__main__":
     import argparse
@@ -16,7 +20,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the autotester.")
     parser.add_argument("source", help="The source file to test.")
     parser.add_argument("query", nargs="?", help="The query file.", default="")
-    parser.add_argument("-i", "--ignore_exists", action="store_true")
+    parser.add_argument(
+        "-i",
+        "--ignore_exists",
+        action="store_true",
+        help="[DEPRECATED] Ignore if the output file exists",
+    )
     parser.add_argument("--output", help="Output xml", default="out.xml")
     parser.add_argument(
         "--run_server", help="Run Autotester Server", default=False, action="store_true"
@@ -29,10 +38,13 @@ if __name__ == "__main__":
         ),
     )
     args = parser.parse_args()
+    args.ignore_exists = True
 
     verbose = True
+    single_file_mode = False
     if is_file(args.source) and is_file(args.query):
         files = [(args.source, args.query)]
+        single_file_mode = True
     elif not is_file(args.source):
         assert os.path.exists(args.source) and os.path.isdir(
             args.source
@@ -62,10 +74,12 @@ if __name__ == "__main__":
         deduced_name = args.source.replace("_source.txt", "_queries.txt")
         print(f"Query file {args.query} does not exist. Trying {deduced_name}")
         files = [(args.source, deduced_name)]
+        single_file_mode = True
     else:
         raise ValueError(f"Neither {args.source} nor {args.query} exist!")
 
     for source, query in files:
+        total_tc_file = 0
         output_name = os.path.basename(args.output)
         output_path = os.path.join(FILE_PATH, output_name)
         run_server = bool(args.run_server)
@@ -76,47 +90,75 @@ if __name__ == "__main__":
             )
 
         exec_args = [args.autotester, source, query, output_path]
-        subprocess.run(
-            exec_args, check=False, stdout=subprocess.DEVNULL if not verbose else None
+        result = subprocess.run(
+            exec_args,
+            check=False,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.DEVNULL if not verbose else None,
+            text=True,
         )
-        tree = ET.parse(f"{output_path}")
-        root = tree.getroot()
 
-        errors = []
+        prefix = os.path.abspath(source).split(".")[0]
+        found_exception = None
+        try:
+            tree = ET.parse(f"{output_path}")
+            root = tree.getroot()
 
-        def traverse(node):
-            # do something with node
-            if node.tag == "query":
-                is_passing = False
-                for child in node:
-                    # Using Python vars quirks here for fast, hackish style
-                    if child.tag == "id":
-                        test_case_number = child.text
-                    elif child.tag == "failed":
-                        is_passing = False
-                    elif child.tag == "passed":
-                        is_passing = True
+            errors = []
 
-                if not is_passing:
-                    errors.append(test_case_number)
-            else:
-                for child in node:
-                    traverse(child)
+            def traverse(node):
+                global total_tc_file
+                # do something with node
+                if node.tag == "query":
+                    is_passing = False
+                    for child in node:
+                        # Using Python vars quirks here for fast, hackish style
+                        if child.tag == "id":
+                            test_case_number = child.text
+                            total_tc_file += 1
+                        elif child.tag == "failed":
+                            is_passing = False
+                        elif child.tag == "passed":
+                            is_passing = True
 
-        traverse(root)
+                    if not is_passing:
+                        errors.append(test_case_number)
+                else:
+                    for child in node:
+                        traverse(child)
 
-        if run_server:
-            path = os.path.join(FILE_PATH, "Code11", "tests")
-            subprocess.run(["mv", f"{output_path}", "Code11/tests"], check=True)
-            subprocess.run(
-                ["python3", "-m", "http.server", "8080", "--directory", path],
-                check=False,
-            )
+            traverse(root)
+        except Exception:
+            found_exception = result.stderr.replace("\n", " ")
 
-        if errors:
+        if found_exception and should_fail_early(source):
+            print(f"[{prefix}] Pass all system testing (1/1)")
+        elif found_exception and not should_fail_early(source):
             print(
-                f"[{source} - {query}] Failed test cases: {','.join(map(str, errors))}"
+                f"[{prefix}] Failed to parse the SIMPLE program due to {found_exception}"
             )
             exit(1)
+        elif not found_exception and should_fail_early(source):
+            print(f"[{prefix}] Failed, SPA successfully parsed invalid SIMPLE program")
+            exit(1)
         else:
-            print(f"[{source} - {query}] Pass all system testing")
+            if errors:
+                print(
+                    f"[{prefix}] Failed test cases: {','.join(map(str, errors))} ({total_tc_file - len(errors)}/{total_tc_file})"
+                )
+                exit(1)
+            else:
+                print(
+                    f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
+                )
+
+    if not single_file_mode:
+        print("All tests passed!")
+
+    if run_server:
+        path = os.path.join(FILE_PATH, "Code11", "tests")
+        subprocess.run(["mv", f"{output_path}", "Code11/tests"], check=True)
+        subprocess.run(
+            ["python3", "-m", "http.server", "8080", "--directory", path],
+            check=False,
+        )

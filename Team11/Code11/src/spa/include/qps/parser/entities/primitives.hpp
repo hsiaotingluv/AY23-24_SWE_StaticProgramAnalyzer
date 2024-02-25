@@ -82,7 +82,7 @@ class QuotedIdent : public Ref {
 };
 
 struct Integer {
-    uint32_t value;
+    std::string value;
 
     friend auto operator<<(std::ostream& os, const Integer& integer) -> std::ostream& {
         os << integer.value;
@@ -93,11 +93,11 @@ struct Integer {
         return lhs.value == rhs.value;
     }
 
-    friend auto operator==(const Integer& lhs, const uint32_t& rhs) -> bool {
+    friend auto operator==(const Integer& lhs, const std::string& rhs) -> bool {
         return lhs.value == rhs;
     }
 
-    friend auto operator==(const uint32_t& lhs, const Integer& rhs) -> bool {
+    friend auto operator==(const std::string& lhs, const Integer& rhs) -> bool {
         return lhs == rhs.value;
     }
 };

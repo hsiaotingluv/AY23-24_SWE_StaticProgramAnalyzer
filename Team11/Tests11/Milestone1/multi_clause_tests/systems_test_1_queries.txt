@@ -36,7 +36,7 @@ Select i
 8 - Select variables
 variable v;
 Select v
-i, n, fizzStr, buzzStr, fizzBuzzStr, fizz, buzz, g4r8aGe
+i, n, fizzStr, buzzStr, fizzBuzzStr, fizz, buzz, g4r8aGe, random
 5000
 9 - Select constants
 constant c;

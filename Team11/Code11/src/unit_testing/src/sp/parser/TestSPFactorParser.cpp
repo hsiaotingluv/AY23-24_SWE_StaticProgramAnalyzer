@@ -23,7 +23,7 @@ TEST_CASE("Test SP Factor Parser") {
         auto node = constant_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
-        REQUIRE(casted_node->integer == 123);
+        REQUIRE(casted_node->integer == "123");
     }
 
     SECTION("name parser - success") {
@@ -59,7 +59,7 @@ TEST_CASE("Test SP Factor Parser") {
         auto node = factor_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<ConstantNode>(node);
         REQUIRE(node->T == NodeType::Constant);
-        REQUIRE(casted_node->integer == 123);
+        REQUIRE(casted_node->integer == "123");
     }
 
     SECTION("factor parser unknown token - fail") {

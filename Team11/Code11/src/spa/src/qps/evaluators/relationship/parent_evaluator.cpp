@@ -83,7 +83,7 @@ auto ParentEvaluator::eval_parent(const std::shared_ptr<StmtSynonym>& stmt_syn_1
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
-    const auto parent_candidate = read_facade->get_parent_of(std::to_string(stmt_num_2.value));
+    const auto parent_candidate = read_facade->get_parent_of(stmt_num_2.value);
     if (relevant_stmts.find(parent_candidate) != relevant_stmts.end()) {
         table.add_row({parent_candidate});
     }
@@ -116,7 +116,7 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const std::shared_p
     -> std::optional<Table> {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
-    const auto all_children_of_stmt = read_facade->get_children_of(std::to_string(stmt_num_1.value));
+    const auto all_children_of_stmt = read_facade->get_children_of(stmt_num_1.value);
     for (const auto& child_name : all_children_of_stmt) {
         if (relevant_stmts.find(child_name) == relevant_stmts.end()) {
             continue;
@@ -131,7 +131,7 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const std::shared_p
 }
 
 auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> std::optional<Table> {
-    if (!read_facade->has_parent_relation(std::to_string(stmt_num_1.value), std::to_string(stmt_num_2.value))) {
+    if (!read_facade->has_parent_relation(stmt_num_1.value, stmt_num_2.value)) {
         return std::nullopt;
     }
     return Table{};
@@ -141,7 +141,7 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const WildCard&) co
     // TODO: Improve pkb API: bool is_a_parent
     const auto all_parents = read_facade->get_all_parent_keys();
     bool is_parent = false;
-    const auto stmt_num = std::to_string(stmt_num_1.value);
+    const auto stmt_num = stmt_num_1.value;
     for (const auto& parent_name : all_parents) {
         if (stmt_num == parent_name) {
             is_parent = true;
@@ -176,7 +176,7 @@ auto ParentEvaluator::eval_parent(const WildCard&, const Integer& stmt_num_2) co
     // TODO: Improve pkb API: bool has_a_parent
     const auto all_children = read_facade->get_all_parent_values();
     bool has_a_parent = false;
-    const auto stmt_num = std::to_string(stmt_num_2.value);
+    const auto stmt_num = stmt_num_2.value;
     for (const auto& child_name : all_children) {
         if (stmt_num == child_name) {
             has_a_parent = true;

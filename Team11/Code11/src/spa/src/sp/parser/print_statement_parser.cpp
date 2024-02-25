@@ -15,6 +15,7 @@ auto StatementParser::parsePrintStmt(Parser::Iterator& token_start, const Token&
         throw ParsingError("Expecting ; in assignment but found other token");
     }
 
-    return std::make_shared<PrintNode>(next_token.content);
+    auto var_node = std::make_shared<VarNode>(next_token.content);
+    return std::make_shared<PrintNode>(var_node);
 }
 } // namespace sp
