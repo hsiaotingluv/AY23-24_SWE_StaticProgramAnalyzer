@@ -130,8 +130,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::sha
 
 auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier) const
     -> std::optional<Table> {
-    const auto does_modify =
-        read_facade->does_statement_modify_var(stmt_num.value, identifier.get_value());
+    const auto does_modify = read_facade->does_statement_modify_var(stmt_num.value, identifier.get_value());
 
     if (!does_modify) {
         return std::nullopt;
