@@ -88,3 +88,8 @@ if i;
 Select i such that Modifies(i, _)
 13
 5000
+19 - Test read uses wildcard
+read r;
+Select r such that Uses(r, _)
+
+5000

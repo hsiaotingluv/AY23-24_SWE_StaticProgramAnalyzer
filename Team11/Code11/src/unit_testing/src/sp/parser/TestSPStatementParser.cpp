@@ -19,7 +19,7 @@ TEST_CASE("Test SP Statement Parser") {
         auto node = statement_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<ReadNode>(node);
         REQUIRE(node->T == NodeType::Read);
-        REQUIRE(casted_node->variable == "variable");
+        REQUIRE(casted_node->var_node->name == "variable");
         REQUIRE(it->T == TokenType::Done);
     }
 
@@ -32,7 +32,7 @@ TEST_CASE("Test SP Statement Parser") {
         auto node = statement_parser.parse(it, tokens.end());
         auto casted_node = std::dynamic_pointer_cast<PrintNode>(node);
         REQUIRE(node->T == NodeType::Print);
-        REQUIRE(casted_node->variable == "variable");
+        REQUIRE(casted_node->var_node->name == "variable");
         REQUIRE(it->T == TokenType::Done);
     }
 

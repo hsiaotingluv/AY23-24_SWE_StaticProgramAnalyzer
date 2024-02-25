@@ -674,18 +674,18 @@ TEST_CASE("Assignment Pattern Test") {
     SECTION("Simple Assignment Pattern Test") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
-        write_facade->add_assignment("1", "x", "1");
-        write_facade->add_assignment("2", "y", "x");
-        write_facade->add_assignment("3", "z", "2");
-        write_facade->add_assignment("4", "q", "y");
-        write_facade->add_assignment("5", "x", "1");
+        write_facade->add_assignment("1", "x", "1 ");
+        write_facade->add_assignment("2", "y", "x ");
+        write_facade->add_assignment("3", "z", "2 ");
+        write_facade->add_assignment("4", "q", "y ");
+        write_facade->add_assignment("5", "x", "1 ");
 
         // Test exact rhs
-        REQUIRE(read_facade->get_all_assignments_rhs("1").size() == 2);
-        REQUIRE(read_facade->get_all_assignments_rhs("2").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_rhs("x").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_rhs("y").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_rhs("z").size() == 0);
+        REQUIRE(read_facade->get_all_assignments_rhs("1 ").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_rhs("2 ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_rhs("x ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_rhs("y ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_rhs("z ").size() == 0);
 
         // Test exact lhs
         REQUIRE(read_facade->get_all_assignments_lhs("x").size() == 2);
@@ -695,37 +695,37 @@ TEST_CASE("Assignment Pattern Test") {
         REQUIRE(read_facade->get_all_assignments_lhs("p").size() == 0);
 
         // Test exact lhs and exact rhs
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs("x", "1").size() == 2);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs("y", "x").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs("z", "2").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs("q", "y").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("x", "1 ").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("y", "x ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("z", "2 ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs("q", "y ").size() == 1);
     }
 
     SECTION("more complex assignment pattern test") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
-        write_facade->add_assignment("1", "x", "1");
-        write_facade->add_assignment("2", "y", "x");
-        write_facade->add_assignment("3", "z", "2");
-        write_facade->add_assignment("4", "q", "y");
-        write_facade->add_assignment("5", "x", "1");
-        write_facade->add_assignment("6", "x", "2");
-        write_facade->add_assignment("7", "xy", "3 4 +");
-        write_facade->add_assignment("8", "x", "1 y +");
-        write_facade->add_assignment("9", "xy", "y 1 +");
+        write_facade->add_assignment("1", "x", "1 ");
+        write_facade->add_assignment("2", "y", "x ");
+        write_facade->add_assignment("3", "z", "2 ");
+        write_facade->add_assignment("4", "q", "y ");
+        write_facade->add_assignment("5", "x", "1 ");
+        write_facade->add_assignment("6", "x", "2 ");
+        write_facade->add_assignment("7", "xy", "3 4 + ");
+        write_facade->add_assignment("8", "x", "1 y + ");
+        write_facade->add_assignment("9", "xy", "y 1 + ");
 
         // Test partial RHS match, any lhs
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("1").size() == 4);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("2").size() == 2);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("x").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("y").size() == 3);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("z").size() == 0);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("1 ").size() == 4);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("2 ").size() == 2);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("x ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("y ").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("z ").size() == 0);
 
         // Test partial RHS match, exact lhs
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1").size() == 3);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("y", "x").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("z", "2").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("q", "y").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1 ").size() == 3);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("y", "x ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("z", "2 ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("q", "y ").size() == 1);
+        REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1 ").size() == 3);
     }
 }
