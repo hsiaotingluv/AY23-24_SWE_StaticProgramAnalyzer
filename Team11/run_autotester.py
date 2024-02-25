@@ -35,8 +35,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     verbose = True
+    single_file_mode = False
     if is_file(args.source) and is_file(args.query):
         files = [(args.source, args.query)]
+        single_file_mode = True
     elif not is_file(args.source):
         assert os.path.exists(args.source) and os.path.isdir(
             args.source
@@ -66,6 +68,7 @@ if __name__ == "__main__":
         deduced_name = args.source.replace("_source.txt", "_queries.txt")
         print(f"Query file {args.query} does not exist. Trying {deduced_name}")
         files = [(args.source, deduced_name)]
+        single_file_mode = True
     else:
         raise ValueError(f"Neither {args.source} nor {args.query} exist!")
 
@@ -142,6 +145,9 @@ if __name__ == "__main__":
                 print(
                     f"[{prefix}] Pass all system testing ({total_tc_file}/{total_tc_file})"
                 )
+
+    if not single_file_mode:
+        print("All tests passed!")
 
     if run_server:
         path = os.path.join(FILE_PATH, "Code11", "tests")
