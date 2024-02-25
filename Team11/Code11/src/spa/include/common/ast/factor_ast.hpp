@@ -33,7 +33,7 @@ class ConstantNode : public ExprNode, public DesignEntitiesMixin {
     }
 
     [[nodiscard]] auto get_postfix() const -> std::string override {
-        return std::to_string(integer);
+        return std::to_string(integer) + " ";
     }
 
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override {
@@ -67,7 +67,7 @@ class VarNode : public ExprNode, public DesignEntitiesMixin {
     }
 
     [[nodiscard]] auto get_postfix() const -> std::string override {
-        return name;
+        return name + " ";
     }
 
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override {
