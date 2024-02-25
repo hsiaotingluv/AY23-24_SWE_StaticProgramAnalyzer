@@ -1,0 +1,90 @@
+1 - Select Statement Wildcard
+stmt s;
+Select s such that Parent*(s, _)
+
+5000
+2 - Select Parent* of print
+print pn; stmt s;
+Select s such that Parent*(s, pn)
+
+5000
+3 - Select Parent* of assignment
+assign a; stmt s;
+Select s such that Parent*(s, a)
+
+5000
+4 - Select Parent* of read
+read r; stmt s;
+Select s such that Parent*(s, r)
+
+5000
+5 - Select Parent* of while
+while w; stmt s;
+Select s such that Parent*(s, w)
+
+5000
+6 - Select Parent* of if
+if i; stmt s;
+Select s such that Parent*(s, i)
+
+5000
+7 - Select nested-if
+if i; stmt s;
+Select i such that Parent*(s, i)
+
+5000
+8 - Select nested-while
+while w; stmt s;
+Select w such that Parent*(s, w)
+
+5000
+9 - Select while within while
+while w, w1;
+Select w such that Parent*(w, w1)
+
+5000
+10 - Parent* of itself
+stmt s;
+Select s such that Parent*(s, s)
+
+5000
+11 - Nonexistent Parent*
+if i, i1;
+Select i such that Parent*(i, i1)
+
+5000
+12 - Random Spacing
+     assign              a;
+Select   a such       that  Parent*(                 _,            a   )
+
+5000
+13 - Wildcard Parent*
+if i;
+Select i such that Parent*(_, i)
+
+5000
+14 - Wildcard Parent* on Second Arg
+if i;
+Select i such that Parent*(i, _)
+
+5000
+15 - Find all Parent*
+stmt s;
+Select s such that Parent*(s, _)
+
+5000
+16 - Both Wildcard Parent*
+constant c;
+Select c such that Parent*(_, _)
+
+5000
+17 - Invalid First Argument (constant) in Parent* Clause
+constant c;
+Select c such that Parent*(c, 3)
+SemanticError
+5000
+18 - Invalid First Argument (constant) in Parent* Clause
+procedure p;
+Select p such that Parent*(p, 3)
+SemanticError
+5000
