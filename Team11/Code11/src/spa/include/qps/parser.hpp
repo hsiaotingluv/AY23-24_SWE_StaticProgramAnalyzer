@@ -17,7 +17,7 @@ class Parser {
 
         const auto& [declared_synonyms, untyped_query] =
             std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(maybe_parsed);
-        const auto maybe_query = SemanticAnalyser::validate(declared_synonyms, untyped_query);
+        const auto maybe_query = SemanticAnalyser::analyse(declared_synonyms, untyped_query);
 
         if (std::holds_alternative<SemanticError>(maybe_query)) {
             return std::get<SemanticError>(maybe_query);

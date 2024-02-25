@@ -49,7 +49,7 @@ namespace qps {
 template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
 class SemanticAnalyser {
   public:
-    static auto validate(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
+    static auto analyse(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
         -> std::variant<Query, SemanticError> {
         // Declarations must be unique
         const auto& maybe_mapping = details::enforce_unique_declarations(declarations);
