@@ -28,11 +28,11 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
     [[nodiscard]] auto get_node_name() const -> std::string override;
     [[nodiscard]] auto identifier() const -> std::stringstream override;
     [[nodiscard]] auto to_xml() const -> std::string override;
-    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
+    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+                               const std::shared_ptr<ModifyMap>& modify_map)
         -> std::unordered_set<std::string> override;
 
-    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
-                                         std::shared_ptr<UsesMap> uses_map) const
-        -> std::unordered_set<std::string> override;
+    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                           const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
 };
 } // namespace sp

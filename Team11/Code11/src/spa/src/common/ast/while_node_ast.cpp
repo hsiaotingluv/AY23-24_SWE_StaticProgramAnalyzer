@@ -32,7 +32,7 @@ auto WhileNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_
 }
 
 auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
-                                      std::shared_ptr<ModifyMap> modify_map) -> std::unordered_set<std::string> {
+                                      const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
     auto stmt_list_node = std::dynamic_pointer_cast<StatementListNode>(stmt_list);
