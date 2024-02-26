@@ -38,7 +38,7 @@ auto CallNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_f
 }
 
 auto CallNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
-                                 std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+                                 const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(p, v) holds if there is a statement s in p.
     auto stmt_number = std::to_string(get_statement_number());
     auto var_names_proc_name = uses_map->at(proc_name);

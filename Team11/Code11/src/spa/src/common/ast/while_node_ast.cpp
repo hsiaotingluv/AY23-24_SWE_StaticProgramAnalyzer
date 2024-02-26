@@ -97,7 +97,7 @@ auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& writ
 }
 
 auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
-                                  std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> {
+                                  const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
     auto combined_set = std::unordered_set<std::string>();

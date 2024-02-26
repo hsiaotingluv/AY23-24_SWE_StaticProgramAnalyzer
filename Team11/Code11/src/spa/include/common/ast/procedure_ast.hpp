@@ -68,8 +68,9 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         return combined_set;
     }
 
-    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map,
-                                 const std::shared_ptr<StatementListNode>& node) const
+    [[nodiscard]] static auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+                                                      const std::shared_ptr<UsesMap>& uses_map,
+                                                      const std::shared_ptr<StatementListNode>& node)
         -> std::unordered_set<std::string> {
         auto combined_set = std::unordered_set<std::string>();
         auto stmts = node->statements;
@@ -86,8 +87,8 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         return combined_set;
     }
 
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
-        -> std::unordered_set<std::string> override {
+    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                           const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override {
         // Uses(p, v) holds if there is a statement s in p
         auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
         for (const auto& var_name : var_names_stmt_list) {
