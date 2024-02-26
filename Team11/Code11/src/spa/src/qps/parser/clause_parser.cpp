@@ -1,9 +1,11 @@
 #include "qps/parser/untyped/clause_parser.hpp"
+#include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
+#include <vector>
 
 namespace qps::untyped {
 auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<std::vector<UntypedPatternClause>, std::vector<Token>::const_iterator>> {
     // pattern_cl := pattern <assign_synonym> ( <ent_ref> , <pattern_expr> )
     constexpr auto EXPECTED_LENGTH = 7;
     if (std::distance(it, end) < EXPECTED_LENGTH) {
@@ -69,7 +71,7 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
     }
     it = std::next(it, 1);
 
-    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+    return std::make_tuple(std::vector<UntypedPatternClause>{UntypedPatternClause{syn_assign, ent_ref, expr_spec}}, it);
 }
 
 } // namespace qps::untyped

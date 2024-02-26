@@ -13,7 +13,7 @@ class PatternClausesParser {
     using ClauseType = UntypedPatternClause;
 
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>>;
+        -> std::optional<std::tuple<std::vector<ClauseType>, std::vector<Token>::const_iterator>>;
 };
 } // namespace qps::untyped
 

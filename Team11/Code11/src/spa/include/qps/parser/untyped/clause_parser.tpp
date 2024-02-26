@@ -31,7 +31,7 @@ class SuchThatClausesParser {
     using ClauseType = UntypedSuchThatClause;
 
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+        -> std::optional<std::tuple<std::vector<ClauseType>, std::vector<Token>::const_iterator>> {
         constexpr auto EXPECTED_LENGTH = 3;
         if (std::distance(it, end) < EXPECTED_LENGTH) {
             return std::nullopt;
@@ -46,13 +46,13 @@ class SuchThatClausesParser {
         const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtParsers{});
         if (maybe_stmt_stmt_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
-            return std::make_tuple(rel_ref, rest);
+            return std::make_tuple(std::vector<ClauseType>{rel_ref}, rest);
         }
 
         const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntParsers{});
         if (maybe_ref_ent_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
-            return std::make_tuple(rel_ref, rest);
+            return std::make_tuple(std::vector<ClauseType>{rel_ref}, rest);
         }
 
         return std::nullopt;

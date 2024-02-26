@@ -8,6 +8,8 @@
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include "qps/parser/errors.hpp"
+#include <iterator>
+#include <tuple>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -206,17 +208,22 @@ auto parse_result_cl(std::vector<Token>::const_iterator it, const std::vector<To
 
 template <typename UntypedClauseType>
 auto parse_clause(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
-    -> std::optional<std::tuple<UntypedClauseType, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<std::vector<UntypedClauseType>, std::vector<Token>::const_iterator>> {
     return std::nullopt;
 }
 
 template <typename UntypedClauseType, typename Head, typename... Tails>
 auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                   TypeList<Head, Tails...>)
-    -> std::optional<std::tuple<UntypedClauseType, std::vector<Token>::const_iterator>> {
+    -> std::optional<std::tuple<std::vector<UntypedClauseType>, std::vector<Token>::const_iterator>> {
     const auto maybe_clause = Head::parse(it, end);
     if (maybe_clause.has_value()) {
-        return maybe_clause;
+        auto& [clauses, rest] = maybe_clause.value();
+        auto variant_clauses = std::vector<UntypedClauseType>{};
+        variant_clauses.reserve(clauses.size());
+        variant_clauses.insert(variant_clauses.end(), std::make_move_iterator(clauses.begin()),
+                               std::make_move_iterator(clauses.end()));
+        return std::make_tuple(variant_clauses, rest);
     }
 
     return parse_clause<UntypedClauseType>(it, end, TypeList<Tails...>{});
@@ -240,8 +247,8 @@ auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vecto
             break;
         }
 
-        const auto& [clause, rest] = maybe_clause.value();
-        clauses.push_back(clause);
+        const auto& [created_clauses, rest] = maybe_clause.value();
+        clauses.insert(clauses.end(), created_clauses.begin(), created_clauses.end());
         it = rest;
     }
 
