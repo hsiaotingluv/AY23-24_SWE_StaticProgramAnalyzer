@@ -73,5 +73,18 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
 
     return std::make_tuple(std::vector<UntypedPatternClause>{UntypedPatternClause{syn_assign, ent_ref, expr_spec}}, it);
 }
-
 } // namespace qps::untyped
+
+namespace qps::untyped::detail {
+auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::vector<Token>::const_iterator> {
+    if (it == end) {
+        return std::nullopt;
+    }
+    const auto maybe_and = *it;
+    if (!is_keyword(maybe_and, "and")) {
+        return std::nullopt;
+    }
+    return std::next(it);
+}
+} // namespace qps::untyped::detail

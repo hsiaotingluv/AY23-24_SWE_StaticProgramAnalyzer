@@ -7,6 +7,7 @@
 #include "qps/template_utils.hpp"
 
 #include <array>
+#include <optional>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -20,6 +21,9 @@ template <typename Head, typename... Tails>
 auto parse_stmt_stmt_rel(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                          TypeList<Head, Tails...>)
     -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>>;
+
+auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::vector<Token>::const_iterator>;
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
@@ -43,19 +47,39 @@ class SuchThatClausesParser {
         }
         it = maybe_it.value();
 
-        const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtParsers{});
-        if (maybe_stmt_stmt_rel.has_value()) {
-            const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
-            return std::make_tuple(std::vector<ClauseType>{rel_ref}, rest);
+        auto clauses = std::vector<ClauseType>{};
+        auto first_clause = true;
+
+        while (it != end) {
+            if (!first_clause) {
+                const auto maybe_and = detail::consume_and(it, end);
+                if (!maybe_and.has_value()) {
+                    return std::make_tuple(clauses, it);
+                }
+                it = maybe_and.value();
+            }
+
+            const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtParsers{});
+            if (maybe_stmt_stmt_rel.has_value()) {
+                const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
+                clauses.push_back(rel_ref);
+                it = rest;
+                first_clause = false;
+                continue;
+            }
+
+            const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntParsers{});
+            if (maybe_ref_ent_rel.has_value()) {
+                const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
+                clauses.push_back(rel_ref);
+                it = rest;
+                first_clause = false;
+                continue;
+            }
+            return std::nullopt;
         }
 
-        const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntParsers{});
-        if (maybe_ref_ent_rel.has_value()) {
-            const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
-            return std::make_tuple(std::vector<ClauseType>{rel_ref}, rest);
-        }
-
-        return std::nullopt;
+        return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
     }
 };
 

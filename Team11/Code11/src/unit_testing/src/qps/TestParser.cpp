@@ -247,3 +247,81 @@ TEST_CASE("Test Parser - Basic Syntax Issues") {
         REQUIRE(std::holds_alternative<SyntaxError>(output)); // "v" is not a valid synonym
     }
 }
+
+TEST_CASE("Test Parser - 'and' connectives") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("No 'and'") {
+        const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) such that Modifies(p, \"v\")";
+        const auto output = parser.parse(query);
+
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 2);
+
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<AnyStmtSynonym>(declarations[1], "s");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause1 = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause1 = untyped::UntypedSuchThatClause{
+            untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+        REQUIRE(such_that_clause1 == reference_clause1);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
+        const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+        REQUIRE(such_that_clause2 == reference_clause2);
+    }
+
+    SECTION("One 'and'") {
+        const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) and Modifies(p, \"v\")";
+        const auto output = parser.parse(query);
+
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 2);
+
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<AnyStmtSynonym>(declarations[1], "s");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause1 = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause1 = untyped::UntypedSuchThatClause{
+            untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
+                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+        REQUIRE(such_that_clause1 == reference_clause1);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
+        const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+        REQUIRE(such_that_clause2 == reference_clause2);
+    }
+
+    SECTION("Syntax Error - 'and' with no relationship") {
+        const auto query = " procedure p; stmt s; Select s such that Modifies(p, \"v\") and";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+
+    SECTION("Syntax Error - 'and' with no relationship 2") {
+        const auto query = R"( procedure p; stmt s; Select s such that Modifies(p, "v") and Modifies(p, "v") and)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+}
