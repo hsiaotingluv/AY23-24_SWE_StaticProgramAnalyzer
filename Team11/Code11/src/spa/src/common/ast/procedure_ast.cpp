@@ -27,7 +27,8 @@ auto ProcedureNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
 }
 
 auto ProcedureNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
-                                          const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
+                                          const std::shared_ptr<ModifyMap>& modify_map)
+    -> std::unordered_set<std::string> {
     // Modifies(p, v)
     auto combined_set = std::unordered_set<std::string>();
 
@@ -70,7 +71,8 @@ auto ProcedureNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& 
 }
 
 auto ProcedureNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
-                                      const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
+                                      const std::shared_ptr<UsesMap>& uses_map) const
+    -> std::unordered_set<std::string> {
     // Uses(p, v) holds if there is a statement s in p
     auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
     for (const auto& var_name : var_names_stmt_list) {
