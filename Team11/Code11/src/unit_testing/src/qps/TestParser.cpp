@@ -248,7 +248,7 @@ TEST_CASE("Test Parser - Basic Syntax Issues") {
     }
 }
 
-TEST_CASE("Test Parser - 'and' connectives") {
+TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
     const auto parser = untyped::DefaultUntypedParser{};
 
     SECTION("No 'and'") {
@@ -321,6 +321,82 @@ TEST_CASE("Test Parser - 'and' connectives") {
 
     SECTION("Syntax Error - 'and' with no relationship 2") {
         const auto query = R"( procedure p; stmt s; Select s such that Modifies(p, "v") and Modifies(p, "v") and)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+}
+
+TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("No 'and'") {
+        const auto query =
+            R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) pattern newa ( "normSq" , _"cenX"_))";
+        const auto output = parser.parse(query);
+
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<AssignSynonym>(declarations[0], "newa");
+
+        const auto& [reference, clauses] = untyped;
+
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+        REQUIRE(pattern_clause == reference_clause);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[1]));
+        const auto pattern_clause2 = std::get<untyped::UntypedPatternClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedPatternClause{
+            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX "}}};
+        REQUIRE(pattern_clause2 == reference_clause2);
+    }
+
+    SECTION("One 'and'") {
+        const auto query =
+            R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) and newa ( "normSq" , _"cenX"_))";
+        const auto output = parser.parse(query);
+
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<AssignSynonym>(declarations[0], "newa");
+
+        const auto& [reference, clauses] = untyped;
+
+        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+        REQUIRE(pattern_clause == reference_clause);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[1]));
+        const auto pattern_clause2 = std::get<untyped::UntypedPatternClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedPatternClause{
+            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX "}}};
+        REQUIRE(pattern_clause2 == reference_clause2);
+    }
+
+    SECTION("Syntax Error - 'and' with no pattern") {
+        const auto query = R"(assign a; Select a pattern a ( _ , _"count + 1"_) and)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+
+    SECTION("Syntax Error - 'and' with no pattern 2") {
+        const auto query = R"(assign a; Select a pattern a ( _ , _"count + 1"_) and a ( _ , _"count + 1"_) and)";
         const auto output = parser.parse(query);
         REQUIRE(std::holds_alternative<SyntaxError>(output));
     }

@@ -1,6 +1,7 @@
 #include "qps/parser/untyped/clause_parser.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
+#include <optional>
 #include <string_view>
 #include <vector>
 
@@ -20,12 +21,35 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
         return std::nullopt;
     }
 
-    const auto maybe_success = detail::parse_rel_cond(keywords, it, end);
-    if (!maybe_success.has_value()) {
+    // Expects keywords
+    const auto maybe_it = detail::parse_keywords(keywords, it, end);
+    if (!maybe_it.has_value()) {
         return std::nullopt;
     }
-    const auto& [clause, rest] = maybe_success.value();
-    return std::make_tuple(std::vector<UntypedPatternClause>{clause}, rest);
+    it = maybe_it.value();
+
+    auto clauses = std::vector<UntypedPatternClause>{};
+    auto first_clause = true;
+    while (it != end) {
+        if (!first_clause) {
+            const auto maybe_and = detail::consume_and(it, end);
+            if (!maybe_and.has_value()) {
+                return std::make_tuple(clauses, it);
+            }
+            it = maybe_and.value();
+        }
+
+        const auto maybe_success = detail::parse_rel_cond(keywords, it, end);
+        if (!maybe_success.has_value()) {
+            return std::nullopt;
+        }
+        const auto& [clause, rest] = maybe_success.value();
+
+        clauses.push_back(clause);
+        it = rest;
+        first_clause = false;
+    }
+    return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
 }
 } // namespace qps::untyped
 
@@ -46,12 +70,10 @@ template <unsigned long N>
 auto parse_rel_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
                     const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
-    // Expects keywords
-    const auto maybe_it = detail::parse_keywords(keywords, it, end);
-    if (!maybe_it.has_value()) {
+    static constexpr auto EXPECTED_LENGTH = 6;
+    if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }
-    it = maybe_it.value();
 
     // Expects string
     const auto maybe_syn_assign = *it;
