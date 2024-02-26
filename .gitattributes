@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Ignore the following files for release
+.git* export-ignore
+Team11/Code11/.clang-format export-ignore
+Team11/Code11/.clangd export-ignore
