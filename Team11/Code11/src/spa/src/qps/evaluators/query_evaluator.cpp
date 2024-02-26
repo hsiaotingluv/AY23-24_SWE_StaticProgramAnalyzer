@@ -29,7 +29,7 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
         if (const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
             const auto relationship = such_that_clause->rel_ref;
             evaluator = std::visit(clause_evaluator_selector(read_facade), relationship);
-        } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
+        } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternAssignClause>(clause)) {
             evaluator = std::make_shared<PatternEvaluator>(read_facade, *pattern_clause);
         }
 

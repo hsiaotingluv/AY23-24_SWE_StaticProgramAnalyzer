@@ -42,25 +42,25 @@ struct SuchThatClause : public Clause {
     }
 };
 
-struct PatternClause : public Clause {
+struct PatternAssignClause : public Clause {
     std::shared_ptr<AssignSynonym> assign_synonym;
     EntRef ent_ref;
     ExpressionSpec expression_spec;
 
-    PatternClause(std::shared_ptr<AssignSynonym> assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
+    PatternAssignClause(std::shared_ptr<AssignSynonym> assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
         : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
           expression_spec(std::move(expression_spec)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
 
-    auto operator==(const PatternClause& other) const -> bool;
+    auto operator==(const PatternAssignClause& other) const -> bool;
 
     [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
-        if (typeid(other) != typeid(PatternClause)) {
+        if (typeid(other) != typeid(PatternAssignClause)) {
             return false;
         }
-        return *this == dynamic_cast<const PatternClause&>(other);
+        return *this == dynamic_cast<const PatternAssignClause&>(other);
     }
 };
 

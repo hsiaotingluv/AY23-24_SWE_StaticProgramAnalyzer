@@ -218,7 +218,7 @@ auto untyped_clause_visitor(const Synonyms& declarations,
             }
 
             const auto& ent_ref = maybe_ent_ref.value();
-            return std::make_shared<PatternClause>(assign_syn, ent_ref, pattern.expression_spec);
+            return std::make_shared<PatternAssignClause>(assign_syn, ent_ref, pattern.expression_spec);
         }};
 };
 
