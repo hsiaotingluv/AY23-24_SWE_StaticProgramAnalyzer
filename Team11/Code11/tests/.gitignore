@@ -2,3 +2,4 @@
 # Please put your test cases inside the correct directory; this is a scratch directory
 *.xml
 *.txt
+Xml2Tree/*.xml

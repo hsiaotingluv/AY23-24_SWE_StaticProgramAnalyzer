@@ -1,0 +1,83 @@
+name: "Ubuntu: Lint cpp/h files and test"
+
+on: [ push, pull_request ]
+
+jobs:
+  run-testing:
+    name: Run Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repo
+        uses: actions/checkout@v3
+
+      - name: Setup CMake
+        run: sudo apt update && sudo apt install -y cmake
+
+      - name: Setup Clang
+        run: sudo apt install -y llvm
+
+      - name: Build cmake
+        run: |
+          cd Team11/Code11
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+          make -j4
+
+      - name: Run linters
+        if: ${{ github.event_name == 'push' }}
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          version: 16
+          repo-root: "Team11/Code11"
+          database: "build/compile_commands.json"
+          ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
+          files-changed-only: false
+          tidy-checks: "-*"
+          step-summary: true
+
+      - name: Check linter status
+        if: steps.linter.outputs.clang-format-checks-failed > 0
+        run: echo "Some files failed the linting checks!" && exit 1
+
+      - name: Run Unit Test
+        run: |
+          chmod +x Team11/Code11/build/src/unit_testing/unit_testing
+          ./Team11/Code11/build/src/unit_testing/unit_testing
+
+      - name: Run Integration Test
+        run: |
+          chmod +x Team11/Code11/build/src/integration_testing/integration_testing
+          ./Team11/Code11/build/src/integration_testing/integration_testing
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run System Testing
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          chmod +x ./.github/scripts/run_sys_test.sh
+          ./.github/scripts/run_sys_test.sh
+
+      - name: Run linters and analyser
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: cpp-linter/cpp-linter-action@v2
+        id: linter_and_analyser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          version: 16
+          repo-root: "Team11/Code11"
+          database: "build/compile_commands.json"
+          ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
+          files-changed-only: false
+          tidy-checks: "-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter,-cppcoreguidelines-special-member-functions"
+          step-summary: true

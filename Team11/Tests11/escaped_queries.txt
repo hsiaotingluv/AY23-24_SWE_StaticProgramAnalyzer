@@ -1,0 +1,15 @@
+1 - comment
+variable v;
+Select v
+y, i, z, x
+5000
+2 - comment
+procedure p;
+Select p
+Example, q, p
+5000
+3 - comment
+constant c;
+Select c
+0, 1, 2, 3, 5
+5000

@@ -11,7 +11,8 @@
 #include "ui_mainwindow.h"
 
 using namespace std;
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     wrapper = new GUIWrapper();
 }
@@ -37,7 +38,7 @@ void MainWindow::btnRun_clicked() {
     wrapper->evaluate(ui->txtQuery->toPlainText().toStdString(), results);
     QString result_str;
 
-    for (auto const &result : results) {
+    for (auto const& result : results) {
         result_str += QString(result.c_str());
     }
     ui->txtResult->document()->setPlainText(result_str);

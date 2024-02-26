@@ -1,0 +1,28 @@
+procedure Bedok {
+  print east;
+  west = 9 + east;
+  y = east - 4;
+  v = west + 2;
+  call Yishun;
+  west = 9 + x * y * v + west;
+  while (east < 0) {
+    x = v - east;
+    if (east > x) then {
+      x = x + 1;
+      east = v - 9 + (x * y) * v; }
+    else {
+      y = east * y * v;
+      call Yishun; }}
+    west = 9 + v * x * y + west;
+    print west; }
+
+procedure Yishun {
+  if (west > y) then {
+    east = east * x + y * v; }
+  else {
+    west = x + y * v; }
+  call Serangoon; }
+
+procedure Serangoon {
+  read x;
+  read y; }
