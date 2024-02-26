@@ -233,3 +233,33 @@ assign a; constant c;
 Select a pattern a(_, c)
 SyntaxError
 5000
+48 - Invalid use of and connective in end of such that clause
+assign a;
+Select a such that Follows(1, 2) and Parent(3, 4) and
+SyntaxError
+5000
+49 - Invalid use of and connective in beginning of such that clause
+assign a;
+Select a such that and Follows(1, 2) and Parent(3, 4)
+SyntaxError
+5000
+50 - Invalid use of and connective in end of pattern clause
+assign a;
+Select a pattern a(_, _) and a(_, _) and
+SyntaxError
+5000
+51 - Invalid use of and connective in beginning of pattern clause
+assign a;
+Select a pattern and a(_, _) and a(_, _)
+SyntaxError
+5000
+52 - Multiple and connectives in such that clause
+assign a;
+Select a such that Follows(1, 2) and and Parent(3, 4)
+SyntaxError
+5000
+53 - Multiple and connectives in pattern clause
+assign a;
+Select a pattern a(_, _) and and a(_, _)
+SyntaxError
+5000
