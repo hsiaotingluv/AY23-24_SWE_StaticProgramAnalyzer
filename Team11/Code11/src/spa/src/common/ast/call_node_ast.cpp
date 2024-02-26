@@ -26,7 +26,7 @@ auto CallNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_f
 }
 
 auto CallNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
-                                     std::shared_ptr<ModifyMap> modify_map) -> std::unordered_set<std::string> {
+                                     const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(c,v)
     auto stmt_number = std::to_string(get_statement_number());
     auto modified_vars = modify_map->at(proc_name);

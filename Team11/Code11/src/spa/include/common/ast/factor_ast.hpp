@@ -16,31 +16,12 @@ class ConstantNode : public ExprNode, public DesignEntitiesMixin {
     explicit ConstantNode(std::string& integer) : ExprNode(NodeType::Constant), integer(std::move(integer)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "ConstantNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << integer << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        return "<" + get_node_name() + " integer=\"" + integer + "\" />";
-    }
-
-    [[nodiscard]] auto get_postfix() const -> std::string override {
-        return integer + " ";
-    }
-
-    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override {
-        write_facade->add_constant(integer);
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    [[nodiscard]] auto get_postfix() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 
 class VarNode : public ExprNode, public DesignEntitiesMixin {
@@ -50,30 +31,11 @@ class VarNode : public ExprNode, public DesignEntitiesMixin {
     explicit VarNode(std::string name) : ExprNode(NodeType::Variable), name(std::move(name)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {};
-    }
-
-    [[nodiscard]] auto get_node_name() const -> std::string override {
-        return "VarNode";
-    }
-
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << name << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        return "<" + get_node_name() + " name=\"" + name + "\" />";
-    }
-
-    [[nodiscard]] auto get_postfix() const -> std::string override {
-        return name + " ";
-    }
-
-    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override {
-        write_facade->add_variable(name);
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
+    [[nodiscard]] auto get_node_name() const -> std::string override;
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
+    [[nodiscard]] auto get_postfix() const -> std::string override;
+    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 } // namespace sp

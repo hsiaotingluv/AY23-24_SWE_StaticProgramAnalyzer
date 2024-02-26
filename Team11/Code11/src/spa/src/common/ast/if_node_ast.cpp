@@ -28,7 +28,7 @@ auto IfNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
 }
 
 auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
-                                   std::shared_ptr<ModifyMap> modify_map) -> std::unordered_set<std::string> {
+                                   const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(s, v) for s = If
     auto stmt_number = std::to_string(get_statement_number());
 
@@ -140,7 +140,7 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
     return combined_set;
 }
 
-auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
     // Parent* relationship) are handled by PKB.
     auto statement_nums = std::unordered_set<std::string>{};
