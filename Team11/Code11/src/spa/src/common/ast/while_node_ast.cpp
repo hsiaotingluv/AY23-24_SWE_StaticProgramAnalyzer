@@ -78,8 +78,8 @@ auto WhileNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -
 }
 
 auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
-                                        std::shared_ptr<UsesMap> uses_map,
-                                        const std::shared_ptr<StatementListNode>& node) const
+                                        const std::shared_ptr<UsesMap>& uses_map,
+                                        const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
     auto combined_set = std::unordered_set<std::string>();
     auto statements = node->statements;
@@ -122,7 +122,7 @@ auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_faca
     return combined_set;
 }
 
-auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const -> std::unordered_set<std::string> {
+auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
     // Parent* relationship) are handled by PKB.
     auto statement_nums = std::unordered_set<std::string>{};

@@ -9,7 +9,7 @@ using UsesMap =
 
 class UsesMixin {
   public:
-    virtual auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+    [[nodiscard]] virtual auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
                                    std::shared_ptr<UsesMap> uses_map) const -> std::unordered_set<std::string> = 0;
     virtual ~UsesMixin() = default;
 };

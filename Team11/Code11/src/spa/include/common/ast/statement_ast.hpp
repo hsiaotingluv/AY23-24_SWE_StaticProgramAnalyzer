@@ -77,18 +77,19 @@ class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
         -> std::unordered_set<std::string> override;
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
+    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                                         std::shared_ptr<UsesMap> uses_map) const
         -> std::unordered_set<std::string> override;
 };
 
 class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, public UsesMixin {
-  private:
-    auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
-    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map,
-                                 const std::shared_ptr<StatementListNode>& node) const
+    [[nodiscard]] auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
+    [[nodiscard]] auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+                                               std::shared_ptr<UsesMap> uses_map,
+                                               const std::shared_ptr<StatementListNode>& node) const
         -> std::unordered_set<std::string>;
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
-        -> std::unordered_set<std::string> override;
+    [[nodiscard]] auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
+        -> std::unordered_set<std::string>;
 
   public:
     std::shared_ptr<AstNode> cond_expr;
@@ -108,19 +109,21 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
         -> std::unordered_set<std::string> override;
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
+    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                                         std::shared_ptr<UsesMap> uses_map) const
         -> std::unordered_set<std::string> override;
     auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 
 class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin, public UsesMixin {
-  private:
-    auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
-    auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map,
-                                 const std::shared_ptr<StatementListNode>& node) const
+    [[nodiscard]] auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const
         -> std::unordered_set<std::string>;
-    auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node) const
-        -> std::unordered_set<std::string> override;
+    [[nodiscard]] static auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+                                               const std::shared_ptr<UsesMap>& uses_map,
+                                               const std::shared_ptr<StatementListNode>& node)
+        -> std::unordered_set<std::string>;
+    [[nodiscard]] static auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node)
+        -> std::unordered_set<std::string>;
 
   public:
     std::shared_ptr<AstNode> cond_expr;
@@ -137,14 +140,16 @@ class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap> modify_map)
         -> std::unordered_set<std::string> override;
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
+    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                                         std::shared_ptr<UsesMap> uses_map) const
         -> std::unordered_set<std::string> override;
     auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
 };
 
 class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMixin {
   private:
-    auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string>;
+    [[nodiscard]] auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const
+        -> std::unordered_set<std::string>;
 
   public:
     std::shared_ptr<VarNode> variable;
@@ -161,7 +166,8 @@ class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMi
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<ModifyMap>)
         -> std::unordered_set<std::string> override;
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, std::shared_ptr<UsesMap> uses_map) const
+    [[nodiscard]] auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+                                         std::shared_ptr<UsesMap> uses_map) const
         -> std::unordered_set<std::string> override;
 };
 } // namespace sp

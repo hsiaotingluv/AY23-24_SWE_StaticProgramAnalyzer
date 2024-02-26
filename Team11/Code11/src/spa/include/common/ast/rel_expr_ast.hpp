@@ -12,24 +12,10 @@ class ComparatorNode : public sp::AstNode {
         : AstNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
-    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override {
-        return {left, right};
-    }
+    auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
 
-    [[nodiscard]] auto identifier() const -> std::stringstream override {
-        auto ss = std::stringstream();
-        ss << get_node_name() << "(" << *left << ", " << *right << ")";
-        return ss;
-    }
-
-    [[nodiscard]] auto to_xml() const -> std::string override {
-        auto start_xml = "<" + get_node_name() + ">";
-        auto left_xml = left->to_xml();
-        auto right_xml = right->to_xml();
-        auto end_xml = "</" + get_node_name() + ">";
-
-        return start_xml + left_xml + right_xml + end_xml;
-    }
+    [[nodiscard]] auto identifier() const -> std::stringstream override;
+    [[nodiscard]] auto to_xml() const -> std::string override;
 };
 
 class GreaterThanNode : public ComparatorNode {
