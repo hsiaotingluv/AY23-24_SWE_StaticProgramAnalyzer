@@ -216,6 +216,556 @@ TEST_CASE("Test Evaluator Entities") {
     }
 }
 
+TEST_CASE("Test Evaluator Parent") {
+    const auto &[read_facade, write_facade] = PKB::create_facades();
+
+    // Populate PKB
+    const auto if_strs = std::vector<std::string>{"1"};
+    const auto while_strs = std::vector<std::string>{"3"};
+    const auto assign_strs = std::vector<std::string>{"2", "4", "5"};
+
+    for (const auto &x: if_strs) {
+        write_facade->add_statement(x, StatementType::If);
+    }
+    for (const auto &x: while_strs) {
+        write_facade->add_statement(x, StatementType::While);
+    }
+    for (const auto &x: assign_strs) {
+        write_facade->add_statement(x, StatementType::Assign);
+    }
+
+    write_facade->add_parent("1", "2");
+    write_facade->add_parent("3", "4");
+
+    auto evaluator = QueryEvaluator{read_facade};
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(if1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<IfSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<IfSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, if2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<IfSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<IfSynonym>("s2")}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(while1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<WhileSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<WhileSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<WhileSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, while2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<WhileSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, 4)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{"4"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, 5)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), Integer{"5"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(s1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
+    }
+
+    SECTION("Evaluate - Select s2 such that Parent(3, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s2"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{Integer{"3"}, std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"4"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(3, 4)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{Integer{"3"}, Integer{"4"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(3, 5)") {
+        const auto query = Query{
+                Synonyms{
+                    std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                    std::make_shared<SuchThatClause>(
+                    Parent{Integer{"3"}, Integer{"5"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(3, _)") {
+        const auto query = Query{
+                Synonyms{
+                    std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{Integer{"3"}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s2 such that Parent(_, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s2")
+                },
+                std::make_shared<AnyStmtSynonym>("s2"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "4"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(_, 2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{WildCard{}, Integer{"2"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(_, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{WildCard{}, Integer{"3"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(_, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                Parent{WildCard{}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+}
+
+TEST_CASE("Test Evaluator Parent*") {
+    const auto &[read_facade, write_facade] = PKB::create_facades();
+
+    // Populate PKB
+    const auto if_strs = std::vector<std::string>{"1", "2"};
+    const auto while_strs = std::vector<std::string>{"4", "5"};
+    const auto assign_strs = std::vector<std::string>{"3", "6", "7"};
+
+    for (const auto &x: if_strs) {
+        write_facade->add_statement(x, StatementType::If);
+    }
+    for (const auto &x: while_strs) {
+        write_facade->add_statement(x, StatementType::While);
+    }
+    for (const auto &x: assign_strs) {
+        write_facade->add_statement(x, StatementType::Assign);
+    }
+
+    write_facade->add_parent("1", "2");
+    write_facade->add_parent("2", "3");
+    write_facade->add_parent("4", "5");
+    write_facade->add_parent("5", "6");
+    write_facade->finalise_pkb();
+
+    auto evaluator = QueryEvaluator{read_facade};
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(if1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<IfSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<IfSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, if2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<IfSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<IfSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(while1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<WhileSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<WhileSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<WhileSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, while2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<WhileSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"4"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, 7)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"7"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(s1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s2 such that Parent*(1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s2"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(1, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{Integer{"1"}, Integer{"3"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(1, 7)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{Integer{"1"}, Integer{"7"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{Integer{"1"}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7"});
+    }
+
+    SECTION("Evaluate - Select s2 such that Parent*(_, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s2")
+                },
+                std::make_shared<AnyStmtSynonym>("s2"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "3", "5", "6"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(_, 2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{WildCard{}, Integer{"2"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent*(_, 7)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{WildCard{}, Integer{"7"}}),
+                },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Parent(_, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1")
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ParentT{WildCard{}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7"});
+    }
+}
+
+
 TEST_CASE("Test Evaluator Follows") {
     const auto& [read_facade, write_facade] = PKB::create_facades();
 
@@ -272,7 +822,7 @@ TEST_CASE("Test Evaluator Follows") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1"});
     }
 
-    SECTION("Evaluate - Select s2 such that Follows (s2, 2)") {
+    SECTION("Evaluate - Select s2 such that Follows (s2, 10)") {
         const auto query = Query{
             Synonyms{
                 std::make_shared<AnyStmtSynonym>("s2"),
@@ -719,5 +1269,629 @@ TEST_CASE("Test Evaluator Pattern") {
 
         const auto expected = std::vector<std::string>{"1"};
         require_equal(evaluator.evaluate(query), expected);
+    }
+}
+
+TEST_CASE("Test Evaluator Follows*"){
+    const auto& [read_facade, write_facade] = PKB::create_facades();
+
+    // Populate PKB
+    const auto assign_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
+    for (const auto& x : assign_strs) {
+        write_facade->add_statement(x, StatementType::Assign);
+    }
+    write_facade->add_follows("1", "2");
+    write_facade->add_follows("2", "3");
+    write_facade->finalise_pkb();
+
+    auto evaluator = QueryEvaluator{read_facade};
+
+    SECTION("Evaluate - Select s1 such that Follows* (s1, s2)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<AnyStmtSynonym>("s2"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (s1, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (s1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (1, s1)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (1, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"1"}, Integer{"3"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), assign_strs);
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (1, 5)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"1"}, Integer{"5"}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"1"}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), assign_strs);
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (5, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"5"}, WildCard{}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (10, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{Integer{"10"}, WildCard{}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (_, s1)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{ WildCard{}, std::make_shared<AnyStmtSynonym>("s1")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (_, 3)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{ WildCard{}, Integer{"3"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), assign_strs);
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (_, 1)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{ WildCard{}, Integer{"1"}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Follows* (_, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                FollowsT{ WildCard{}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), assign_strs);
+    }
+
+}
+
+TEST_CASE("Test Evaluator UsesS"){
+    const auto& [read_facade, write_facade] = PKB::create_facades();
+
+    // Populate PKB
+    write_facade->add_statement("1", StatementType::Assign);
+    write_facade->add_statement("2", StatementType::Print);
+    write_facade->add_statement("3", StatementType::If);
+    write_facade->add_statement("4", StatementType::While);
+    write_facade->add_statement("5", StatementType::Assign);
+
+    write_facade->add_variable("a");
+    write_facade->add_variable("b");
+    write_facade->add_statement_uses_var("1", "a");
+    write_facade->add_statement_uses_var("2", "b");
+    write_facade->add_statement_uses_var("3", "a");
+    write_facade->add_statement_uses_var("4", "b");
+
+    write_facade->finalise_pkb();
+
+    auto evaluator = QueryEvaluator{read_facade};
+
+    SECTION("Evaluate - Select s1 such that Uses(s1, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
+    }
+
+    SECTION("Evaluate - Select a such that Uses(a, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AssignSynonym>("a"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<AssignSynonym>("a"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1"});
+    }
+
+    SECTION("Evaluate - Select pn such that Uses(pn, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<PrintSynonym>("pn"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<PrintSynonym>("pn"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<PrintSynonym>("pn"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2"});
+    }
+
+    SECTION("Evaluate - Select v such that Uses(if1, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<IfSynonym>("if1"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<IfSynonym>("if1"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"a"});
+    }
+
+    SECTION("Evaluate - Select v such that Uses(w, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<WhileSynonym>("w"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<WhileSynonym>("w"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"b"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Uses(s1, \"a\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<AnyStmtSynonym>("s1"), QuotedIdent{"a"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Uses(s1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
+    }
+
+    SECTION("Evaluate - Select v such that Uses(3, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{Integer{"3"}, std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"a"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Uses(3, \"a\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{Integer{"3"}, QuotedIdent{"a"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+    SECTION("Evaluate - Select s1 such that Uses(3, \"b\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{Integer{"3"}, QuotedIdent{"b"}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Uses(3, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{Integer{"3"}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Uses(5, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                UsesS{Integer{"5"}, WildCard{}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+}
+
+TEST_CASE("Test Evaluator ModifiesS") {
+    const auto &[read_facade, write_facade] = PKB::create_facades();
+
+    // Populate PKB
+    write_facade->add_statement("1", StatementType::Assign);
+    write_facade->add_statement("2", StatementType::Read);
+    write_facade->add_statement("3", StatementType::If);
+    write_facade->add_statement("4", StatementType::While);
+    write_facade->add_statement("5", StatementType::Assign);
+
+    write_facade->add_variable("a");
+    write_facade->add_variable("b");
+    write_facade->add_statement_modifies_var("1", "a");
+    write_facade->add_statement_modifies_var("2", "b");
+    write_facade->add_statement_modifies_var("3", "a");
+    write_facade->add_statement_modifies_var("4", "b");
+
+    write_facade->finalise_pkb();
+
+    auto evaluator = QueryEvaluator{read_facade};
+
+    SECTION("Evaluate - Select s1 such that Modifies(s1, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
+    }
+
+    SECTION("Evaluate - Select a such that Modifies(a, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AssignSynonym>("a"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<AssignSynonym>("a"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1"});
+    }
+
+    SECTION("Evaluate - Select r such that Modifies(r, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<ReadSynonym>("r"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<ReadSynonym>("r"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<ReadSynonym>("r"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2"});
+    }
+
+    SECTION("Evaluate - Select v such that Modifies(if1, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<IfSynonym>("if1"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<IfSynonym>("if1"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"a"});
+    }
+
+    SECTION("Evaluate - Select v such that Modifies(w, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<WhileSynonym>("w"),
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<WhileSynonym>("w"), std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"b"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Modifies(s1, \"a\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<AnyStmtSynonym>("s1"), QuotedIdent{"a"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Modifies(s1, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
+    }
+
+    SECTION("Evaluate - Select v such that Modifies(3, v)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<VarSynonym>("v"),
+                },
+                std::make_shared<VarSynonym>("v"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{Integer{"3"}, std::make_shared<VarSynonym>("v")}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"a"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Modifies(3, \"a\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{Integer{"3"}, QuotedIdent{"a"}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }SECTION("Evaluate - Select s1 such that Modifies(3, \"b\")") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{Integer{"3"}, QuotedIdent{"b"}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that Modifies(3, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{Integer{"3"}, WildCard{}}),
+                },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
+    SECTION("Evaluate - Select s1 such that Modifies(5, _)") {
+        const auto query = Query{
+                Synonyms{
+                        std::make_shared<AnyStmtSynonym>("s1"),
+                },
+                std::make_shared<AnyStmtSynonym>("s1"),
+                std::vector<std::shared_ptr<Clause>>{
+                        std::make_shared<SuchThatClause>(
+                                ModifiesS{Integer{"5"}, WildCard{}}),
+                },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
     }
 }

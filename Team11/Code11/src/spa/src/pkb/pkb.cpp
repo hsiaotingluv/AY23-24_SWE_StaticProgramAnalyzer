@@ -19,8 +19,7 @@ PKB::PKB()
 }
 
 auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
-    PKB* raw_ptr_pkb = new PKB();
-    auto pkb = std::shared_ptr<PKB>(raw_ptr_pkb);
+    auto pkb = std::make_shared<PKB>();
     auto read_facade = std::make_shared<ReadFacade>(pkb);
     auto write_facade = std::make_shared<WriteFacade>(pkb);
 
