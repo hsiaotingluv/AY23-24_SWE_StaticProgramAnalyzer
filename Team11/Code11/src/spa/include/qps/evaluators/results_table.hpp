@@ -2,6 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/parser/semantic_analyser.hpp"
 #include <memory>
 #include <optional>
 #include <vector>
@@ -54,7 +55,7 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
 }
 
 auto join(const Table& table1, const Table& table2) -> std::optional<Table>;
-auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string>;
+auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
 void print(const Table& table);
 
 namespace detail {

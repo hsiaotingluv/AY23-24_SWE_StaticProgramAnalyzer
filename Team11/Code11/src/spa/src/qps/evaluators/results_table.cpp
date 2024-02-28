@@ -1,5 +1,6 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
+#include "qps/parser/semantic_analyser.hpp"
 
 #include <algorithm>
 #include <iterator>
@@ -10,6 +11,7 @@
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace qps::detail {
@@ -601,6 +603,53 @@ auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std
         results.insert(row.at(col_idx));
     }
     return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const Synonyms& synonyms) -> std::vector<std::string> {
+    if (table.get_column().empty()) {
+        // Table is empty --> contradiction
+        return {};
+    }
+
+    const auto column = table.get_column();
+    auto column_indices = std::vector<long>{};
+    for (const auto& synonym : synonyms) {
+        const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
+        if (col_idx == static_cast<long>(column.size())) {
+            // Synonym not found in table
+            return {};
+        }
+        column_indices.push_back(col_idx);
+    }
+
+    // All synonyms found in table -> Populate results
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& row : table.get_records()) {
+        auto curr_row = std::vector<std::string>{};
+        for (const auto& col_idx : column_indices) {
+            curr_row.push_back(row.at(col_idx));
+        }
+        results.insert(std::accumulate(curr_row.begin(), curr_row.end(), std::string{}));
+    }
+
+    return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const Reference& reference) -> std::vector<std::string> {
+    if (table.get_column().empty()) {
+        // Table is empty --> contradiction
+        return {};
+    }
+
+    return std::visit(overloaded{
+                          [&table](const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
+                              return project(table, synonym);
+                          },
+                          [&table](const Synonyms& synonyms) -> std::vector<std::string> {
+                              return project(table, synonyms);
+                          },
+                      },
+                      reference);
 }
 
 void print(const Table& table) {

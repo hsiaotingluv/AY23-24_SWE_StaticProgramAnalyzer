@@ -9,6 +9,9 @@
 #include "qps/template_utils.hpp"
 
 #include <memory>
+#include <optional>
+#include <variant>
+#include <vector>
 
 namespace qps::details {
 // Forward declarations
@@ -19,12 +22,21 @@ auto validate_clause(const Synonyms& declarations,
 } // namespace qps::details
 
 namespace qps {
+using Reference = std::variant<std::shared_ptr<Synonym>, Synonyms>;
+
+inline auto operator<<(std::ostream& os, const Synonyms& reference) -> std::ostream& {
+    for (const auto& synonym : reference) {
+        os << synonym << " ";
+    }
+    return os;
+}
+
 struct Query {
     Synonyms declared;
-    std::shared_ptr<Synonym> reference;
+    Reference reference;
     std::vector<std::shared_ptr<Clause>> clauses;
 
-    Query(Synonyms declared, std::shared_ptr<Synonym> reference, std::vector<std::shared_ptr<Clause>> clauses)
+    Query(Synonyms declared, Reference reference, std::vector<std::shared_ptr<Clause>> clauses)
         : declared(std::move(declared)), reference(std::move(reference)), clauses(std::move(clauses)) {
     }
 
@@ -35,7 +47,7 @@ struct Query {
             os << "\t\t" << declared << "\n";
         }
         os << "\tReference:\n";
-        os << "\t\t" << reference << "\n"; // TODO: dispatch to reference's operator<<
+        os << "\t\t" << reference << "\n";
         os << "\tClauses:\n";
         for (const auto& clause : clauses) {
             os << "\t\t" << clause << "\n";
@@ -67,14 +79,7 @@ class SemanticAnalyser {
         // Reference must be declared
         const auto& maybe_reference = std::visit(VisitorGenerator{}(mapping, declarations), references);
         if (!maybe_reference.has_value()) {
-            const auto string_rep = std::visit(
-                overloaded{
-                    [](const untyped::UntypedSynonym& synonym) {
-                        return synonym.get_name_string();
-                    },
-                },
-                references);
-            return SemanticError{"Undeclared reference: " + string_rep};
+            return SemanticError{"Undeclared reference"};
         }
 
         const auto& reference = maybe_reference.value();
@@ -96,9 +101,24 @@ class SemanticAnalyser {
 
 const auto visitor_generator = [](const auto& mapping, const auto& declarations) {
     return overloaded{
-        [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<std::shared_ptr<Synonym>> {
-            return details::is_synonym_declared(declarations, mapping, synonym);
-        }};
+        [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<Reference> {
+            const auto maybe_results = details::is_synonym_declared(declarations, mapping, synonym);
+
+            return maybe_results.has_value() ? std::optional<Reference>{maybe_results.value()} : std::nullopt;
+        },
+        [&declarations, &mapping](const std::vector<untyped::UntypedSynonym>& synonyms) -> std::optional<Reference> {
+            std::vector<std::shared_ptr<Synonym>> validated_synonyms;
+            for (const auto& synonym : synonyms) {
+                const auto& maybe_synonym = details::is_synonym_declared(declarations, mapping, synonym);
+                if (!maybe_synonym.has_value()) {
+                    return std::nullopt;
+                }
+                validated_synonyms.push_back(maybe_synonym.value());
+            }
+            return validated_synonyms;
+        },
+
+    };
 };
 using VisitorGenerator = decltype(visitor_generator);
 

@@ -1,27 +1,48 @@
 #include "qps/evaluators/query_evaluator.hpp"
+#include "pkb/facades/read_facade.h"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/relationship/pattern_evaluator.hpp"
 #include "qps/evaluators/results_table.hpp"
+#include "qps/parser/semantic_analyser.hpp"
+#include "qps/template_utils.hpp"
 
 #include <memory>
 #include <optional>
-#include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace qps {
 
+auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& read_facade) -> Table {
+    return std::visit(overloaded{
+                          [&read_facade](const std::shared_ptr<Synonym>& synonym) -> Table {
+                              auto table = Table{{synonym}};
+                              for (const auto& result : synonym->scan(read_facade)) {
+                                  table.add_row({result});
+                              }
+                              return table;
+                          },
+                          [&read_facade](const Synonyms& synonyms) -> Table {
+                              auto table = Table{synonyms};
+                              for (const auto& synonym : synonyms) {
+                                  for (const auto& result : synonym->scan(read_facade)) {
+                                      table.add_row({result});
+                                  }
+                              }
+                              return table;
+                          },
+                      },
+                      reference);
+}
+
 auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
-    const auto results = reference->scan(read_facade);
 
-    auto curr_table = Table{{reference}};
-    for (const auto& result : results) {
-        curr_table.add_row({result});
-    }
+    auto curr_table = build_table(reference, read_facade);
 
     if (query_obj.clauses.empty()) {
         // Short-circuit if there are no clauses
-        return {results.begin(), results.end()};
+        return project(curr_table, query_obj.reference);
     }
 
     // Step 1: populate all synonyms

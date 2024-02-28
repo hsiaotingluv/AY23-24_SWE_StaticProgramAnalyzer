@@ -15,7 +15,9 @@ template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
 template <typename T, typename Variant>
-struct is_variant_member;
+struct is_variant_member {
+    static constexpr bool value = false;
+};
 
 template <typename T, typename... Ts>
 struct is_variant_member<T, std::variant<Ts...>> : std::disjunction<std::is_same<T, Ts>...> {};
