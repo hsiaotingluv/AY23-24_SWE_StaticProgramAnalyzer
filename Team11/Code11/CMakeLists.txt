@@ -26,7 +26,7 @@ else ()
     message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 endif ()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
