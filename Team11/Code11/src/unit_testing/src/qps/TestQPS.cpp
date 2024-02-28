@@ -15,6 +15,7 @@
 #include <iterator>
 #include <memory>
 #include <optional>
+#include <variant>
 
 using namespace qps;
 
@@ -290,5 +291,53 @@ TEST_CASE("Test QPS - long queries") {
                            "print pn; read re;  Select p such that Parent (7, 20)";
         const auto output = to_query(qps.parse(query));
         REQUIRE(output.has_value());
+    }
+}
+
+TEST_CASE("Test QPS - Select multiple synonyms") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query with stmt-stmt relationship - 0 synonyms") {
+        const auto query = " procedure p; stmt s; Select <> such that Follows(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(!output.has_value());
+    }
+
+    SECTION("Query with stmt-stmt relationship - 1 synonyms") {
+        const auto query = " procedure p; stmt s; Select <s> such that Follows(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+    }
+
+    SECTION("Query with stmt-stmt relationship - 2 synonyms") {
+        const auto query = " procedure p; stmt s; Select <s, p> such that Follows(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+        require_value<ProcSynonym>(result.reference, "p");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
     }
 }
