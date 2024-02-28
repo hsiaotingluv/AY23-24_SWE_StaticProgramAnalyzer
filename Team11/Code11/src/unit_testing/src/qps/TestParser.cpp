@@ -21,15 +21,17 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(13, s)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -44,8 +46,9 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -53,7 +56,8 @@ TEST_CASE("Test QPSParser") {
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -68,8 +72,9 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -77,7 +82,8 @@ TEST_CASE("Test QPSParser") {
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -92,14 +98,16 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(stmt s; Select s such that Uses(s, "v"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AnyStmtSynonym>(declarations[0], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -114,15 +122,17 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<VarSynonym>(declarations[1], "v");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"p"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"p"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -138,14 +148,16 @@ TEST_CASE("Test QPSParser") {
 Select a pattern a ( _ , _"count + 1"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "a");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"a"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"a"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -159,15 +171,17 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
         const auto& [reference, clauses] = untyped;
 
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -182,14 +196,16 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = "procedure p; Select v";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"v"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
         REQUIRE(clauses.empty());
     }
 
@@ -255,8 +271,9 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) such that Modifies(p, \"v\")";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -264,7 +281,8 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -286,8 +304,9 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) and Modifies(p, \"v\")";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -295,7 +314,8 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
         const auto& [reference, clauses] = untyped;
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"s"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -334,15 +354,17 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
             R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) pattern newa ( "normSq" , _"cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
         const auto& [reference, clauses] = untyped;
 
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -364,15 +386,17 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
             R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) and newa ( "normSq" , _"cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::UntypedQuery>>(output));
-        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
         const auto& [reference, clauses] = untyped;
 
-        REQUIRE(reference == untyped::UntypedSynonym{IDENT{"newa"}});
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));

@@ -4,7 +4,9 @@
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
 #include "qps/parser/semantic_analyser_helper.hpp"
-#include "qps/parser/untyped/entities/query.hpp"
+#include "qps/parser/untyped/entities/synonym.hpp"
+#include "qps/parser/untyped/untyped_parser.hpp"
+#include "qps/template_utils.hpp"
 
 #include <memory>
 
@@ -46,10 +48,12 @@ struct Query {
 #include "qps/parser/semantic_analyser.tpp"
 
 namespace qps {
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename UntypedQueryType,
+          typename VisitorGenerator>
 class SemanticAnalyser {
   public:
-    static auto analyse(const Synonyms& declarations, const untyped::UntypedQuery& untyped_query)
+    static auto analyse(const Synonyms& declarations, const UntypedQueryType& untyped_query)
         -> std::variant<Query, SemanticError> {
         // Declarations must be unique
         const auto& maybe_mapping = details::enforce_unique_declarations(declarations);
@@ -61,9 +65,16 @@ class SemanticAnalyser {
         const auto& [references, clauses] = untyped_query;
 
         // Reference must be declared
-        const auto& maybe_reference = details::is_synonym_declared(declarations, mapping, references);
+        const auto& maybe_reference = std::visit(VisitorGenerator{}(mapping, declarations), references);
         if (!maybe_reference.has_value()) {
-            return SemanticError{"Undeclared reference: " + references.get_name_string()};
+            const auto string_rep = std::visit(
+                overloaded{
+                    [](const untyped::UntypedSynonym& synonym) {
+                        return synonym.get_name_string();
+                    },
+                },
+                references);
+            return SemanticError{"Undeclared reference: " + string_rep};
         }
 
         const auto& reference = maybe_reference.value();
@@ -80,8 +91,17 @@ class SemanticAnalyser {
         }
 
         return Query{declarations, reference, validated_clauses};
-    }
+    };
 };
 
-using DefaultSemanticAnalyser = SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>;
+const auto visitor_generator = [](const auto& mapping, const auto& declarations) {
+    return overloaded{
+        [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<std::shared_ptr<Synonym>> {
+            return details::is_synonym_declared(declarations, mapping, synonym);
+        }};
+};
+using VisitorGenerator = decltype(visitor_generator);
+
+using DefaultSemanticAnalyser = SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList,
+                                                 untyped::DefaultUntypedParser::UntypedQueryType, VisitorGenerator>;
 } // namespace qps
