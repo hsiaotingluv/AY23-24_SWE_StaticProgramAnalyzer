@@ -22,21 +22,6 @@ template <typename SupportedResultParsers, typename SupportedClauseParsers, type
 auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedReference, std::vector<UntypedClauseType>>>;
 
-template <typename... T>
-struct get_return_type;
-
-template <>
-struct get_return_type<TypeList<>> {
-    using type = TypeList<>;
-};
-
-template <typename Head, typename... Tails>
-struct get_return_type<TypeList<Head, Tails...>> {
-    using type = concat_t<TypeList<typename Head::ClauseType>, typename get_return_type<TypeList<Tails...>>::type>;
-};
-
-template <typename T>
-using get_return_type_t = typename get_return_type<T>::type;
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
@@ -46,7 +31,7 @@ class UntypedParser {
     static inline const auto tokeniser_runner =
         tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
 
-    using UntypedClauseType = type_list_to_variant_t<detail::get_return_type_t<SupportedClauseParsers>>;
+    using UntypedClauseType = type_list_to_variant_t<get_return_type_t<SupportedClauseParsers>>;
     using UntypedQueryType = std::tuple<UntypedReference, std::vector<UntypedClauseType>>;
 
   public:

@@ -100,4 +100,20 @@ auto operator==(const std::variant<T>& lhs, const std::variant<T>& rhs) -> bool 
         lhs, rhs);
 }
 
+template <typename... T>
+struct get_return_type;
+
+template <>
+struct get_return_type<TypeList<>> {
+    using type = TypeList<>;
+};
+
+template <typename Head, typename... Tails>
+struct get_return_type<TypeList<Head, Tails...>> {
+    using type = concat_t<TypeList<typename Head::ClauseType>, typename get_return_type<TypeList<Tails...>>::type>;
+};
+
+template <typename T>
+using get_return_type_t = typename get_return_type<T>::type;
+
 } // namespace qps
