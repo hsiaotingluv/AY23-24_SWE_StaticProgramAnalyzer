@@ -343,5 +343,51 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 }
+TEST_CASE("Test QPS - 'and' connectives") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("'FollowsT' and 'ModifiesP'") {
+        const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) and Modifies(p, \"v\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<ProcSynonym>(result.declared[0], "p");
+        require_value<AnyStmtSynonym>(result.declared[1], "s");
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 2);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+
+        const auto reference_clause2 = std::make_shared<SuchThatClause>(
+            ModifiesP{ProcedureRefNoWildcard{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"v"}});
+        REQUIRE(*(result.clauses[1]) == *reference_clause2);
+    }
+
+    SECTION("'pattern A and B' ") {
+        const auto query =
+            R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) and newa ( "normSq" , _"cenX"_))";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 1);
+        require_value<AssignSynonym>(result.declared[0], "newa");
+
+        require_value<AssignSynonym>(result.reference, "newa");
+
+        REQUIRE(result.clauses.size() == 2);
+        const auto reference_clause = std::make_shared<PatternAssignClause>(
+            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+        const auto reference_clause2 = std::make_shared<PatternAssignClause>(
+            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX "});
+        REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
 }
