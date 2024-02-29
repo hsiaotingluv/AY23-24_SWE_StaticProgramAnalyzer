@@ -4,10 +4,12 @@
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/semantic_analyser.hpp"
 #include <memory>
-#include <optional>
+#include <variant>
 #include <vector>
 
 namespace qps {
+
+struct UnitTable {};
 
 class Table {
     std::vector<std::shared_ptr<Synonym>> record_type;
@@ -44,6 +46,11 @@ class Table {
     }
 };
 
+using OutputTable = std::variant<Table, UnitTable>;
+
+auto is_empty(const OutputTable& table) -> bool;
+auto is_unit(const OutputTable& table) -> bool;
+
 template <class T>
 void reorder(std::vector<T>& v, std::vector<int> const& order) {
     std::vector<T> v_copy(v.size());
@@ -54,8 +61,9 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
     v = v_copy;
 }
 
-auto join(const Table& table1, const Table& table2) -> std::optional<Table>;
-auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
+auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable;
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+    -> std::vector<std::string>;
 void print(const Table& table);
 
 namespace detail {
@@ -71,15 +79,15 @@ auto ordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
                        const std::vector<std::shared_ptr<Synonym>>& column2) -> std::vector<std::shared_ptr<Synonym>>;
 
 // Join strategies
-auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> std::optional<Table>;
+auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> OutputTable;
 
-auto cross_join(const Table& table1, const Table& table2) -> std::optional<Table>;
-auto cross_join(Table&& table1, Table&& table2) -> std::optional<Table>;
+auto cross_join(const Table& table1, const Table& table2) -> OutputTable;
+auto cross_join(Table&& table1, Table&& table2) -> OutputTable;
 
-auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table>;
-// auto merge_join(Table&& table1, Table&& table2) -> std::optional<Table>;
+auto merge_join(const Table& table1, const Table& table2) -> OutputTable;
+// auto merge_join(Table&& table1, Table&& table2) -> OutputTable;
 
-auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table>;
+auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable;
 
 } // namespace detail
 } // namespace qps

@@ -7,22 +7,21 @@
 #include "qps/template_utils.hpp"
 
 #include <memory>
-#include <optional>
 #include <variant>
 #include <vector>
 
 namespace qps {
 
-auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& read_facade) -> Table {
+auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& read_facade) -> OutputTable {
     return std::visit(overloaded{
-                          [&read_facade](const std::shared_ptr<Synonym>& synonym) -> Table {
+                          [&read_facade](const std::shared_ptr<Synonym>& synonym) -> OutputTable {
                               auto table = Table{{synonym}};
                               for (const auto& result : synonym->scan(read_facade)) {
                                   table.add_row({result});
                               }
                               return table;
                           },
-                          [&read_facade](const Synonyms& synonyms) -> Table {
+                          [&read_facade](const Synonyms& synonyms) -> OutputTable {
                               auto table = Table{synonyms};
                               for (const auto& synonym : synonyms) {
                                   for (const auto& result : synonym->scan(read_facade)) {
@@ -30,6 +29,9 @@ auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& 
                                   }
                               }
                               return table;
+                          },
+                          [&read_facade](const BooleanReference&) -> OutputTable {
+                              return UnitTable{};
                           },
                       },
                       reference);
@@ -42,7 +44,7 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 
     if (query_obj.clauses.empty()) {
         // Short-circuit if there are no clauses
-        return project(curr_table, query_obj.reference);
+        return project(read_facade, curr_table, query_obj.reference);
     }
 
     // Step 1: populate all synonyms
@@ -59,22 +61,20 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
             return {};
         }
 
-        const auto maybe_table = evaluator->evaluate();
-        if (!maybe_table.has_value()) {
+        const auto next_table = evaluator->evaluate();
+        if (is_empty(next_table)) {
             return {};
         }
 
-        const auto& next_table = maybe_table.value();
-        const auto maybe_new_table = join(curr_table, next_table);
-        if (!maybe_new_table.has_value()) {
+        curr_table = join(curr_table, next_table);
+        if (is_empty(curr_table)) {
             // Conflict detected -> no results
             return {};
         }
-        curr_table = maybe_new_table.value();
     }
 
     // Step 2: project to relevant synonym
-    return project(curr_table, query_obj.reference);
+    return project(read_facade, curr_table, query_obj.reference);
 };
 
 } // namespace qps

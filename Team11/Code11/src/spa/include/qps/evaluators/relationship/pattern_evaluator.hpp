@@ -15,44 +15,41 @@ class PatternEvaluator : public ClauseEvaluator {
 
     // e.g. pattern a(x, _"v"_)
     [[nodiscard]] auto eval_pattern(const std::shared_ptr<Synonym>& synonym,
-                                    const qps::PartialMatch& partial_match) const -> std::optional<Table>;
+                                    const qps::PartialMatch& partial_match) const -> OutputTable;
 
     // e.g. pattern a(x, _)
-    [[nodiscard]] auto eval_pattern(const std::shared_ptr<Synonym>& synonym, const qps::WildCard&) const
-        -> std::optional<Table>;
+    [[nodiscard]] auto eval_pattern(const std::shared_ptr<Synonym>& synonym, const qps::WildCard&) const -> OutputTable;
 
     // e.g. pattern a("x", _"v"_)
     [[nodiscard]] auto eval_pattern(const qps::QuotedIdent& quoted_ident, const qps::PartialMatch& partial_match) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. pattern a("x", _)
-    [[nodiscard]] auto eval_pattern(const qps::QuotedIdent& quoted_ident, const qps::WildCard&) const
-        -> std::optional<Table>;
+    [[nodiscard]] auto eval_pattern(const qps::QuotedIdent& quoted_ident, const qps::WildCard&) const -> OutputTable;
 
     // e.g. pattern a(_, _"v"_)
     [[nodiscard]] auto eval_pattern(const qps::WildCard& wild_card, const qps::PartialMatch& partial_match) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. pattern a(_, _)
-    [[nodiscard]] auto eval_pattern(const qps::WildCard&, const qps::WildCard&) const -> std::optional<Table>;
+    [[nodiscard]] auto eval_pattern(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
     // e.g. pattern a(_, "v")
-    [[nodiscard]] auto eval_pattern(const WildCard&, const ExactMatch& exact) const -> std::optional<Table>;
+    [[nodiscard]] auto eval_pattern(const WildCard&, const ExactMatch& exact) const -> OutputTable;
 
     // e.g. pattern a(x, "v")
     [[nodiscard]] auto eval_pattern(const std::shared_ptr<Synonym>& synonym, const ExactMatch& exact) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. pattern a("x", "v")
-    [[nodiscard]] auto eval_pattern(const QuotedIdent& quoted_ident, const ExactMatch& exact) const
-        -> std::optional<Table>;
+    [[nodiscard]] auto eval_pattern(const QuotedIdent& quoted_ident, const ExactMatch& exact) const -> OutputTable;
 
   public:
     PatternEvaluator(std::shared_ptr<ReadFacade> read_facade, PatternAssignClause pattern)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), pattern(std::move(pattern)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> std::optional<Table> override;
+    [[nodiscard]] auto evaluate() const -> OutputTable override;
 };
 
 } // namespace qps
