@@ -29,17 +29,17 @@ struct UntypedSuchThatClause {
 };
 
 struct UntypedPatternClause {
-    UntypedSynonym assign_synonym;
+    UntypedSynonym synonym;
     UntypedEntRef ent_ref;
     ExpressionSpec expression_spec;
 
-    UntypedPatternClause(UntypedSynonym assign_synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec)
-        : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
+    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec)
+        : synonym(std::move(synonym)), ent_ref(std::move(ent_ref)),
           expression_spec(std::move(expression_spec)) {
     }
 
     auto operator==(const UntypedPatternClause& rhs) const -> bool {
-        return assign_synonym == rhs.assign_synonym && ent_ref == rhs.ent_ref && expression_spec == rhs.expression_spec;
+        return synonym == rhs.synonym && ent_ref == rhs.ent_ref && expression_spec == rhs.expression_spec;
     }
 };
 

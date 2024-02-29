@@ -20,7 +20,7 @@ class PatternAssign {
 
     auto operator==(const PatternAssign& other) const -> bool;
 
-    [[nodiscard]] auto get_assign_synonym() const -> std::shared_ptr<AssignSynonym> {
+    [[nodiscard]] auto get_synonym() const -> std::shared_ptr<AssignSynonym> {
         return assign_synonym;
     }
 

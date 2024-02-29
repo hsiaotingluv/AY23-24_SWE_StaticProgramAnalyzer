@@ -26,7 +26,7 @@ struct Clause {
 struct SuchThatClause : public Clause {
     Relationship rel_ref;
 
-    SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
+    explicit SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
