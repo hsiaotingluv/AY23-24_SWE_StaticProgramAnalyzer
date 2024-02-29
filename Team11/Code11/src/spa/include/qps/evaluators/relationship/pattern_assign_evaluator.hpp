@@ -4,12 +4,12 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/relationship/clause_evaluator.hpp"
-#include "qps/parser/entities/clause.hpp"
+#include "qps/parser/entities/syntactic_pattern.hpp"
 
 namespace qps {
-class PatternEvaluator : public ClauseEvaluator {
+class PatternAssignEvaluator : public ClauseEvaluator {
     std::shared_ptr<ReadFacade> read_facade;
-    PatternAssignClause pattern;
+    PatternAssign pattern;
 
     [[nodiscard]] auto select_eval_method() const;
 
@@ -45,7 +45,7 @@ class PatternEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_pattern(const QuotedIdent& quoted_ident, const ExactMatch& exact) const -> OutputTable;
 
   public:
-    PatternEvaluator(std::shared_ptr<ReadFacade> read_facade, PatternAssignClause pattern)
+    PatternAssignEvaluator(std::shared_ptr<ReadFacade> read_facade, PatternAssign pattern)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), pattern(std::move(pattern)) {
     }
 

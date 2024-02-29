@@ -3,6 +3,7 @@
 #include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
+#include "qps/parser/entities/syntactic_pattern.hpp"
 #include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
@@ -218,7 +219,7 @@ auto untyped_clause_visitor(const Synonyms& declarations,
             }
 
             const auto& ent_ref = maybe_ent_ref.value();
-            return std::make_shared<PatternAssignClause>(assign_syn, ent_ref, pattern.expression_spec);
+            return std::make_shared<PatternClause>(PatternAssign{assign_syn, ent_ref, pattern.expression_spec});
         }};
 };
 

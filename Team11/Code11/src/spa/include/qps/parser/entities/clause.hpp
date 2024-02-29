@@ -1,7 +1,6 @@
 #pragma once
 #include "qps/parser/entities/relationship.hpp"
-#include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/expression_parser.hpp"
+#include "qps/parser/entities/syntactic_pattern.hpp"
 
 namespace qps {
 
@@ -42,25 +41,21 @@ struct SuchThatClause : public Clause {
     }
 };
 
-struct PatternAssignClause : public Clause {
-    std::shared_ptr<AssignSynonym> assign_synonym;
-    EntRef ent_ref;
-    ExpressionSpec expression_spec;
+struct PatternClause : public Clause {
+    SyntacticPattern syntactic_pattern;
 
-    PatternAssignClause(std::shared_ptr<AssignSynonym> assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
-        : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
-          expression_spec(std::move(expression_spec)) {
+    explicit PatternClause(SyntacticPattern syntactic_pattern) : syntactic_pattern(std::move(syntactic_pattern)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
 
-    auto operator==(const PatternAssignClause& other) const -> bool;
+    auto operator==(const PatternClause& other) const -> bool;
 
     [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
-        if (typeid(other) != typeid(PatternAssignClause)) {
+        if (typeid(other) != typeid(PatternClause)) {
             return false;
         }
-        return *this == dynamic_cast<const PatternAssignClause&>(other);
+        return *this == dynamic_cast<const PatternClause&>(other);
     }
 };
 
