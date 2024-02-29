@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "qps/parser.hpp"
 #include "utils.hpp"
 
 #include "qps/parser/entities/primitives.hpp"
@@ -423,5 +424,43 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
         const auto query = R"(assign a; Select a pattern a ( _ , _"count + 1"_) and a ( _ , _"count + 1"_) and)";
         const auto output = parser.parse(query);
         REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+}
+
+TEST_CASE("Test Parser - pattern clause with 3 arg") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("Test Parser - pattern if") {
+        const auto query = R"(if a; variable v; Select a pattern a ( v , _, _))";
+        const auto output = parser.parse(query);
+
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+
+        REQUIRE(declarations.size() == 2);
+        require_value<IfSynonym>(declarations[0], "a");
+        require_value<VarSynonym>(declarations[1], "v");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"a"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}},
+                                                                    untyped::UntypedSynonym{IDENT{"v"}}, WildCard{}};
+        REQUIRE(pattern_clause == reference_clause);
+    }
+
+    SECTION("Test Parser - pattern 3 args Syntax Error") {
+        const auto query = R"(while a; variable v; Select a pattern a ( _ , _, v))";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+
+        const auto query2 = R"(while a; variable v; Select a pattern a ( _ , v, _))";
+        const auto output2 = parser.parse(query2);
+        REQUIRE(std::holds_alternative<SyntaxError>(output2));
     }
 }

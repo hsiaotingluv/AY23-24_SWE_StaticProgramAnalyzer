@@ -466,3 +466,24 @@ TEST_CASE("Test QPS - BOOLEAN") {
         REQUIRE(is_semantic_error(output));
     }
 }
+
+TEST_CASE("Test QPS - Pattern If") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query with pattern if clause") {
+        const auto query = R"(if ifs;Select ifs pattern ifs ( "normSq" , _, _))";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 1);
+        require_value<IfSynonym>(result.declared[0], "ifs");
+        require_value<IfSynonym>(result.reference, "ifs");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<PatternClause>(
+            PatternIf{std::make_shared<IfSynonym>(IDENT{"ifs"}), QuotedIdent{"normSq"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+}

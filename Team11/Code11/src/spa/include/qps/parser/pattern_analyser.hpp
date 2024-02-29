@@ -82,5 +82,29 @@ class PatternWhileAnalyser {
     }
 };
 
-using DefaultPatternAnalysersList = TypeList<PatternAssignAnalyser, PatternWhileAnalyser>;
+class PatternIfAnalyser {
+
+  public:
+    static auto analyse(const Synonyms& declarations,
+                        const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                        const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
+        const auto& maybe_synonym = details::require<IfSynonym>(pattern.synonym, declarations, mapping);
+        if (!maybe_synonym.has_value()) {
+            return std::nullopt;
+        }
+        const auto maybe_ent_ref = details::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
+        if (!maybe_ent_ref.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto is_wildcard = std::holds_alternative<WildCard>(pattern.expression_spec);
+        if (!is_wildcard) {
+            return std::nullopt;
+        }
+
+        return PatternIf{std::dynamic_pointer_cast<IfSynonym>(maybe_synonym.value()), maybe_ent_ref.value()};
+    }
+};
+
+using DefaultPatternAnalysersList = TypeList<PatternAssignAnalyser, PatternWhileAnalyser, PatternIfAnalyser>;
 } // namespace qps

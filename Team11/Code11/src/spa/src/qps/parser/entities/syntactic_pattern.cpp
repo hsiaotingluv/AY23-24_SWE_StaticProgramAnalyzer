@@ -18,4 +18,12 @@ auto operator<<(std::ostream& os, const PatternWhile& pattern_while) -> std::ost
 auto PatternWhile::operator==(const PatternWhile& other) const -> bool {
     return while_synonym == other.while_synonym && ent_ref == other.ent_ref;
 }
+
+auto operator<<(std::ostream& os, const PatternIf& pattern_if) -> std::ostream& {
+    return os << "While(" << pattern_if.if_synonym << ", " << pattern_if.ent_ref << ")";
+}
+
+auto PatternIf::operator==(const PatternIf& other) const -> bool {
+    return if_synonym == other.if_synonym && ent_ref == other.ent_ref;
+}
 } // namespace qps

@@ -7,8 +7,8 @@
 
 namespace qps::untyped::detail {
 template <unsigned long N>
-auto parse_rel_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
-                    const std::vector<Token>::const_iterator& end)
+auto parse_pattern_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
+                        const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>>;
 } // namespace qps::untyped::detail
 
@@ -39,7 +39,7 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
             it = maybe_and.value();
         }
 
-        const auto maybe_success = detail::parse_rel_cond(keywords, it, end);
+        const auto maybe_success = detail::parse_pattern_cond(keywords, it, end);
         if (!maybe_success.has_value()) {
             return std::nullopt;
         }
@@ -67,8 +67,8 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
 }
 
 template <unsigned long N>
-auto parse_rel_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
-                    const std::vector<Token>::const_iterator& end)
+auto parse_pattern_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
+                        const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;
     if (std::distance(it, end) < EXPECTED_LENGTH) {
@@ -116,17 +116,44 @@ auto parse_rel_cond(const std::array<std::string_view, N>& keywords, std::vector
     const auto& [expr_spec, rest2] = maybe_expr_spec.value();
     it = rest2;
 
-    // Expects closing bracket
+    // Expects closing bracket, or comma
     if (std::distance(it, end) < 1) {
         return std::nullopt;
     }
 
     const auto maybe_close_bracket = *it;
-    if (!is_close_bracket(maybe_close_bracket)) {
-        return std::nullopt;
-    }
-    it = std::next(it, 1);
+    if (is_close_bracket(maybe_close_bracket)) {
+        it = std::next(it, 1);
+        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+    } else {
+        // Expects comma
+        const auto maybe_comma = *it;
+        if (!is_comma(maybe_comma)) {
+            return std::nullopt;
+        }
+        it = std::next(it, 1);
 
-    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+        // Expects wildcard
+        const auto maybe_wildcard = *it;
+        if (!is_wildcard(maybe_wildcard)) {
+            return std::nullopt;
+        }
+        it = std::next(it, 1);
+
+        // Expects closing bracket
+        const auto maybe_close_bracket = *it;
+        if (!is_close_bracket(maybe_close_bracket)) {
+            return std::nullopt;
+        }
+        it = std::next(it, 1);
+
+        // Require expression spec to be wildcard
+        const auto is_wildcard = std::holds_alternative<WildCard>(expr_spec);
+        if (!is_wildcard) {
+            return std::nullopt;
+        }
+
+        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+    }
 }
 } // namespace qps::untyped::detail
