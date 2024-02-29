@@ -34,5 +34,31 @@ class PatternAssign {
     }
 };
 
-using SyntacticPattern = std::variant<PatternAssign>;
+class PatternWhile {
+    std::shared_ptr<WhileSynonym> while_synonym;
+    EntRef ent_ref;
+
+  public:
+    PatternWhile(std::shared_ptr<WhileSynonym> while_synonym, EntRef ent_ref)
+        : while_synonym(std::move(while_synonym)), ent_ref(std::move(ent_ref)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const PatternWhile& follows) -> std::ostream&;
+
+    auto operator==(const PatternWhile& other) const -> bool;
+
+    [[nodiscard]] auto get_synonym() const -> std::shared_ptr<WhileSynonym> {
+        return while_synonym;
+    }
+
+    [[nodiscard]] auto get_ent_ref() const -> EntRef {
+        return ent_ref;
+    }
+
+    [[nodiscard]] auto get_expression_spec() const -> ExpressionSpec {
+        return WildCard{};
+    }
+};
+
+using SyntacticPattern = std::variant<PatternAssign, PatternWhile>;
 } // namespace qps

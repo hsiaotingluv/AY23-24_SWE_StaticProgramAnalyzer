@@ -199,6 +199,31 @@ Select a pattern a ( _ , _"count + 1"_))";
             std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "}});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
+
+    SECTION("Query with pattern while clause") {
+        const auto query = R"(while newa;Select newa pattern newa ( "normSq" , _))";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 1);
+
+        require_value<WhileSynonym>(result.declared[0], "newa");
+        require_value<WhileSynonym>(result.reference, "newa");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<PatternClause>(
+            PatternWhile{std::make_shared<WhileSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query with pattern while clause - Invalid Semantics") {
+        const auto query = R"(while newa;Select newa pattern newa ( "normSq" , _"cenX"_))";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_semantic_error(output));
+    }
 }
 
 TEST_CASE("Test QPS - Syntax") {
