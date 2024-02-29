@@ -4,7 +4,8 @@
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/entities/syntactic_pattern.hpp"
-#include "qps/parser/semantic_analyser.hpp"
+#include "qps/parser/semantic_analyser_helper.hpp"
+#include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
@@ -166,7 +167,26 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         }};
 };
 
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+inline auto validate_pattern(const Synonyms& declarations,
+                             const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                             const untyped::UntypedPatternClause& pattern, TypeList<>)
+    -> std::optional<SyntacticPattern> {
+    return std::nullopt;
+}
+
+template <typename Head, typename... Tails>
+auto validate_pattern(const Synonyms& declarations,
+                      const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                      const untyped::UntypedPatternClause& pattern, TypeList<Head, Tails...>)
+    -> std::optional<SyntacticPattern> {
+    const auto& maybe_success = Head::analyse(declarations, mapping, pattern);
+    if (maybe_success.has_value()) {
+        return maybe_success;
+    }
+    return validate_pattern(declarations, mapping, pattern, TypeList<Tails...>{});
+}
+
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList>
 auto untyped_clause_visitor(const Synonyms& declarations,
                             const std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping) {
     return overloaded{
@@ -184,50 +204,21 @@ auto untyped_clause_visitor(const Synonyms& declarations,
         },
         [&declarations,
          &mapping](const untyped::UntypedPatternClause& pattern) -> std::optional<std::shared_ptr<Clause>> {
-            const auto& maybe_syn = is_synonym_declared(declarations, mapping, pattern.assign_synonym);
-
-            if (!maybe_syn.has_value()) {
+            auto maybe_syntactic_pattern = validate_pattern(declarations, mapping, pattern, PatternAnalysersList{});
+            if (!maybe_syntactic_pattern.has_value()) {
                 return std::nullopt;
             }
-            const auto& maybe_assign_syn = std::dynamic_pointer_cast<AssignSynonym>(maybe_syn.value());
-            if (!maybe_assign_syn) {
-                return std::nullopt;
-            }
-            const auto& assign_syn = maybe_assign_syn;
-
-            const auto& maybe_ent_ref = std::visit(
-                overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<EntRef> {
-                               const auto& maybe_synonym = is_synonym_declared(declarations, mapping, synonym);
-                               if (!maybe_synonym.has_value()) {
-                                   return std::nullopt;
-                               }
-
-                               const auto& maybe_variable =
-                                   std::dynamic_pointer_cast<VarSynonym>(maybe_synonym.value());
-                               if (!maybe_variable) {
-                                   return std::nullopt;
-                               }
-                               return maybe_variable;
-                           },
-                           [](const auto& x) -> std::optional<EntRef> {
-                               return x;
-                           }},
-                pattern.ent_ref);
-
-            if (!maybe_ent_ref.has_value()) {
-                return std::nullopt;
-            }
-
-            const auto& ent_ref = maybe_ent_ref.value();
-            return std::make_shared<PatternClause>(PatternAssign{assign_syn, ent_ref, pattern.expression_spec});
+            return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
         }};
 };
 
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList>
 auto validate_clause(const Synonyms& declarations,
                      const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                      const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>> {
 
-    return std::visit(untyped_clause_visitor<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping), clause);
+    return std::visit(
+        untyped_clause_visitor<StmtStmtList, StmtEntList, EntEntList, PatternAnalysersList>(declarations, mapping),
+        clause);
 }
 } // namespace qps::details

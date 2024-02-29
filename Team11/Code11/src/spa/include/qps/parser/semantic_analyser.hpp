@@ -3,6 +3,7 @@
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
+#include "qps/parser/pattern_analyser.hpp"
 #include "qps/parser/semantic_analyser_helper.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
@@ -68,8 +69,8 @@ struct Query {
 
 namespace qps {
 
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename UntypedQueryType,
-          typename VisitorGenerator>
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList,
+          typename UntypedQueryType, typename VisitorGenerator>
 class SemanticAnalyser {
   public:
     static auto analyse(const Synonyms& declarations, const UntypedQueryType& untyped_query)
@@ -95,7 +96,8 @@ class SemanticAnalyser {
         std::vector<std::shared_ptr<Clause>> validated_clauses;
         for (const auto& clause : clauses) {
             const auto& maybe_validated_clause =
-                details::validate_clause<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping, clause);
+                details::validate_clause<StmtStmtList, StmtEntList, EntEntList, PatternAnalysersList>(declarations,
+                                                                                                      mapping, clause);
             if (!maybe_validated_clause.has_value()) {
                 return SemanticError{"Invalid clause"};
             }
@@ -137,7 +139,7 @@ const auto visitor_generator = [](const auto& mapping, const auto& declarations)
     };
 };
 using VisitorGenerator = decltype(visitor_generator);
-
-using DefaultSemanticAnalyser = SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList,
-                                                 untyped::DefaultUntypedParser::UntypedQueryType, VisitorGenerator>;
+using DefaultSemanticAnalyser =
+    SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList, DefaultPatternAnalysersList,
+                     untyped::DefaultUntypedParser::UntypedQueryType, VisitorGenerator>;
 } // namespace qps

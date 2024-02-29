@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qps/parser/entities/primitives.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/expression_parser.hpp"
