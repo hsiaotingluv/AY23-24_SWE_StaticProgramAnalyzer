@@ -22,7 +22,14 @@ auto validate_clause(const Synonyms& declarations,
 } // namespace qps::details
 
 namespace qps {
-using Reference = std::variant<std::shared_ptr<Synonym>, Synonyms>;
+struct BooleanReference {};
+
+inline auto operator<<(std::ostream& os, const BooleanReference& reference) -> std::ostream& {
+    os << "BOOLEAN()";
+    return os;
+}
+
+using Reference = std::variant<std::shared_ptr<Synonym>, Synonyms, BooleanReference>;
 
 inline auto operator<<(std::ostream& os, const Synonyms& reference) -> std::ostream& {
     for (const auto& synonym : reference) {
@@ -102,9 +109,18 @@ class SemanticAnalyser {
 const auto visitor_generator = [](const auto& mapping, const auto& declarations) {
     return overloaded{
         [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<Reference> {
+            static constexpr auto BOOLEAN_STRING = "BOOLEAN";
             const auto maybe_results = details::is_synonym_declared(declarations, mapping, synonym);
+            if (maybe_results.has_value()) {
+                return std::optional<Reference>{maybe_results.value()};
+            }
 
-            return maybe_results.has_value() ? std::optional<Reference>{maybe_results.value()} : std::nullopt;
+            // Special case: BOOLEAN
+            if (synonym.get_name_string() == BOOLEAN_STRING) {
+                return std::optional<Reference>{BooleanReference{}};
+            }
+
+            return std::nullopt;
         },
         [&declarations, &mapping](const std::vector<untyped::UntypedSynonym>& synonyms) -> std::optional<Reference> {
             std::vector<std::shared_ptr<Synonym>> validated_synonyms;

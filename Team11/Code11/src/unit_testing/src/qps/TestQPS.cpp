@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 #include "utils.hpp"
 
@@ -343,6 +344,7 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 }
+
 TEST_CASE("Test QPS - 'and' connectives") {
     const auto qps = qps::DefaultParser{};
 
@@ -389,5 +391,53 @@ TEST_CASE("Test QPS - 'and' connectives") {
         const auto reference_clause2 = std::make_shared<PatternAssignClause>(
             std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX "});
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
+    }
+}
+
+TEST_CASE("Test QPS - BOOLEAN") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query with BOOLEAN reference") {
+        const auto query = " stmt s; Select BOOLEAN such that Follows*(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 1);
+        require_value<AnyStmtSynonym>(result.declared[0], "s");
+        require_boolean(result.reference);
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query with BOOLEAN reference overriden by declaration") {
+        const auto query = " stmt s, BOOLEAN; Select BOOLEAN such that Follows*(s, 13) and Modifies(1, \"v\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 2);
+        require_value<AnyStmtSynonym>(result.declared[0], "s");
+        require_value<AnyStmtSynonym>(result.reference, "BOOLEAN");
+
+        REQUIRE(result.clauses.size() == 2);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+
+        const auto reference_clause2 = std::make_shared<SuchThatClause>(ModifiesS{Integer{"1"}, QuotedIdent{"v"}});
+        REQUIRE(*(result.clauses[1]) == *reference_clause2);
+    }
+
+    SECTION("Invalid Semantics - tuple with undeclared BOOLEAN") {
+        const auto query = " stmt s; Select <s, BOOLEAN> such that Follows*(s, 13) and Modifies(1, \"v\")";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_semantic_error(output));
     }
 }
