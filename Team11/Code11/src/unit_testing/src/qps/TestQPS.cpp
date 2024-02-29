@@ -320,6 +320,7 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
             Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
     SECTION("Query with stmt-stmt relationship - 2 synonyms") {
@@ -339,5 +340,8 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
             Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+}
     }
 }
