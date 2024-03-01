@@ -79,12 +79,12 @@ class SourceProcessor {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
             std::make_shared<ProgramParser>(),
+            std::make_shared<CfgBuilder>(),
             std::vector<std::shared_ptr<Traverser>>{
                 std::make_shared<StmtNumTraverser>(write_facade),
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
                 std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
-            std::make_shared<CfgBuilder>(),
             write_facade);
     }
 
