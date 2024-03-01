@@ -6,15 +6,17 @@
 
 namespace sp {
 /**
- * @brief CfgNode represents a Control Flow Graph's Node. 
- * @note If or While CfgNode must have 1 statement number. Otherwise, other CfgNode can have multiple consecutive statement numbers.
+ * @brief CfgNode represents a Control Flow Graph's Node.
+ * @note If or While CfgNode must have 1 statement number. Otherwise, other CfgNode can have multiple consecutive
+ * statement numbers.
  */
 class CfgNode {
     using StatementNumber = std::vector<int>;
+
   private:
     StatementNumber stmt_nums;
-  public:
 
+  public:
     /**
      * @brief Construct a new Cfg Node object
      */
@@ -28,7 +30,7 @@ class CfgNode {
     auto empty() -> bool {
         return stmt_nums.size() == 0;
     };
-    
+
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
      */
@@ -37,7 +39,7 @@ class CfgNode {
         for (const auto& stmt_num : stmt_nums) {
             str_rep += std::to_string(stmt_num) + ", ";
         }
-        str_rep = str_rep.substr(0, str_rep.size()-2); //Remove final ", "
+        str_rep = str_rep.substr(0, str_rep.size() - 2); // Remove final ", "
         str_rep += ")";
         return str_rep;
     };
@@ -48,13 +50,16 @@ class CfgNode {
  * @note There is one Cfg per Procedure.
  */
 class Cfg {
-    using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>; // If and While CfgNode have 2 out-neighbours.
-    using Graph = std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
+    using OutNeighbours =
+        std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>; // If and While CfgNode have 2 out-neighbours.
+    using Graph =
+        std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
   public:
     std::shared_ptr<CfgNode> current_node;
     Graph graph{};
 
-    explicit Cfg(): current_node(std::make_shared<CfgNode>()), graph() {}
+    explicit Cfg() : current_node(std::make_shared<CfgNode>()), graph() {
+    }
 
     /**
      * @brief Add a statement number to the current node.
@@ -94,7 +99,7 @@ class Cfg {
     };
 
     /**
-     * @brief Add outneighbour node to the graph and move current node to the outneighbour node. 
+     * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
      * @note Default way to traverse the Cfg.
      */
     auto link_and_next(std::shared_ptr<CfgNode> next_node) -> void {
@@ -104,7 +109,8 @@ class Cfg {
     };
 
     /**
-     * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10, 11, 12))"
+     * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
+     * 11, 12))"
      */
     auto to_string() -> std::string {
         std::string str_rep = "";
@@ -122,4 +128,4 @@ class Cfg {
         return str_rep;
     };
 };
-}
+} // namespace sp

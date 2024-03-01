@@ -27,6 +27,5 @@ class NodeTypeChecker {
     static auto is_program_node(const std::shared_ptr<AstNode>& node) -> bool {
         return std::dynamic_pointer_cast<ProgramNode>(node) != nullptr;
     }
-
 };
 } // namespace sp
