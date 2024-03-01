@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace sp {
 /**
@@ -13,10 +14,9 @@ namespace sp {
 class CfgNode {
     using StatementNumber = std::vector<int>;
 
-  private:
-    StatementNumber stmt_nums;
-
   public:
+    StatementNumber stmt_nums; // Public for Testing purposes
+
     /**
      * @brief Construct a new Cfg Node object
      */

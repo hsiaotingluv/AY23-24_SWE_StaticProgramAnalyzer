@@ -1,8 +1,8 @@
 #include "catch.hpp"
+#include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/cfg_builder.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
 

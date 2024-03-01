@@ -3,10 +3,10 @@
 #include "common/tokeniser/runner.hpp"
 
 #include "common/ast/ast.hpp"
+#include "sp/cfg/cfg_builder.hpp"
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/cfg_builder.hpp"
 #include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"

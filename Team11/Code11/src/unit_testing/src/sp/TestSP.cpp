@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include "common/ast/node_type.hpp"
+#include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
-#include "sp/traverser/cfg_builder.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 
 TEST_CASE("Test SP") {
