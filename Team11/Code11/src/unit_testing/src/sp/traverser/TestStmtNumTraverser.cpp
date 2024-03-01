@@ -6,6 +6,7 @@
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
+#include "sp/traverser/cfg_builder.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include <vector>
@@ -70,9 +71,9 @@ TEST_CASE("Test Statement Number Traverser") {
     auto parser = std::make_shared<sp::ProgramParser>();
 
     auto [read_facade, write_facade] = PKB::create_facades();
-
+    auto cfg_builder = std::make_shared<sp::CfgBuilder>();
     std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>(write_facade)};
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, cfg_builder, traversers};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {

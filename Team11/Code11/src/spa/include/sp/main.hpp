@@ -7,6 +7,7 @@
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/design_entites_populator_traverser.hpp"
+#include "sp/traverser/cfg_builder.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
 #include "sp/traverser/parent_traverser.hpp"
@@ -31,6 +32,7 @@ namespace sp {
 class SourceProcessor {
     std::shared_ptr<TokenizerRunner> tokenizer_runner;
     std::shared_ptr<Parser> parser;
+    std::shared_ptr<CfgBuilder> cfg_builder;
     std::vector<std::shared_ptr<Traverser>> traversers;
     std::shared_ptr<WriteFacade> write_facade;
     SemanticValidator semantic_validator{};
@@ -53,6 +55,26 @@ class SourceProcessor {
           write_facade(write_facade) {
     }
 
+    SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
+                    std::shared_ptr<CfgBuilder> cfg_builder,
+                    const std::vector<std::shared_ptr<Traverser>>& traversers)
+        : tokenizer_runner(std::move(tr)), parser(std::move(parser)), cfg_builder(std::move(cfg_builder)), traversers(traversers) {
+    }
+
+    SourceProcessor(std::shared_ptr<TokenizerRunner>&& tr, std::shared_ptr<Parser>&& parser,
+                    std::shared_ptr<CfgBuilder>&& cfg_builder,
+                    std::vector<std::shared_ptr<Traverser>>&& traversers)
+        : tokenizer_runner(std::move(tr)), parser(std::move(parser)), cfg_builder(std::move(cfg_builder)), traversers(std::move(traversers)) {
+    }
+
+    SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
+                    std::shared_ptr<CfgBuilder> cfg_builder,
+                    std::vector<std::shared_ptr<Traverser>>&& traversers,
+                    const std::shared_ptr<WriteFacade>& write_facade)
+        : tokenizer_runner(std::move(tr)), parser(std::move(parser)), cfg_builder(std::move(cfg_builder)) , traversers(traversers),
+          write_facade(write_facade) {
+    }
+
     static auto get_complete_sp(const std::shared_ptr<WriteFacade>& write_facade) -> std::shared_ptr<SourceProcessor> {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
@@ -62,6 +84,7 @@ class SourceProcessor {
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
                 std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
+            std::make_shared<CfgBuilder>(),
             write_facade);
     }
 
@@ -97,6 +120,8 @@ class SourceProcessor {
         for (const auto& traverser : traversers) {
             ast = traverser->traverse(ast, procedure_topology_orders);
         }
+
+        auto cfgs = cfg_builder->build(ast); // To support NextTraverser and AffectsTraverser, might have to slot CfgBuilder between StmtNumTraverser and those traversers.
 
         if (write_facade != nullptr) {
             write_facade->finalise_pkb();

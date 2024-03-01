@@ -1,6 +1,7 @@
 #include "common/ast/mixin/mixin_type_checker.hpp"
 #include "common/ast/node_type_checker.hpp"
 #include "common/ast/statement_ast.hpp"
+#include "common/cfg/cfg.hpp"
 
 namespace sp {
 auto IfNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
@@ -165,6 +166,35 @@ auto IfNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facad
     for (const auto& child_statement_num : else_statement_nums) {
         write_facade->add_parent(parent_statement_num, child_statement_num);
     }
+}
+
+auto IfNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+    auto if_node = std::make_shared<CfgNode>();
+    auto then_node = std::make_shared<CfgNode>();
+    auto else_node = std::make_shared<CfgNode>();
+    auto end_node = std::make_shared<CfgNode>();
+
+    if (cfg->current_node->empty()) { // If no statement in current node
+        if_node = cfg->current_node; // Reuse Node
+    } else {
+        cfg->link_and_next(if_node); // Move to new If node.
+    }
+
+    auto stmt_num = get_statement_number();
+    cfg->add_stmt_to_node(stmt_num); // Add statement to If node.
+
+    // Build CFG for 'Then' branch
+    cfg->link_and_next(then_node);
+    then_stmt_list->build_cfg(cfg);
+    cfg->link_and_next(end_node);
+
+    // Jump back to If node (without making a link)
+    cfg->next(if_node);
+
+    // Build CFG for 'Else' branch
+    cfg->link_and_next(else_node);
+    else_stmt_list->build_cfg(cfg);
+    cfg->link_and_next(end_node);
 }
 
 } // namespace sp

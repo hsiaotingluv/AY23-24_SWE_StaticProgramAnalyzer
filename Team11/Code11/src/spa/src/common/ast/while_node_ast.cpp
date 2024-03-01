@@ -142,4 +142,27 @@ auto WhileNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_fa
         write_facade->add_parent(parent_statement_num, child_statement_num);
     }
 }
+
+auto WhileNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+    auto while_node = std::make_shared<CfgNode>();
+    auto loop_node = std::make_shared<CfgNode>();
+    auto end_node = std::make_shared<CfgNode>();
+
+    if (cfg->current_node->empty()) { // If no statement in current node
+        while_node = cfg->current_node; // Reuse Node
+    } else {
+        cfg->link_and_next(while_node); // Move to new While node.
+    }
+
+    auto stmt_num = get_statement_number();
+    cfg->add_stmt_to_node(stmt_num); // Add statement to While node.
+
+    // Build CFG for 'loop' branch.
+    cfg->link_and_next(loop_node);
+    stmt_list->build_cfg(cfg);
+    cfg->link_and_next(while_node); // Back to While node
+    cfg->link_and_next(end_node); // Finally go to End node.
+}
+
 } // namespace sp
+

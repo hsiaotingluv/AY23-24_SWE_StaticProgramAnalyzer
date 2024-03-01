@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
+#include "common/ast/mixin/cfg_mixin.hpp"
 #include "common/ast/mixin/design_entities_mixin.hpp"
 #include "common/ast/mixin/expr_mixin.hpp"
 #include "common/ast/mixin/modifies_mixin.hpp"
@@ -17,7 +18,7 @@
  */
 namespace sp {
 
-class StatementNode : public AstNode, public DesignEntitiesMixin {
+class StatementNode : public AstNode, public DesignEntitiesMixin, public CfgMixin {
     std::optional<uint32_t> statement_number;
 
   public:
@@ -44,6 +45,7 @@ class ReadNode : public StatementNode, public ModifiesMixin {
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade, const std::shared_ptr<ModifyMap>&)
         -> std::unordered_set<std::string> override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 
 class PrintNode : public StatementNode, public UsesMixin {
@@ -61,6 +63,7 @@ class PrintNode : public StatementNode, public UsesMixin {
     auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade, const std::shared_ptr<UsesMap>&) const
         -> std::unordered_set<std::string> override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 
 class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
@@ -80,6 +83,7 @@ class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
         -> std::unordered_set<std::string> override;
     auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 
 class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, public UsesMixin {
@@ -114,6 +118,7 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
     auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
     auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 
 class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin, public UsesMixin {
@@ -142,9 +147,10 @@ class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin
     auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
                                const std::shared_ptr<ModifyMap>& modify_map)
         -> std::unordered_set<std::string> override;
+    auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
     auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
-    auto populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 
 class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMixin {
@@ -169,5 +175,6 @@ class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMi
         -> std::unordered_set<std::string> override;
     auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
+    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
 };
 } // namespace sp
