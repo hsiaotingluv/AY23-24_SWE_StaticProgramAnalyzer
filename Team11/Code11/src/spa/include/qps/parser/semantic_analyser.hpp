@@ -108,37 +108,40 @@ class SemanticAnalyser {
     };
 };
 
-const auto visitor_generator = [](const auto& mapping, const auto& declarations) {
-    return overloaded{
-        [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<Reference> {
-            static constexpr auto BOOLEAN_STRING = "BOOLEAN";
-            const auto maybe_results = details::is_synonym_declared(declarations, mapping, synonym);
-            if (maybe_results.has_value()) {
-                return std::optional<Reference>{maybe_results.value()};
-            }
-
-            // Special case: BOOLEAN
-            if (synonym.get_name_string() == BOOLEAN_STRING) {
-                return std::optional<Reference>{BooleanReference{}};
-            }
-
-            return std::nullopt;
-        },
-        [&declarations, &mapping](const std::vector<untyped::UntypedSynonym>& synonyms) -> std::optional<Reference> {
-            std::vector<std::shared_ptr<Synonym>> validated_synonyms;
-            for (const auto& synonym : synonyms) {
-                const auto& maybe_synonym = details::is_synonym_declared(declarations, mapping, synonym);
-                if (!maybe_synonym.has_value()) {
-                    return std::nullopt;
+struct VisitorGenerator {
+    auto operator()(const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                    const Synonyms& declarations) const {
+        return overloaded{
+            [&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<Reference> {
+                static constexpr auto BOOLEAN_STRING = "BOOLEAN";
+                const auto maybe_results = details::is_synonym_declared(declarations, mapping, synonym);
+                if (maybe_results.has_value()) {
+                    return std::optional<Reference>{maybe_results.value()};
                 }
-                validated_synonyms.push_back(maybe_synonym.value());
-            }
-            return validated_synonyms;
-        },
 
-    };
+                // Special case: BOOLEAN
+                if (synonym.get_name_string() == BOOLEAN_STRING) {
+                    return std::optional<Reference>{BooleanReference{}};
+                }
+
+                return std::nullopt;
+            },
+            [&declarations,
+             &mapping](const std::vector<untyped::UntypedSynonym>& synonyms) -> std::optional<Reference> {
+                std::vector<std::shared_ptr<Synonym>> validated_synonyms;
+                for (const auto& synonym : synonyms) {
+                    const auto& maybe_synonym = details::is_synonym_declared(declarations, mapping, synonym);
+                    if (!maybe_synonym.has_value()) {
+                        return std::nullopt;
+                    }
+                    validated_synonyms.push_back(maybe_synonym.value());
+                }
+                return validated_synonyms;
+            },
+        };
+    }
 };
-using VisitorGenerator = decltype(visitor_generator);
+
 using DefaultSemanticAnalyser =
     SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList, DefaultPatternAnalysersList,
                      untyped::DefaultUntypedParser::UntypedQueryType, VisitorGenerator>;
