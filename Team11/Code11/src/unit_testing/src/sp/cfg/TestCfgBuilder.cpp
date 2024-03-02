@@ -76,7 +76,7 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         auto ast = sp.process(input);
-        std::cout << cfg_builder->to_string() << std::endl; // To inspect the string output of the CFG.
+        // std::cout << cfg_builder->to_string() << std::endl; // To inspect the string output of the CFG.
 
         /**
          * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
@@ -122,7 +122,7 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         auto ast = sp.process(input);
-        // std::cout << cfg_builder->to_string() << std::endl; To inspect the string output of the CFG.
+        // std::cout << cfg_builder->to_string() << std::endl;  // To inspect the string output of the CFG.
 
         /**
          * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.

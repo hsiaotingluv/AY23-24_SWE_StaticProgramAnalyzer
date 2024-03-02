@@ -5,6 +5,8 @@
 #include "common/cfg/cfg.hpp"
 #include "sp/traverser/traverser.hpp"
 
+#include <sstream>
+
 namespace sp {
 
 using ProcMap = std::unordered_map<std::string, std::shared_ptr<Cfg>>; // Map of Procedure Statement Number -> Cfg.
@@ -16,13 +18,12 @@ class CfgBuilder {
      */
     auto create_empty_cfg(std::string proc_name) -> std::shared_ptr<Cfg> {
         auto cfg = std::make_shared<Cfg>();
-        cfg->add_node_to_graph();                        // Add the first node.
         proc_map.insert(std::make_pair(proc_name, cfg)); // Add the Cfg to the ProcMap.
         return cfg;
     };
 
   public:
-    ProcMap proc_map{}; // Public for Testing Purpose
+    ProcMap proc_map{}; // Only 1 Proc Map for the entire Program.
 
     /**
      * @brief Build a Control Flow Graph for the given Program ASTNode.
@@ -48,13 +49,14 @@ class CfgBuilder {
     /**
      * @brief Construct a string representation of the Control Flow Graph.
      */
-    auto to_string() -> std::string {
-        std::string result = "";
+    auto to_string() const -> std::string {
+        std::stringstream ss;
         for (const auto& [proc_name, cfg] : proc_map) {
-            result += proc_name + ":\n";
-            result += cfg->to_string();
+            ss << proc_name;
+            ss << ":\n";
+            ss << cfg->to_string();
         }
-        return result;
+        return ss.str();
     };
 };
 } // namespace sp

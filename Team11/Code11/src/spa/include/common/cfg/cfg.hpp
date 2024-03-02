@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -27,23 +28,25 @@ class CfgNode {
     /**
      * @brief Check if the CfgNode has no statement numbers.
      */
-    auto empty() -> bool {
+    auto empty() const -> bool {
         return stmt_nums.size() == 0;
     };
 
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
      */
-    auto to_string() -> std::string {
-        std::string str_rep = "Node(";
-        for (const auto& stmt_num : stmt_nums) {
-            str_rep += std::to_string(stmt_num) + ", ";
+    auto to_string() const -> std::string {
+        std::stringstream ss;
+        ss << "Node(";
+        for (size_t i = 0; i < stmt_nums.size(); i++) {
+            if (i != 0) {
+                ss << ", ";
+            }
+            ss << stmt_nums[i];
         }
-        if (stmt_nums.size() > 0) {
-            str_rep = str_rep.substr(0, str_rep.size() - 2); // Remove final ", "
-        }
-        str_rep += ")";
-        return str_rep;
+        ss << ")";
+        std::string str = ss.str();
+        return str;
     };
 };
 
@@ -56,11 +59,15 @@ class Cfg {
         std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>; // If and While CfgNode have 2 out-neighbours.
     using Graph =
         std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
+    static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
+
   public:
-    std::shared_ptr<CfgNode> current_node;
+    std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
     Graph graph{};
 
-    explicit Cfg() : current_node(std::make_shared<CfgNode>()), graph() {
+    explicit Cfg() {
+        current_node = std::make_shared<CfgNode>(); // Writing stmts in the constructor body, for readability.
+        add_node_to_graph();
     }
 
     /**
@@ -74,7 +81,7 @@ class Cfg {
      * @brief Add a new node to the graph, with empty out-neighbours.
      */
     auto add_node_to_graph() -> void {
-        graph.insert(std::make_pair(current_node, std::make_pair(nullptr, nullptr)));
+        graph.insert(std::make_pair(current_node, EMPTY_OUTNEIGHBOURS));
     }
 
     /**
@@ -94,7 +101,7 @@ class Cfg {
 
     /**
      * @brief Move current node to the next node (Need not be a outneighbour node).
-     * @note This is only used for If CfgNode to build both branches of the If statement.
+     * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
     auto next(std::shared_ptr<CfgNode> next_node) -> void {
         current_node = next_node;
@@ -114,20 +121,20 @@ class Cfg {
      * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
      * 11, 12))"
      */
-    auto to_string() -> std::string {
-        std::string str_rep = "";
+    auto to_string() const -> std::string {
+        std::stringstream ss;
         for (const auto& [node, outneighbours] : graph) {
-            std::string edge = node->to_string() + " -> OutNeighbours(";
+            ss << node->to_string();
+            ss << " -> OutNeighbours(";
             if (outneighbours.first) {
-                edge += outneighbours.first->to_string();
+                ss << outneighbours.first->to_string();
             }
             if (outneighbours.second) {
-                edge += ", " + outneighbours.second->to_string();
+                ss << ", " << outneighbours.second->to_string();
             }
-            edge += ")\n";
-            str_rep += edge;
+            ss << ")\n";
         }
-        return str_rep;
+        return ss.str();
     };
 };
 } // namespace sp
