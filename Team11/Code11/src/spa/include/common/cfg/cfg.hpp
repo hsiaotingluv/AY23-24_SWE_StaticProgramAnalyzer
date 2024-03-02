@@ -39,7 +39,9 @@ class CfgNode {
         for (const auto& stmt_num : stmt_nums) {
             str_rep += std::to_string(stmt_num) + ", ";
         }
-        str_rep = str_rep.substr(0, str_rep.size() - 2); // Remove final ", "
+        if (stmt_nums.size() > 0) {
+            str_rep = str_rep.substr(0, str_rep.size() - 2); // Remove final ", "
+        }
         str_rep += ")";
         return str_rep;
     };

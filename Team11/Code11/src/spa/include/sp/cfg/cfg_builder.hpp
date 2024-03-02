@@ -42,8 +42,6 @@ class CfgBuilder {
             stmt_list->build_cfg(cfg);
         }
 
-        // Inspection Time! Uncomment to see the final Control Flow Graph. (Hacky way to be refactored later).
-        std::cout << to_string() << std::endl; // Remove final newline
         return proc_map;
     }
 

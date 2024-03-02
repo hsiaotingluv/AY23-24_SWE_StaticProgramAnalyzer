@@ -76,6 +76,7 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         auto ast = sp.process(input);
+        std::cout << cfg_builder->to_string() << std::endl; // To inspect the string output of the CFG.
 
         /**
          * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
@@ -103,6 +104,42 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
+    }
+
+    SECTION("Single Procedure ending with If Statement - success") {
+        std::string input = R"(procedure computeCentroid {
+            while ((x != 0) && (y != 0)) {
+                count = count + 1;
+                cenX = cenX + x;
+                cenY = cenY + y;
+            }
+            if (count == 0) then {
+                flag = 1;
+            } else {
+                cenX = cenX / count;
+                cenY = cenY / count;
+            }
+        })";
+
+        auto ast = sp.process(input);
+        // std::cout << cfg_builder->to_string() << std::endl; To inspect the string output of the CFG.
+
+        /**
+         * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
+         *
+         * computeCentroid:
+         * Node(7, 8) -> OutNeighbours(Node()) // Points to dummy node
+         * Node() -> OutNeighbours() // Dummy node
+         * Node(6) -> OutNeighbours(Node()) // Points to dummy node
+         * Node(5) -> OutNeighbours(Node(6), Node(7, 8))
+         * Node(2, 3, 4) -> OutNeighbours(Node(1))
+         * Node(1) -> OutNeighbours(Node(2, 3, 4), Node(5))
+         */
+
+        REQUIRE(get_proc_names(cfg_builder->proc_map) == std::unordered_set<std::string>{"computeCentroid"});
+        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
+                std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
+        // Write evaluation for if-else statements.
     }
 }
 
