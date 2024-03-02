@@ -48,11 +48,17 @@ class PatternAssignAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
+        if (pattern.num_arg != 2) {
+            return std::nullopt;
+        }
         const auto& maybe_synonym = details::require<AssignSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
         const auto& maybe_ent_ref = details::require_if_syn<VarSynonym>(pattern.ent_ref, declarations, mapping);
+        if (!maybe_ent_ref) {
+            return std::nullopt;
+        }
         return PatternAssign{std::dynamic_pointer_cast<AssignSynonym>(maybe_synonym.value()), maybe_ent_ref.value(),
                              pattern.expression_spec};
     }
@@ -64,6 +70,9 @@ class PatternWhileAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
+        if (pattern.num_arg != 2) {
+            return std::nullopt;
+        }
         const auto& maybe_synonym = details::require<WhileSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
@@ -88,6 +97,9 @@ class PatternIfAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
+        if (pattern.num_arg != 3) {
+            return std::nullopt;
+        }
         const auto& maybe_synonym = details::require<IfSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;

@@ -17,7 +17,7 @@ class PatternAssign {
           expression_spec(std::move(expression_spec)) {
     }
 
-    friend auto operator<<(std::ostream& os, const PatternAssign& follows) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const PatternAssign& pattern_assign) -> std::ostream&;
 
     auto operator==(const PatternAssign& other) const -> bool;
 
@@ -43,7 +43,7 @@ class PatternWhile {
         : while_synonym(std::move(while_synonym)), ent_ref(std::move(ent_ref)) {
     }
 
-    friend auto operator<<(std::ostream& os, const PatternWhile& follows) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const PatternWhile& pattern_while) -> std::ostream&;
 
     auto operator==(const PatternWhile& other) const -> bool;
 
@@ -69,7 +69,7 @@ class PatternIf {
         : if_synonym(std::move(if_synonym)), ent_ref(std::move(ent_ref)) {
     }
 
-    friend auto operator<<(std::ostream& os, const PatternIf& follows) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const PatternIf& pattern_if) -> std::ostream&;
 
     auto operator==(const PatternIf& other) const -> bool;
 

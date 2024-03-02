@@ -32,9 +32,11 @@ struct UntypedPatternClause {
     UntypedSynonym synonym;
     UntypedEntRef ent_ref;
     ExpressionSpec expression_spec;
+    int num_arg;
 
-    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec)
-        : synonym(std::move(synonym)), ent_ref(std::move(ent_ref)), expression_spec(std::move(expression_spec)) {
+    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec, int num_arg = 2)
+        : synonym(std::move(synonym)), ent_ref(std::move(ent_ref)), expression_spec(std::move(expression_spec)),
+          num_arg(num_arg) {
     }
 
     auto operator==(const UntypedPatternClause& rhs) const -> bool {

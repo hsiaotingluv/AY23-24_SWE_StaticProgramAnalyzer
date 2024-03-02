@@ -59,7 +59,7 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
     if (it == end) {
         return std::nullopt;
     }
-    const auto maybe_and = *it;
+    const auto& maybe_and = *it;
     if (!is_keyword(maybe_and, "and")) {
         return std::nullopt;
     }
@@ -153,7 +153,7 @@ auto parse_pattern_cond(const std::array<std::string_view, N>&, std::vector<Toke
             return std::nullopt;
         }
 
-        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec, 3}, it);
     }
 }
 } // namespace qps::untyped::detail

@@ -16,7 +16,7 @@
 
 namespace qps::details {
 // Forward declarations
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
+template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList>
 auto validate_clause(const Synonyms& declarations,
                      const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                      const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>>;
