@@ -67,7 +67,7 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
 }
 
 template <unsigned long N>
-auto parse_pattern_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
+auto parse_pattern_cond(const std::array<std::string_view, N>&, std::vector<Token>::const_iterator it,
                         const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;

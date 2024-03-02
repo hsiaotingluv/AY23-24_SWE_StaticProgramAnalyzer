@@ -167,10 +167,8 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         }};
 };
 
-inline auto validate_pattern(const Synonyms& declarations,
-                             const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                             const untyped::UntypedPatternClause& pattern, TypeList<>)
-    -> std::optional<SyntacticPattern> {
+inline auto validate_pattern(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>&,
+                             const untyped::UntypedPatternClause&, TypeList<>) -> std::optional<SyntacticPattern> {
     return std::nullopt;
 }
 

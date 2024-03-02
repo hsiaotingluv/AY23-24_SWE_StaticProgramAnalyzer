@@ -583,10 +583,10 @@ auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
                           [](const UnitTable&, const UnitTable&) -> OutputTable {
                               return UnitTable{};
                           },
-                          [](const Table& table, const UnitTable& unit_table) -> OutputTable {
+                          [](const Table& table, const UnitTable&) -> OutputTable {
                               return table;
                           },
-                          [](const UnitTable& unit_table, const Table& table) -> OutputTable {
+                          [](const UnitTable&, const Table& table) -> OutputTable {
                               return table;
                           },
                       },
@@ -611,7 +611,7 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& 
         table, reference);
 }
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const UnitTable& table, const Reference& reference)
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const UnitTable&, const Reference& reference)
     -> std::vector<std::string> {
     return std::visit(overloaded{[&read_facade](const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
                                      const auto responses = synonym->scan(read_facade);

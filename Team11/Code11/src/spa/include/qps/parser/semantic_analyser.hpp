@@ -25,7 +25,7 @@ auto validate_clause(const Synonyms& declarations,
 namespace qps {
 struct BooleanReference {};
 
-inline auto operator<<(std::ostream& os, const BooleanReference& reference) -> std::ostream& {
+inline auto operator<<(std::ostream& os, const BooleanReference&) -> std::ostream& {
     os << "BOOLEAN()";
     return os;
 }

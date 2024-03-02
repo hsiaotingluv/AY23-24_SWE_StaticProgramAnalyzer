@@ -29,7 +29,7 @@ auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& 
                               }
                               return table;
                           },
-                          [&read_facade](const BooleanReference&) -> OutputTable {
+                          [](const BooleanReference&) -> OutputTable {
                               return UnitTable{};
                           },
                       },
