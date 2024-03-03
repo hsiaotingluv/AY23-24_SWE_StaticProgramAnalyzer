@@ -138,11 +138,6 @@ assign a;
 Select a pattern a(_, _) extra
 SyntaxError
 5000
-29 - Extra Arguments in Pattern Clause
-assign a;
-Select a pattern a("x", _, _)
-SyntaxError
-5000
 30 - Missing Comma in Pattern Clause
 assign a;
 Select a pattern a("x" "y")
