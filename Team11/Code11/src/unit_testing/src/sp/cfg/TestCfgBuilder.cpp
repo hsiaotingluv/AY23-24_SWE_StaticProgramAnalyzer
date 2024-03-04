@@ -19,12 +19,24 @@ auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::
     return all_stmt_nums;
 }
 
-auto get_proc_names(sp::ProcMap proc_map) {
+auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
     std::unordered_set<std::string> proc_names;
     for (const auto& [proc_name, cfg] : proc_map) {
         proc_names.insert(proc_name);
     }
     return proc_names;
+}
+
+auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
+    int num_dummy = 0;
+    for (const auto& [proc_name, cfg] : proc_map) {
+        for (const auto& [cfg_node, outneighbours] : cfg->graph) {
+            if (cfg_node->stmt_nums.empty()) {
+                num_dummy++;
+            }
+        }
+    }
+    return num_dummy;
 }
 
 TEST_CASE("Test CFG Builder") {
@@ -104,6 +116,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
+        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 0);
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -140,6 +153,49 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
                 std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
         // Write evaluation for if-else statements.
+        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 1);
+    }
+
+    SECTION("Multiple If Statements ending with Elses - success") {
+        // There are multiple dummy nodes. For clarity of implementation, they will NOT be merged together.
+        std::string input = R"(
+            procedure nesting {
+                if (i>j) then {
+                    read i;
+                } else {
+                    if (i==j) then {
+                        if (j < 0) then {
+                            print i;
+                        } else {
+                            print j;}
+                    } else {
+                            read j;}}
+            }
+        )";
+
+        /**
+         * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
+         *
+         * computeCentroid:
+         * Node(7) -> OutNeighbours(Node()) // read j
+         * Node() -> OutNeighbours(Node()) // #3 dummy node  for if(i==j). Points to #1 dummy node.
+         * Node(6) -> OutNeighbours(Node()) // print j
+         * Node() -> OutNeighbours(Node()) // #2 dummy node for if(j<0). Points to #3 dummy node.
+         * Node(5) -> OutNeighbours(Node()) // print i
+         * Node(4) -> OutNeighbours(Node(5), Node(6)) // if(j<0)
+         * Node(3) -> OutNeighbours(Node(4), Node(7)) // if(i==j)
+         * Node() -> OutNeighbours() // #1 dummy node for if (i>j). Points to nothing. It's the end.
+         * Node(2) -> OutNeighbours(Node()) // read i;
+         * Node(1) -> OutNeighbours(Node(2), Node(3)) // if(i>j)
+         */
+
+        auto ast = sp.process(input);
+        //std::cout << cfg_builder->to_string() << std::endl;  // To inspect the string output of the CFG.
+        REQUIRE(get_proc_names(cfg_builder->proc_map) == std::unordered_set<std::string>{"nesting"});
+        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "nesting") ==
+                std::unordered_set<int>{1,2,3,4,5,6,7});
+        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 3);
+
     }
 }
 
