@@ -7,6 +7,9 @@ namespace qps::untyped::detail {
 auto parse_synonym(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedSynonym, std::vector<Token>::const_iterator>>;
 
+auto parse_quoted_ident(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<QuotedIdent, std::vector<Token>::const_iterator>>;
+
 auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedEntRef, std::vector<Token>::const_iterator>>;
 

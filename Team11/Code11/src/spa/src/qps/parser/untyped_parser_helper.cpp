@@ -25,6 +25,22 @@ auto parse_stmt_ref(const Token& token) -> UntypedStmtRef {
     }
 }
 
+auto parse_quoted_ident(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<QuotedIdent, std::vector<Token>::const_iterator>> {
+    if (std::distance(it, end) < 3) {
+        return std::nullopt;
+    }
+    const auto& maybe_open_quote = *it;
+    const auto& maybe_ident = *std::next(it);
+    const auto& maybe_close_quote = *std::next(it, 2);
+
+    if (!is_open_quote(maybe_open_quote) || !is_string(maybe_ident) || !is_close_quote(maybe_close_quote)) {
+        return std::nullopt;
+    }
+
+    return std::make_tuple(QuotedIdent{maybe_ident.content}, std::next(it, 3));
+}
+
 auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedEntRef, std::vector<Token>::const_iterator>> {
     if (it == end) {
@@ -37,19 +53,7 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     } else if (is_wildcard(first_token)) {
         return std::make_tuple(WildCard{}, std::next(it));
     } else {
-        // Quoted Ident
-        if (std::distance(it, end) < 3) {
-            return std::nullopt;
-        }
-        const auto& maybe_open_quote = *it;
-        const auto& maybe_ident = *std::next(it);
-        const auto& maybe_close_quote = *std::next(it, 2);
-
-        if (!is_open_quote(maybe_open_quote) || !is_string(maybe_ident) || !is_close_quote(maybe_close_quote)) {
-            return std::nullopt;
-        }
-
-        return std::make_tuple(QuotedIdent{maybe_ident.content}, std::next(it, 3));
+        return parse_quoted_ident(it, end);
     }
 }
 
