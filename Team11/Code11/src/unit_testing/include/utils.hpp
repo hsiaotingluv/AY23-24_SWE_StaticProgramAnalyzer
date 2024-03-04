@@ -1,8 +1,8 @@
 #pragma once
 
 #include "catch.hpp"
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 #include "qps/template_utils.hpp"
 #include <memory>
 #include <type_traits>

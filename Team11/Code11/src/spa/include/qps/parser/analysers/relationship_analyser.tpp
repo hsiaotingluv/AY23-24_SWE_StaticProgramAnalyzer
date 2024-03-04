@@ -1,8 +1,8 @@
 #pragma once
 
+#include "qps/parser/analysers/semantic_analyser_helper.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_analyser_helper.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 

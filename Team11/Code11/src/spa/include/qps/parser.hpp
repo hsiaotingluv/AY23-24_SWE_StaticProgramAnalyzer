@@ -1,7 +1,7 @@
 #pragma once
 
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 
 namespace qps {

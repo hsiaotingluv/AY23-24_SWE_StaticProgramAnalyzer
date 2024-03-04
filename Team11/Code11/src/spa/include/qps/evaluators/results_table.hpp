@@ -1,8 +1,8 @@
 #pragma once
 
 #include "pkb/facades/read_facade.h"
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 #include <memory>
 #include <variant>
 #include <vector>

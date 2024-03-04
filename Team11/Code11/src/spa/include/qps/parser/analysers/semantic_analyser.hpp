@@ -1,11 +1,11 @@
 #pragma once
 
+#include "qps/parser/analysers/pattern_analyser.hpp"
+#include "qps/parser/analysers/relationship_analyser.hpp"
+#include "qps/parser/analysers/semantic_analyser_helper.hpp"
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/pattern_analyser.hpp"
-#include "qps/parser/relationship_analyser.hpp"
-#include "qps/parser/semantic_analyser_helper.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 #include "qps/template_utils.hpp"
@@ -58,7 +58,7 @@ struct Query {
 };
 } // namespace qps
 
-#include "qps/parser/semantic_analyser.tpp"
+#include "qps/parser/analysers/semantic_analyser.tpp"
 
 namespace qps {
 

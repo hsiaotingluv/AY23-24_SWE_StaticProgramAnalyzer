@@ -1,6 +1,6 @@
 #include "qps/parser.hpp"
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 
 #include <optional>
 #include <variant>

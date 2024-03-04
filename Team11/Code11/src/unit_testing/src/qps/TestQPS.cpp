@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "qps/parser/semantic_analyser.hpp"
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 #include "utils.hpp"
 
