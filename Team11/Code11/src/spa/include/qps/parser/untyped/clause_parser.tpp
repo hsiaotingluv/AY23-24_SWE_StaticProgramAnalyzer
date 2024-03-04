@@ -8,6 +8,7 @@
 
 #include <array>
 #include <optional>
+#include <string_view>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -27,29 +28,27 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
-template <typename SupportedStmtStmtParsers, typename SupportedRefEntParsers>
-class SuchThatClausesParser {
-    static constexpr auto keywords = std::array<std::string_view, 2>{"such", "that"};
-
+template <typename Strategy>
+class ClausesParser {
   public:
-    using ClauseType = UntypedSuchThatClause;
+    using ClauseType = typename Strategy::ClauseType;
 
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
         -> std::optional<std::tuple<std::vector<ClauseType>, std::vector<Token>::const_iterator>> {
-        constexpr auto EXPECTED_LENGTH = 3;
-        if (std::distance(it, end) < EXPECTED_LENGTH) {
+        if (it == end) {
             return std::nullopt;
         }
 
-        const auto maybe_it = detail::parse_keywords(keywords, it, end);
+        // Expects keywords
+        const auto maybe_it = detail::parse_keywords(Strategy::keywords, it, end);
         if (!maybe_it.has_value()) {
             return std::nullopt;
         }
         it = maybe_it.value();
 
+        // Expects Clauses
         auto clauses = std::vector<ClauseType>{};
         auto first_clause = true;
-
         while (it != end) {
             if (!first_clause) {
                 const auto maybe_and = detail::consume_and(it, end);
@@ -59,27 +58,44 @@ class SuchThatClausesParser {
                 it = maybe_and.value();
             }
 
-            const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtParsers{});
-            if (maybe_stmt_stmt_rel.has_value()) {
-                const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
-                clauses.push_back(rel_ref);
-                it = rest;
-                first_clause = false;
-                continue;
+            const auto maybe_success = Strategy::parse(it, end);
+            if (!maybe_success.has_value()) {
+                return std::nullopt;
             }
+            const auto& [clause, rest] = maybe_success.value();
 
-            const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntParsers{});
-            if (maybe_ref_ent_rel.has_value()) {
-                const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
-                clauses.push_back(rel_ref);
-                it = rest;
-                first_clause = false;
-                continue;
-            }
+            clauses.push_back(clause);
+            it = rest;
+            first_clause = false;
+        }
+        return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
+    }
+};
+
+template <typename SupportedStmtStmtStrategies, typename SupportedRefEntStrategies>
+struct SuchThatParserStrategy {
+    static constexpr auto keywords = std::array<std::string_view, 2>{"such", "that"};
+
+    using ClauseType = UntypedSuchThatClause;
+
+    static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+        if (it == end) {
             return std::nullopt;
         }
 
-        return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
+        const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtStrategies{});
+        if (maybe_stmt_stmt_rel.has_value()) {
+            const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
+            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+        }
+
+        const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntStrategies{});
+        if (maybe_ref_ent_rel.has_value()) {
+            const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
+            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+        }
+        return std::nullopt;
     }
 };
 

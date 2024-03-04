@@ -9,95 +9,6 @@
 #include <vector>
 
 namespace qps::untyped::detail {
-auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>>;
-
-auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedWithClause, std::vector<Token>::const_iterator>>;
-} // namespace qps::untyped::detail
-
-namespace qps::untyped {
-auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<std::vector<UntypedPatternClause>, std::vector<Token>::const_iterator>> {
-    // pattern_cl := pattern <assign_synonym> ( <ent_ref> , <pattern_expr> )
-    constexpr auto EXPECTED_LENGTH = 7;
-    if (std::distance(it, end) < EXPECTED_LENGTH) {
-        return std::nullopt;
-    }
-
-    // Expects keywords
-    const auto maybe_it = detail::parse_keywords(keywords, it, end);
-    if (!maybe_it.has_value()) {
-        return std::nullopt;
-    }
-    it = maybe_it.value();
-
-    auto clauses = std::vector<UntypedPatternClause>{};
-    auto first_clause = true;
-    while (it != end) {
-        if (!first_clause) {
-            const auto maybe_and = detail::consume_and(it, end);
-            if (!maybe_and.has_value()) {
-                return std::make_tuple(clauses, it);
-            }
-            it = maybe_and.value();
-        }
-
-        const auto maybe_success = detail::parse_pattern_cond(it, end);
-        if (!maybe_success.has_value()) {
-            return std::nullopt;
-        }
-        const auto& [clause, rest] = maybe_success.value();
-
-        clauses.push_back(clause);
-        it = rest;
-        first_clause = false;
-    }
-    return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
-}
-
-auto WithClausesParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<std::vector<ClauseType>, std::vector<Token>::const_iterator>> {
-
-    // with_cl := with <synonym> . <attr_name> = <attr_name>
-    if (it == end) {
-        return std::nullopt;
-    }
-
-    // Expects keywords
-    const auto maybe_it = detail::parse_keywords(keywords, it, end);
-    if (!maybe_it.has_value()) {
-        return std::nullopt;
-    }
-    it = maybe_it.value();
-
-    // Expects Clauses
-    auto clauses = std::vector<UntypedWithClause>{};
-    auto first_clause = true;
-    while (it != end) {
-        if (!first_clause) {
-            const auto maybe_and = detail::consume_and(it, end);
-            if (!maybe_and.has_value()) {
-                return std::make_tuple(clauses, it);
-            }
-            it = maybe_and.value();
-        }
-
-        const auto maybe_success = detail::parse_attr_cond(it, end);
-        if (!maybe_success.has_value()) {
-            return std::nullopt;
-        }
-        const auto& [clause, rest] = maybe_success.value();
-
-        clauses.push_back(clause);
-        it = rest;
-        first_clause = false;
-    }
-    return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
-}
-} // namespace qps::untyped
-
-namespace qps::untyped::detail {
 auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::vector<Token>::const_iterator> {
     if (it == end) {
@@ -318,3 +229,15 @@ auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<To
     return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
 }
 } // namespace qps::untyped::detail
+
+namespace qps::untyped {
+auto PatternParserStrategy::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    return detail::parse_pattern_cond(it, end);
+}
+
+auto WithParserStrategy::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    return detail::parse_attr_cond(it, end);
+}
+} // namespace qps::untyped
