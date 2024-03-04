@@ -1,12 +1,19 @@
 #include "qps/parser/untyped/clause_parser.hpp"
+#include "qps/parser/entities/attribute_name.hpp"
+#include "qps/parser/parser_helper.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
+#include <iterator>
 #include <optional>
 #include <vector>
 
 namespace qps::untyped::detail {
 auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>>;
+
+auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedWithClause, std::vector<Token>::const_iterator>>;
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
@@ -37,6 +44,46 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
         }
 
         const auto maybe_success = detail::parse_pattern_cond(it, end);
+        if (!maybe_success.has_value()) {
+            return std::nullopt;
+        }
+        const auto& [clause, rest] = maybe_success.value();
+
+        clauses.push_back(clause);
+        it = rest;
+        first_clause = false;
+    }
+    return clauses.empty() ? std::nullopt : std::make_optional(std::make_tuple(clauses, it));
+}
+
+auto WithClausesParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<std::vector<ClauseType>, std::vector<Token>::const_iterator>> {
+
+    // with_cl := with <synonym> . <attr_name> = <attr_name>
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    // Expects keywords
+    const auto maybe_it = detail::parse_keywords(keywords, it, end);
+    if (!maybe_it.has_value()) {
+        return std::nullopt;
+    }
+    it = maybe_it.value();
+
+    // Expects Clauses
+    auto clauses = std::vector<UntypedWithClause>{};
+    auto first_clause = true;
+    while (it != end) {
+        if (!first_clause) {
+            const auto maybe_and = detail::consume_and(it, end);
+            if (!maybe_and.has_value()) {
+                return std::make_tuple(clauses, it);
+            }
+            it = maybe_and.value();
+        }
+
+        const auto maybe_success = detail::parse_attr_cond(it, end);
         if (!maybe_success.has_value()) {
             return std::nullopt;
         }
@@ -150,5 +197,124 @@ auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector
 
         return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec, 3}, it);
     }
+}
+
+inline auto parse_attr_name(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
+    -> std::optional<std::tuple<AttrName, std::vector<Token>::const_iterator>> {
+    return std::nullopt;
+}
+
+template <typename Head, typename... Tails>
+auto parse_attr_name(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
+                     TypeList<Head, Tails...>)
+    -> std::optional<std::tuple<AttrName, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    for (const auto& expected_keyword : Head::keyword) {
+        if (it == end) {
+            return std::nullopt;
+        }
+        if ((*it).content != expected_keyword) {
+            return parse_attr_name(it, end, TypeList<Tails...>{});
+        }
+
+        it = std::next(it);
+    }
+
+    return std::make_tuple(Head{}, it);
+}
+
+auto parse_attr_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedAttrRef, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    // attrRef := <synonym> . <attr_name>
+
+    // Expects Synonym
+    const auto maybe_synonym = parse_synonym(it, end);
+    if (!maybe_synonym.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [synonym, rest] = maybe_synonym.value();
+    it = rest;
+
+    // Expects .
+    if (it == end || !is_char<'.'>(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    // Expects AttrName
+    const auto maybe_attr_name = parse_attr_name(it, end, AttrNameList{});
+    if (!maybe_attr_name.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [attr_name, rest2] = maybe_attr_name.value();
+    it = rest2;
+
+    return std::make_tuple(UntypedAttrRef{synonym, attr_name}, it);
+}
+
+auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    // Integer
+    if (is_integer(*it)) {
+        return std::make_tuple(UntypedRef{Integer{it->content}}, std::next(it));
+    }
+
+    // Quoted Ident
+    const auto maybe_quoted_ident = parse_quoted_ident(it, end);
+    if (maybe_quoted_ident.has_value()) {
+        const auto& [quoted_ident, rest] = maybe_quoted_ident.value();
+        return std::make_tuple(UntypedRef{quoted_ident}, rest);
+    }
+
+    // attrRef
+    const auto maybe_attr_ref = parse_attr_ref(it, end);
+    if (maybe_attr_ref.has_value()) {
+        const auto& [attr_ref, rest] = maybe_attr_ref.value();
+        return std::make_tuple(UntypedRef{attr_ref}, rest);
+    }
+
+    return std::nullopt;
+}
+
+auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedWithClause, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    // Expects Ref
+    const auto maybe_ref1 = parse_ref(it, end);
+    if (!maybe_ref1.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ref1, rest] = maybe_ref1.value();
+    it = rest;
+
+    // Expects =
+    if (it == end || !is_char<'='>(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    // Expects Ref
+    const auto maybe_ref2 = parse_ref(it, end);
+    if (!maybe_ref2.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ref2, rest2] = maybe_ref2.value();
+    it = rest2;
+
+    return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
 }
 } // namespace qps::untyped::detail
