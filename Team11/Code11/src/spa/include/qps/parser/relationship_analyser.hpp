@@ -2,7 +2,7 @@
 
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_analyser.tpp"
+#include "qps/parser/relationship_analyser.tpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 
 namespace qps {
