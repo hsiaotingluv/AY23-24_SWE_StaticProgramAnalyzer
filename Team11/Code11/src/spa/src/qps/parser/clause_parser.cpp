@@ -2,13 +2,10 @@
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
 #include <optional>
-#include <string_view>
 #include <vector>
 
 namespace qps::untyped::detail {
-template <unsigned long N>
-auto parse_pattern_cond(const std::array<std::string_view, N>& keywords, std::vector<Token>::const_iterator it,
-                        const std::vector<Token>::const_iterator& end)
+auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>>;
 } // namespace qps::untyped::detail
 
@@ -39,7 +36,7 @@ auto PatternClausesParser::parse(std::vector<Token>::const_iterator it, const st
             it = maybe_and.value();
         }
 
-        const auto maybe_success = detail::parse_pattern_cond(keywords, it, end);
+        const auto maybe_success = detail::parse_pattern_cond(it, end);
         if (!maybe_success.has_value()) {
             return std::nullopt;
         }
@@ -66,9 +63,7 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
     return std::next(it);
 }
 
-template <unsigned long N>
-auto parse_pattern_cond(const std::array<std::string_view, N>&, std::vector<Token>::const_iterator it,
-                        const std::vector<Token>::const_iterator& end)
+auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;
     if (std::distance(it, end) < EXPECTED_LENGTH) {
