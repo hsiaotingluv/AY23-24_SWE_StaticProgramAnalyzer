@@ -19,27 +19,6 @@ auto SelectSynonymParser::parse(std::vector<Token>::const_iterator it, const std
     return detail::parse_synonym(it, end);
 }
 
-// auto SelectBooleanParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-//     -> std::optional<std::tuple<bool, std::vector<Token>::const_iterator>> {
-//     constexpr auto EXPECTED_LENGTH = 2;
-
-//     if (std::distance(it, end) < EXPECTED_LENGTH) {
-//         return std::nullopt;
-//     }
-
-//     const auto maybe_it = detail::parse_keywords(keywords, it, end);
-//     if (!maybe_it.has_value()) {
-//         return std::nullopt;
-//     }
-//     it = maybe_it.value();
-
-//     const auto maybe_boolean = detail::parse_boolean(it, end);
-//     if (!maybe_boolean.has_value()) {
-//         return std::nullopt;
-//     }
-//     return std::make_tuple(std::get<0>(maybe_boolean.value()), std::get<1>(maybe_boolean.value()));
-// }
-
 auto SelectSynonymsParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<std::vector<UntypedSynonym>, std::vector<Token>::const_iterator>> {
 
