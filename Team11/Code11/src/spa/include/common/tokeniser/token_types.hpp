@@ -37,6 +37,11 @@ enum class TokenType {
     // QPS Wildcard Token
     Wildcard,
 
+    // QPS Miscellaneous Token
+    Dot,
+    Hash,
+    SingleEqual,
+
     // ============= SP specifics Token ===============
     // Keyword is captured as string since keyword names are not reserved
     // SP Delimiter
