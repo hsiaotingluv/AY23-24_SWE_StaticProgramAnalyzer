@@ -84,7 +84,7 @@ auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, cons
 template <typename StmtEntList>
 auto validate_stmt_ent(const Synonyms& declarations,
                        const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                       const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+                       const std::string& keyword, const untyped::UntypedStmtEntRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
     const auto& maybe_stmt_ref = to_stmt_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {
@@ -114,7 +114,7 @@ auto validate_ent_ent(const std::string& keyword, const EntRef& ent_ref1, const 
 template <typename EntEntList>
 auto validate_ent_ent(const Synonyms& declarations,
                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                      const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+                      const std::string& keyword, const untyped::UntypedStmtEntRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
     const auto& maybe_stmt_ref = to_ent_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {

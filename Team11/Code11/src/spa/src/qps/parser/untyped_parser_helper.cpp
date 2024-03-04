@@ -53,13 +53,13 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
     }
 }
 
-auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>> {
     const auto& token = *it;
     if (is_stmt_ref(token)) {
         const auto& stmt_ref = parse_stmt_ref(token);
         return std::visit(
-            [it](auto&& arg) -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+            [it](auto&& arg) -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>> {
                 return std::make_tuple(arg, std::next(it));
             },
             stmt_ref);
@@ -68,7 +68,7 @@ auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::
         if (maybe_ent_ref.has_value()) {
             const auto& [ent_ref, rest] = maybe_ent_ref.value();
             return std::visit(
-                [it](auto&& arg) -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>> {
+                [it](auto&& arg) -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>> {
                     return std::make_tuple(arg, std::next(it));
                 },
                 ent_ref);

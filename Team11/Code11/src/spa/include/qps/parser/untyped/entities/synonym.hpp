@@ -31,5 +31,5 @@ struct UntypedSynonym {
 
 using UntypedStmtRef = std::variant<UntypedSynonym, WildCard, Integer>;
 using UntypedEntRef = std::variant<UntypedSynonym, WildCard, QuotedIdent>;
-using UntypedRef = std::variant<UntypedSynonym, WildCard, Integer, QuotedIdent>;
+using UntypedStmtEntRef = std::variant<UntypedSynonym, WildCard, Integer, QuotedIdent>;
 } // namespace qps::untyped

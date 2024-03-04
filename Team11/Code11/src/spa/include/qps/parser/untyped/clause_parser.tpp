@@ -146,7 +146,7 @@ auto parse_ref_ent(std::vector<Token>::const_iterator it, const std::vector<Toke
     it = std::next(it, 2);
 
     // Get reference
-    const auto maybe_ref = parse_ref(it, end);
+    const auto maybe_ref = parse_stmt_ent_ref(it, end);
     if (!maybe_ref.has_value()) {
         return std::nullopt;
     }

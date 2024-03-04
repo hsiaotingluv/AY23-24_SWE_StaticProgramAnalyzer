@@ -114,7 +114,7 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
-            untyped::UntypedRefEntRel{"Uses", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"s"}}},
+            untyped::UntypedRefEntRel{"Uses", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"s"}}},
                                       untyped::UntypedEntRef{QuotedIdent{"v"}}}};
         REQUIRE(such_that_clause == reference_clause);
     }
@@ -139,7 +139,7 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
-            untyped::UntypedRefEntRel{"Uses", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+            untyped::UntypedRefEntRel{"Uses", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
                                       untyped::UntypedEntRef{QuotedIdent{"s"}}}};
         REQUIRE(such_that_clause == reference_clause);
     }
@@ -296,7 +296,7 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
         const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
         const auto reference_clause2 = untyped::UntypedSuchThatClause{
-            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
                                       untyped::UntypedEntRef{QuotedIdent{"v"}}}};
         REQUIRE(such_that_clause2 == reference_clause2);
     }
@@ -329,7 +329,7 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
         const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
         const auto reference_clause2 = untyped::UntypedSuchThatClause{
-            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedRef{untyped::UntypedSynonym{IDENT{"p"}}},
+            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
                                       untyped::UntypedEntRef{QuotedIdent{"v"}}}};
         REQUIRE(such_that_clause2 == reference_clause2);
     }

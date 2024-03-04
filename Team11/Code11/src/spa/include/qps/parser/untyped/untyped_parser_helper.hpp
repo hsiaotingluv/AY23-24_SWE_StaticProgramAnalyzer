@@ -12,8 +12,8 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
 
 auto parse_stmt_ref(const Token& token) -> UntypedStmtRef;
 
-auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>>;
+auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>>;
 
 template <unsigned long N>
 auto parse_keywords(std::array<std::string_view, N> keywords, std::vector<Token>::const_iterator it,
