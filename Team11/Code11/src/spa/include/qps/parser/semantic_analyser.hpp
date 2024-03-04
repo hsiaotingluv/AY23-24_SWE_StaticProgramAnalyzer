@@ -4,6 +4,7 @@
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
 #include "qps/parser/pattern_analyser.hpp"
+#include "qps/parser/relationship_analyser.hpp"
 #include "qps/parser/semantic_analyser_helper.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
@@ -13,14 +14,6 @@
 #include <optional>
 #include <variant>
 #include <vector>
-
-namespace qps::details {
-// Forward declarations
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList>
-auto validate_clause(const Synonyms& declarations,
-                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                     const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>>;
-} // namespace qps::details
 
 namespace qps {
 struct BooleanReference {};
@@ -69,8 +62,8 @@ struct Query {
 
 namespace qps {
 
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList, typename PatternAnalysersList,
-          typename UntypedQueryType, typename VisitorGenerator>
+template <typename RelationshipAnalysersList, typename PatternAnalysersList, typename ReferenceAnalyser,
+          typename UntypedQueryType>
 class SemanticAnalyser {
   public:
     static auto analyse(const Synonyms& declarations, const UntypedQueryType& untyped_query)
@@ -85,7 +78,7 @@ class SemanticAnalyser {
         const auto& [references, clauses] = untyped_query;
 
         // Reference must be declared
-        const auto& maybe_reference = std::visit(VisitorGenerator{}(mapping, declarations), references);
+        const auto& maybe_reference = std::visit(ReferenceAnalyser{}(mapping, declarations), references);
         if (!maybe_reference.has_value()) {
             return SemanticError{"Undeclared reference"};
         }
@@ -95,9 +88,9 @@ class SemanticAnalyser {
         // Clauses must be valid
         std::vector<std::shared_ptr<Clause>> validated_clauses;
         for (const auto& clause : clauses) {
-            const auto& maybe_validated_clause =
-                details::validate_clause<StmtStmtList, StmtEntList, EntEntList, PatternAnalysersList>(declarations,
-                                                                                                      mapping, clause);
+            const auto& maybe_validated_clause = std::visit(
+                details::untyped_clause_visitor<RelationshipAnalysersList, PatternAnalysersList>(declarations, mapping),
+                clause);
             if (!maybe_validated_clause.has_value()) {
                 return SemanticError{"Invalid clause"};
             }
@@ -108,7 +101,7 @@ class SemanticAnalyser {
     };
 };
 
-struct VisitorGenerator {
+struct ReferenceAnalyser {
     auto operator()(const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                     const Synonyms& declarations) const {
         return overloaded{
@@ -142,7 +135,8 @@ struct VisitorGenerator {
     }
 };
 
-using DefaultSemanticAnalyser =
-    SemanticAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList, DefaultPatternAnalysersList,
-                     untyped::DefaultUntypedParser::UntypedQueryType, VisitorGenerator>;
+using DefaultRelationshipAnalysersList =
+    TypeList<RelationshipAnalyser<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>>;
+using DefaultSemanticAnalyser = SemanticAnalyser<DefaultRelationshipAnalysersList, DefaultPatternAnalysersList,
+                                                 ReferenceAnalyser, untyped::DefaultUntypedParser::UntypedQueryType>;
 } // namespace qps
