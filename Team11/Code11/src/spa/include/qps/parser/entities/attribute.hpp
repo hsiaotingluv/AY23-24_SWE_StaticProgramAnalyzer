@@ -20,7 +20,7 @@ struct AttrRef {
     }
 
     auto operator==(const AttrRef& other) const -> bool {
-        return synonym == other.synonym && attr_name == other.attr_name;
+        return synonym == other.synonym && attr_name == other.attr_name && type == other.type;
     }
 
     friend auto operator<<(std::ostream& os, const AttrRef& attr_ref) -> std::ostream& {

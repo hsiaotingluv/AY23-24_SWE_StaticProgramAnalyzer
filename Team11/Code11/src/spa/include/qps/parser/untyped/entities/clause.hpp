@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qps/parser/expression_parser.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include <variant>
@@ -44,5 +45,22 @@ struct UntypedPatternClause {
     }
 };
 
-using UntypedClause = std::variant<UntypedSuchThatClause, UntypedPatternClause>;
+struct UntypedWithClause {
+    UntypedRef ref1;
+    UntypedRef ref2;
+
+    UntypedWithClause(UntypedRef ref1, UntypedRef ref2) : ref1(std::move(ref1)), ref2(std::move(ref2)) {
+    }
+
+    auto operator==(const UntypedWithClause& rhs) const -> bool {
+        return ref1 == rhs.ref1 && ref2 == rhs.ref2;
+    }
+
+    friend auto operator<<(std::ostream& os, const UntypedWithClause& clause) -> std::ostream& {
+        os << clause.ref1 << " = " << clause.ref2;
+        return os;
+    }
+};
+
+using UntypedClause = std::variant<UntypedSuchThatClause, UntypedPatternClause, UntypedWithClause>;
 } // namespace qps::untyped

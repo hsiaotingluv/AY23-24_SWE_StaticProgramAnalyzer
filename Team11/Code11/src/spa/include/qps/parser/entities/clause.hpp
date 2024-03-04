@@ -1,4 +1,5 @@
 #pragma once
+#include "qps/parser/entities/attribute.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/syntactic_pattern.hpp"
 
@@ -56,6 +57,25 @@ struct PatternClause : public Clause {
             return false;
         }
         return *this == dynamic_cast<const PatternClause&>(other);
+    }
+};
+
+struct WithClause : public Clause {
+    TypedRef ref1;
+    TypedRef ref2;
+
+    WithClause(TypedRef ref1, TypedRef ref2) : ref1(std::move(ref1)), ref2(std::move(ref2)) {
+    }
+
+    [[nodiscard]] auto representation() const -> std::string override;
+
+    auto operator==(const WithClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(WithClause)) {
+            return false;
+        }
+        return *this == dynamic_cast<const WithClause&>(other);
     }
 };
 

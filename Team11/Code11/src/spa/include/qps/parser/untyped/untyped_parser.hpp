@@ -16,7 +16,7 @@ using DefaultSupportedRefEntRelationships = TypeList<ModifiesS, UsesS>;
 using DefaultSuchThatClausesParser =
     SuchThatClausesParser<DefaultSupportedStmtStmtRelationships, DefaultSupportedRefEntRelationships>;
 
-using DefaultSupportedClauseParsers = TypeList<DefaultSuchThatClausesParser, PatternClausesParser>;
+using DefaultSupportedClauseParsers = TypeList<DefaultSuchThatClausesParser, PatternClausesParser, WithClausesParser>;
 
 using DefaultUntypedParser =
     UntypedParser<DefaultSupportedSynonyms, DefaultSupportedSelectParsers, DefaultSupportedClauseParsers>;

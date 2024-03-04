@@ -1,4 +1,5 @@
 #pragma once
+#include "qps/parser/analysers/semantic_analyser_helper.hpp"
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
@@ -69,6 +70,25 @@ auto untyped_clause_visitor(const Synonyms& declarations,
                 return std::nullopt;
             }
             return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
+        },
+        [&declarations, &mapping](const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
+            const auto& maybe_ref1 = validate_ref(declarations, mapping, with.ref1);
+            if (!maybe_ref1.has_value()) {
+                return std::nullopt;
+            }
+
+            const auto& maybe_ref2 = validate_ref(declarations, mapping, with.ref2);
+            if (!maybe_ref2.has_value()) {
+                return std::nullopt;
+            }
+
+            const auto maybe_valid_combi = validate_ref_combination(maybe_ref1.value(), maybe_ref2.value());
+            if (!maybe_valid_combi.has_value()) {
+                return std::nullopt;
+            }
+            const auto& [ref1, ref2] = maybe_valid_combi.value();
+
+            return std::make_shared<WithClause>(ref1, ref2);
         }};
 };
 
