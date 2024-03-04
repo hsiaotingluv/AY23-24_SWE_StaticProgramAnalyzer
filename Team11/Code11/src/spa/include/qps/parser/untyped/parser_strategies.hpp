@@ -6,6 +6,9 @@
 
 namespace qps::untyped {
 
+template <typename SupportedStmtStmtStrategies, typename SupportedRefEntStrategies>
+struct SuchThatParserStrategy; // Forward declaration - defined in parser_strategies.tpp
+
 struct PatternParserStrategy {
     static constexpr auto keywords = std::array<std::string_view, 1>{"pattern"};
 
@@ -23,6 +26,7 @@ struct WithParserStrategy {
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
         -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>>;
 };
+
 } // namespace qps::untyped
 
-#include "qps/parser/untyped/clause_parser.tpp"
+#include "qps/parser/untyped/parser_strategies.tpp"

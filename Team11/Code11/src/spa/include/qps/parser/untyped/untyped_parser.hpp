@@ -2,8 +2,8 @@
 
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/untyped/clause_parser.hpp"
-#include "qps/parser/untyped/clause_parser.tpp"
+#include "qps/parser/untyped/clauses_parser.tpp"
+#include "qps/parser/untyped/parser_strategies.hpp"
 #include "qps/parser/untyped/result_cl_parser.hpp"
 #include "qps/parser/untyped/untyped_parser.tpp"
 #include "qps/template_utils.hpp"

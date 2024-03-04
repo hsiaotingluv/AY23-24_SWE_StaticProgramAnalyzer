@@ -1,26 +1,14 @@
-#include "qps/parser/untyped/clause_parser.hpp"
 #include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
+#include "qps/parser/untyped/parser_strategies.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
 #include <iterator>
 #include <optional>
 #include <vector>
 
 namespace qps::untyped::detail {
-auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::vector<Token>::const_iterator> {
-    if (it == end) {
-        return std::nullopt;
-    }
-    const auto& maybe_and = *it;
-    if (!is_keyword(maybe_and, "and")) {
-        return std::nullopt;
-    }
-    return std::next(it);
-}
-
 auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;

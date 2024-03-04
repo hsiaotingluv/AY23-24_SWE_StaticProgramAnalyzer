@@ -80,4 +80,16 @@ auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector
         return std::nullopt;
     }
 }
+
+auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::vector<Token>::const_iterator> {
+    if (it == end) {
+        return std::nullopt;
+    }
+    const auto& maybe_and = *it;
+    if (!is_keyword(maybe_and, "and")) {
+        return std::nullopt;
+    }
+    return std::next(it);
+}
 } // namespace qps::untyped::detail
