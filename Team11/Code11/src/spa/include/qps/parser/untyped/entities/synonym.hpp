@@ -23,8 +23,8 @@ struct UntypedSynonym {
         return name.get_value();
     }
 
-    auto operator<<(std::ostream& os) const -> std::ostream& {
-        os << name;
+    friend auto operator<<(std::ostream& os, const UntypedSynonym& synonym) -> std::ostream& {
+        os << synonym.name;
         return os;
     }
 };
