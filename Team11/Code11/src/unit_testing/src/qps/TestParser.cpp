@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "qps/parser.hpp"
+#include "qps/parser/entities/attribute_name.hpp"
 #include "utils.hpp"
 
 #include "qps/parser/entities/primitives.hpp"
@@ -462,5 +462,75 @@ TEST_CASE("Test Parser - pattern clause with 3 arg") {
         const auto query2 = R"(while a; variable v; Select a pattern a ( _ , v, _))";
         const auto output2 = parser.parse(query2);
         REQUIRE(std::holds_alternative<SyntaxError>(output2));
+    }
+}
+
+TEST_CASE("Test Parser - Basic With clause") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("Test Parser - with stmt#") {
+        const auto query = R"(variable v; Select v with v.stmt# = 1)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<VarSynonym>(declarations[0], "v");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
+        const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedWithClause{
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, StmtNum{}}, Integer{"1"}};
+        REQUIRE(with_clause == reference_clause);
+    }
+
+    SECTION("Test Parser - with value") {
+        const auto query = R"(variable v; Select v with v.value = "x")";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<VarSynonym>(declarations[0], "v");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
+        const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedWithClause{
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, Value{}}, QuotedIdent{"x"}};
+        REQUIRE(with_clause == reference_clause);
+    }
+
+    SECTION("Test Parser - with procName") {
+        const auto query = R"(procedure p; Select p with p.procName = "x")";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
+        const auto& [declarations, untyped] =
+            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<ProcSynonym>(declarations[0], "p");
+
+        const auto& [reference, clauses] = untyped;
+        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
+        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"p"}});
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
+        const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedWithClause{
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"p"}}, ProcName{}}, QuotedIdent{"x"}};
+        REQUIRE(with_clause == reference_clause);
     }
 }

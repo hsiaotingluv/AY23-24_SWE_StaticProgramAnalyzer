@@ -1,6 +1,8 @@
 #include "catch.hpp"
 
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/attribute.hpp"
+#include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 #include "utils.hpp"
 
@@ -485,5 +487,444 @@ TEST_CASE("Test QPS - Pattern If") {
         const auto reference_clause = std::make_shared<PatternClause>(
             PatternIf{std::make_shared<IfSynonym>(IDENT{"ifs"}), QuotedIdent{"normSq"}});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+}
+
+TEST_CASE("Test QPS - With") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query - with procName") {
+        SECTION("Query - with procedure.procName") {
+            const auto query = "procedure p; Select p with p.procName = \"main\"";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<ProcSynonym>(result.declared[0], "p");
+            require_value<ProcSynonym>(result.reference, "p");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<ProcSynonym>(IDENT{"p"}), ProcName{}, AttrRef::Type::Name},
+                QuotedIdent{"main"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with call.procName") {
+            const auto query = "call c; Select c with c.procName = \"main\"";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<CallSynonym>(result.declared[0], "c");
+            require_value<CallSynonym>(result.reference, "c");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<CallSynonym>(IDENT{"c"}), ProcName{}, AttrRef::Type::Name},
+                QuotedIdent{"main"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with variable.procName - SemanticError") {
+            const auto query = "variable v; Select v with v.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with stmt.procName - SemanticError") {
+            const auto query = "stmt s; Select s with s.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with constant.procName - SemanticError") {
+            const auto query = "constant c; Select c with c.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with print.procName - SemanticError") {
+            const auto query = "print p; Select p with p.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with read.procName - SemanticError") {
+            const auto query = "read r; Select r with r.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with while.procName - SemanticError") {
+            const auto query = "while w; Select w with w.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with if.procName - SemanticError") {
+            const auto query = "if i; Select i with i.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with assign.procName - SemanticError") {
+            const auto query = "assign a; Select a with a.procName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+    }
+
+    SECTION("Query - with varName") {
+        SECTION("Query - with v.varName") {
+            const auto query = "variable v; Select v with v.varName = \"main\"";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<VarSynonym>(result.declared[0], "v");
+            require_value<VarSynonym>(result.reference, "v");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<VarSynonym>(IDENT{"v"}), VarName{}, AttrRef::Type::Name}, QuotedIdent{"main"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with read.varName") {
+            const auto query = "read r; Select r with r.varName = \"main\"";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<ReadSynonym>(result.declared[0], "r");
+            require_value<ReadSynonym>(result.reference, "r");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), VarName{}, AttrRef::Type::Name},
+                QuotedIdent{"main"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with print.varName") {
+            const auto query = "print p; Select p with p.varName = \"main\"";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<PrintSynonym>(result.declared[0], "p");
+            require_value<PrintSynonym>(result.reference, "p");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<PrintSynonym>(IDENT{"p"}), VarName{}, AttrRef::Type::Name},
+                QuotedIdent{"main"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with proc.varName - SemanticError") {
+            const auto query = "procedure p; Select p with p.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with constant.varName - SemanticError") {
+            const auto query = "constant c; Select c with c.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with stmt.varName - SemanticError") {
+            const auto query = "stmt s; Select s with s.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with assign.varName - SemanticError") {
+            const auto query = "assign a; Select a with a.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with while.varName - SemanticError") {
+            const auto query = "while w; Select w with w.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with if.varName - SemanticError") {
+            const auto query = "if i; Select i with i.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with call.varName - SemanticError") {
+            const auto query = "call c; Select c with c.varName = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+    }
+
+    SECTION("Query - with value") {
+        SECTION("Query - with constant.value") {
+            const auto query = "constant c; Select c with c.value = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<ConstSynonym>(result.declared[0], "c");
+            require_value<ConstSynonym>(result.reference, "c");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<ConstSynonym>(IDENT{"c"}), Value{}, AttrRef::Type::Integer}, Integer{"1"});
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with variable.value - SemanticError") {
+            const auto query = "variable v; Select v with v.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with read.value - SemanticError") {
+            const auto query = "read r; Select r with r.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with print.value - SemanticError") {
+            const auto query = "print p; Select p with p.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with proc.value - SemanticError") {
+            const auto query = "procedure p; Select p with p.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with stmt.value - SemanticError") {
+            const auto query = "stmt s; Select s with s.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with assign.value - SemanticError") {
+            const auto query = "assign a; Select a with a.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with while.value - SemanticError") {
+            const auto query = "while w; Select w with w.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with if.value - SemanticError") {
+            const auto query = "if i; Select i with i.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with call.value - SemanticError") {
+            const auto query = "call c; Select c with c.value = \"main\"";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+    }
+
+    SECTION("Query - with stmt#") {
+        SECTION("Query - with s.stmt#") {
+            const auto query = "stmt s; Select s with s.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+            require_value<AnyStmtSynonym>(result.declared[0], "s");
+            require_value<AnyStmtSynonym>(result.reference, "s");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with r.stmt#") {
+            const auto query = "read r; Select r with r.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<ReadSynonym>(result.declared[0], "r");
+            require_value<ReadSynonym>(result.reference, "r");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with print.stmt#") {
+            const auto query = "print p; Select p with p.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<PrintSynonym>(result.declared[0], "p");
+            require_value<PrintSynonym>(result.reference, "p");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<PrintSynonym>(IDENT{"p"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with call.stmt#") {
+            const auto query = "call c; Select c with c.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<CallSynonym>(result.declared[0], "c");
+            require_value<CallSynonym>(result.reference, "c");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<CallSynonym>(IDENT{"c"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with while.stmt#") {
+            const auto query = "while w; Select w with w.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<WhileSynonym>(result.declared[0], "w");
+            require_value<WhileSynonym>(result.reference, "w");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<WhileSynonym>(IDENT{"w"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with if.stmt#") {
+            const auto query = "if i; Select i with i.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<IfSynonym>(result.declared[0], "i");
+            require_value<IfSynonym>(result.reference, "i");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<IfSynonym>(IDENT{"i"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with assign.stmt#") {
+            const auto query = "assign a; Select a with a.stmt# = 1";
+            const auto output = to_query(qps.parse(query));
+
+            REQUIRE(output.has_value());
+            const auto result = output.value();
+
+            REQUIRE(result.declared.size() == 1);
+
+            require_value<AssignSynonym>(result.declared[0], "a");
+            require_value<AssignSynonym>(result.reference, "a");
+
+            REQUIRE(result.clauses.size() == 1);
+            const auto reference_clause = std::make_shared<WithClause>(
+                AttrRef{std::make_shared<AssignSynonym>(IDENT{"a"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+
+            REQUIRE(*(result.clauses[0]) == *reference_clause);
+        }
+
+        SECTION("Query - with p.stmt# - SemanticError") {
+            const auto query = "procedure p; Select p with p.stmt# = 1";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with c.stmt# - SemanticError") {
+            const auto query = "constant c; Select c with c.stmt# = 1";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
+
+        SECTION("Query - with v.stmt# - SemanticError") {
+            const auto query = "variable v; Select v with v.stmt# = 1";
+            const auto output = qps.parse(query);
+
+            REQUIRE(is_semantic_error(output));
+        }
     }
 }
