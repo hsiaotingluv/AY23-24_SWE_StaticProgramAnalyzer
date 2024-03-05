@@ -227,6 +227,13 @@ TEST_CASE("Test QPS - Syntax") {
 
         REQUIRE(is_syntax_error(output));
     }
+
+    SECTION("Query with missing semi-colon") {
+        const auto query = "stmt s Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
 }
 
 TEST_CASE("Test QPS - Semantics") {

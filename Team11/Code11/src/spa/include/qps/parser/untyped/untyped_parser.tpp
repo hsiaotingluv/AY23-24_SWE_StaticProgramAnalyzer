@@ -8,6 +8,7 @@
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include "qps/parser/errors.hpp"
+#include <optional>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -133,10 +134,11 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
         synonyms.emplace_back(std::make_shared<SynonymType>(IDENT{synonym.content}));
     }
 
-    // Consume ';' delimiter if it exists
-    if (it != end && is_semicolon(*it)) {
-        it = std::next(it);
+    // Expect ';' delimiter
+    if (it == end || !is_semicolon(*it)) {
+        return std::nullopt;
     }
+    it = std::next(it);
     return std::make_tuple(synonyms, it);
 }
 
