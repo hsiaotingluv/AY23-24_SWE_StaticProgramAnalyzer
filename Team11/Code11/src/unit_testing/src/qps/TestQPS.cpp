@@ -27,8 +27,7 @@ TEST_CASE("Test Declaration Parser") {
         const auto output =
             untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
+        const auto& [result, rest] = output;
 
         REQUIRE(result.size() == 1);
         require_value<ProcSynonym>(result[0], "p");
@@ -41,8 +40,7 @@ TEST_CASE("Test Declaration Parser") {
         const auto output =
             untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
+        const auto& [result, rest] = output;
 
         REQUIRE(result.size() == 3);
         require_value<ProcSynonym>(result[0], "p");
@@ -57,8 +55,7 @@ TEST_CASE("Test Declaration Parser") {
         const auto output =
             untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
 
-        REQUIRE(output.has_value());
-        const auto& [result, rest] = output.value();
+        const auto& [result, rest] = output;
 
         REQUIRE(result.size() == 2);
         require_value<ProcSynonym>(result[0], "p");
@@ -69,10 +66,11 @@ TEST_CASE("Test Declaration Parser") {
     SECTION("Declaration with invalid keyword") {
         const auto query = "proc p;";
         auto tokens = runner.apply_tokeniser(query);
-        const auto result =
+        const auto output =
             untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
-
-        REQUIRE(!result.has_value());
+        const auto& [result, rest] = output;
+        REQUIRE(result.empty());
+        REQUIRE(std::distance(tokens.cbegin(), rest) == 0);
     }
 }
 
@@ -244,6 +242,10 @@ TEST_CASE("Test QPS - Semantics") {
 
         // expression-spec : '_' '"' factor '"' '_' | '_'
         REQUIRE(is_semantic_error(output2));
+
+        const auto query3 = "Select s";
+        const auto output3 = qps.parse(query3);
+        REQUIRE(is_semantic_error(output3));
     }
 
     SECTION("Query with semantic issues") {
