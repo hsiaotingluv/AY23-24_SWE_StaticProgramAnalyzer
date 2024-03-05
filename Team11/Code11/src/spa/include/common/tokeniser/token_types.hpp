@@ -37,6 +37,9 @@ enum class TokenType {
     // QPS Wildcard Token
     Wildcard,
 
+    // QPS Relationship Keyword Token
+    Relationship,
+
     // ============= SP specifics Token ===============
     // Keyword is captured as string since keyword names are not reserved
     // SP Delimiter
