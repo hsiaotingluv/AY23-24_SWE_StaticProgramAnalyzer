@@ -1,8 +1,8 @@
+#include "qps/parser/untyped/parser_strategies.hpp"
 #include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
-#include "qps/parser/untyped/parser_strategies.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
 #include <iterator>
 #include <optional>
