@@ -284,10 +284,10 @@ struct ModifiesP {
     }
 };
 
-using DefaultStmtStmtList = TypeList<Follows, FollowsT, Parent, ParentT>;
+using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
 using DefaultEntEntList = TypeList<UsesP, ModifiesP>;
 
-using Relationship =
-    type_list_to_variant_t<concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>>;
+using RelationshipList = concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>;
+using Relationship = type_list_to_variant_t<RelationshipList>;
 } // namespace qps
