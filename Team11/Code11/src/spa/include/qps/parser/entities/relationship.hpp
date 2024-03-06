@@ -284,7 +284,7 @@ struct ModifiesP {
     }
 };
 
-using DefaultStmtStmtList = TypeList<Follows, FollowsT, Parent, ParentT>;
+using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
 using DefaultEntEntList = TypeList<UsesP, ModifiesP>;
 
