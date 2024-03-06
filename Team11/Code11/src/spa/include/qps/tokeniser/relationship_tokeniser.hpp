@@ -4,7 +4,6 @@
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/template_utils.hpp"
 #include <memory>
-#include <optional>
 
 namespace tokenizer {
 template <typename T>
@@ -34,27 +33,9 @@ class QPSRelationshipTokenizer : public Tokenizer {
         return vector;
     }();
 
-    template <typename Iterator>
-    auto one_of_with_longer_preference(const TokeniserInput& input, Iterator tokenisers_start,
-                                       const Iterator& tokenisers_end) const -> TokeniserOutput {
-        TokeniserOutput output = std::nullopt;
-        for (auto it = tokenisers_start; it != tokenisers_end; it++) {
-            auto result = (*it)->tokenize(input);
-            if (!result.has_value()) {
-                continue;
-            }
-
-            if (!output.has_value() ||
-                (std::get<0>(output.value()).content.length() < std::get<0>(result.value()).content.length())) {
-                output = result;
-            }
-        }
-        return output;
-    }
-
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
-        return one_of_with_longer_preference(input, tokenizers.begin(), tokenizers.end());
+        return one_of(input, tokenizers.begin(), tokenizers.end());
     }
 };
 
