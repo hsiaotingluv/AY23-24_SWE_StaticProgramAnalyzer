@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/entities/clause.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
@@ -61,29 +62,19 @@ auto parse_stmt_stmt(std::vector<Token>::const_iterator it, const std::vector<To
     -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
     constexpr auto EXPECTED_LENGTH = 6;
     const auto keyword = std::string{T::keyword};
-    const auto is_direct = keyword.find('*') == std::string::npos;
-    const auto offset = is_direct ? 0 : 1;
-    if (std::distance(it, end) < EXPECTED_LENGTH + offset) {
+    if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }
 
-    if (!is_direct) {
-        // Ancestor relationship must have a star
-        const auto maybe_star = std::next(it);
-        if (!is_star(*maybe_star)) {
-            return std::nullopt;
-        }
-    }
-
     const auto& maybe_keyword = *it;
-    const auto& maybe_open_bracket = *std::next(it, 1 + offset);
-    const auto& maybe_first_arg = *std::next(it, 2 + offset);
-    const auto& maybe_comma = *std::next(it, 3 + offset);
-    const auto& maybe_second_arg = *std::next(it, 4 + offset);
-    const auto& maybe_close_bracket = *std::next(it, 5 + offset);
+    const auto& maybe_open_bracket = *std::next(it, 1);
+    const auto& maybe_first_arg = *std::next(it, 2);
+    const auto& maybe_comma = *std::next(it, 3);
+    const auto& maybe_second_arg = *std::next(it, 4);
+    const auto& maybe_close_bracket = *std::next(it, 5);
 
-    if (!is_keyword(maybe_keyword, keyword.substr(0, keyword.size() - offset)) ||
-        !is_open_bracket(maybe_open_bracket) || !is_comma(maybe_comma) || !is_close_bracket(maybe_close_bracket)) {
+    if (!is_relationship_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket) ||
+        !is_comma(maybe_comma) || !is_close_bracket(maybe_close_bracket)) {
         return std::nullopt;
     }
 
@@ -94,7 +85,7 @@ auto parse_stmt_stmt(std::vector<Token>::const_iterator it, const std::vector<To
 
     return std::make_tuple(
         UntypedStmtStmtRel{keyword, parse_stmt_ref(maybe_first_arg), parse_stmt_ref(maybe_second_arg)},
-        std::next(it, EXPECTED_LENGTH + offset));
+        std::next(it, EXPECTED_LENGTH));
 };
 
 template <typename T>
@@ -108,7 +99,7 @@ auto parse_ref_ent(std::vector<Token>::const_iterator it, const std::vector<Toke
 
     const auto maybe_keyword = *it;
     const auto maybe_open_bracket = *std::next(it, 1);
-    if (!is_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket)) {
+    if (!is_relationship_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket)) {
         return std::nullopt;
     }
 

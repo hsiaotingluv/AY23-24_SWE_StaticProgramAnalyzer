@@ -66,7 +66,7 @@ TEST_CASE("Test QPS Tokenizer") {
         REQUIRE(result[8].T == TokenType::String);
 
         REQUIRE(result[9].content == "Modifies");
-        REQUIRE(result[9].T == TokenType::String);
+        REQUIRE(result[9].T == TokenType::Relationship);
 
         REQUIRE(result[10].content == "(");
         REQUIRE(result[10].T == TokenType::LParen);
@@ -94,5 +94,41 @@ TEST_CASE("Test QPS Tokenizer") {
 
         REQUIRE(result[18].content == ")");
         REQUIRE(result[18].T == TokenType::RParen);
+    }
+
+    SECTION("Follows*") {
+        const auto query = R"(Follows*(_, "b123 * 456"))";
+        const auto result = tokenizer_runner.apply_tokeniser(query);
+
+        REQUIRE(result.size() == 10);
+        REQUIRE(result[0].content == "Follows*");
+        REQUIRE(result[0].T == TokenType::Relationship);
+
+        REQUIRE(result[1].content == "(");
+        REQUIRE(result[1].T == TokenType::LParen);
+
+        REQUIRE(result[2].content == "_");
+        REQUIRE(result[2].T == TokenType::Wildcard);
+
+        REQUIRE(result[3].content == ",");
+        REQUIRE(result[3].T == TokenType::Comma);
+
+        REQUIRE(result[4].content == "\"");
+        REQUIRE(result[4].T == TokenType::DQuote);
+
+        REQUIRE(result[5].content == "b123");
+        REQUIRE(result[5].T == TokenType::String);
+
+        REQUIRE(result[6].content == "*");
+        REQUIRE(result[6].T == TokenType::Mul);
+
+        REQUIRE(result[7].content == "456");
+        REQUIRE(result[7].T == TokenType::Integer);
+
+        REQUIRE(result[8].content == "\"");
+        REQUIRE(result[8].T == TokenType::DQuote);
+
+        REQUIRE(result[9].content == ")");
+        REQUIRE(result[9].T == TokenType::RParen);
     }
 }

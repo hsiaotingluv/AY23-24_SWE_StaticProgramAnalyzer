@@ -45,6 +45,23 @@ struct concat<TypeList<Ts...>, TypeList<Us...>> {
 template <typename T, typename U>
 using concat_t = typename concat<T, U>::type;
 
+template <typename T>
+struct num_elem;
+
+template <>
+struct num_elem<qps::TypeList<>> {
+    static constexpr int value = 0;
+};
+
+template <typename Head, typename... Tails>
+struct num_elem<qps::TypeList<Head, Tails...>> {
+
+    static constexpr int value = 1 + num_elem<qps::TypeList<Tails...>>::value;
+};
+
+template <typename T>
+static constexpr int num_elem_v = num_elem<T>::value;
+
 template <typename TypeList>
 struct type_list_to_variant;
 

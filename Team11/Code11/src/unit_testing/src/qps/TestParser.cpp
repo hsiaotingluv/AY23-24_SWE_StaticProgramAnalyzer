@@ -532,5 +532,15 @@ TEST_CASE("Test Parser - Basic With clause") {
         const auto reference_clause = untyped::UntypedWithClause{
             untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"p"}}, ProcName{}}, QuotedIdent{"x"}};
         REQUIRE(with_clause == reference_clause);
+
+        SECTION("Transitive relationships") {
+            const auto query = "variable v; select v such that Parent *(v, 1)";
+            const auto output = parser.parse(query);
+            REQUIRE(std::holds_alternative<SyntaxError>(output)); // Parent* instead of Parent *
+
+            const auto query2 = "variable v; select v such that Follows *(v, 1)";
+            const auto output2 = parser.parse(query);
+            REQUIRE(std::holds_alternative<SyntaxError>(output2)); // Follows* instead of Follows *
+        }
     }
 }
