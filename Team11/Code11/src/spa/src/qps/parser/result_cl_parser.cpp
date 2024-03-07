@@ -8,6 +8,11 @@ auto SelectSynonymStrategy::parse(std::vector<Token>::const_iterator it, const s
     return detail::parse_synonym(it, end);
 }
 
+auto SelectAttrRefStrategy::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedAttrRef, std::vector<Token>::const_iterator>> {
+    return detail::parse_attr_ref(it, end);
+}
+
 auto SelectBooleanParser::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedBoolean, std::vector<Token>::const_iterator>> {
     constexpr auto EXPECTED_LENGTH = 2;

@@ -7,6 +7,7 @@
 #include "qps/parser/entities/select.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/parser/errors.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/boolean.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
@@ -71,12 +72,21 @@ template <typename T>
 auto analyse(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
              const T& element) -> std::optional<Elem> {
     return std::visit(overloaded{[&](const untyped::UntypedSynonym& synonym) -> std::optional<Elem> {
-                          const auto& maybe_synonym = details::is_synonym_declared(declarations, mapping, synonym);
-                          if (!maybe_synonym.has_value()) {
-                              return std::nullopt;
-                          }
-                          return std::make_optional(Elem{maybe_synonym.value()});
-                      }},
+                                     const auto& maybe_synonym =
+                                         details::is_synonym_declared(declarations, mapping, synonym);
+                                     if (!maybe_synonym.has_value()) {
+                                         return std::nullopt;
+                                     }
+                                     return std::make_optional(Elem{maybe_synonym.value()});
+                                 },
+                                 [&](const untyped::UntypedAttrRef& attr_ref) -> std::optional<Elem> {
+                                     const auto& maybe_synonym =
+                                         details::is_synonym_declared(declarations, mapping, attr_ref.synonym);
+                                     if (!maybe_synonym.has_value()) {
+                                         return std::nullopt;
+                                     }
+                                     return std::make_optional(Elem{maybe_synonym.value()});
+                                 }},
                       element);
 }
 

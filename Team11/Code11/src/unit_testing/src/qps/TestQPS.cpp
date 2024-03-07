@@ -958,3 +958,40 @@ TEST_CASE("Test QPS - With") {
         }
     }
 }
+
+TEST_CASE("Test QPS - Select attrRef") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query - Select attrRef one") {
+        const auto query = "stmt s; Select s.stmt#";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 1);
+        require_value<AnyStmtSynonym>(result.declared[0], "s");
+        require_value<AnyStmtSynonym>(result.reference, "s");
+    }
+
+    SECTION("Query - Select attrRef two") {
+        const auto query = "assign a1; variable a2; Select<a1.stmt#, a2> such that Modifies(a1, a2)";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 2);
+        require_value<AssignSynonym>(result.declared[0], "a1");
+        require_value<VarSynonym>(result.declared[1], "a2");
+
+        require_value<AssignSynonym>(result.reference, "a1");
+        require_value<VarSynonym>(result.reference, "a2");
+    }
+
+    SECTION("Query - Invalid Syntax") {
+        const auto query = "assign a1; Select<a1.stmt #>";
+        const auto output = qps.parse(query);
+        REQUIRE(is_syntax_error(output));
+    }
+}

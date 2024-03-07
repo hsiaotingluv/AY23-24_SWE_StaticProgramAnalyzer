@@ -1,6 +1,7 @@
 #include "catch.hpp"
 
 #include "qps/parser/entities/attribute_name.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "utils.hpp"
 
 #include "qps/parser/entities/primitives.hpp"
@@ -16,7 +17,7 @@
 
 using namespace qps;
 
-using UntypedVector = std::vector<std::variant<untyped::UntypedSynonym>>;
+using UntypedVector = std::vector<std::variant<untyped::UntypedAttrRef, untyped::UntypedSynonym>>;
 
 template <typename T>
 auto require_value(const UntypedVector& vector, const std::string& str) -> void {

@@ -1,5 +1,6 @@
 #pragma once
 #include "qps/parser/parser_helper.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/boolean.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
@@ -24,6 +25,14 @@ namespace qps::untyped {
 class SelectSynonymStrategy {
   public:
     using ClauseType = UntypedSynonym;
+
+    static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>>;
+};
+
+class SelectAttrRefStrategy {
+  public:
+    using ClauseType = UntypedAttrRef;
 
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
         -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>>;
@@ -58,7 +67,7 @@ class SelectElemParser {
     }
 };
 
-using DefaultSelectElemParser = SelectElemParser<TypeList<SelectSynonymStrategy>>;
+using DefaultSelectElemParser = SelectElemParser<TypeList<SelectAttrRefStrategy, SelectSynonymStrategy>>;
 
 class SelectBooleanParser {
     static constexpr auto keywords = std::array<std::string_view, 1>{"Select"};
