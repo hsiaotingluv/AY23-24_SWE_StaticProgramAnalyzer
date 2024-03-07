@@ -1,4 +1,4 @@
-#include "pkb/stores/assignment_store.h"
+#include "pkb/stores/pattern_matching_store/assignment_store.h"
 
 AssignmentStore::AssignmentStore() = default;
 

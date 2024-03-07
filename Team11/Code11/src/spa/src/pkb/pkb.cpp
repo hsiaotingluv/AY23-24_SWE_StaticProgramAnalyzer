@@ -15,7 +15,9 @@ PKB::PKB()
       statement_modifies_store(std::make_shared<StatementModifiesStore>()),
       procedure_uses_store(std::make_shared<ProcedureUsesStore>()),
       statement_uses_store(std::make_shared<StatementUsesStore>()),
-      assignment_store(std::make_shared<AssignmentStore>()) {
+      assignment_store(std::make_shared<AssignmentStore>()), next_store(std::make_shared<NextStore>()),
+      calls_store(std::make_shared<CallsStore>()), if_var_store(std::make_shared<IfVarStore>()),
+      while_var_store(std::make_shared<WhileVarStore>()) {
 }
 
 auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {

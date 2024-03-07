@@ -6,8 +6,7 @@
 
 class Procedure : public Entity {
   public:
-    explicit Procedure(std::string name) : Entity(std::move(name)) {
-    }
+    using Entity::Entity;
 };
 
 namespace std {

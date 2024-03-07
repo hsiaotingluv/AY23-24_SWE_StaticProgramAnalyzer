@@ -1,13 +1,17 @@
 #pragma once
 
-#include "pkb/stores/assignment_store.h"
+#include "pkb/stores/calls_store.h"
 #include "pkb/stores/entity_store.h"
 #include "pkb/stores/follows_store/direct_follows_store.h"
 #include "pkb/stores/follows_store/follows_star_store.h"
 #include "pkb/stores/modifies_store/procedure_modifies_store.h"
 #include "pkb/stores/modifies_store/statement_modifies_store.h"
+#include "pkb/stores/next_store.h"
 #include "pkb/stores/parent_store/direct_parent_store.h"
 #include "pkb/stores/parent_store/parent_star_store.h"
+#include "pkb/stores/pattern_matching_store/assignment_store.h"
+#include "pkb/stores/pattern_matching_store/if_var_store.h"
+#include "pkb/stores/pattern_matching_store/while_var_store.h"
 #include "pkb/stores/statement_store.h"
 #include "pkb/stores/uses_store/procedure_uses_store.h"
 #include "pkb/stores/uses_store/statement_uses_store.h"
@@ -64,6 +68,10 @@ class PKB {
     std::shared_ptr<ProcedureUsesStore> procedure_uses_store;
     std::shared_ptr<StatementUsesStore> statement_uses_store;
     std::shared_ptr<AssignmentStore> assignment_store;
+    std::shared_ptr<NextStore> next_store;
+    std::shared_ptr<CallsStore> calls_store;
+    std::shared_ptr<IfVarStore> if_var_store;
+    std::shared_ptr<WhileVarStore> while_var_store;
 
     template <class DirectStore, class StarStore>
     void populate_star_from_direct(DirectStore direct_store, StarStore star_store);
