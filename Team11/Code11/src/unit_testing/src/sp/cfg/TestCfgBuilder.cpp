@@ -88,10 +88,9 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         auto ast = sp.process(input);
-        // std::cout << cfg_builder->to_string() << std::endl; // To inspect the string output of the CFG.
 
         /**
-         * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
+         * FYI : cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
          *
          * computeCentroid:
          * Node(21, 22) -> OutNeighbours(Node(23))
@@ -135,10 +134,9 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         auto ast = sp.process(input);
-        // std::cout << cfg_builder->to_string() << std::endl;  // To inspect the string output of the CFG.
 
         /**
-         * cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
+         * FYI : cfg_builder->to_string() returns the below string representation of the Control Flow Graph.
          *
          * computeCentroid:
          * Node(7, 8) -> OutNeighbours(Node()) // Points to dummy node
