@@ -188,12 +188,10 @@ TEST_CASE("Test CFG Builder") {
          */
 
         auto ast = sp.process(input);
-        //std::cout << cfg_builder->to_string() << std::endl;  // To inspect the string output of the CFG.
         REQUIRE(get_proc_names(cfg_builder->proc_map) == std::unordered_set<std::string>{"nesting"});
         REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "nesting") ==
-                std::unordered_set<int>{1,2,3,4,5,6,7});
+                std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 3);
-
     }
 }
 
