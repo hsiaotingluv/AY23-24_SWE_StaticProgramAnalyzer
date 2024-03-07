@@ -729,3 +729,377 @@ TEST_CASE("Assignment Pattern Test") {
         REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1 ").size() == 3);
     }
 }
+
+TEST_CASE("Calls Test") {
+    SECTION("Adding and Verifying Direct Calls Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+
+        REQUIRE(read_facade->has_calls_relation("Main", "Helper"));
+        REQUIRE(read_facade->has_calls_relation("Helper", "Logger"));
+    }
+
+    SECTION("Verifying Absence of Non-existent Direct Calls Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+
+        REQUIRE_FALSE(read_facade->has_calls_relation("Main", "Logger"));
+        REQUIRE_FALSE(read_facade->has_calls_relation("Helper", "Main"));
+        REQUIRE_FALSE(read_facade->has_calls_relation("Logger", "Helper"));
+    }
+
+    SECTION("Retrieving All Direct Calls Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Main", "Logger");
+        write_facade->add_calls("Helper", "Validator");
+
+        auto calls_keys = read_facade->get_all_calls_keys();
+
+        REQUIRE(calls_keys.size() == 2);
+
+        auto main_calls = read_facade->get_callees("Main");
+
+        REQUIRE(main_calls.size() == 2);
+        REQUIRE(main_calls.count("Helper") == 1);
+        REQUIRE(main_calls.count("Logger") == 1);
+
+        auto helper_calls = read_facade->get_callees("Helper");
+
+        REQUIRE(helper_calls.size() == 1);
+        REQUIRE(helper_calls.count("Validator") == 1);
+
+        auto logger_calls = read_facade->get_callees("Logger");
+        auto validator_calls = read_facade->get_callees("Validator");
+
+        REQUIRE(logger_calls.empty());
+        REQUIRE(validator_calls.empty());
+    }
+
+    SECTION("Retrieving All Callees") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Main", "Utils");
+
+        auto callees = read_facade->get_all_calls_values();
+
+        REQUIRE(callees.size() == 2);
+        REQUIRE(callees.find("Main") == callees.end());
+        REQUIRE(callees.find("Helper") != callees.end());
+        REQUIRE(callees.find("Utils") != callees.end());
+    }
+
+    SECTION("Retrieving All Callers") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Utils", "Logger");
+
+        auto callers = read_facade->get_all_calls_keys();
+
+        REQUIRE(callers.size() == 2);
+        REQUIRE(callers.find("Main") != callers.end());
+        REQUIRE(callers.find("Utils") != callers.end());
+        REQUIRE(callers.find("Helper") == callers.end());
+        REQUIRE(callers.find("Logger") == callers.end());
+    }
+
+    SECTION("Retrieving All Callers for a Given Callee") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Logger", "Helper");
+
+        auto callers = read_facade->get_callers("Helper");
+
+        REQUIRE(callers.size() == 2);
+        REQUIRE(callers.find("Main") != callers.end());
+        REQUIRE(callers.find("Logger") != callers.end());
+        REQUIRE(callers.find("Helper") == callers.end());
+    }
+
+    SECTION("Retrieving Callers for Non-existent Callee Returns Empty Set") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        auto callers = read_facade->get_callers("NonExisting");
+
+        REQUIRE(callers.empty());
+    }
+
+    SECTION("Retrieving All Callees for a Given Caller") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Main", "Logger");
+
+        auto callees = read_facade->get_callees("Main");
+
+        REQUIRE(callees.size() == 2);
+        REQUIRE(callees.find("Helper") != callees.end());
+        REQUIRE(callees.find("Logger") != callees.end());
+        REQUIRE(callees.find("Main") == callees.end());
+    }
+
+    SECTION("Retrieving Callees for Non-existent Caller Returns Empty Set") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        auto callees = read_facade->get_callees("NonExisting");
+
+        REQUIRE(callees.empty());
+    }
+}
+
+TEST_CASE("Next Test") {
+    SECTION("Add and Verify Direct Next Relationship") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("2", "3");
+
+        REQUIRE(read_facade->has_next_relation("1", "2"));
+        REQUIRE(read_facade->has_next_relation("2", "3"));
+        REQUIRE_FALSE(read_facade->has_next_relation("1", "3"));
+    }
+
+    SECTION("Get All Direct Next Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("2", "3");
+        write_facade->add_next("2", "4");
+
+        auto next_keys = read_facade->get_all_next_keys();
+
+        REQUIRE(next_keys.size() == 2);
+
+        auto next_1 = read_facade->get_next_of("1");
+
+        REQUIRE(next_1.size() == 1);
+        REQUIRE(next_1.count("2") == 1);
+        REQUIRE(next_1.count("1") == 0);
+        REQUIRE(next_1.count("3") == 0);
+        REQUIRE(next_1.count("4") == 0);
+
+        auto next_2 = read_facade->get_next_of("2");
+
+        REQUIRE(next_2.size() == 2);
+        REQUIRE(next_2.count("2") == 0);
+        REQUIRE(next_2.count("1") == 0);
+        REQUIRE(next_2.count("3") == 1);
+        REQUIRE(next_2.count("4") == 1);
+    }
+
+    SECTION("Get All Previous of a Statement") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("3", "2");
+        write_facade->add_next("4", "2");
+
+        auto previous = read_facade->get_previous_of("2");
+
+        REQUIRE(previous.size() == 3);
+        REQUIRE(previous.count("1") == 1);
+        REQUIRE(previous.count("3") == 1);
+        REQUIRE(previous.count("4") == 1);
+        REQUIRE(previous.count("2") == 0);
+    }
+
+    SECTION("Get Direct Next Successors") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("1", "3");
+
+        auto next = read_facade->get_next_of("1");
+
+        REQUIRE(next.size() == 2);
+        REQUIRE(next.count("1") == 0);
+        REQUIRE(next.count("2") == 1);
+        REQUIRE(next.count("3") == 1);
+    }
+
+    SECTION("Get Direct Next Predecessors") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("3", "2");
+
+        auto previous = read_facade->get_previous_of("2");
+
+        REQUIRE(previous.size() == 2);
+        REQUIRE(previous.count("1") == 1);
+        REQUIRE(previous.count("2") == 0);
+        REQUIRE(previous.count("3") == 1);
+    }
+}
+
+TEST_CASE("If Pattern Test") {
+    SECTION("Get all if statements with any variables") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_if_var("1", "x");
+        write_facade->add_if_var("2", "y");
+        write_facade->add_if_var("3", "z");
+
+        REQUIRE(read_facade->get_if_stmts_with_var().size() == 3);
+
+        REQUIRE(read_facade->get_if_stmts_with_var().count("1") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var().count("2") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var().count("3") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var().count("4") == 0);
+    }
+
+    SECTION("Get all if statement with specific variables") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_if_var("1", "x");
+        write_facade->add_if_var("2", "y");
+        write_facade->add_if_var("3", "z");
+
+        REQUIRE(read_facade->get_if_stmts_with_var("x").size() == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("y").size() == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("z").size() == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("a").size() == 0);
+
+        REQUIRE(read_facade->get_if_stmts_with_var("x").count("1") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("y").count("2") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("z").count("3") == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("x").count("2") == 0);
+    }
+
+    SECTION("Get all variables inside ifs") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_if_var("1", "x");
+        write_facade->add_if_var("1", "y");
+        write_facade->add_if_var("2", "x");
+        write_facade->add_if_var("2", "z");
+
+        REQUIRE(read_facade->get_vars_in_any_if().size() == 3);
+
+        REQUIRE(read_facade->get_vars_in_any_if().count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_any_if().count("y") == 1);
+        REQUIRE(read_facade->get_vars_in_any_if().count("z") == 1);
+        REQUIRE(read_facade->get_vars_in_any_if().count("a") == 0);
+    }
+
+    SECTION("Get all variables inside specific if") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_if_var("1", "x");
+        write_facade->add_if_var("1", "y");
+        write_facade->add_if_var("2", "x");
+        write_facade->add_if_var("2", "z");
+
+        REQUIRE(read_facade->get_vars_in_if("1").size() == 2);
+        REQUIRE(read_facade->get_vars_in_if("2").size() == 2);
+        REQUIRE(read_facade->get_vars_in_if("3").size() == 0);
+
+        REQUIRE(read_facade->get_vars_in_if("1").count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_if("1").count("y") == 1);
+        REQUIRE(read_facade->get_vars_in_if("1").count("z") == 0);
+        REQUIRE(read_facade->get_vars_in_if("2").count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_if("2").count("y") == 0);
+        REQUIRE(read_facade->get_vars_in_if("2").count("z") == 1);
+    }
+
+    SECTION("Get all if statement and variable pairs") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_if_var("1", "x");
+        write_facade->add_if_var("1", "y");
+        write_facade->add_if_var("2", "x");
+        write_facade->add_if_var("2", "z");
+
+        REQUIRE(read_facade->get_all_if_stmt_var_pairs().size() == 4);
+    }
+}
+
+TEST_CASE("While Pattern Test") {
+    SECTION("Get all while statements with any variables") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_while_var("1", "x");
+        write_facade->add_while_var("2", "y");
+        write_facade->add_while_var("3", "z");
+
+        REQUIRE(read_facade->get_while_stmts_with_var().size() == 3);
+
+        REQUIRE(read_facade->get_while_stmts_with_var().count("1") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var().count("2") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var().count("3") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var().count("4") == 0);
+    }
+
+    SECTION("Get all while statement with specific variables") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_while_var("1", "x");
+        write_facade->add_while_var("2", "y");
+        write_facade->add_while_var("3", "z");
+
+        REQUIRE(read_facade->get_while_stmts_with_var("x").size() == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("y").size() == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("z").size() == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("a").size() == 0);
+
+        REQUIRE(read_facade->get_while_stmts_with_var("x").count("1") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("y").count("2") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("z").count("3") == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("x").count("2") == 0);
+    }
+
+    SECTION("Get all variables inside whiles") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_while_var("1", "x");
+        write_facade->add_while_var("1", "y");
+        write_facade->add_while_var("2", "x");
+        write_facade->add_while_var("2", "z");
+
+        REQUIRE(read_facade->get_vars_in_any_while().size() == 3);
+
+        REQUIRE(read_facade->get_vars_in_any_while().count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_any_while().count("y") == 1);
+        REQUIRE(read_facade->get_vars_in_any_while().count("z") == 1);
+        REQUIRE(read_facade->get_vars_in_any_while().count("a") == 0);
+    }
+
+    SECTION("Get all variables inside specific while") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_while_var("1", "x");
+        write_facade->add_while_var("1", "y");
+        write_facade->add_while_var("2", "x");
+        write_facade->add_while_var("2", "z");
+
+        REQUIRE(read_facade->get_vars_in_while("1").size() == 2);
+        REQUIRE(read_facade->get_vars_in_while("2").size() == 2);
+        REQUIRE(read_facade->get_vars_in_while("3").size() == 0);
+
+        REQUIRE(read_facade->get_vars_in_while("1").count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_while("1").count("y") == 1);
+        REQUIRE(read_facade->get_vars_in_while("1").count("z") == 0);
+        REQUIRE(read_facade->get_vars_in_while("2").count("x") == 1);
+        REQUIRE(read_facade->get_vars_in_while("2").count("y") == 0);
+        REQUIRE(read_facade->get_vars_in_while("2").count("z") == 1);
+    }
+
+    SECTION("Get all while statement and variable pairs") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_while_var("1", "x");
+        write_facade->add_while_var("1", "y");
+        write_facade->add_while_var("2", "x");
+        write_facade->add_while_var("2", "z");
+
+        REQUIRE(read_facade->get_all_while_stmt_var_pairs().size() == 4);
+    }
+}

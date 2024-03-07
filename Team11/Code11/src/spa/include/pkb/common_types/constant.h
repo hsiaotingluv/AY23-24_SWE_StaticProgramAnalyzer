@@ -6,8 +6,7 @@
 
 class Constant : public Entity {
   public:
-    explicit Constant(std::string name) : Entity(std::move(name)) {
-    }
+    using Entity::Entity;
 };
 
 namespace std {

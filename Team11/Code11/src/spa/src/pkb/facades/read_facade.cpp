@@ -528,6 +528,74 @@ std::unordered_set<std::string> ReadFacade::get_parent_star_of(const std::string
     return this->pkb->filter_by_statement_type(stmts_pool, statement_type);
 }
 
+bool ReadFacade::has_next_relation(const std::string& before, const std::string& after) const {
+    return this->pkb->next_store->contains_key_val_pair(before, after);
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_next_keys() const {
+    return this->pkb->next_store->get_all_keys();
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_next_values() const {
+    return this->pkb->next_store->get_all_vals();
+}
+
+std::unordered_set<std::string> ReadFacade::get_next_of(const std::string& before) const {
+    return this->pkb->next_store->get_vals_by_key(before);
+}
+
+std::unordered_set<std::string> ReadFacade::get_previous_of(const std::string& after) const {
+    return this->pkb->next_store->get_keys_by_val(after);
+}
+
+bool ReadFacade::has_calls_relation(const std::string& caller, const std::string& callee) const {
+    return this->pkb->calls_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_calls_values() const {
+    auto procedures = this->pkb->calls_store->get_all_vals();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_calls_keys() const {
+    auto procedures = this->pkb->calls_store->get_all_keys();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_callees(const std::string& caller) const {
+    auto procedures = this->pkb->calls_store->get_vals_by_key(Procedure(caller));
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_callers(const std::string& callee) const {
+    auto procedures = this->pkb->calls_store->get_keys_by_val(Procedure(callee));
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_assignments_rhs(const std::string& rhs) {
     return this->pkb->assignment_store->get_all_assignments_rhs(rhs);
 }
@@ -554,4 +622,92 @@ std::unordered_set<std::string> ReadFacade::get_all_assignments_lhs_rhs_partial(
     auto v = Variable(lhs);
 
     return this->pkb->assignment_store->get_all_assignments_lhs_rhs_partial(v, rhs);
+}
+
+std::unordered_set<std::string> ReadFacade::get_if_stmts_with_var() {
+    return this->pkb->if_var_store->get_all_vals();
+}
+
+std::unordered_set<std::string> ReadFacade::get_if_stmts_with_var(const std::string& variable) {
+    auto v = Variable(variable);
+
+    return this->pkb->if_var_store->get_vals_by_key(v);
+}
+
+std::unordered_set<std::string> ReadFacade::get_vars_in_any_if() {
+    auto temp = this->pkb->if_var_store->get_all_keys();
+
+    std::unordered_set<std::string> vars;
+    for (const auto& v : temp) {
+        vars.insert(v.getName());
+    }
+
+    return vars;
+}
+
+std::unordered_set<std::string> ReadFacade::get_vars_in_if(const std::string& if_stmt) {
+    auto temp = this->pkb->if_var_store->get_keys_by_val(if_stmt);
+
+    std::unordered_set<std::string> vars;
+
+    for (const auto& v : temp) {
+        vars.insert(v.getName());
+    }
+
+    return vars;
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_if_stmt_var_pairs() {
+    auto pairs = this->pkb->if_var_store->get_all_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [v, s] : pairs) {
+        temp.insert(std::make_tuple(s, v.getName()));
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_while_stmts_with_var() {
+    return this->pkb->while_var_store->get_all_vals();
+}
+
+std::unordered_set<std::string> ReadFacade::get_while_stmts_with_var(const std::string& variable) {
+    auto v = Variable(variable);
+
+    return this->pkb->while_var_store->get_vals_by_key(v);
+}
+
+std::unordered_set<std::string> ReadFacade::get_vars_in_any_while() {
+    auto temp = this->pkb->while_var_store->get_all_keys();
+
+    std::unordered_set<std::string> vars;
+    for (const auto& v : temp) {
+        vars.insert(v.getName());
+    }
+
+    return vars;
+}
+
+std::unordered_set<std::string> ReadFacade::get_vars_in_while(const std::string& while_stmt) {
+    auto temp = this->pkb->while_var_store->get_keys_by_val(while_stmt);
+
+    std::unordered_set<std::string> vars;
+
+    for (const auto& v : temp) {
+        vars.insert(v.getName());
+    }
+
+    return vars;
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_while_stmt_var_pairs() {
+    auto pairs = this->pkb->while_var_store->get_all_pairs();
+
+    std::unordered_set<std::tuple<std::string, std::string>> temp;
+    for (const auto& [v, s] : pairs) {
+        temp.insert(std::make_tuple(s, v.getName()));
+    }
+
+    return temp;
 }

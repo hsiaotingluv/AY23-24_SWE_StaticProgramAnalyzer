@@ -8,6 +8,7 @@
 class Entity {
   public:
     explicit Entity(std::string name) : name(std::move(name)){};
+    Entity() = default;
 
     bool operator==(Entity const& other) const {
         return name == other.name;
