@@ -190,7 +190,29 @@ class ReadFacade {
     std::unordered_set<std::string> get_parent_star_of(const std::string& child,
                                                        const StatementType& statement_type) const;
 
-    // Pattern-related Read Operations
+    // Next-related Read Operations
+    bool has_next_relation(const std::string& before, const std::string& after) const;
+
+    std::unordered_set<std::string> get_all_next_keys() const;
+
+    std::unordered_set<std::string> get_all_next_values() const;
+
+    std::unordered_set<std::string> get_next_of(const std::string& before) const;
+
+    std::unordered_set<std::string> get_previous_of(const std::string& after) const;
+
+    // Calls-related Read Operations
+    bool has_calls_relation(const std::string& caller, const std::string& callee) const;
+
+    std::unordered_set<std::string> get_all_calls_values() const;
+
+    std::unordered_set<std::string> get_all_calls_keys() const;
+
+    std::unordered_set<std::string> get_callees(const std::string& caller) const;
+
+    std::unordered_set<std::string> get_callers(const std::string& callee) const;
+
+    // Assignment pattern-related Read Operations
     std::unordered_set<std::string> get_all_assignments_rhs(const std::string& rhs);
 
     std::unordered_set<std::string> get_all_assignments_rhs_partial(const std::string& rhs);
@@ -200,6 +222,28 @@ class ReadFacade {
     std::unordered_set<std::string> get_all_assignments_lhs_rhs(const std::string& lhs, const std::string& rhs);
 
     std::unordered_set<std::string> get_all_assignments_lhs_rhs_partial(const std::string& lhs, const std::string& rhs);
+
+    // If pattern-related Read Operations
+    std::unordered_set<std::string> get_if_stmts_with_var();
+
+    std::unordered_set<std::string> get_if_stmts_with_var(const std::string& variable);
+
+    std::unordered_set<std::string> get_vars_in_any_if();
+
+    std::unordered_set<std::string> get_vars_in_if(const std::string& if_stmt);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_if_stmt_var_pairs();
+
+    // While pattern-related Read Operations
+    std::unordered_set<std::string> get_while_stmts_with_var();
+
+    std::unordered_set<std::string> get_while_stmts_with_var(const std::string& variable);
+
+    std::unordered_set<std::string> get_vars_in_any_while();
+
+    std::unordered_set<std::string> get_vars_in_while(const std::string& while_stmt);
+
+    std::unordered_set<std::tuple<std::string, std::string>> get_all_while_stmt_var_pairs();
 
   private:
     std::shared_ptr<PKB> pkb;

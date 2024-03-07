@@ -1,6 +1,6 @@
 #include <catch.hpp>
 
-#include "pkb/stores/assignment_store.h"
+#include "pkb/stores/pattern_matching_store/assignment_store.h"
 
 TEST_CASE("Assignment Store Tests") {
     AssignmentStore assignment_store;

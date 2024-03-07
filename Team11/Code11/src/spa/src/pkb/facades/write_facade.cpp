@@ -62,6 +62,26 @@ void WriteFacade::add_assignment(const std::string& statement_number, const std:
     this->pkb->assignment_store->add_assignment(statement_number, v, rhs);
 }
 
+void WriteFacade::add_if_var(const std::string& statement_number, const std::string& variable) {
+    auto v = Variable(std::move(variable));
+    this->pkb->if_var_store->add(v, statement_number);
+}
+
+void WriteFacade::add_while_var(const std::string& statement_number, const std::string& variable) {
+    auto v = Variable(std::move(variable));
+    this->pkb->while_var_store->add(v, statement_number);
+}
+
+void WriteFacade::add_next(const std::string& stmt1, const std::string& stmt2) {
+    this->pkb->next_store->add(stmt1, stmt2);
+}
+
+void WriteFacade::add_calls(const std::string& caller, const std::string& callee) {
+    auto caller_procedure = Procedure(caller);
+    auto callee_procedure = Procedure(callee);
+    this->pkb->calls_store->add(caller_procedure, callee_procedure);
+}
+
 void WriteFacade::finalise_pkb() {
     this->pkb->finalise_pkb();
 }
