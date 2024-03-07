@@ -177,24 +177,24 @@ auto IfNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
     if (cfg->current_node->empty()) { // If no statement in current node
         if_node = cfg->current_node;  // Reuse Node
     } else {
-        cfg->link_and_next(if_node); // Move to new If node.
+        cfg->link_and_move_to(if_node); // Move to new If node.
     }
 
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num); // Add statement to If node.
 
     // Build CFG for 'Then' branch
-    cfg->link_and_next(then_node);
+    cfg->link_and_move_to(then_node);
     then_stmt_list->build_cfg(cfg);
-    cfg->link_and_next(end_node);
+    cfg->link_and_move_to(end_node);
 
     // Jump back to If node (without making a link)
-    cfg->next(if_node);
+    cfg->move_to(if_node);
 
     // Build CFG for 'Else' branch
-    cfg->link_and_next(else_node);
+    cfg->link_and_move_to(else_node);
     else_stmt_list->build_cfg(cfg);
-    cfg->link_and_next(end_node);
+    cfg->link_and_move_to(end_node);
 }
 
 } // namespace sp

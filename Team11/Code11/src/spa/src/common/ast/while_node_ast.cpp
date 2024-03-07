@@ -151,17 +151,17 @@ auto WhileNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
     if (cfg->current_node->empty()) {   // If no statement in current node
         while_node = cfg->current_node; // Reuse Node
     } else {
-        cfg->link_and_next(while_node); // Move to new While node.
+        cfg->link_and_move_to(while_node); // Move to new While node.
     }
 
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num); // Add statement to While node.
 
     // Build CFG for 'loop' branch.
-    cfg->link_and_next(loop_node);
+    cfg->link_and_move_to(loop_node);
     stmt_list->build_cfg(cfg);
-    cfg->link_and_next(while_node); // Back to While node
-    cfg->link_and_next(end_node);   // Finally go to End node.
+    cfg->link_and_move_to(while_node); // Back to While node
+    cfg->link_and_move_to(end_node);   // Finally go to End node.
 }
 
 } // namespace sp
