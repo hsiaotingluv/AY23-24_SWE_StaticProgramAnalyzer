@@ -35,19 +35,17 @@ class CfgNode {
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
      */
-    auto to_string() const -> std::string {
-        std::stringstream ss;
-        ss << "Node(";
-        for (size_t i = 0; i < stmt_nums.size(); i++) {
+    friend auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream& {
+        os << "Node(";
+        for (size_t i = 0; i < cfg_node.stmt_nums.size(); i++) {
             if (i != 0) {
-                ss << ", ";
+                os << ", ";
             }
-            ss << stmt_nums[i];
+            os << cfg_node.stmt_nums[i];
         }
-        ss << ")";
-        std::string str = ss.str();
-        return str;
-    };
+        os << ")";
+        return os;
+    }
 };
 
 /**
@@ -103,7 +101,7 @@ class Cfg {
      * @brief Move current node to the next node (Need not be a outneighbour node).
      * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
-    auto next(std::shared_ptr<CfgNode> next_node) -> void {
+    auto move_to(std::shared_ptr<CfgNode> next_node) -> void {
         current_node = next_node;
     };
 
@@ -111,9 +109,9 @@ class Cfg {
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
      * @note Default way to traverse the Cfg.
      */
-    auto link_and_next(std::shared_ptr<CfgNode> next_node) -> void {
+    auto link_and_move_to(std::shared_ptr<CfgNode> next_node) -> void {
         add_outneighbour_to_graph(next_node);
-        next(next_node);
+        move_to(next_node);
         add_node_to_graph();
     };
 
@@ -121,20 +119,20 @@ class Cfg {
      * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
      * 11, 12))"
      */
-    auto to_string() const -> std::string {
-        std::stringstream ss;
+    friend auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream& {
+        auto graph = cfg.graph;
         for (const auto& [node, outneighbours] : graph) {
-            ss << node->to_string();
-            ss << " -> OutNeighbours(";
+            os << *node;
+            os << " -> OutNeighbours(";
             if (outneighbours.first) {
-                ss << outneighbours.first->to_string();
+                os << *outneighbours.first;
             }
             if (outneighbours.second) {
-                ss << ", " << outneighbours.second->to_string();
+                os << ", " << *outneighbours.second;
             }
-            ss << ")\n";
+            os << ")\n";
         }
-        return ss.str();
-    };
+        return os;
+    }
 };
 } // namespace sp

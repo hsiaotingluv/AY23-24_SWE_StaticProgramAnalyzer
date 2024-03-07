@@ -49,14 +49,12 @@ class CfgBuilder {
     /**
      * @brief Construct a string representation of the Control Flow Graph.
      */
-    auto to_string() const -> std::string {
-        std::stringstream ss;
+    friend auto operator<<(std::ostream& os, const CfgBuilder& cfg_builder) -> std::ostream& {
+        auto proc_map = cfg_builder.proc_map;
         for (const auto& [proc_name, cfg] : proc_map) {
-            ss << proc_name;
-            ss << ":\n";
-            ss << cfg->to_string();
+            os << proc_name << ":\n" << *cfg;
         }
-        return ss.str();
-    };
+        return os;
+    }
 };
 } // namespace sp
