@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qps/parser/parser_helper.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 
 namespace qps::untyped::detail {
@@ -18,6 +19,8 @@ auto parse_stmt_ref(const Token& token) -> UntypedStmtRef;
 auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>>;
 
+auto parse_attr_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedAttrRef, std::vector<Token>::const_iterator>>;
 auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::vector<Token>::const_iterator>;
 

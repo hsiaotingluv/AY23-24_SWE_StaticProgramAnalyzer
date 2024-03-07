@@ -7,19 +7,19 @@
 namespace qps {
 
 struct ProcName {
-    static constexpr auto keyword = std::array<std::string_view, 1>{"procName"};
+    static constexpr auto keyword = "procName";
 };
 
 struct VarName {
-    static constexpr auto keyword = std::array<std::string_view, 1>{"varName"};
+    static constexpr auto keyword = "varName";
 };
 
 struct Value {
-    static constexpr auto keyword = std::array<std::string_view, 1>{"value"};
+    static constexpr auto keyword = "value";
 };
 
 struct StmtNum {
-    static constexpr auto keyword = std::array<std::string_view, 2>{"stmt", "#"};
+    static constexpr auto keyword = "stmt#";
 };
 
 using AttrNameList = TypeList<ProcName, VarName, Value, StmtNum>;

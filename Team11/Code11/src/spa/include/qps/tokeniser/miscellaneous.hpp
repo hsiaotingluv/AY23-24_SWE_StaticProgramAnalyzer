@@ -11,13 +11,6 @@ class DotTokenizer : public tokenizer::Tokenizer {
     }
 };
 
-class HashTokenizer : public tokenizer::Tokenizer {
-  public:
-    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
-        return tokenize_string(input, "#", TokenType::Hash);
-    }
-};
-
 class SingleEqualTokenizer : public tokenizer::Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
@@ -27,8 +20,8 @@ class SingleEqualTokenizer : public tokenizer::Tokenizer {
 
 class MiscellaneousTokenizer : public tokenizer::Tokenizer {
   private:
-    static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 3>{
-        std::make_shared<DotTokenizer>(), std::make_shared<HashTokenizer>(), std::make_shared<SingleEqualTokenizer>()};
+    static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{
+        std::make_shared<DotTokenizer>(), std::make_shared<SingleEqualTokenizer>()};
 
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {

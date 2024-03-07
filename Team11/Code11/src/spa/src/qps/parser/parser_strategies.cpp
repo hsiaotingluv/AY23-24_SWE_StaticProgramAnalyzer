@@ -1,4 +1,5 @@
 #include "qps/parser/untyped/parser_strategies.hpp"
+#include "common/tokeniser/token_types.hpp"
 #include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/entities/attribute.hpp"
@@ -110,18 +111,11 @@ auto parse_attr_name(std::vector<Token>::const_iterator it, const std::vector<To
     if (it == end) {
         return std::nullopt;
     }
-
-    for (const auto& expected_keyword : Head::keyword) {
-        if (it == end) {
-            return std::nullopt;
-        }
-        if ((*it).content != expected_keyword) {
-            return parse_attr_name(it, end, TypeList<Tails...>{});
-        }
-
-        it = std::next(it);
+    const auto maybe_keyword = *it;
+    if (maybe_keyword.T != tokenizer::TokenType::AttrName || maybe_keyword.content != Head::keyword) {
+        return parse_attr_name(it, end, TypeList<Tails...>{});
     }
-
+    it = std::next(it);
     return std::make_tuple(Head{}, it);
 }
 

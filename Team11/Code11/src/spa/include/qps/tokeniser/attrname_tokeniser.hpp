@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/tokeniser/tokenizer.hpp"
-#include "qps/parser/entities/relationship.hpp"
+#include "qps/parser/entities/attribute_name.hpp"
 #include "qps/template_utils.hpp"
 
 #include "utils.hpp"
@@ -9,18 +9,18 @@
 
 namespace tokenizer {
 template <typename T>
-class RelationshipTokeniser : public Tokenizer {
+class AttrNameTokeniser : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
-        return tokenize_string(input, T::keyword, TokenType::Relationship);
+        return tokenize_string(input, T::keyword, TokenType::AttrName);
     }
 };
 
-class QPSRelationshipTokenizer : public Tokenizer {
+class QPSAttrNameTokenizer : public Tokenizer {
   private:
     static inline const auto tokenizers = []() {
-        auto vector = std::array<std::shared_ptr<Tokenizer>, qps::num_elem_v<qps::RelationshipList>>{};
-        push_array_rec<0, RelationshipTokeniser>(vector, qps::RelationshipList{});
+        auto vector = std::array<std::shared_ptr<Tokenizer>, qps::num_elem_v<qps::AttrNameList>>{};
+        push_array_rec<0, AttrNameTokeniser>(vector, qps::AttrNameList{});
         return vector;
     }();
 
