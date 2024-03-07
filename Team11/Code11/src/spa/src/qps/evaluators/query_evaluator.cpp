@@ -3,6 +3,7 @@
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
 #include <memory>
@@ -11,28 +12,44 @@
 
 namespace qps {
 
+auto build_table(const std::shared_ptr<Synonym>& synonym, const std::shared_ptr<ReadFacade>& read_facade)
+    -> OutputTable {
+    auto table = Table{{synonym}};
+    for (const auto& result : synonym->scan(read_facade)) {
+        table.add_row({result});
+    }
+    return table;
+}
+
+auto build_table(const std::vector<Elem>& elems, const std::shared_ptr<ReadFacade>& read_facade) -> OutputTable {
+    // TODO: Relax this constraint
+    for (const auto& elem : elems) {
+        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
+            throw std::runtime_error("Cannot handle non-synonym elements");
+        }
+    }
+
+    Synonyms synonyms;
+    for (const auto& elem : elems) {
+        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
+    }
+
+    auto table = Table{synonyms};
+    for (const auto& synonym : synonyms) {
+        for (const auto& result : synonym->scan(read_facade)) {
+            table.add_row({result});
+        }
+    }
+    return table;
+}
+
 auto build_table(const Reference& reference, const std::shared_ptr<ReadFacade>& read_facade) -> OutputTable {
-    return std::visit(overloaded{
-                          [&read_facade](const std::shared_ptr<Synonym>& synonym) -> OutputTable {
-                              auto table = Table{{synonym}};
-                              for (const auto& result : synonym->scan(read_facade)) {
-                                  table.add_row({result});
-                              }
-                              return table;
-                          },
-                          [&read_facade](const Synonyms& synonyms) -> OutputTable {
-                              auto table = Table{synonyms};
-                              for (const auto& synonym : synonyms) {
-                                  for (const auto& result : synonym->scan(read_facade)) {
-                                      table.add_row({result});
-                                  }
-                              }
-                              return table;
-                          },
-                          [](const BooleanReference&) -> OutputTable {
-                              return UnitTable{};
-                          },
-                      },
+    return std::visit(overloaded{[](const BooleanReference&) -> OutputTable {
+                                     return UnitTable{};
+                                 },
+                                 [&read_facade](const std::vector<Elem>& elems) -> OutputTable {
+                                     return build_table(elems, read_facade);
+                                 }},
                       reference);
 }
 

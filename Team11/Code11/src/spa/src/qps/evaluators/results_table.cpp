@@ -1,6 +1,7 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/select.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
@@ -594,41 +595,49 @@ auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
 }
 
 auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const UnitTable& table, const Reference& reference)
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string>;
 
 auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
-    return std::visit(
-        overloaded{
-            [](const Table& table, const Reference& reference) -> std::vector<std::string> {
-                return project(table, reference);
-            },
-            [&read_facade](const UnitTable& table, const Reference& reference) -> std::vector<std::string> {
-                return project(read_facade, table, reference);
-            },
-        },
-        table, reference);
+    return std::visit(overloaded{
+                          [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
+                              return table.empty() ? std::vector<std::string>{"False"}
+                                                   : std::vector<std::string>{"True"};
+                          },
+                          [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
+                              return {"True"};
+                          },
+                          [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(read_facade, elems);
+                          },
+                          [](const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(table, elems);
+                          },
+                      },
+                      table, reference);
 }
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const UnitTable&, const Reference& reference)
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string> {
-    return std::visit(overloaded{[&read_facade](const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
-                                     const auto responses = synonym->scan(read_facade);
-                                     return {responses.begin(), responses.end()};
-                                 },
-                                 [&read_facade](const Synonyms& synonyms) -> std::vector<std::string> {
-                                     auto results = std::unordered_set<std::string>{};
-                                     for (const auto& synonym : synonyms) {
-                                         const auto responses = synonym->scan(read_facade);
-                                         results.insert(responses.begin(), responses.end());
-                                     }
-                                     return {results.begin(), results.end()};
-                                 },
-                                 [](const BooleanReference&) -> std::vector<std::string> {
-                                     return {"true"};
-                                 }},
-                      reference);
+    // TODO: Relax this constraint
+    for (const auto& elem : elems) {
+        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
+            throw std::runtime_error("Cannot handle non-synonym elements");
+        }
+    }
+
+    Synonyms synonyms;
+    for (const auto& elem : elems) {
+        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
+    }
+
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& synonym : synonyms) {
+        const auto responses = synonym->scan(read_facade);
+        results.insert(responses.begin(), responses.end());
+    }
+    return {results.begin(), results.end()};
 }
 
 auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
@@ -689,17 +698,24 @@ auto project(const Table& table, const Reference& reference) -> std::vector<std:
         return {};
     }
 
-    return std::visit(overloaded{
-                          [&table](const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
-                              return project(table, synonym);
-                          },
-                          [&table](const Synonyms& synonyms) -> std::vector<std::string> {
-                              return project(table, synonyms);
-                          },
-                          [](const BooleanReference&) -> std::vector<std::string> {
-                              return {};
-                          },
-                      },
+    return std::visit(overloaded{[](const BooleanReference&) -> std::vector<std::string> {
+                                     return {"True"};
+                                 },
+                                 [&table](const std::vector<Elem>& elems) -> std::vector<std::string> {
+                                     // TODO: Relax this constraint
+                                     for (const auto& elem : elems) {
+                                         if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
+                                             throw std::runtime_error("Cannot handle non-synonym elements");
+                                         }
+                                     }
+
+                                     Synonyms synonyms;
+                                     for (const auto& elem : elems) {
+                                         synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
+                                     }
+
+                                     return project(table, synonyms);
+                                 }},
                       reference);
 }
 

@@ -449,6 +449,21 @@ TEST_CASE("Test QPS - BOOLEAN") {
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
+    SECTION("Query with BOOLEAN reference - 2") {
+        const auto query = "Select BOOLEAN such that Follows*(_, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        REQUIRE(result.declared.size() == 0);
+        require_boolean(result.reference);
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(FollowsT{WildCard{}, Integer{"13"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
     SECTION("Query with BOOLEAN reference overriden by declaration") {
         const auto query = " stmt s, BOOLEAN; Select BOOLEAN such that Follows*(s, 13) and Modifies(1, \"v\")";
         const auto output = to_query(qps.parse(query));
@@ -471,6 +486,13 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
     SECTION("Invalid Semantics - tuple with undeclared BOOLEAN") {
         const auto query = " stmt s; Select <s, BOOLEAN> such that Follows*(s, 13) and Modifies(1, \"v\")";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_semantic_error(output));
+    }
+
+    SECTION("Invalid Semantics - tuple with undeclared BOOLEAN - 2") {
+        const auto query = " Select <BOOLEAN> such that Follows*(_, 13) and Modifies(1, \"v\")";
         const auto output = qps.parse(query);
 
         REQUIRE(is_semantic_error(output));

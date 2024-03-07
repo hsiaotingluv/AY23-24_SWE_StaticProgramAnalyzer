@@ -8,8 +8,9 @@
 
 #include "qps/parser/errors.hpp"
 #include <iterator>
-#include <tuple>
 #include <optional>
+#include <sstream>
+#include <tuple>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -32,10 +33,9 @@ class UntypedParser {
     static inline const auto tokeniser_runner =
         tokenizer::TokenizerRunner{std::make_unique<QueryProcessingSystemTokenizer>()};
 
+  public:
     using UntypedReferenceType = type_list_to_variant_t<get_return_type_t<SupportedSelectParsers>>;
     using UntypedClauseType = type_list_to_variant_t<get_return_type_t<SupportedClauseParsers>>;
-
-  public:
     using UntypedQueryType = std::tuple<UntypedReferenceType, std::vector<UntypedClauseType>>;
 
     static auto parse(std::string query) -> std::variant<std::tuple<Synonyms, UntypedQueryType>, SyntaxError> {
@@ -65,11 +65,11 @@ class UntypedParser {
         if (!maybe_remaining.has_value()) {
             const auto remaining_str = [begin, end]() -> std::string {
                 const auto remaining = std::vector<Token>(begin, end);
-                std::string str;
+                std::stringstream ss;
                 for (const auto& token : remaining) {
-                    str += token.content;
+                    ss << token.content << " ";
                 }
-                return str;
+                return ss.str();
             }();
             return SyntaxError{"Syntax error: unable to parse remaining: " + remaining_str};
         }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <ostream>
 #include <variant>
+#include <vector>
 
 namespace qps {
 template <class... Ts>
@@ -80,6 +81,14 @@ auto operator<<(std::ostream& os, const std::variant<Ts...>& some_variant) -> st
             return os << x;
         },
         some_variant);
+}
+
+template <typename... Ts>
+auto operator<<(std::ostream& os, const std::vector<std::variant<Ts...>>& some_variants) -> std::ostream& {
+    for (const auto& variant : some_variants) {
+        os << variant << "\n";
+    }
+    return os;
 }
 
 template <typename T>

@@ -12,8 +12,23 @@
 #include "qps/parser/untyped/untyped_parser.hpp"
 
 #include <variant>
+#include <vector>
 
 using namespace qps;
+
+using UntypedVector = std::vector<std::variant<untyped::UntypedSynonym>>;
+
+template <typename T>
+auto require_value(const UntypedVector& vector, const std::string& str) -> void {
+    const auto& value = T{IDENT{str}};
+    for (const auto& elem : vector) {
+        if (std::holds_alternative<T>(elem)) {
+            REQUIRE(std::get<T>(elem) == value);
+            return;
+        }
+    }
+    REQUIRE(false);
+}
 
 TEST_CASE("Test QPSParser") {
     const auto parser = untyped::DefaultUntypedParser{};
@@ -30,9 +45,10 @@ TEST_CASE("Test QPSParser") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -56,9 +72,10 @@ TEST_CASE("Test QPSParser") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -82,9 +99,10 @@ TEST_CASE("Test QPSParser") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -106,9 +124,10 @@ TEST_CASE("Test QPSParser") {
         REQUIRE(declarations.size() == 1);
         require_value<AnyStmtSynonym>(declarations[0], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -131,9 +150,10 @@ TEST_CASE("Test QPSParser") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<VarSynonym>(declarations[1], "v");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"p"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "p");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -156,9 +176,10 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "a");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"a"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "a");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -179,10 +200,10 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
-        const auto& [reference, clauses] = untyped;
-
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "newa");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -204,9 +225,11 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "v");
+
         REQUIRE(clauses.empty());
     }
 
@@ -281,9 +304,10 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -314,9 +338,10 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         require_value<ProcSynonym>(declarations[0], "p");
         require_value<AnyStmtSynonym>(declarations[1], "s");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"s"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "s");
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
@@ -362,10 +387,10 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
-        const auto& [reference, clauses] = untyped;
-
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "newa");
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -394,10 +419,10 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
 
-        const auto& [reference, clauses] = untyped;
-
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"newa"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "newa");
 
         REQUIRE(clauses.size() == 2);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -442,9 +467,10 @@ TEST_CASE("Test Parser - pattern clause with 3 arg") {
         require_value<IfSynonym>(declarations[0], "a");
         require_value<VarSynonym>(declarations[1], "v");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"a"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "a");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
@@ -478,9 +504,10 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(declarations.size() == 1);
         require_value<VarSynonym>(declarations[0], "v");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "v");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
@@ -500,9 +527,10 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(declarations.size() == 1);
         require_value<VarSynonym>(declarations[0], "v");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"v"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "v");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
@@ -522,9 +550,10 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
 
-        const auto& [reference, clauses] = untyped;
-        REQUIRE(std::holds_alternative<untyped::UntypedSynonym>(reference));
-        REQUIRE(std::get<untyped::UntypedSynonym>(reference) == untyped::UntypedSynonym{IDENT{"p"}});
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "p");
 
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
