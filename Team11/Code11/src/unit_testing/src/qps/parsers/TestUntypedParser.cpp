@@ -240,6 +240,98 @@ Select a pattern a ( _ , _"count + 1"_))";
     }
 }
 
+TEST_CASE("Test Parser - Advanced Relationship") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("Calls - proc_syn and proc_syn") {
+        const auto query = "procedure p; procedure q; Select p such that Calls(p, q)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 2);
+        require_value<ProcSynonym>(declarations[0], "p");
+        require_value<ProcSynonym>(declarations[1], "q");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "p");
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{untyped::UntypedSynonym{IDENT{"q"}}}}};
+        REQUIRE(such_that_clause == reference_clause);
+    }
+
+    SECTION("Calls - proc_syn and quoted_ident ") {
+        const auto query = "procedure p; Select p such that Calls(p, \"q\")";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<ProcSynonym>(declarations[0], "p");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "p");
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"q"}}}};
+    }
+
+    SECTION("Calls - proc_syn and wildcard") {
+        const auto query = "procedure p; Select p such that Calls(p, _)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+
+        require_value<ProcSynonym>(declarations[0], "p");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "p");
+
+        REQUIRE(clauses.size() == 1);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
+                                      untyped::UntypedEntRef{WildCard{}}}};
+        REQUIRE(such_that_clause == reference_clause);
+    }
+
+    SECTION("Calls - proc_syn and integer - SyntaxError") {
+        const auto query = "procedure p; Select p such that Calls(p, 1)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<SyntaxError>(output));
+    }
+
+    SECTION("Calls - quoted_ident and proc_syn") {
+        const auto query = "procedure p; Select p such that Calls(\"bob\", p)";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+    }
+}
+
 TEST_CASE("Test Parser - Basic Syntax Issues") {
     const auto parser = untyped::DefaultUntypedParser{};
     SECTION("Missing synonym") {

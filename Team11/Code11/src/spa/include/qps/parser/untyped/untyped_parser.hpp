@@ -12,8 +12,8 @@ namespace qps::untyped {
 using DefaultSupportedSynonyms = TypeList<AnyStmtSynonym, ReadSynonym, PrintSynonym, WhileSynonym, IfSynonym,
                                           AssignSynonym, CallSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
 
-using DefaultSupportedStmtStmtRelationships = TypeList<Follows, FollowsT, Parent, ParentT>;
-using DefaultSupportedRefEntRelationships = TypeList<ModifiesS, UsesS>;
+using DefaultSupportedStmtStmtRelationships = DefaultStmtStmtList;
+using DefaultSupportedRefEntRelationships = concat_t<DefaultStmtEntList, DefaultEntEntList>;
 
 using DefaultSuchThatClausesParser =
     ClausesParser<SuchThatParserStrategy<DefaultSupportedStmtStmtRelationships, DefaultSupportedRefEntRelationships>>;

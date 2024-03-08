@@ -16,6 +16,7 @@ using StmtRef = std::variant<WildCard, std::shared_ptr<StmtSynonym>, Integer>;
 using EntRef = std::variant<WildCard, std::shared_ptr<Synonym>, QuotedIdent>;
 using StmtRefNoWildcard = std::variant<std::shared_ptr<StmtSynonym>, Integer>;
 using EntRefNoWildcard = std::variant<std::shared_ptr<Synonym>, QuotedIdent>;
+using ProcedureRef = std::variant<WildCard, std::shared_ptr<ProcSynonym>, QuotedIdent>;
 using ProcedureRefNoWildcard = std::variant<std::shared_ptr<ProcSynonym>, QuotedIdent>;
 using VarRef = std::variant<WildCard, std::shared_ptr<VarSynonym>, QuotedIdent>;
 
@@ -23,6 +24,7 @@ auto reject_wildcard(const StmtRef& stmt_ref) -> std::optional<StmtRefNoWildcard
 auto reject_wildcard(const EntRef& ent_ref) -> std::optional<EntRefNoWildcard>;
 auto to_var_ref(const EntRef& ent_ref) -> std::optional<VarRef>;
 auto to_proc_ref(const EntRefNoWildcard& ent_ref) -> std::optional<ProcedureRefNoWildcard>;
+auto to_proc_ref(const EntRef& ent_ref) -> std::optional<ProcedureRef>;
 
 struct Follows {
     /**
@@ -121,7 +123,71 @@ struct ParentT {
     }
 };
 
+struct Calls {
+    ProcedureRef procedure1;
+    ProcedureRef procedure2;
+
+    static constexpr auto keyword = "Calls";
+
+    Calls(ProcedureRef procedure1, ProcedureRef procedure2)
+        : procedure1(std::move(procedure1)), procedure2(std::move(procedure2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const Calls& call) -> std::ostream&;
+
+    auto operator==(const Calls& other) const -> bool {
+        return procedure1 == other.procedure1 && procedure2 == other.procedure2;
+    }
+
+    static auto construct(const EntRef& proc_ref1, const EntRef& proc_ref2) -> std::optional<Calls> {
+        const auto maybe_proc1 = to_proc_ref(proc_ref1);
+        if (!maybe_proc1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_proc2 = to_proc_ref(proc_ref2);
+        if (!maybe_proc2.has_value()) {
+            return std::nullopt;
+        }
+
+        return Calls{maybe_proc1.value(), maybe_proc2.value()};
+    }
+};
+
+struct CallsT {
+
+    ProcedureRef procedure1;
+    ProcedureRef procedure2;
+
+    static constexpr auto keyword = "Calls*";
+
+    CallsT(ProcedureRef procedure1, ProcedureRef procedure2)
+        : procedure1(std::move(procedure1)), procedure2(std::move(procedure2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const CallsT& callT) -> std::ostream&;
+
+    auto operator==(const CallsT& other) const -> bool {
+        return procedure1 == other.procedure1 && procedure2 == other.procedure2;
+    }
+
+    static auto construct(const EntRef& proc_ref1, const EntRef& proc_ref2) -> std::optional<CallsT> {
+        const auto maybe_proc1 = to_proc_ref(proc_ref1);
+        if (!maybe_proc1.has_value()) {
+            return std::nullopt;
+        }
+
+        const auto maybe_proc2 = to_proc_ref(proc_ref2);
+        if (!maybe_proc2.has_value()) {
+            return std::nullopt;
+        }
+
+        return CallsT{maybe_proc1.value(), maybe_proc2.value()};
+    }
+};
+
 struct UsesS {
+
     /**
      * @brief A Uses relationship is a relationship between a statement and a variable where the statement uses the
      * variable.
@@ -286,7 +352,7 @@ struct ModifiesP {
 
 using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
-using DefaultEntEntList = TypeList<UsesP, ModifiesP>;
+using DefaultEntEntList = TypeList<UsesP, ModifiesP, Calls, CallsT>;
 
 using RelationshipList = concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>;
 using Relationship = type_list_to_variant_t<RelationshipList>;
