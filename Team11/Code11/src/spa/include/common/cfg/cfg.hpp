@@ -14,7 +14,7 @@ namespace sp {
  */
 class CfgNode {
 
-    using StatementNumbers = std::vector<int>;
+    using StatementNumbers = std::vector<int>; // Need to maintain order
 
   private:
     StatementNumbers stmt_nums{};
@@ -50,7 +50,7 @@ class CfgNode {
             if (i != 0) {
                 os << ", ";
             }
-            os << cfg_node.stmt_nums[i];
+            os << cfg_node.stmt_nums.at(i);
         }
         os << ")";
         return os;
@@ -69,14 +69,23 @@ class Cfg {
     static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
 
   private:
+    std::shared_ptr<CfgNode> start_node;
     std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
     Graph graph{};
 
   public:
     explicit Cfg() {
-        current_node = std::make_shared<CfgNode>();
+        start_node = std::make_shared<CfgNode>();
+        current_node = start_node;
         add_node_to_graph();
     }
+
+    /**
+     * @brief Get the start node.
+     */
+    auto get_start_node() const -> std::shared_ptr<CfgNode> {
+        return start_node;
+    };
 
     /**
      * @brief Get the current node.

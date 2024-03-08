@@ -9,6 +9,30 @@
 #include "sp/traverser/traverser.hpp"
 #include <unordered_set>
 
+auto verify_start_node(sp::ProcMap proc_map, std::string proc_name) -> bool {
+    auto cfg = proc_map.at(proc_name);
+
+    auto actual_start_node = std::make_shared<sp::CfgNode>(); // Placeholder
+    int smallest_stmt_num = INT32_MAX;
+
+    for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
+        if (cfg_node->empty()) {
+            continue; // No stmt num to evaluate
+        }
+        auto node_stmt_nums = cfg_node->get();
+        auto node_smallest_stmt_num = node_stmt_nums.front(); // Get smallest stmt num in that node
+        if (node_smallest_stmt_num < smallest_stmt_num) { 
+            actual_start_node = cfg_node; // Update node with smallest stmt num
+            smallest_stmt_num = node_smallest_stmt_num;
+        }
+    }
+
+    // 4. Retrieve expected start node (for comparison)
+    auto expected_start_node = cfg->get_start_node();
+    
+    return actual_start_node == expected_start_node;
+}
+
 auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::unordered_set<int> {
     std::unordered_set<int> all_stmt_nums;
     auto cfg = proc_map.at(proc_name);
@@ -47,7 +71,8 @@ TEST_CASE("Test CFG Builder") {
     auto cfg_builder = std::make_shared<sp::CfgBuilder>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, stmt_num_traverser, cfg_builder, design_abstr_traversers};
+    auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, stmt_num_traverser, cfg_builder, design_abstr_traversers, next_traverser};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -113,12 +138,19 @@ TEST_CASE("Test CFG Builder") {
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
+        
         REQUIRE(get_stmt_nums_in_proc(proc_map, "main") == std::unordered_set<int>{1, 2, 3});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "readPoint") == std::unordered_set<int>{4, 5});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
+        
         REQUIRE(get_dummy_nodes(proc_map) == 0);
+
+        REQUIRE(verify_start_node(proc_map, "main"));
+        REQUIRE(verify_start_node(proc_map, "readPoint"));
+        REQUIRE(verify_start_node(proc_map, "printResults"));
+        REQUIRE(verify_start_node(proc_map, "computeCentroid"));
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -155,6 +187,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
         // Write evaluation for if-else statements.
         REQUIRE(get_dummy_nodes(proc_map) == 1);
+        REQUIRE(verify_start_node(proc_map, "computeCentroid"));
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -195,6 +228,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(proc_map) == 3);
+        REQUIRE(verify_start_node(proc_map, "nesting"));
     }
 }
 
