@@ -79,5 +79,5 @@ jobs:
           database: "build/compile_commands.json"
           ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
           files-changed-only: false
-          tidy-checks: "-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter,-cppcoreguidelines-special-member-functions"
+          tidy-checks: "-*"
           step-summary: true
