@@ -21,7 +21,7 @@ auto verify_start_node(sp::ProcMap proc_map, std::string proc_name) -> bool {
         }
         auto node_stmt_nums = cfg_node->get();
         auto node_smallest_stmt_num = node_stmt_nums.front(); // Get smallest stmt num in that node
-        if (node_smallest_stmt_num < smallest_stmt_num) { 
+        if (node_smallest_stmt_num < smallest_stmt_num) {
             actual_start_node = cfg_node; // Update node with smallest stmt num
             smallest_stmt_num = node_smallest_stmt_num;
         }
@@ -29,7 +29,7 @@ auto verify_start_node(sp::ProcMap proc_map, std::string proc_name) -> bool {
 
     // 4. Retrieve expected start node (for comparison)
     auto expected_start_node = cfg->get_start_node();
-    
+
     return actual_start_node == expected_start_node;
 }
 
@@ -72,7 +72,8 @@ TEST_CASE("Test CFG Builder") {
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
     auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, stmt_num_traverser, cfg_builder, design_abstr_traversers, next_traverser};
+    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, cfg_builder,
+                                  design_abstr_traversers, next_traverser};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -138,13 +139,13 @@ TEST_CASE("Test CFG Builder") {
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
-        
+
         REQUIRE(get_stmt_nums_in_proc(proc_map, "main") == std::unordered_set<int>{1, 2, 3});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "readPoint") == std::unordered_set<int>{4, 5});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
-        
+
         REQUIRE(get_dummy_nodes(proc_map) == 0);
 
         REQUIRE(verify_start_node(proc_map, "main"));
