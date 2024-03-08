@@ -1,4 +1,5 @@
 #include "catch.hpp"
+#include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
@@ -10,8 +11,11 @@ TEST_CASE("Test SP Semantic Validator") {
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
     auto [_, write_facade] = PKB::create_facades();
-    std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>(write_facade)};
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
+    auto cfg_builder = std::make_shared<sp::CfgBuilder>();
+    auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
+    std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {
+        std::make_shared<sp::StmtNumTraverser>(write_facade)};
+    auto sp = sp::SourceProcessor{tokenizer_runner, parser, stmt_num_traverser, cfg_builder, design_abstr_traversers};
     auto semantic_validator = sp::SemanticValidator();
 
     SECTION("complex program Code 4 - success") {
