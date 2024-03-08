@@ -4,9 +4,8 @@
 #include "pkb/pkb.h"
 #include "sp/main.hpp"
 
-TEST_CASE("Test SP and PKB") {
+TEST_CASE("Test SP and PKB - Basic SPA") {
     auto [read_facade, write_facade] = PKB::create_facades();
-
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     std::string input = R"(procedure main {
@@ -133,5 +132,58 @@ TEST_CASE("Test SP and PKB") {
 
         REQUIRE(read_facade->get_all_assignments_lhs_rhs("flag", "1 ").size() == 1);
         REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("cenX", "cenX ").size() == 2);
+    }
+}
+
+TEST_CASE("Test SP and PKB - Advanced SPA") {
+    auto [read_facade, write_facade] = PKB::create_facades();
+    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
+
+    std::string input = R"(procedure First {
+      read x;
+      read z;
+      call Second; }
+
+      procedure Second {
+        x = 0;
+        i = 5;
+        while (i!=0) {
+            x = x + 2*y;
+            call Third;
+            i = i - 1; }
+        if (x==1) then {
+            x = x+1; }
+          else {
+            z = 1; }
+        z = z + x + i;
+        y = z + 2;
+        x = x * y + z; }
+
+      procedure Third {
+          z = 5;
+          v = z;
+          print v; })";
+
+    SECTION("Test SP and PKB Next Website - success") {
+        // Taken from
+        // https://nus-cs3203.github.io/course-website/contents/advanced-spa-requirements/design-abstractions.html
+        // computeCentroid starts with stmt 10
+        auto ast = sp->process(input);
+
+        REQUIRE(read_facade->has_next_relation("4", "5"));
+        REQUIRE(read_facade->has_next_relation("5", "6"));
+        REQUIRE(read_facade->has_next_relation("6", "7"));
+        REQUIRE(read_facade->has_next_relation("6", "10"));
+        REQUIRE(read_facade->has_next_relation("8", "9"));
+        REQUIRE(read_facade->has_next_relation("9", "6"));
+        REQUIRE(read_facade->has_next_relation("10", "11"));
+        REQUIRE(read_facade->has_next_relation("10", "12"));
+        REQUIRE(read_facade->has_next_relation("11", "13"));
+        REQUIRE(read_facade->has_next_relation("12", "13"));
+
+        REQUIRE_FALSE(read_facade->has_next_relation("9", "5"));
+        REQUIRE_FALSE(read_facade->has_next_relation("9", "10"));
+        REQUIRE_FALSE(read_facade->has_next_relation("12", "14"));
+        REQUIRE_FALSE(read_facade->has_next_relation("12", "15"));
     }
 }
