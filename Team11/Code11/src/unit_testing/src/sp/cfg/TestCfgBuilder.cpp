@@ -71,9 +71,8 @@ TEST_CASE("Test CFG Builder") {
     auto cfg_builder = std::make_shared<sp::CfgBuilder>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
-    auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
     auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, cfg_builder,
-                                  design_abstr_traversers, next_traverser};
+                                  design_abstr_traversers};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
