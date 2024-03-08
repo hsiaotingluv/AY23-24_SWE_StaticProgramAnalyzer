@@ -17,14 +17,15 @@
 
 using namespace qps;
 
+using UntypedQuery = untyped::DefaultUntypedParser::UntypedQueryType;
 using UntypedVector = std::vector<std::variant<untyped::UntypedAttrRef, untyped::UntypedSynonym>>;
 
 template <typename T>
 auto require_value(const UntypedVector& vector, const std::string& str) -> void {
     const auto& value = T{IDENT{str}};
     for (const auto& elem : vector) {
-        if (std::holds_alternative<T>(elem)) {
-            REQUIRE(std::get<T>(elem) == value);
+        if (std::holds_alternative<T>(elem) && std::get<T>(elem) == value) {
+            REQUIRE(true);
             return;
         }
     }
@@ -38,9 +39,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(13, s)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -64,9 +64,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -91,9 +90,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13)";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -118,9 +116,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(stmt s; Select s such that Uses(s, "v"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AnyStmtSynonym>(declarations[0], "s");
@@ -143,9 +140,8 @@ TEST_CASE("Test QPSParser") {
         const auto query = R"(procedure p; variable v; Select p such that Uses(p, "s"))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -170,9 +166,8 @@ TEST_CASE("Test QPSParser") {
 Select a pattern a ( _ , _"count + 1"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "a");
@@ -194,9 +189,8 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
@@ -219,9 +213,8 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto query = "procedure p; Select v";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
@@ -289,9 +282,8 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) such that Modifies(p, \"v\")";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -323,9 +315,8 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto query = " procedure p; stmt s; Select s such that Follows*(s, 13) and Modifies(p, \"v\")";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
 
@@ -374,9 +365,8 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
             R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) pattern newa ( "normSq" , _"cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
@@ -406,9 +396,8 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
             R"(assign newa;Select newa pattern newa ( "normSq" , _"cenX * cenX"_) and newa ( "normSq" , _"cenX"_))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<AssignSynonym>(declarations[0], "newa");
@@ -453,9 +442,8 @@ TEST_CASE("Test Parser - pattern clause with 3 arg") {
         const auto query = R"(if a; variable v; Select a pattern a ( v , _, _))";
         const auto output = parser.parse(query);
 
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 2);
         require_value<IfSynonym>(declarations[0], "a");
@@ -491,9 +479,8 @@ TEST_CASE("Test Parser - Basic With clause") {
     SECTION("Test Parser - with stmt#") {
         const auto query = R"(variable v; Select v with v.stmt# = 1)";
         const auto output = parser.parse(query);
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<VarSynonym>(declarations[0], "v");
@@ -514,9 +501,8 @@ TEST_CASE("Test Parser - Basic With clause") {
     SECTION("Test Parser - with value") {
         const auto query = R"(variable v; Select v with v.value = "x")";
         const auto output = parser.parse(query);
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<VarSynonym>(declarations[0], "v");
@@ -537,9 +523,8 @@ TEST_CASE("Test Parser - Basic With clause") {
     SECTION("Test Parser - with procName") {
         const auto query = R"(procedure p; Select p with p.procName = "x")";
         const auto output = parser.parse(query);
-        REQUIRE(std::holds_alternative<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output));
-        const auto& [declarations, untyped] =
-            std::get<std::tuple<Synonyms, untyped::DefaultUntypedParser::UntypedQueryType>>(output);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
 
         REQUIRE(declarations.size() == 1);
         require_value<ProcSynonym>(declarations[0], "p");
