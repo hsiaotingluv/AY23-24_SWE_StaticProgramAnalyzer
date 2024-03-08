@@ -8,13 +8,14 @@
 #include "qps/tokeniser/tokeniser.hpp"
 
 #include "qps/parser/errors.hpp"
+#include <optional>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
 template <typename Head, typename... Tails>
 auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                         TypeList<Head, Tails...> supported_synonyms)
-    -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>>;
+    -> std::tuple<Synonyms, std::vector<Token>::const_iterator>;
 
 template <typename SupportedResultParsers, typename SupportedClauseParsers, typename UntypedClauseType>
 auto build_untyped_query(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
@@ -65,12 +66,7 @@ class UntypedParser {
         const auto end = tokens.end();
 
         // Parse declarations
-        const auto maybe_declared_synonyms = detail::parse_declarations(begin, end, SupportedSynonyms{});
-        if (!maybe_declared_synonyms.has_value()) {
-            return SyntaxError{"Syntax error: unable to declare synonyms"};
-        }
-
-        const auto& [declared_synonyms, rest] = maybe_declared_synonyms.value();
+        const auto& [declared_synonyms, rest] = detail::parse_declarations(begin, end, SupportedSynonyms{});
         begin = rest;
 
         // Parse remaining
@@ -138,10 +134,11 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
         synonyms.emplace_back(std::make_shared<SynonymType>(IDENT{synonym.content}));
     }
 
-    // Consume ';' delimiter if it exists
-    if (it != end && is_semicolon(*it)) {
-        it = std::next(it);
+    // Expect ';' delimiter
+    if (it == end || !is_semicolon(*it)) {
+        return std::nullopt;
     }
+    it = std::next(it);
     return std::make_tuple(synonyms, it);
 }
 
@@ -175,7 +172,7 @@ auto parse_declarations_rec(Synonyms& synonyms, std::vector<Token>::const_iterat
 template <typename Head, typename... Tails>
 auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                         TypeList<Head, Tails...> supported_synonyms)
-    -> std::optional<std::tuple<Synonyms, std::vector<Token>::const_iterator>> {
+    -> std::tuple<Synonyms, std::vector<Token>::const_iterator> {
     auto declared_synonyms = Synonyms{};
     while (true) {
         const auto maybe_it = parse_declarations_rec(declared_synonyms, it, end, supported_synonyms);
@@ -184,7 +181,7 @@ auto parse_declarations(std::vector<Token>::const_iterator it, const std::vector
         }
         it = maybe_it.value();
     }
-    return !declared_synonyms.empty() ? std::make_optional(std::make_tuple(declared_synonyms, it)) : std::nullopt;
+    return std::make_tuple(declared_synonyms, it);
 }
 
 inline auto parse_result_cl(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)

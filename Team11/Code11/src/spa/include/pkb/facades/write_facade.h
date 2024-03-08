@@ -36,6 +36,14 @@ class WriteFacade {
 
     void add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs);
 
+    void add_next(const std::string& stmt1, const std::string& stmt2);
+
+    void add_calls(const std::string& caller, const std::string& callee);
+
+    void add_if_var(const std::string& statement_number, const std::string& variable);
+
+    void add_while_var(const std::string& statement_number, const std::string& variable);
+
     void finalise_pkb();
 
   private:

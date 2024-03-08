@@ -8,7 +8,7 @@ OneToManyStore<KeyType, ValueType>::OneToManyStore() = default;
 template <class KeyType, class ValueType>
 void OneToManyStore<KeyType, ValueType>::add(const KeyType& key, const ValueType& value) {
     forward_map[key].insert(value);
-    reverse_map[value] = key;
+    reverse_map.insert({value, key});
 }
 
 template <class KeyType, class ValueType>

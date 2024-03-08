@@ -7,7 +7,7 @@ ManyToOneStore<KeyType, ValueType>::ManyToOneStore() = default;
 
 template <class KeyType, class ValueType>
 void ManyToOneStore<KeyType, ValueType>::add(const KeyType& key, const ValueType& value) {
-    forward_map[key] = value;
+    forward_map.insert({key, value});
     reverse_map[value].insert(key);
 }
 
