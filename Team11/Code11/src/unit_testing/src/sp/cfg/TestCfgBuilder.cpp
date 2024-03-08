@@ -65,7 +65,7 @@ auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::
 
 auto verify_outneighbour_stmt_nums(sp::ProcMap proc_map, std::string proc_name) -> bool {
     std::unordered_set<int> stmt_nums{};
-    
+
     auto cfg = proc_map.at(proc_name);
 
     // Add start node stmt nums to outneighbours_stmt_nums
