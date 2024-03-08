@@ -13,10 +13,19 @@ namespace sp {
  * statement numbers.
  */
 class CfgNode {
-    using StatementNumber = std::vector<int>;
+
+    using StatementNumbers = std::vector<int>;
+
+  private:
+    StatementNumbers stmt_nums{};
 
   public:
-    StatementNumber stmt_nums; // Public for Testing purposes
+    /**
+     * @brief Get all statement numbers in the CfgNode.
+     */
+    auto get() const -> StatementNumbers {
+        return stmt_nums;
+    };
 
     /**
      * @brief Construct a new Cfg Node object
@@ -59,13 +68,35 @@ class Cfg {
         std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
     static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
 
-  public:
+  private:
     std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
     Graph graph{};
 
+  public:
     explicit Cfg() {
-        current_node = std::make_shared<CfgNode>(); // Writing stmts in the constructor body, for readability.
+        current_node = std::make_shared<CfgNode>();
         add_node_to_graph();
+    }
+
+    /**
+     * @brief Get the current node.
+     */
+    auto get_current_node() const -> std::shared_ptr<CfgNode> {
+        return current_node;
+    };
+
+    /**
+     * @brief Get the graph.
+     */
+    auto get_graph() const -> Graph {
+        return graph;
+    };
+
+    /**
+     * @brief Check if the current node is empty.
+     */
+    auto is_current_node_empty() const -> bool {
+        return current_node->empty();
     }
 
     /**
@@ -79,21 +110,20 @@ class Cfg {
      * @brief Add a new node to the graph, with empty out-neighbours.
      */
     auto add_node_to_graph() -> void {
-        graph.insert(std::make_pair(current_node, EMPTY_OUTNEIGHBOURS));
+        auto edge = std::make_pair(current_node, EMPTY_OUTNEIGHBOURS);
+        graph.insert(edge);
     }
 
     /**
      * @brief Add a new node to the graph and link it to the current node.
      */
-    auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> out_neighbour) -> void {
-        if (graph.find(current_node) == graph.end()) {
-            add_node_to_graph();
-        }
+    auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> outneighbour) -> void {
         // Fill the out-neighbours of current_node.
-        if (graph[current_node].first) {
-            graph[current_node].second = out_neighbour;
+        auto outneighbours = graph.at(current_node);
+        if (outneighbours.first) {
+            outneighbours.second = outneighbour;
         } else {
-            graph[current_node].first = out_neighbour;
+            outneighbours.first = outneighbour;
         }
     }
 
@@ -101,17 +131,17 @@ class Cfg {
      * @brief Move current node to the next node (Need not be a outneighbour node).
      * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
-    auto move_to(std::shared_ptr<CfgNode> next_node) -> void {
-        current_node = next_node;
+    auto move_to(std::shared_ptr<CfgNode> node) -> void {
+        current_node = node;
     };
 
     /**
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
      * @note Default way to traverse the Cfg.
      */
-    auto link_and_move_to(std::shared_ptr<CfgNode> next_node) -> void {
-        add_outneighbour_to_graph(next_node);
-        move_to(next_node);
+    auto link_and_move_to(std::shared_ptr<CfgNode> node) -> void {
+        add_outneighbour_to_graph(node);
+        move_to(node);
         add_node_to_graph();
     };
 
@@ -122,8 +152,7 @@ class Cfg {
     friend auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream& {
         auto graph = cfg.graph;
         for (const auto& [node, outneighbours] : graph) {
-            os << *node;
-            os << " -> OutNeighbours(";
+            os << *node << " -> OutNeighbours(";
             if (outneighbours.first) {
                 os << *outneighbours.first;
             }

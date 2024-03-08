@@ -1,11 +1,8 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
-#include "common/ast/node_type_checker.hpp"
 #include "common/cfg/cfg.hpp"
 #include "sp/traverser/traverser.hpp"
-
-#include <sstream>
 
 namespace sp {
 
@@ -13,6 +10,8 @@ using ProcMap = std::unordered_map<std::string, std::shared_ptr<Cfg>>; // Map of
 
 class CfgBuilder {
   private:
+    ProcMap proc_map{}; // Only 1 Proc Map for the entire Program.
+
     /**
      * @brief Initialise an empty Cfg for the given Procedure Name.
      */
@@ -22,17 +21,19 @@ class CfgBuilder {
         return cfg;
     };
 
+
   public:
-    ProcMap proc_map{}; // Only 1 Proc Map for the entire Program.
+    /**
+     * @brief Get the ProcMap.
+     */
+    auto get_proc_map() const -> ProcMap {
+        return proc_map;
+    };
 
     /**
      * @brief Build a Control Flow Graph for the given Program ASTNode.
      */
     auto build(std::shared_ptr<AstNode> ast) -> ProcMap {
-        if (!NodeTypeChecker::is_program_node(ast)) {
-            return proc_map; // Invalid Node -> No valid ProcMap.
-        }
-
         auto prog_node = std::dynamic_pointer_cast<ProgramNode>(ast);
         for (const auto& node : prog_node->procedures) {
             auto proc_node = std::dynamic_pointer_cast<ProcedureNode>(node);

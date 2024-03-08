@@ -174,8 +174,8 @@ auto IfNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
     auto else_node = std::make_shared<CfgNode>();
     auto end_node = std::make_shared<CfgNode>();
 
-    if (cfg->current_node->empty()) { // If no statement in current node
-        if_node = cfg->current_node;  // Reuse Node
+    if (cfg->is_current_node_empty()) { // If no statement in current node
+        if_node = cfg->get_current_node();  // Reuse Node
     } else {
         cfg->link_and_move_to(if_node); // Move to new If node.
     }

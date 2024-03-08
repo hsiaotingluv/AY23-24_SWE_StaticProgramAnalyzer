@@ -12,8 +12,8 @@
 auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::unordered_set<int> {
     std::unordered_set<int> all_stmt_nums;
     auto cfg = proc_map.at(proc_name);
-    for (const auto& [cfg_node, outneighbours] : cfg->graph) {
-        auto stmt_nums = cfg_node->stmt_nums;
+    for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
+        auto stmt_nums = cfg_node->get();
         all_stmt_nums.insert(stmt_nums.begin(), stmt_nums.end());
     }
     return all_stmt_nums;
@@ -30,8 +30,8 @@ auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
 auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
     int num_dummy = 0;
     for (const auto& [proc_name, cfg] : proc_map) {
-        for (const auto& [cfg_node, outneighbours] : cfg->graph) {
-            if (cfg_node->stmt_nums.empty()) {
+        for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
+            if (cfg_node->empty()) {
                 num_dummy++;
             }
         }
@@ -109,15 +109,16 @@ TEST_CASE("Test CFG Builder") {
          * main:
          * Node(1, 2, 3) -> OutNeighbours()
          */
-
-        REQUIRE(get_proc_names(cfg_builder->proc_map) ==
+        
+        auto proc_map = cfg_builder->get_proc_map();
+        REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "main") == std::unordered_set<int>{1, 2, 3});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "readPoint") == std::unordered_set<int>{4, 5});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "main") == std::unordered_set<int>{1, 2, 3});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "readPoint") == std::unordered_set<int>{4, 5});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
-        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 0);
+        REQUIRE(get_dummy_nodes(proc_map) == 0);
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -149,12 +150,12 @@ TEST_CASE("Test CFG Builder") {
          * Node(2, 3, 4) -> OutNeighbours(Node(1))
          * Node(1) -> OutNeighbours(Node(2, 3, 4), Node(5))
          */
-
-        REQUIRE(get_proc_names(cfg_builder->proc_map) == std::unordered_set<std::string>{"computeCentroid"});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "computeCentroid") ==
+        auto proc_map = cfg_builder->get_proc_map();
+        REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
                 std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
         // Write evaluation for if-else statements.
-        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 1);
+        REQUIRE(get_dummy_nodes(proc_map) == 1);
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -189,12 +190,13 @@ TEST_CASE("Test CFG Builder") {
          * Node(2) -> OutNeighbours(Node()) // read i;
          * Node(1) -> OutNeighbours(Node(2), Node(3)) // if(i>j)
          */
-
+        
         auto ast = sp.process(input);
-        REQUIRE(get_proc_names(cfg_builder->proc_map) == std::unordered_set<std::string>{"nesting"});
-        REQUIRE(get_stmt_nums_in_proc(cfg_builder->proc_map, "nesting") ==
+        auto proc_map = cfg_builder->get_proc_map();
+        REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") ==
                 std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
-        REQUIRE(get_dummy_nodes(cfg_builder->proc_map) == 3);
+        REQUIRE(get_dummy_nodes(proc_map) == 3);
     }
 }
 
