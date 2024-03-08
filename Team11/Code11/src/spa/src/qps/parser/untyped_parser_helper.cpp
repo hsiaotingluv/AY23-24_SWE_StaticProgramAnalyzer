@@ -1,4 +1,5 @@
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
+#include <optional>
 
 namespace qps::untyped::detail {
 auto parse_synonym(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
@@ -59,6 +60,10 @@ auto parse_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Toke
 
 auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
     const auto& token = *it;
     if (is_stmt_ref(token)) {
         const auto& stmt_ref = parse_stmt_ref(token);
@@ -71,9 +76,10 @@ auto parse_stmt_ent_ref(std::vector<Token>::const_iterator it, const std::vector
         const auto maybe_ent_ref = parse_ent_ref(it, end);
         if (maybe_ent_ref.has_value()) {
             const auto& [ent_ref, rest] = maybe_ent_ref.value();
+            it = rest;
             return std::visit(
                 [it](auto&& arg) -> std::optional<std::tuple<UntypedStmtEntRef, std::vector<Token>::const_iterator>> {
-                    return std::make_tuple(arg, std::next(it));
+                    return std::make_tuple(arg, it);
                 },
                 ent_ref);
         }
