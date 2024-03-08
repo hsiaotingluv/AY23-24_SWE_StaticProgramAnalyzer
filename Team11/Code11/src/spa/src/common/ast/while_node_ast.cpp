@@ -148,7 +148,7 @@ auto WhileNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
     auto loop_node = std::make_shared<CfgNode>();
     auto end_node = std::make_shared<CfgNode>();
 
-    if (cfg->is_current_node_empty()) {   // If no statement in current node
+    if (cfg->is_current_node_empty()) {       // If no statement in current node
         while_node = cfg->get_current_node(); // Reuse Node
     } else {
         cfg->link_and_move_to(while_node); // Move to new While node.

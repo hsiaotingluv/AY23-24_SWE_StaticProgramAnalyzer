@@ -21,7 +21,6 @@ class CfgBuilder {
         return cfg;
     };
 
-
   public:
     /**
      * @brief Get the ProcMap.

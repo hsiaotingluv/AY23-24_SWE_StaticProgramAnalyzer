@@ -109,7 +109,7 @@ TEST_CASE("Test CFG Builder") {
          * main:
          * Node(1, 2, 3) -> OutNeighbours()
          */
-        
+
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
@@ -152,8 +152,7 @@ TEST_CASE("Test CFG Builder") {
          */
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
-        REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
-                std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
         // Write evaluation for if-else statements.
         REQUIRE(get_dummy_nodes(proc_map) == 1);
     }
@@ -190,12 +189,11 @@ TEST_CASE("Test CFG Builder") {
          * Node(2) -> OutNeighbours(Node()) // read i;
          * Node(1) -> OutNeighbours(Node(2), Node(3)) // if(i>j)
          */
-        
+
         auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
-        REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") ==
-                std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(proc_map) == 3);
     }
 }
