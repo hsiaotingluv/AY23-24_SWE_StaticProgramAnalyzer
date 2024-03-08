@@ -234,20 +234,13 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(clauses.empty());
     }
 
-    SECTION("Modifies cannot start with wildcard") {
-        const auto query = R"(procedure p; variable v; Select p such that Modifies("x", v))";
-        const auto output = parser.parse(query);
-
-        REQUIRE(std::holds_alternative<SyntaxError>(output));
-    }
-
-    SECTION("Uses cannot start with quoted ident") {
-        const auto query = R"(procedure p; variable v; Select p such that Uses("s", p))";
+    SECTION("Modifies cannot end with integer") {
+        const auto query = "variable v; Select v such that Modifies(v, 1)";
         const auto output = parser.parse(query);
         REQUIRE(std::holds_alternative<SyntaxError>(output));
     }
 
-    SECTION("Uses cannot start with integer") {
+    SECTION("Uses cannot end with integer") {
         const auto query = "variable v; Select v such that Uses(v, 1)";
         const auto output = parser.parse(query);
         REQUIRE(std::holds_alternative<SyntaxError>(output));
