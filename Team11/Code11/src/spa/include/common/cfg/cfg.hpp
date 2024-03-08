@@ -65,10 +65,10 @@ class Cfg {
     /**
      * For normal Statements: OutNeighbours.first is the next node. OutNeighbours.second is nullptr.
      * For If Statements: OutNeighbours.first is the then-block node. OutNeighbours.second is the else-block node.
-     * For While Statements: OutNeighbours.first is the loop-block node. OutNeighbours.second is next node after the While block.
+     * For While Statements: OutNeighbours.first is the loop-block node. OutNeighbours.second is next node after the
+     * While block.
      */
-    using OutNeighbours =
-        std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>; 
+    using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>;
     using Graph =
         std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
     static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
