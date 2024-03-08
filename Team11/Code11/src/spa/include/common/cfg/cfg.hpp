@@ -133,11 +133,10 @@ class Cfg {
      */
     auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> outneighbour) -> void {
         // Fill the out-neighbours of current_node.
-        auto outneighbours = graph.at(current_node);
-        if (outneighbours.first) {
-            outneighbours.second = outneighbour;
+        if (graph.at(current_node).first) {
+            graph.at(current_node).second = outneighbour;
         } else {
-            outneighbours.first = outneighbour;
+            graph.at(current_node).first = outneighbour;
         }
     }
 
