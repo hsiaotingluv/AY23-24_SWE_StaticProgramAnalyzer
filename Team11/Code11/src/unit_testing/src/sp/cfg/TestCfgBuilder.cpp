@@ -2,7 +2,7 @@
 #pragma ide diagnostic ignored "bugprone-suspicious-missing-comma"
 #include "catch.hpp"
 
-#include "sp/cfg/cfg.hpp"
+#include "common/cfg/cfg.hpp"
 #include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
@@ -10,6 +10,9 @@
 #include "sp/traverser/traverser.hpp"
 #include <unordered_set>
 
+/**
+ * @brief Verify if the start node of the CFG is the node with the smallest stmt num.
+ */
 auto verify_start_node(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     auto cfg = proc_map.at(proc_name);
 
@@ -28,12 +31,15 @@ auto verify_start_node(const sp::ProcMap& proc_map, const std::string& proc_name
         }
     }
 
-    // 4. Retrieve expected start node (for comparison)
+    // Retrieve expected start node (for comparison)
     auto expected_start_node = cfg->get_start_node();
 
     return actual_start_node == expected_start_node;
 }
 
+/**
+ * @brief Get all procedure names from the Program CFG.
+ */
 auto get_proc_names(const sp::ProcMap& proc_map) -> std::unordered_set<std::string> {
     std::unordered_set<std::string> proc_names;
     for (const auto& [proc_name, cfg] : proc_map) {
@@ -42,6 +48,9 @@ auto get_proc_names(const sp::ProcMap& proc_map) -> std::unordered_set<std::stri
     return proc_names;
 }
 
+/**
+ * @brief Get the number of dummy nodes in the Program CFGs.
+ */
 auto get_dummy_nodes(const sp::ProcMap& proc_map) -> int {
     int num_dummy = 0;
     for (const auto& [proc_name, cfg] : proc_map) {
@@ -54,6 +63,9 @@ auto get_dummy_nodes(const sp::ProcMap& proc_map) -> int {
     return num_dummy;
 }
 
+/**
+ * @brief Get all stmt nums in a procedure.
+ */
 auto get_stmt_nums_in_proc(const sp::ProcMap& proc_map, const std::string& proc_name) -> std::unordered_set<int> {
     std::unordered_set<int> all_stmt_nums;
     auto cfg = proc_map.at(proc_name);
@@ -64,6 +76,9 @@ auto get_stmt_nums_in_proc(const sp::ProcMap& proc_map, const std::string& proc_
     return all_stmt_nums;
 }
 
+/**
+ * @brief Verify if the outneighbour stmt nums are equal to all stmt nums in the procedure.
+ */
 auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     std::unordered_set<int> stmt_nums{};
 
@@ -93,7 +108,6 @@ auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::strin
     auto all_stmt_nums = get_stmt_nums_in_proc(proc_map, proc_name);
     return stmt_nums == all_stmt_nums;
 }
-
 
 TEST_CASE("Test CFG Builder") {
     auto tokenizer_runner =
