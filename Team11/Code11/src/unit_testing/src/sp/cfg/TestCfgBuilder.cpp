@@ -2,6 +2,7 @@
 #pragma ide diagnostic ignored "bugprone-suspicious-missing-comma"
 #include "catch.hpp"
 
+#include "sp/cfg/cfg.hpp"
 #include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
@@ -9,7 +10,7 @@
 #include "sp/traverser/traverser.hpp"
 #include <unordered_set>
 
-auto verify_start_node(sp::ProcMap proc_map, std::string proc_name) -> bool {
+auto verify_start_node(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     auto cfg = proc_map.at(proc_name);
 
     auto actual_start_node = std::make_shared<sp::CfgNode>(); // Placeholder
@@ -33,7 +34,7 @@ auto verify_start_node(sp::ProcMap proc_map, std::string proc_name) -> bool {
     return actual_start_node == expected_start_node;
 }
 
-auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
+auto get_proc_names(const sp::ProcMap& proc_map) -> std::unordered_set<std::string> {
     std::unordered_set<std::string> proc_names;
     for (const auto& [proc_name, cfg] : proc_map) {
         proc_names.insert(proc_name);
@@ -41,7 +42,7 @@ auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
     return proc_names;
 }
 
-auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
+auto get_dummy_nodes(const sp::ProcMap& proc_map) -> int {
     int num_dummy = 0;
     for (const auto& [proc_name, cfg] : proc_map) {
         for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
@@ -53,7 +54,7 @@ auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
     return num_dummy;
 }
 
-auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::unordered_set<int> {
+auto get_stmt_nums_in_proc(const sp::ProcMap& proc_map, const std::string& proc_name) -> std::unordered_set<int> {
     std::unordered_set<int> all_stmt_nums;
     auto cfg = proc_map.at(proc_name);
     for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
@@ -63,7 +64,7 @@ auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::
     return all_stmt_nums;
 }
 
-auto verify_outneighbour_stmt_nums(sp::ProcMap proc_map, std::string proc_name) -> bool {
+auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     std::unordered_set<int> stmt_nums{};
 
     auto cfg = proc_map.at(proc_name);
@@ -92,6 +93,7 @@ auto verify_outneighbour_stmt_nums(sp::ProcMap proc_map, std::string proc_name) 
     auto all_stmt_nums = get_stmt_nums_in_proc(proc_map, proc_name);
     return stmt_nums == all_stmt_nums;
 }
+
 
 TEST_CASE("Test CFG Builder") {
     auto tokenizer_runner =
