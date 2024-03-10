@@ -1,11 +1,12 @@
 #pragma once
 
+#include "qps/parser/concepts.hpp"
 #include "qps/parser/parser_helper.hpp"
 #include "qps/parser/untyped/untyped_parser_helper.hpp"
 #include <vector>
 
 namespace qps::untyped {
-template <typename Strategy>
+template <typename Strategy, std::enable_if_t<is_parser_strategy_v<Strategy>, int> = 0>
 class ClausesParser {
   public:
     using ClauseType = typename Strategy::ClauseType;

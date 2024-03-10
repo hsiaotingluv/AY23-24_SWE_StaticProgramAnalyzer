@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
@@ -32,9 +33,21 @@ struct is_one_of<T, std::variant<Ts...>> : std::bool_constant<(std::is_same_v<T,
 template <typename T, typename Variant>
 inline constexpr bool is_variant_member_v = is_variant_member<T, Variant>::value;
 
+// Wrapper around variadic templates
 template <typename... T>
 struct TypeList {};
 
+// Check if a type is a TypeList
+template <typename T>
+struct is_type_list : std::false_type {};
+
+template <typename... T>
+struct is_type_list<TypeList<T...>> : std::true_type {};
+
+template <typename T>
+inline constexpr bool is_type_list_v = is_type_list<T>::value;
+
+// Concatenate TypeLists
 template <typename... Lists>
 struct concat;
 
@@ -46,6 +59,7 @@ struct concat<TypeList<Ts...>, TypeList<Us...>> {
 template <typename T, typename U>
 using concat_t = typename concat<T, U>::type;
 
+// Count number of elements in a TypeList
 template <typename T>
 struct num_elem;
 
@@ -62,6 +76,33 @@ struct num_elem<qps::TypeList<Head, Tails...>> {
 
 template <typename T>
 static constexpr int num_elem_v = num_elem<T>::value;
+
+// Check if a TypeList is empty
+template <typename T>
+struct is_type_list_empty : std::false_type {};
+
+template <>
+struct is_type_list_empty<TypeList<>> : std::true_type {};
+
+template <typename T>
+static constexpr bool is_typelist_empty_v = is_type_list_empty<T>::value;
+
+// Check if all elements of a TypeList satisfy a condition
+template <typename T, template <typename> typename Func>
+struct all_of;
+
+template <template <typename> typename Func>
+struct all_of<TypeList<>, Func> {
+    static constexpr bool value = true;
+};
+
+template <template <typename> typename Func, typename Head, typename... Tails>
+struct all_of<TypeList<Head, Tails...>, Func> {
+    static constexpr bool value = Func<Head>::value && all_of<TypeList<Tails...>, Func>::value;
+};
+
+template <typename T, template <typename> typename Func>
+static constexpr bool all_of_v = all_of<T, Func>::value;
 
 template <typename TypeList>
 struct type_list_to_variant;

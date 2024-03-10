@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/tokeniser/tokenizer.hpp"
+#include "qps/parser/concepts.hpp"
 #include "qps/parser/entities/attribute_name.hpp"
 #include "qps/template_utils.hpp"
 
@@ -10,6 +11,8 @@
 namespace tokenizer {
 template <typename T>
 class AttrNameTokeniser : public Tokenizer {
+    static_assert(qps::is_lexable_v<T>, "T must be lexable");
+
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, T::keyword, TokenType::AttrName);
