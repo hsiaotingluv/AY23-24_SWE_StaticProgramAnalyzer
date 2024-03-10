@@ -150,8 +150,8 @@ TEST_CASE("Test SP and PKB") {
     SECTION("Test SP and PKB Populate calls - success") {
         auto ast = sp->process(input);
 
-        REQUIRE(read_facade->get_all_calls_keys().size() == 2);
-        REQUIRE(read_facade->get_all_calls_values().size() == 3);
+        REQUIRE(read_facade->get_all_calls_callers().size() == 2);
+        REQUIRE(read_facade->get_all_calls_callees().size() == 3);
         REQUIRE(read_facade->get_callees("main").size() == 2);
         REQUIRE(read_facade->get_callers("main").empty());
         REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
