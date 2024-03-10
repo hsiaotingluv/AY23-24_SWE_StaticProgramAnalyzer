@@ -48,7 +48,8 @@ class PatternAssignAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
-        if (pattern.num_arg != 2) {
+        static constexpr auto NUM_ARGS = 2;
+        if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
         const auto& maybe_synonym = details::require<AssignSynonym>(pattern.synonym, declarations, mapping);
@@ -70,7 +71,8 @@ class PatternWhileAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
-        if (pattern.num_arg != 2) {
+        static constexpr auto NUM_ARGS = 2;
+        if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
         const auto& maybe_synonym = details::require<WhileSynonym>(pattern.synonym, declarations, mapping);
@@ -97,7 +99,8 @@ class PatternIfAnalyser {
     static auto analyse(const Synonyms& declarations,
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedPatternClause& pattern) -> std::optional<SyntacticPattern> {
-        if (pattern.num_arg != 3) {
+        static constexpr auto NUM_ARGS = 3;
+        if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
         const auto& maybe_synonym = details::require<IfSynonym>(pattern.synonym, declarations, mapping);

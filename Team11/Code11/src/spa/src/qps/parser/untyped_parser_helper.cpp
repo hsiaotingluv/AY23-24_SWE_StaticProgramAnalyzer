@@ -28,7 +28,8 @@ auto parse_stmt_ref(const Token& token) -> UntypedStmtRef {
 
 auto parse_quoted_ident(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<QuotedIdent, std::vector<Token>::const_iterator>> {
-    if (std::distance(it, end) < 3) {
+    static constexpr auto EXPECTED_LENGTH = 3;
+    if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }
     const auto& maybe_open_quote = *it;
