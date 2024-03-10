@@ -110,7 +110,9 @@ auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::strin
     return stmt_nums == all_stmt_nums;
 }
 
-auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node, std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes, std::unordered_set<int>& visited_stmt_nums) -> void {
+auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node,
+                       std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes,
+                       std::unordered_set<int>& visited_stmt_nums) -> void {
     if (std::find(visited_nodes.begin(), visited_nodes.end(), node) != visited_nodes.end()) {
         return; // If node is visited, skip
     }
@@ -127,8 +129,9 @@ auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr
     }
 }
 
-auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {    
-    std::vector<std::shared_ptr<sp::CfgNode>> visited_nodes; //Sacrifice O(n) lookup to avoid more trouble implementing hash and equality fns for CfgNode.
+auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
+    std::vector<std::shared_ptr<sp::CfgNode>>
+        visited_nodes; // Sacrifice O(n) lookup to avoid more trouble implementing hash and equality fns for CfgNode.
     std::unordered_set<int> visited_stmt_nums;
     const auto cfg = proc_map.at(proc_name);
     const auto start_node = cfg->get_start_node();
@@ -250,7 +253,6 @@ TEST_CASE("Test CFG Builder") {
                 cenY = cenY / count;
             }
         })";
-
 
         /**
          * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
