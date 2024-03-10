@@ -13,7 +13,7 @@ namespace qps::details {
 template <typename T>
 auto require(const untyped::UntypedSynonym& synonym, const Synonyms& declarations,
              const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping)
-    -> std::optional<std::shared_ptr<Synonym>> {
+    -> std::optional<std::shared_ptr<T>> {
     const auto& maybe_synonym = is_synonym_declared(declarations, mapping, synonym);
     if (!maybe_synonym.has_value()) {
         return std::nullopt;
@@ -60,8 +60,7 @@ class PatternAssignAnalyser {
         if (!maybe_ent_ref) {
             return std::nullopt;
         }
-        return PatternAssign{std::dynamic_pointer_cast<AssignSynonym>(maybe_synonym.value()), maybe_ent_ref.value(),
-                             pattern.expression_spec};
+        return PatternAssign{maybe_synonym.value(), maybe_ent_ref.value(), pattern.expression_spec};
     }
 };
 
@@ -89,7 +88,7 @@ class PatternWhileAnalyser {
             return std::nullopt;
         }
 
-        return PatternWhile{std::dynamic_pointer_cast<WhileSynonym>(maybe_synonym.value()), maybe_ent_ref.value()};
+        return PatternWhile{maybe_synonym.value(), maybe_ent_ref.value()};
     }
 };
 
@@ -117,7 +116,7 @@ class PatternIfAnalyser {
             return std::nullopt;
         }
 
-        return PatternIf{std::dynamic_pointer_cast<IfSynonym>(maybe_synonym.value()), maybe_ent_ref.value()};
+        return PatternIf{maybe_synonym.value(), maybe_ent_ref.value()};
     }
 };
 
