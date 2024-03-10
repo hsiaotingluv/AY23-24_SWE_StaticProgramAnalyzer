@@ -9,6 +9,7 @@
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include <unordered_set>
+#include <vector>
 
 /**
  * @brief Verify if the start node of the CFG is the node with the smallest stmt num.
@@ -109,6 +110,33 @@ auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::strin
     return stmt_nums == all_stmt_nums;
 }
 
+auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node, std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes, std::unordered_set<int>& visited_stmt_nums) -> void {
+    if (std::find(visited_nodes.begin(), visited_nodes.end(), node) != visited_nodes.end()) {
+        return; // If node is visited, skip
+    }
+    const auto node_stmt_nums = node->get();
+    visited_nodes.push_back(node);
+    visited_stmt_nums.insert(node_stmt_nums.begin(), node_stmt_nums.end());
+
+    const auto outneighbours = cfg->get_outneighbours(node);
+    if (outneighbours.first) {
+        test_traverse_dfs(cfg, outneighbours.first, visited_nodes, visited_stmt_nums);
+    }
+    if (outneighbours.second) {
+        test_traverse_dfs(cfg, outneighbours.second, visited_nodes, visited_stmt_nums);
+    }
+}
+
+auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {    
+    std::vector<std::shared_ptr<sp::CfgNode>> visited_nodes; //Sacrifice O(n) lookup to avoid more trouble implementing hash and equality fns for CfgNode.
+    std::unordered_set<int> visited_stmt_nums;
+    const auto cfg = proc_map.at(proc_name);
+    const auto start_node = cfg->get_start_node();
+    test_traverse_dfs(cfg, start_node, visited_nodes, visited_stmt_nums);
+    const bool is_all_nodes = (get_stmt_nums_in_proc(proc_map, proc_name) == visited_stmt_nums);
+    return is_all_nodes;
+}
+
 TEST_CASE("Test CFG Builder") {
     auto tokenizer_runner =
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
@@ -201,6 +229,11 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "readPoint"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "printResults"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
+
+        REQUIRE(test_traverse(proc_map, "main"));
+        REQUIRE(test_traverse(proc_map, "readPoint"));
+        REQUIRE(test_traverse(proc_map, "printResults"));
+        REQUIRE(test_traverse(proc_map, "computeCentroid"));
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -218,7 +251,6 @@ TEST_CASE("Test CFG Builder") {
             }
         })";
 
-        auto ast = sp.process(input);
 
         /**
          * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
@@ -232,13 +264,15 @@ TEST_CASE("Test CFG Builder") {
          * Node(2, 3, 4) -> OutNeighbours(Node(1))
          * Node(1) -> OutNeighbours(Node(2, 3, 4), Node(5))
          */
+        auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
+
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
-        // Write evaluation for if-else statements.
         REQUIRE(get_dummy_nodes(proc_map) == 1);
         REQUIRE(verify_start_node(proc_map, "computeCentroid"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
+        REQUIRE(test_traverse(proc_map, "computeCentroid"));
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -281,6 +315,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_dummy_nodes(proc_map) == 3);
         REQUIRE(verify_start_node(proc_map, "nesting"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "nesting"));
+        REQUIRE(test_traverse(proc_map, "nesting"));
     }
 }
 

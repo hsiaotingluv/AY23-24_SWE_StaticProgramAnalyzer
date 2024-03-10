@@ -100,6 +100,17 @@ class Cfg {
     };
 
     /**
+     * @brief Get the associated OutNeighbours
+     */
+    auto get_outneighbours(std::shared_ptr<CfgNode> node) const -> OutNeighbours {
+        if (graph.find(node) == graph.end()) {
+            return EMPTY_OUTNEIGHBOURS;
+        } else {
+            return graph.at(node);
+        }
+    };
+
+    /**
      * @brief Get the graph.
      */
     auto get_graph() const -> Graph {
