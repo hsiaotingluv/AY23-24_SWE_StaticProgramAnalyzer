@@ -34,7 +34,7 @@ auto WhileNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_
     // populate patterns for while
     auto var_names_cond_expr = get_vars_from_expr(cond_expr);
     for (const auto& var_name : var_names_cond_expr) {
-        write_facade->add_if_var(stmt_number, var_name);
+        write_facade->add_while_var(stmt_number, var_name);
     }
 }
 
