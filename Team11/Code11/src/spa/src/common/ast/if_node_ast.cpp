@@ -70,7 +70,7 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_fac
 auto IfNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
     auto stmt_number = std::to_string(get_statement_number());
     write_facade->add_statement(stmt_number, StatementType::If);
-    
+
     // populate patterns for if
     auto var_names_cond_expr = get_vars_from_expr(cond_expr);
     for (const auto& var_name : var_names_cond_expr) {
