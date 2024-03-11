@@ -21,7 +21,7 @@ class ConstantNode : public ExprNode, public DesignEntitiesMixin {
     [[nodiscard]] auto identifier() const -> std::stringstream override;
     [[nodiscard]] auto to_xml() const -> std::string override;
     [[nodiscard]] auto get_postfix() const -> std::string override;
-    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void override;
 };
 
 class VarNode : public ExprNode, public DesignEntitiesMixin {
@@ -36,6 +36,6 @@ class VarNode : public ExprNode, public DesignEntitiesMixin {
     [[nodiscard]] auto identifier() const -> std::stringstream override;
     [[nodiscard]] auto to_xml() const -> std::string override;
     [[nodiscard]] auto get_postfix() const -> std::string override;
-    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    auto populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void override;
 };
 } // namespace sp

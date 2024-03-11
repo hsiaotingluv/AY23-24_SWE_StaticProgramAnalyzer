@@ -9,6 +9,8 @@
 #include <tuple>
 #include <unordered_set>
 
+namespace pkb {
+
 class ReadFacade {
   public:
     explicit ReadFacade(std::shared_ptr<PKB> pkb);
@@ -248,3 +250,4 @@ class ReadFacade {
   private:
     std::shared_ptr<PKB> pkb;
 };
+} // namespace pkb

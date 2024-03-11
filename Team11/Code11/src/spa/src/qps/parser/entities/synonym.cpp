@@ -102,43 +102,43 @@ auto ConstSynonym::get_keyword() const -> std::string {
     return keyword;
 }
 
-auto AnyStmtSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto AnyStmtSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_all_statements();
 }
 
-auto ReadSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto ReadSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_read_statements();
 }
 
-auto PrintSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto PrintSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_print_statements();
 }
 
-auto CallSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto CallSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_call_statements();
 }
 
-auto WhileSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto WhileSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_while_statements();
 }
 
-auto IfSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto IfSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_if_statements();
 }
 
-auto AssignSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto AssignSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_assign_statements();
 }
 
-auto ProcSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto ProcSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_procedures();
 }
 
-auto VarSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto VarSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_variables();
 }
 
-auto ConstSynonym::scan(const std::shared_ptr<ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto ConstSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
     return read_facade->get_constants();
 }
 

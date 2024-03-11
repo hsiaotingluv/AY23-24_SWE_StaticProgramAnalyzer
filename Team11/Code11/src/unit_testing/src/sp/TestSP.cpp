@@ -6,6 +6,8 @@
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 
+using namespace pkb;
+
 TEST_CASE("Test SP") {
     auto tokenizer_runner =
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
