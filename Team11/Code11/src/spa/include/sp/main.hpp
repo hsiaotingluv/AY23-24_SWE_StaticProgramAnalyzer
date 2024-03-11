@@ -14,6 +14,7 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include "sp/traverser/uses_traverser.hpp"
+#include "sp/validator/call_graph_traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
 
 #include <filesystem>
@@ -37,6 +38,7 @@ class SourceProcessor {
     std::vector<std::shared_ptr<Traverser>> design_abstr_traversers;
     std::shared_ptr<pkb::WriteFacade> write_facade;
     SemanticValidator semantic_validator{};
+    CallGraphTraverser call_graph_traverser;
 
   public:
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
@@ -51,7 +53,8 @@ class SourceProcessor {
                     std::vector<std::shared_ptr<Traverser>>&& traversers,
                     const std::shared_ptr<pkb::WriteFacade>& write_facade)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
-          cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers), write_facade(write_facade) {
+          cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers), write_facade(write_facade),
+          call_graph_traverser(write_facade) {
     }
 
     static auto get_complete_sp(const std::shared_ptr<pkb::WriteFacade>& write_facade)
@@ -106,6 +109,8 @@ class SourceProcessor {
         ast = stmt_num_traverser->traverse(ast, procedure_topology_orders);
         // Step 3.3 Build CFG
         auto cfgs = cfg_builder->build(ast);
+        // Step 3.4 Extract Call Graph
+        call_graph_traverser.traverse(semantic_validator.get_call_graph());
 
         // Step 4. Execute Design Abstraction Traversers (Update AST)
         for (const auto& traverser : design_abstr_traversers) {

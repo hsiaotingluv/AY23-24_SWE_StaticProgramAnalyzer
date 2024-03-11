@@ -39,20 +39,7 @@ auto SemanticValidator::validate_get_traversal_order(const std::shared_ptr<AstNo
     // No recursive and cyclic call, use Topological sort to detect this
     auto topo_sort = topological_sort();
 
-    // Valid graph, proceed to populate pkb
-    if (write_facade != nullptr) { // used for unit testing where write facade is not required
-        populate_pkb_calls();
-    }
-
     return topo_sort;
-}
-
-void SemanticValidator::populate_pkb_calls() {
-    for (auto& [callee, callers] : dependency_graph) {
-        for (const auto& caller : callers) {
-            write_facade->add_calls(caller, callee);
-        }
-    }
 }
 
 auto SemanticValidator::build_graph(const std::shared_ptr<AstNode>& node, const std::string& caller_name) -> void {
