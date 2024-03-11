@@ -86,8 +86,15 @@ struct is_parser_strategy : std::true_type {
     static_assert(std::is_same_v<std::remove_cv_t<KeywordsArray>, std::array<std::string_view, N>>,
                   "T::keywords must be a std::array<std::string_view, N>");
 
-    // Ensure that Strategy is a parser
-    static_assert(is_parser_v<Strategy>, "Strategy must be a parser");
+    // Ensure that T exposes a ClauseType
+    using ReturnType = typename Strategy::ClauseType;
+    static_assert(std::is_same_v<ReturnType, ReturnType>, "T must expose return type as a ClauseType");
+
+    // Ensure that T::parse is a valid function
+    static_assert(std::is_invocable_v<decltype(&Strategy::parse_clause), std::vector<Token>::const_iterator,
+                                      const std::vector<Token>::const_iterator&>,
+                  "T must expose a parse_clause function with signature: "
+                  "std::optional<std::tuple<ReturnType, std::vector<Token>::const_iterator>>");
 };
 
 template <typename Strategy>

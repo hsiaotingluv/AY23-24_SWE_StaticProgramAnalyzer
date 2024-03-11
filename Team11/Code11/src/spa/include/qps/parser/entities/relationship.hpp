@@ -165,7 +165,7 @@ struct CallsT {
         : procedure1(std::move(procedure1)), procedure2(std::move(procedure2)) {
     }
 
-    friend auto operator<<(std::ostream& os, const CallsT& callT) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const CallsT& callsT) -> std::ostream&;
 
     auto operator==(const CallsT& other) const -> bool {
         return procedure1 == other.procedure1 && procedure2 == other.procedure2;

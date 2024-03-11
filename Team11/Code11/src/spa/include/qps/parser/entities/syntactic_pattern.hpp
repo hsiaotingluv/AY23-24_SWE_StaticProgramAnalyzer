@@ -55,7 +55,7 @@ class PatternWhile {
         return ent_ref;
     }
 
-    [[nodiscard]] auto get_expression_spec() const -> ExpressionSpec {
+    [[nodiscard]] static auto get_expression_spec() -> ExpressionSpec {
         return WildCard{};
     }
 };
@@ -81,7 +81,7 @@ class PatternIf {
         return ent_ref;
     }
 
-    [[nodiscard]] auto get_expression_spec() const -> ExpressionSpec {
+    [[nodiscard]] static auto get_expression_spec() -> ExpressionSpec {
         return WildCard{};
     }
 };
