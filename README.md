@@ -1,8 +1,8 @@
 # Team 11
 
-[![Ubuntu: Lint cpp/h files and test](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/lint_test_ubuntu.yml/badge.svg?branch=milestone1)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/lint_test_ubuntu.yml)
-[![MacOS: Test](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/test_macos.yml/badge.svg?branch=milestone1)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/test_macos.yml)
-[![Code Coverage](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/code_coverage.yml/badge.svg?branch=milestone1)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/code_coverage.yml)
+[![Ubuntu: Lint cpp/h files and test](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/lint_test_ubuntu.yml/badge.svg?branch=milestone2)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/lint_test_ubuntu.yml)
+[![MacOS: Test](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/test_macos.yml/badge.svg?branch=milestone2)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/test_macos.yml)
+[![Code Coverage](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/code_coverage.yml/badge.svg?branch=milestone2)](https://github.com/nus-cs3203/23s2-cp-spa-team-11/actions/workflows/code_coverage.yml)
 
 ## Target Environment
 
