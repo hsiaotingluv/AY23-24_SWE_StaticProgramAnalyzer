@@ -9,7 +9,7 @@
 #include <memory>
 #include <optional>
 
-namespace qps::details {
+namespace qps::detail {
 template <typename T>
 auto require(const untyped::UntypedSynonym& synonym, const Synonyms& declarations,
              const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping)
@@ -39,7 +39,7 @@ auto require_if_syn(const untyped::UntypedEntRef& ent_ref, const Synonyms& decla
                    }},
         ent_ref);
 }
-} // namespace qps::details
+} // namespace qps::detail
 
 namespace qps {
 class PatternAssignAnalyser {
@@ -52,11 +52,11 @@ class PatternAssignAnalyser {
         if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
-        const auto& maybe_synonym = details::require<AssignSynonym>(pattern.synonym, declarations, mapping);
+        const auto& maybe_synonym = detail::require<AssignSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
-        const auto& maybe_ent_ref = details::require_if_syn<VarSynonym>(pattern.ent_ref, declarations, mapping);
+        const auto& maybe_ent_ref = detail::require_if_syn<VarSynonym>(pattern.ent_ref, declarations, mapping);
         if (!maybe_ent_ref) {
             return std::nullopt;
         }
@@ -74,11 +74,11 @@ class PatternWhileAnalyser {
         if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
-        const auto& maybe_synonym = details::require<WhileSynonym>(pattern.synonym, declarations, mapping);
+        const auto& maybe_synonym = detail::require<WhileSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
-        const auto maybe_ent_ref = details::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
+        const auto maybe_ent_ref = detail::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
         if (!maybe_ent_ref.has_value()) {
             return std::nullopt;
         }
@@ -102,11 +102,11 @@ class PatternIfAnalyser {
         if (pattern.num_arg != NUM_ARGS) {
             return std::nullopt;
         }
-        const auto& maybe_synonym = details::require<IfSynonym>(pattern.synonym, declarations, mapping);
+        const auto& maybe_synonym = detail::require<IfSynonym>(pattern.synonym, declarations, mapping);
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
-        const auto maybe_ent_ref = details::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
+        const auto maybe_ent_ref = detail::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
         if (!maybe_ent_ref.has_value()) {
             return std::nullopt;
         }
