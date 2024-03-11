@@ -6,6 +6,8 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/validator/semantic_validator.hpp"
 
+using namespace pkb;
+
 TEST_CASE("Test SP Semantic Validator") {
     auto tokenizer_runner =
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);

@@ -4,6 +4,8 @@
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
+using namespace pkb;
+
 TEST_CASE("Simple Entity Test") {
     SECTION("Procedure Test") {
         auto [read_facade, write_facade] = PKB::create_facades();

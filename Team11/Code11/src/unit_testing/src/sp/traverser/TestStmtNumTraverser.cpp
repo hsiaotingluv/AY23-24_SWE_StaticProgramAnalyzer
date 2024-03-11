@@ -11,6 +11,8 @@
 #include "sp/traverser/traverser.hpp"
 #include <vector>
 
+using namespace pkb;
+
 auto is_stmt_node(const std::shared_ptr<sp::AstNode>& node) -> bool {
     return (dynamic_cast<sp::StatementNode*>(node.get()) != nullptr);
 }

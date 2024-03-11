@@ -4,6 +4,8 @@
 #include "pkb/pkb.h"
 #include "sp/main.hpp"
 
+using namespace pkb;
+
 TEST_CASE("Test SP and PKB") {
     auto [read_facade, write_facade] = PKB::create_facades();
 

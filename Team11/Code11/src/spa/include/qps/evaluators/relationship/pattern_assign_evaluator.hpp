@@ -8,7 +8,7 @@
 
 namespace qps {
 class PatternAssignEvaluator : public ClauseEvaluator {
-    std::shared_ptr<ReadFacade> read_facade;
+    std::shared_ptr<pkb::ReadFacade> read_facade;
     PatternAssign pattern;
 
     [[nodiscard]] auto select_eval_method() const;
@@ -45,7 +45,7 @@ class PatternAssignEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_pattern(const QuotedIdent& quoted_ident, const ExactMatch& exact) const -> OutputTable;
 
   public:
-    PatternAssignEvaluator(std::shared_ptr<ReadFacade> read_facade, PatternAssign pattern)
+    PatternAssignEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, PatternAssign pattern)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), pattern(std::move(pattern)) {
     }
 
