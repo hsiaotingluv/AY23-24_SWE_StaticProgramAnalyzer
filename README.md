@@ -20,9 +20,9 @@ No additional instructions required.
 
 Name | Email | Development OS/Toolchain
 -:|:-|-|
-Chan Choon Yong | <e0560275@u.nus.edu> | Windows, Clang
+Chan Choon Yong | <e0560275@u.nus.edu> | Windows / Clang
 Amadeus Aristo Winarto | <e0559265@u.nus.edu> | Ubuntu 22.04 /  Clang
 Simon Julian Lauw | <e0389164@u.nus.edu> | Ubuntu 23.04 / Clang
-Ng Jun Wei Timothy | <e0543671@u.nus.edu> | macOS/Clang
-Chen Hsiao Ting | <e0559714@u.nus.edu> | macOS/Clang
-Bernardus Krishna | <e0389203@u.nus.edu> | macOS/Clang
+Ng Jun Wei Timothy | <e0543671@u.nus.edu> | macOS / Clang
+Chen Hsiao Ting | <e0559714@u.nus.edu> | macOS / Clang
+Bernardus Krishna | <e0389203@u.nus.edu> | macOS / Clang
