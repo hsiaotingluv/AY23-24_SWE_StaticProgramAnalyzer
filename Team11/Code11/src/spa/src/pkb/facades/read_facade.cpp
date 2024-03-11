@@ -2,6 +2,7 @@
 
 #include <utility>
 
+namespace pkb {
 ReadFacade::ReadFacade(std::shared_ptr<PKB> pkb) : pkb(std::move(pkb)) {
 }
 
@@ -711,3 +712,4 @@ std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_whi
 
     return temp;
 }
+} // namespace pkb

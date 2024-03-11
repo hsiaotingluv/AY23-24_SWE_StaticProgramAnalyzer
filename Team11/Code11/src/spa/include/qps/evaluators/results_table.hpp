@@ -62,7 +62,7 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
 }
 
 auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable;
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
 void print(const Table& table);
 

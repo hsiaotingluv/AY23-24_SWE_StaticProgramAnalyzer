@@ -23,7 +23,7 @@ auto VarNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return name + " ";
 }
 
-auto VarNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto VarNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     write_facade->add_variable(name);
 }
 } // namespace sp

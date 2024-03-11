@@ -595,10 +595,10 @@ auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
 }
 
 auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string>;
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
     return std::visit(overloaded{
                           [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
@@ -618,7 +618,7 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& 
                       table, reference);
 }
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string> {
     // TODO: Relax this constraint
     for (const auto& elem : elems) {

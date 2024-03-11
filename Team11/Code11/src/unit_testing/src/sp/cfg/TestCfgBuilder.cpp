@@ -11,6 +11,8 @@
 #include <unordered_set>
 #include <vector>
 
+using namespace pkb;
+
 /**
  * @brief Verify if the start node of the CFG is the node with the smallest stmt num.
  */

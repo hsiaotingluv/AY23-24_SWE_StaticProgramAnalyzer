@@ -27,11 +27,11 @@ auto WhileNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return opening_xml + cond_expr_xml + body_xml + ending_xml;
 }
 
-auto WhileNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto WhileNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     write_facade->add_statement(std::to_string(get_statement_number()), StatementType::While);
 }
 
-auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                       const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
@@ -77,7 +77,7 @@ auto WhileNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -
     return combined_set;
 }
 
-auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                         const std::shared_ptr<UsesMap>& uses_map,
                                         const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
@@ -96,7 +96,7 @@ auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& writ
     return combined_set;
 }
 
-auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                   const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
@@ -135,7 +135,7 @@ auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) ->
     return statement_nums;
 }
 
-auto WhileNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto WhileNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     auto parent_statement_num = std::to_string(get_statement_number());
     auto children_statement_nums = get_stmt_nums(stmt_list);
     for (const auto& child_statement_num : children_statement_nums) {

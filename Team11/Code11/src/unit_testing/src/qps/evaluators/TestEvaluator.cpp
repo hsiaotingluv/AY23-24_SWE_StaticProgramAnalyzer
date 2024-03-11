@@ -17,6 +17,7 @@
 #include <vector>
 
 using namespace qps;
+using namespace pkb;
 
 auto require_equal(const std::vector<std::string>& actual, const std::vector<std::string>& expected) -> void {
     REQUIRE(actual.size() == expected.size());

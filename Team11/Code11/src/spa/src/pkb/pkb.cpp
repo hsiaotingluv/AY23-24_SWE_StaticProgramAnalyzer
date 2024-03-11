@@ -5,6 +5,7 @@
 #include <tuple>
 #include <vector>
 
+namespace pkb {
 PKB::PKB()
     : entity_store(std::make_shared<EntityStore>()), statement_store(std::make_shared<StatementStore>()),
       direct_follows_store(std::make_shared<DirectFollowsStore>()),
@@ -70,3 +71,5 @@ void PKB::finalise_pkb() {
     populate_star_from_direct(direct_follows_store, follows_star_store);
     populate_star_from_direct(direct_parent_store, parent_star_store);
 }
+
+} // namespace pkb

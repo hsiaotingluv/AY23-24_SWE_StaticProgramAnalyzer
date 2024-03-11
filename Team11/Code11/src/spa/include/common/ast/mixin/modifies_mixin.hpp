@@ -9,7 +9,7 @@ using ModifyMap = std::unordered_map<std::string, std::unordered_set<std::string
 
 class ModifiesMixin {
   public:
-    virtual auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+    virtual auto populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                        const std::shared_ptr<ModifyMap>& modify_map)
         -> std::unordered_set<std::string> = 0;
 

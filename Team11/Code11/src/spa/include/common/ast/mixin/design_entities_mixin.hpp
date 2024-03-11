@@ -6,7 +6,7 @@ namespace sp {
 
 class DesignEntitiesMixin {
   public:
-    virtual auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void = 0;
+    virtual auto populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void = 0;
 
     virtual ~DesignEntitiesMixin() = default;
 };
