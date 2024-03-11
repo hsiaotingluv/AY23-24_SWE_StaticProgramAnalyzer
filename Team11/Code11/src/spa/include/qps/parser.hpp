@@ -1,13 +1,15 @@
 #pragma once
 
+#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/errors.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/untyped_parser.hpp"
 
 namespace qps {
 template <typename UntypedParser, typename SemanticAnalyser>
 class Parser {
   public:
+    using UntypedQueryType = typename UntypedParser::UntypedQueryType;
+
     static auto parse(std::string query) -> std::variant<Query, SyntaxError, SemanticError> {
         const auto maybe_parsed = UntypedParser::parse(std::move(query));
 
@@ -15,8 +17,7 @@ class Parser {
             return std::get<SyntaxError>(maybe_parsed);
         }
 
-        const auto& [declared_synonyms, untyped_query] =
-            std::get<std::tuple<Synonyms, untyped::UntypedQuery>>(maybe_parsed);
+        const auto& [declared_synonyms, untyped_query] = std::get<std::tuple<Synonyms, UntypedQueryType>>(maybe_parsed);
         const auto maybe_query = SemanticAnalyser::analyse(declared_synonyms, untyped_query);
 
         if (std::holds_alternative<SemanticError>(maybe_query)) {

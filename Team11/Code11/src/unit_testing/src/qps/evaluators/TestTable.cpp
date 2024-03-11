@@ -102,13 +102,16 @@ TEST_CASE("Test Join") {
             {"1", "x"}, {"1", "y"}, {"1", "z"}, {"2", "x"}, {"2", "y"}, {"2", "z"}, {"3", "x"}, {"3", "y"}, {"3", "z"}};
 
         const auto result = join(table1, table2);
-        REQUIRE(result.has_value());
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        REQUIRE(std::holds_alternative<Table>(result));
+        const auto table = std::get<Table>(result);
 
-        auto column = result.value().get_column();
+        auto column = table.get_column();
         const auto ordering = detail::sort_and_get_order(column);
 
         REQUIRE(column == expected_column);
-        auto records = result.value().get_records();
+        auto records = table.get_records();
         REQUIRE(records.size() == expected_set.size());
 
         for (auto& record : records) {
@@ -234,11 +237,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::cross_join_with_conflict_checks(table1, table2);
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-
-        // print(result.value());
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -264,10 +267,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::cross_join(table1, table2);
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-        // print(result.value());
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -293,9 +297,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::cross_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -321,9 +327,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::merge_join(table1, table2);
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -349,9 +357,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -377,9 +387,11 @@ TEST_CASE("BENCHMARK - Cross Product") {
         auto result = detail::cross_merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -454,9 +466,11 @@ TEST_CASE("BENCHMARK - Inner Join") {
         auto result = detail::cross_join_with_conflict_checks(table1, table2);
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -518,9 +532,11 @@ TEST_CASE("BENCHMARK - Inner Join") {
         auto result = detail::merge_join(table1, table2);
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -582,9 +598,11 @@ TEST_CASE("BENCHMARK - Inner Join") {
         auto result = detail::cross_merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }

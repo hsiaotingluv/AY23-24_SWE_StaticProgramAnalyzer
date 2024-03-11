@@ -8,6 +8,7 @@
 #include "qps/evaluators/relationship/modifies_s_evaluator.hpp"
 #include "qps/evaluators/relationship/parent_evaluator.hpp"
 #include "qps/evaluators/relationship/parent_t_evaluator.hpp"
+#include "qps/evaluators/relationship/pattern_assign_evaluator.hpp"
 #include "qps/evaluators/relationship/uses_s_evaluator.hpp"
 #include "qps/parser/entities/relationship.hpp"
 
@@ -37,6 +38,11 @@ auto clause_evaluator_selector(const std::shared_ptr<ReadFacade>& read_facade) {
 
         [read_facade](const qps::ModifiesS& modifies) -> std::shared_ptr<ClauseEvaluator> {
             return std::make_shared<ModifiesSEvaluator>(read_facade, modifies);
+        },
+
+        // TODO: move this to a separate file
+        [read_facade](const qps::PatternAssign& pattern) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<PatternAssignEvaluator>(read_facade, pattern);
         },
 
         // TODO: add other clause evaluator cases here

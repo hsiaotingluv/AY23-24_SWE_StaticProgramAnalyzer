@@ -5,46 +5,44 @@ namespace qps {
 auto FollowsEvaluator::select_eval_method() const {
     return overloaded{
         [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
             return eval_follows(stmt_syn_1, stmt_syn_2);
         },
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) -> OutputTable {
             return eval_follows(stmt_syn_1, stmt_num_2);
         },
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-               const qps::WildCard& wild_card_2) -> std::optional<Table> {
+        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::WildCard& wild_card_2) -> OutputTable {
             return eval_follows(stmt_syn_1, wild_card_2);
         },
-        [this](const qps::Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
             return eval_follows(stmt_num_1, stmt_syn_2);
         },
-        [this](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> OutputTable {
             return eval_follows(stmt_num_1, stmt_num_2);
         },
-        [this](const qps::Integer& stmt_num_1, const qps::WildCard& wild_card_2) -> std::optional<Table> {
+        [this](const qps::Integer& stmt_num_1, const qps::WildCard& wild_card_2) -> OutputTable {
             return eval_follows(stmt_num_1, wild_card_2);
         },
-        [this](const qps::WildCard& wild_card_1,
-               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> std::optional<Table> {
+        [this](const qps::WildCard& wild_card_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
             return eval_follows(wild_card_1, stmt_syn_2);
         },
-        [this](const qps::WildCard& wild_card_1, const qps::Integer& stmt_num_2) -> std::optional<Table> {
+        [this](const qps::WildCard& wild_card_1, const qps::Integer& stmt_num_2) -> OutputTable {
             return eval_follows(wild_card_1, stmt_num_2);
         },
 
-        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> std::optional<Table> {
+        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> OutputTable {
             return eval_follows(wild_card_1, wild_card_2);
         }};
 }
 
-auto FollowsEvaluator::evaluate() const -> std::optional<Table> {
+auto FollowsEvaluator::evaluate() const -> OutputTable {
     return std::visit(select_eval_method(), follows.stmt1, follows.stmt2);
 }
 
 auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> std::optional<Table> {
+                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
     if (stmt_syn_1 == stmt_syn_2) {
-        return std::nullopt;
+        return Table{};
     }
     const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
     const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
@@ -61,14 +59,11 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
         table.add_row({follows_pair.first, follows_pair.second});
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
 auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                                    const qps::Integer& stmt_num_2) const -> std::optional<Table> {
+                                    const qps::Integer& stmt_num_2) const -> OutputTable {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto candidate = read_facade->get_statement_followed_by(stmt_num_2.value);
@@ -76,14 +71,11 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
         table.add_row({candidate});
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
 auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
-    -> std::optional<Table> {
+    -> OutputTable {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto all_followed_stmts = read_facade->get_all_follows_keys();
@@ -94,14 +86,11 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
         table.add_row({stmt});
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
 auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
-    -> std::optional<Table> {
+    -> OutputTable {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table{{stmt_syn_2}};
     const auto candidate = read_facade->get_statement_following(stmt_num_1.value);
@@ -109,21 +98,17 @@ auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const std::shared
         table.add_row({candidate});
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
-auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const Integer& stmt_num_2) const
-    -> std::optional<Table> {
+auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
     if (!read_facade->has_follows_relation(stmt_num_1.value, stmt_num_2.value)) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 }
 
-auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const WildCard&) const -> std::optional<Table> {
+auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
     // TODO: Improve pkb API: bool is_followed_by_something
     const auto all_followed_stmts = read_facade->get_all_follows_keys();
     bool is_followed = false;
@@ -135,13 +120,13 @@ auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const WildCard&) 
         }
     }
     if (!is_followed) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 }
 
 auto FollowsEvaluator::eval_follows(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
-    -> std::optional<Table> {
+    -> OutputTable {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table({stmt_syn_2});
     const auto all_following = read_facade->get_all_follows_values();
@@ -151,14 +136,10 @@ auto FollowsEvaluator::eval_follows(const WildCard&, const std::shared_ptr<StmtS
         }
         table.add_row({stmt});
     }
-
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
-auto FollowsEvaluator::eval_follows(const WildCard&, const Integer& stmt_num_2) const -> std::optional<Table> {
+auto FollowsEvaluator::eval_follows(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
     // TODO: Improve pkb API: bool is_following_something
     const auto all_following_stmts = read_facade->get_all_follows_values();
     bool is_following = false;
@@ -170,16 +151,16 @@ auto FollowsEvaluator::eval_follows(const WildCard&, const Integer& stmt_num_2) 
         }
     }
     if (!is_following) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 }
 
-auto FollowsEvaluator::eval_follows(const WildCard&, const WildCard&) const -> std::optional<Table> {
+auto FollowsEvaluator::eval_follows(const WildCard&, const WildCard&) const -> OutputTable {
     if (read_facade->get_all_follows_keys().empty()) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 }
 
 } // namespace qps

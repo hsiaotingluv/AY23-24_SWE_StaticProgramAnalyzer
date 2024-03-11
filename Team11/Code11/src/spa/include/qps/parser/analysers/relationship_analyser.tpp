@@ -1,20 +1,12 @@
 #pragma once
-#include "qps/parser/entities/clause.hpp"
-#include "qps/parser/entities/primitives.hpp"
+
+#include "qps/parser/analysers/semantic_analyser_helper.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/semantic_analyser.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
-#include "qps/template_utils.hpp"
 
-#include <memory>
-#include <optional>
-#include <string>
-#include <unordered_map>
-#include <variant>
-
-namespace qps ::details {
+namespace qps::details {
 template <typename T>
 auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                  const T& x) -> std::optional<StmtRef> {
@@ -92,7 +84,7 @@ auto validate_stmt_ent(const std::string& keyword, const StmtRef& stmt_ref, cons
 template <typename StmtEntList>
 auto validate_stmt_ent(const Synonyms& declarations,
                        const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                       const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+                       const std::string& keyword, const untyped::UntypedStmtEntRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
     const auto& maybe_stmt_ref = to_stmt_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {
@@ -122,7 +114,7 @@ auto validate_ent_ent(const std::string& keyword, const EntRef& ent_ref1, const 
 template <typename EntEntList>
 auto validate_ent_ent(const Synonyms& declarations,
                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                      const std::string& keyword, const untyped::UntypedRef& ref, const EntRef& ent_ref)
+                      const std::string& keyword, const untyped::UntypedStmtEntRef& ref, const EntRef& ent_ref)
     -> std::optional<Relationship> {
     const auto& maybe_stmt_ref = to_ent_ref(declarations, mapping, ref);
     if (!maybe_stmt_ref.has_value()) {
@@ -165,68 +157,4 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         }};
 };
 
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
-auto untyped_clause_visitor(const Synonyms& declarations,
-                            const std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping) {
-    return overloaded{
-        [&declarations,
-         &mapping](const untyped::UntypedSuchThatClause& such_that) -> std::optional<std::shared_ptr<Clause>> {
-            auto maybe_rel_ref =
-                std::visit(untyped_relationship_visitor<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping),
-                           such_that.rel_ref);
-
-            if (!maybe_rel_ref.has_value()) {
-                return std::nullopt;
-            }
-
-            return std::make_shared<SuchThatClause>(maybe_rel_ref.value());
-        },
-        [&declarations,
-         &mapping](const untyped::UntypedPatternClause& pattern) -> std::optional<std::shared_ptr<Clause>> {
-            const auto& maybe_syn = is_synonym_declared(declarations, mapping, pattern.assign_synonym);
-
-            if (!maybe_syn.has_value()) {
-                return std::nullopt;
-            }
-            const auto& maybe_assign_syn = std::dynamic_pointer_cast<AssignSynonym>(maybe_syn.value());
-            if (!maybe_assign_syn) {
-                return std::nullopt;
-            }
-            const auto& assign_syn = maybe_assign_syn;
-
-            const auto& maybe_ent_ref = std::visit(
-                overloaded{[&declarations, &mapping](const untyped::UntypedSynonym& synonym) -> std::optional<EntRef> {
-                               const auto& maybe_synonym = is_synonym_declared(declarations, mapping, synonym);
-                               if (!maybe_synonym.has_value()) {
-                                   return std::nullopt;
-                               }
-
-                               const auto& maybe_variable =
-                                   std::dynamic_pointer_cast<VarSynonym>(maybe_synonym.value());
-                               if (!maybe_variable) {
-                                   return std::nullopt;
-                               }
-                               return maybe_variable;
-                           },
-                           [](const auto& x) -> std::optional<EntRef> {
-                               return x;
-                           }},
-                pattern.ent_ref);
-
-            if (!maybe_ent_ref.has_value()) {
-                return std::nullopt;
-            }
-
-            const auto& ent_ref = maybe_ent_ref.value();
-            return std::make_shared<PatternClause>(assign_syn, ent_ref, pattern.expression_spec);
-        }};
-};
-
-template <typename StmtStmtList, typename StmtEntList, typename EntEntList>
-auto validate_clause(const Synonyms& declarations,
-                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                     const untyped::UntypedClause& clause) -> std::optional<std::shared_ptr<Clause>> {
-
-    return std::visit(untyped_clause_visitor<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping), clause);
-}
 } // namespace qps::details

@@ -1,7 +1,7 @@
 #pragma once
+#include "qps/parser/entities/attribute.hpp"
 #include "qps/parser/entities/relationship.hpp"
-#include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/expression_parser.hpp"
+#include "qps/parser/entities/syntactic_pattern.hpp"
 
 namespace qps {
 
@@ -27,7 +27,7 @@ struct Clause {
 struct SuchThatClause : public Clause {
     Relationship rel_ref;
 
-    SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
+    explicit SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
@@ -43,13 +43,9 @@ struct SuchThatClause : public Clause {
 };
 
 struct PatternClause : public Clause {
-    std::shared_ptr<AssignSynonym> assign_synonym;
-    EntRef ent_ref;
-    ExpressionSpec expression_spec;
+    SyntacticPattern syntactic_pattern;
 
-    PatternClause(std::shared_ptr<AssignSynonym> assign_synonym, EntRef ent_ref, ExpressionSpec expression_spec)
-        : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
-          expression_spec(std::move(expression_spec)) {
+    explicit PatternClause(SyntacticPattern syntactic_pattern) : syntactic_pattern(std::move(syntactic_pattern)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
@@ -61,6 +57,25 @@ struct PatternClause : public Clause {
             return false;
         }
         return *this == dynamic_cast<const PatternClause&>(other);
+    }
+};
+
+struct WithClause : public Clause {
+    TypedRef ref1;
+    TypedRef ref2;
+
+    WithClause(TypedRef ref1, TypedRef ref2) : ref1(std::move(ref1)), ref2(std::move(ref2)) {
+    }
+
+    [[nodiscard]] auto representation() const -> std::string override;
+
+    auto operator==(const WithClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(WithClause)) {
+            return false;
+        }
+        return *this == dynamic_cast<const WithClause&>(other);
     }
 };
 
