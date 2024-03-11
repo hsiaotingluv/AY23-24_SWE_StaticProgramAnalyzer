@@ -730,7 +730,7 @@ TEST_CASE("Assignment Pattern Test") {
     }
 }
 
-TEST_CASE("Calls Test") {
+TEST_CASE("Calls and Calls* Relationship Test") {
     SECTION("Adding and Verifying Direct Calls Relationships") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
@@ -850,6 +850,136 @@ TEST_CASE("Calls Test") {
         auto [read_facade, write_facade] = PKB::create_facades();
 
         auto callees = read_facade->get_callees("NonExisting");
+
+        REQUIRE(callees.empty());
+    }
+
+    SECTION("Adding and Verifying Calls* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb();
+
+        REQUIRE(read_facade->has_calls_star_relation("Main", "Helper"));
+        REQUIRE(read_facade->has_calls_star_relation("Helper", "Logger"));
+    }
+
+    SECTION("Verifying Absence of Non-existent Calls* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb();
+
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("Logger", "Helper"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("Main", "Main"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("Logger", "Main"));
+    }
+
+    SECTION("Retrieving All Calls* Relationships") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Main", "Logger");
+        write_facade->add_calls("Helper", "Validator");
+        write_facade->finalise_pkb();
+
+        auto calls_keys = read_facade->get_all_calls_star_keys();
+
+        REQUIRE(calls_keys.size() == 2);
+
+        auto main_calls = read_facade->get_star_callees("Main");
+
+        REQUIRE(main_calls.size() == 3);
+        REQUIRE(main_calls.count("Helper") == 1);
+        REQUIRE(main_calls.count("Logger") == 1);
+        REQUIRE(main_calls.count("Validator") == 1);
+
+        auto helper_calls = read_facade->get_star_callees("Helper");
+
+        REQUIRE(helper_calls.size() == 1);
+        REQUIRE(helper_calls.count("Validator") == 1);
+
+        auto logger_calls = read_facade->get_star_callees("Logger");
+        auto validator_calls = read_facade->get_star_callees("Validator");
+
+        REQUIRE(logger_calls.empty());
+        REQUIRE(validator_calls.empty());
+    }
+
+    SECTION("Retrieving All Calls* Callees") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Utils");
+        write_facade->finalise_pkb();
+
+        auto callees = read_facade->get_all_calls_star_values();
+
+        REQUIRE(callees.size() == 2);
+        REQUIRE(callees.find("Main") == callees.end());
+        REQUIRE(callees.find("Helper") != callees.end());
+        REQUIRE(callees.find("Utils") != callees.end());
+    }
+
+    SECTION("Retrieving All Calls* Callers") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb();
+
+        auto callers = read_facade->get_all_calls_star_keys();
+
+        REQUIRE(callers.size() == 2);
+        REQUIRE(callers.find("Main") != callers.end());
+        REQUIRE(callers.find("Helper") != callers.end());
+        REQUIRE(callers.find("Logger") == callers.end());
+    }
+
+    SECTION("Retrieving All Star Callers for a Given Callee") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb();
+
+        auto callers = read_facade->get_star_callers("Logger");
+
+        REQUIRE(callers.size() == 2);
+        REQUIRE(callers.find("Main") != callers.end());
+        REQUIRE(callers.find("Helper") != callers.end());
+        REQUIRE(callers.find("Logger") == callers.end());
+    }
+
+    SECTION("Retrieving Star Callers for Non-existent Callee Returns Empty Set") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        auto callers = read_facade->get_star_callers("NonExisting");
+
+        REQUIRE(callers.empty());
+    }
+
+    SECTION("Retrieving All Star Callees for a Given Caller") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb();
+
+        auto callees = read_facade->get_star_callees("Main");
+
+        REQUIRE(callees.size() == 2);
+        REQUIRE(callees.find("Helper") != callees.end());
+        REQUIRE(callees.find("Logger") != callees.end());
+        REQUIRE(callees.find("Main") == callees.end());
+    }
+
+    SECTION("Retrieving Star Callees for Non-existent Caller Returns Empty Set") {
+        auto [read_facade, write_facade] = PKB::create_facades();
+
+        auto callees = read_facade->get_star_callees("NonExisting");
 
         REQUIRE(callees.empty());
     }
