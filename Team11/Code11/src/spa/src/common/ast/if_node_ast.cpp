@@ -28,7 +28,7 @@ auto IfNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return opening_xml + cond_expr_xml + then_xml + else_xml + ending_xml;
 }
 
-auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+auto IfNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                    const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(s, v) for s = If
     auto stmt_number = std::to_string(get_statement_number());
@@ -67,8 +67,15 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_fac
     return combined_set;
 }
 
-auto IfNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
-    write_facade->add_statement(std::to_string(get_statement_number()), StatementType::If);
+auto IfNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
+    auto stmt_number = std::to_string(get_statement_number());
+    write_facade->add_statement(stmt_number, StatementType::If);
+
+    // populate patterns for if
+    auto var_names_cond_expr = get_vars_from_expr(cond_expr);
+    for (const auto& var_name : var_names_cond_expr) {
+        write_facade->add_if_var(stmt_number, var_name);
+    }
 }
 
 auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
@@ -90,7 +97,7 @@ auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> s
     return combined_set;
 }
 
-auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<UsesMap>& uses_map,
                                      const std::shared_ptr<StatementListNode>& node) const
     -> std::unordered_set<std::string> {
@@ -109,7 +116,7 @@ auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_f
     return combined_set;
 }
 
-auto IfNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+auto IfNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(s, v) for s = If
     auto stmt_number = std::to_string(get_statement_number());
@@ -154,7 +161,7 @@ auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> st
     return statement_nums;
 }
 
-auto IfNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto IfNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     auto parent_statement_num = std::to_string(get_statement_number());
 
     auto then_statement_nums = get_stmt_nums(then_stmt_list);

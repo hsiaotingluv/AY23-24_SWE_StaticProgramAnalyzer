@@ -2,6 +2,7 @@
 
 #include <utility>
 
+namespace pkb {
 WriteFacade::WriteFacade(std::shared_ptr<PKB> pkb) : pkb(std::move(pkb)) {
 }
 
@@ -63,12 +64,12 @@ void WriteFacade::add_assignment(const std::string& statement_number, const std:
 }
 
 void WriteFacade::add_if_var(const std::string& statement_number, const std::string& variable) {
-    auto v = Variable(std::move(variable));
+    auto v = Variable(variable);
     this->pkb->if_var_store->add(v, statement_number);
 }
 
 void WriteFacade::add_while_var(const std::string& statement_number, const std::string& variable) {
-    auto v = Variable(std::move(variable));
+    auto v = Variable(variable);
     this->pkb->while_var_store->add(v, statement_number);
 }
 
@@ -85,3 +86,4 @@ void WriteFacade::add_calls(const std::string& caller, const std::string& callee
 void WriteFacade::finalise_pkb() {
     this->pkb->finalise_pkb();
 }
+} // namespace pkb

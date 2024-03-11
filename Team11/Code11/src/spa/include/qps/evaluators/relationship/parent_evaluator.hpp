@@ -8,7 +8,7 @@
 
 namespace qps {
 class ParentEvaluator : public ClauseEvaluator {
-    std::shared_ptr<ReadFacade> read_facade;
+    std::shared_ptr<pkb::ReadFacade> read_facade;
     Parent parent;
 
     [[nodiscard]] auto select_eval_method() const;
@@ -46,7 +46,7 @@ class ParentEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_parent(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    ParentEvaluator(std::shared_ptr<ReadFacade> read_facade, Parent parent)
+    ParentEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Parent parent)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), parent(std::move(parent)) {
     }
 

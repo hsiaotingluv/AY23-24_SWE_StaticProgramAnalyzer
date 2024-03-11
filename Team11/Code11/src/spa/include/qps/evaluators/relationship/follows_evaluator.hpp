@@ -9,7 +9,7 @@
 
 namespace qps {
 class FollowsEvaluator : public ClauseEvaluator {
-    std::shared_ptr<ReadFacade> read_facade;
+    std::shared_ptr<pkb::ReadFacade> read_facade;
     Follows follows;
 
     // visitor method to determine which method to employ per clause
@@ -51,7 +51,7 @@ class FollowsEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_follows(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    FollowsEvaluator(std::shared_ptr<ReadFacade> read_facade, Follows follows)
+    FollowsEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Follows follows)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), follows(std::move(follows)) {
     }
 

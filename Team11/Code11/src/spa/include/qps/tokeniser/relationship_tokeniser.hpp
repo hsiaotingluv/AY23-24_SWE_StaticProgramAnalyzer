@@ -10,7 +10,7 @@
 
 namespace tokenizer {
 template <typename T>
-class RelationshipTokeniser : public Tokenizer {
+class RelationshipTokeniser final : public Tokenizer {
     static_assert(qps::is_lexable_v<T>, "T must be lexable");
 
   public:
@@ -19,7 +19,7 @@ class RelationshipTokeniser : public Tokenizer {
     }
 };
 
-class QPSRelationshipTokenizer : public Tokenizer {
+class QPSRelationshipTokenizer final : public Tokenizer {
   private:
     static inline const auto tokenizers = []() {
         auto vector = std::array<std::shared_ptr<Tokenizer>, qps::num_elem_v<qps::RelationshipList>>{};

@@ -6,7 +6,7 @@
 #include <memory>
 #include <utility>
 
-namespace qps ::details {
+namespace qps ::detail {
 auto enforce_unique_declarations(const Synonyms& declarations)
     -> std::optional<std::unordered_map<std::string, std::shared_ptr<Synonym>>> {
     std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping;
@@ -121,4 +121,4 @@ auto validate_ref_combination(const TypedRef& ref1, const TypedRef& ref2)
         },
         ref1, ref2);
 }
-} // namespace qps::details
+} // namespace qps::detail

@@ -6,7 +6,7 @@
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include <optional>
 
-namespace qps::details {
+namespace qps::detail {
 // Forward declarations
 auto enforce_unique_declarations(const Synonyms& declarations)
     -> std::optional<std::unordered_map<std::string, std::shared_ptr<Synonym>>>;
@@ -25,4 +25,4 @@ auto validate_ref(const Synonyms& declarations,
 
 auto validate_ref_combination(const TypedRef&, const TypedRef&) -> std::optional<std::pair<TypedRef, TypedRef>>;
 
-} // namespace qps::details
+} // namespace qps::detail
