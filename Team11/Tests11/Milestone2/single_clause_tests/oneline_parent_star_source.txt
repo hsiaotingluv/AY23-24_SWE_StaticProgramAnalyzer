@@ -1,0 +1,3 @@
+procedure p {
+    a = 1; 
+}

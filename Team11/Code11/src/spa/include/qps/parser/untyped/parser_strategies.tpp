@@ -8,6 +8,8 @@
 #include "qps/template_utils.hpp"
 
 #include <array>
+#include <optional>
+#include <string_view>
 
 // Forward declarations of helper functions
 namespace qps::untyped::detail {
@@ -21,41 +23,33 @@ template <typename Head, typename... Tails>
 auto parse_stmt_stmt_rel(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                          TypeList<Head, Tails...>)
     -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>>;
+
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
-template <typename SupportedStmtStmtParsers, typename SupportedRefEntParsers>
-class SuchThatClausesParser {
+template <typename SupportedStmtStmtStrategies, typename SupportedRefEntStrategies>
+struct SuchThatParserStrategy {
     static constexpr auto keywords = std::array<std::string_view, 2>{"such", "that"};
 
-  public:
     using ClauseType = UntypedSuchThatClause;
 
     static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
         -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
-        constexpr auto EXPECTED_LENGTH = 3;
-        if (std::distance(it, end) < EXPECTED_LENGTH) {
+        if (it == end) {
             return std::nullopt;
         }
 
-        const auto maybe_it = detail::parse_keywords(keywords, it, end);
-        if (!maybe_it.has_value()) {
-            return std::nullopt;
-        }
-        it = maybe_it.value();
-
-        const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtParsers{});
+        const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtStrategies{});
         if (maybe_stmt_stmt_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
-            return std::make_tuple(rel_ref, rest);
+            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
         }
 
-        const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntParsers{});
+        const auto maybe_ref_ent_rel = detail::parse_ref_ent_rel(it, end, SupportedRefEntStrategies{});
         if (maybe_ref_ent_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_ref_ent_rel.value();
-            return std::make_tuple(rel_ref, rest);
+            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
         }
-
         return std::nullopt;
     }
 };
@@ -113,7 +107,7 @@ auto parse_ref_ent(std::vector<Token>::const_iterator it, const std::vector<Toke
     it = std::next(it, 2);
 
     // Get reference
-    const auto maybe_ref = parse_ref(it, end);
+    const auto maybe_ref = parse_stmt_ent_ref(it, end);
     if (!maybe_ref.has_value()) {
         return std::nullopt;
     }
