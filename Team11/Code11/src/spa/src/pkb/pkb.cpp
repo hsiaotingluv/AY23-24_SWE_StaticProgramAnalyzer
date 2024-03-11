@@ -16,8 +16,8 @@ PKB::PKB()
       procedure_uses_store(std::make_shared<ProcedureUsesStore>()),
       statement_uses_store(std::make_shared<StatementUsesStore>()),
       assignment_store(std::make_shared<AssignmentStore>()), next_store(std::make_shared<NextStore>()),
-      calls_store(std::make_shared<CallsStore>()), if_var_store(std::make_shared<IfVarStore>()),
-      while_var_store(std::make_shared<WhileVarStore>()) {
+      direct_calls_store(std::make_shared<DirectCallsStore>()), calls_star_store(std::make_shared<CallsStarStore>()),
+      if_var_store(std::make_shared<IfVarStore>()), while_var_store(std::make_shared<WhileVarStore>()) {
 }
 
 auto PKB::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
@@ -37,6 +37,17 @@ auto insert(std::vector<std::tuple<StatementNumber, StatementNumber>>& rs, const
             const std::unordered_set<StatementNumber>& s2) -> void {
     for (const auto& s : s2) {
         insert(rs, s1, s);
+    }
+}
+
+auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1, const Procedure& p2) -> void {
+    rs.emplace_back(p1, p2);
+}
+
+auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1,
+            const std::unordered_set<Procedure>& p2) -> void {
+    for (const auto& p : p2) {
+        insert_procedure(rs, p1, p);
     }
 }
 
@@ -66,7 +77,29 @@ void PKB::populate_star_from_direct(DirectStore direct_store, StarStore star_sto
     }
 }
 
+template <class DirectStore, class StarStore>
+void PKB::populate_call_star_from_direct(DirectStore direct_store, StarStore star_store) {
+    // extract all the direct relationships into a vector of tuples
+    std::vector<std::tuple<Procedure, Procedure>> relationships;
+
+    for (const auto& pair : direct_store->get_all()) {
+        insert_procedure(relationships, pair.first, pair.second);
+    }
+
+    // populate star_store, starting from the last element of relationships
+    for (auto it = relationships.rbegin(); it != relationships.rend(); ++it) {
+        const auto& [s1, s2] = *it;
+        star_store->add(s1, s2);
+
+        // add all the star relationships from s2 to s1
+        for (const auto& s3 : star_store->get_vals_by_key(s2)) {
+            star_store->add(s1, s3);
+        }
+    }
+}
+
 void PKB::finalise_pkb() {
     populate_star_from_direct(direct_follows_store, follows_star_store);
     populate_star_from_direct(direct_parent_store, parent_star_store);
+    populate_call_star_from_direct(direct_calls_store, calls_star_store);
 }

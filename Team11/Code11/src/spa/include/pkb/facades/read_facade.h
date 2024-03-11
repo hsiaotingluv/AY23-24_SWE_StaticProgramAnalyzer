@@ -212,6 +212,16 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_callers(const std::string& callee) const;
 
+    bool has_calls_star_relation(const std::string& caller, const std::string& callee) const;
+
+    std::unordered_set<std::string> get_all_calls_star_values() const;
+
+    std::unordered_set<std::string> get_all_calls_star_keys() const;
+
+    std::unordered_set<std::string> get_star_callees(const std::string& caller) const;
+
+    std::unordered_set<std::string> get_star_callers(const std::string& callee) const;
+
     // Assignment pattern-related Read Operations
     std::unordered_set<std::string> get_all_assignments_rhs(const std::string& rhs);
 

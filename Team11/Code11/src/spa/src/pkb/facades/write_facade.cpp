@@ -79,7 +79,7 @@ void WriteFacade::add_next(const std::string& stmt1, const std::string& stmt2) {
 void WriteFacade::add_calls(const std::string& caller, const std::string& callee) {
     auto caller_procedure = Procedure(caller);
     auto callee_procedure = Procedure(callee);
-    this->pkb->calls_store->add(caller_procedure, callee_procedure);
+    this->pkb->direct_calls_store->add(caller_procedure, callee_procedure);
 }
 
 void WriteFacade::finalise_pkb() {

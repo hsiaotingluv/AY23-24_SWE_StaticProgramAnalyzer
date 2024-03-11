@@ -549,11 +549,11 @@ std::unordered_set<std::string> ReadFacade::get_previous_of(const std::string& a
 }
 
 bool ReadFacade::has_calls_relation(const std::string& caller, const std::string& callee) const {
-    return this->pkb->calls_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
+    return this->pkb->direct_calls_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_calls_values() const {
-    auto procedures = this->pkb->calls_store->get_all_vals();
+    auto procedures = this->pkb->direct_calls_store->get_all_vals();
 
     std::unordered_set<std::string> temp;
     for (const Procedure& p : procedures) {
@@ -564,7 +564,7 @@ std::unordered_set<std::string> ReadFacade::get_all_calls_values() const {
 }
 
 std::unordered_set<std::string> ReadFacade::get_all_calls_keys() const {
-    auto procedures = this->pkb->calls_store->get_all_keys();
+    auto procedures = this->pkb->direct_calls_store->get_all_keys();
 
     std::unordered_set<std::string> temp;
     for (const Procedure& p : procedures) {
@@ -575,7 +575,7 @@ std::unordered_set<std::string> ReadFacade::get_all_calls_keys() const {
 }
 
 std::unordered_set<std::string> ReadFacade::get_callees(const std::string& caller) const {
-    auto procedures = this->pkb->calls_store->get_vals_by_key(Procedure(caller));
+    auto procedures = this->pkb->direct_calls_store->get_vals_by_key(Procedure(caller));
 
     std::unordered_set<std::string> temp;
     for (const Procedure& p : procedures) {
@@ -586,7 +586,56 @@ std::unordered_set<std::string> ReadFacade::get_callees(const std::string& calle
 }
 
 std::unordered_set<std::string> ReadFacade::get_callers(const std::string& callee) const {
-    auto procedures = this->pkb->calls_store->get_keys_by_val(Procedure(callee));
+    auto procedures = this->pkb->direct_calls_store->get_keys_by_val(Procedure(callee));
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+bool ReadFacade::has_calls_star_relation(const std::string& caller, const std::string& callee) const {
+    return this->pkb->calls_star_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
+}
+
+
+std::unordered_set<std::string> ReadFacade::get_all_calls_star_values() const {
+    auto procedures = this->pkb->calls_star_store->get_all_vals();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_calls_star_keys() const {
+    auto procedures = this->pkb->calls_star_store->get_all_keys();
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_star_callees(const std::string& caller) const {
+    auto procedures = this->pkb->calls_star_store->get_vals_by_key(Procedure(caller));
+
+    std::unordered_set<std::string> temp;
+    for (const Procedure& p : procedures) {
+        temp.insert(p.getName());
+    }
+
+    return temp;
+}
+
+std::unordered_set<std::string> ReadFacade::get_star_callers(const std::string& callee) const {
+    auto procedures = this->pkb->calls_star_store->get_keys_by_val(Procedure(callee));
 
     std::unordered_set<std::string> temp;
     for (const Procedure& p : procedures) {

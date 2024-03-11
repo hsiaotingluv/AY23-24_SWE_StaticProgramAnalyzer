@@ -1,6 +1,7 @@
 #pragma once
 
-#include "pkb/stores/calls_store.h"
+#include "pkb/stores/calls_store/calls_star_store.h"
+#include "pkb/stores/calls_store/direct_calls_store.h"
 #include "pkb/stores/entity_store.h"
 #include "pkb/stores/follows_store/direct_follows_store.h"
 #include "pkb/stores/follows_store/follows_star_store.h"
@@ -69,12 +70,16 @@ class PKB {
     std::shared_ptr<StatementUsesStore> statement_uses_store;
     std::shared_ptr<AssignmentStore> assignment_store;
     std::shared_ptr<NextStore> next_store;
-    std::shared_ptr<CallsStore> calls_store;
+    std::shared_ptr<DirectCallsStore> direct_calls_store;
+    std::shared_ptr<CallsStarStore> calls_star_store;
     std::shared_ptr<IfVarStore> if_var_store;
     std::shared_ptr<WhileVarStore> while_var_store;
 
     template <class DirectStore, class StarStore>
     void populate_star_from_direct(DirectStore direct_store, StarStore star_store);
+
+    template <class DirectStore, class StarStore>
+    void populate_call_star_from_direct(DirectStore direct_store, StarStore star_store);
 
     friend class ReadFacade;
 
