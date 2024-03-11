@@ -2,3 +2,4 @@ OUTPUT_DIRECTORY       = ./
 INPUT                  = ../include/
 EXTRACT_ALL            = YES
 RECURSIVE              = ALL
+PROJECT_NAME           = "Static Program Analyser for SIMPLE Language"
