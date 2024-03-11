@@ -10,8 +10,14 @@
 #include <vector>
 
 namespace qps::untyped::detail {
-auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
+auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>>;
+}
+
+namespace qps::untyped {
+auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
+                                         const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
@@ -99,6 +105,40 @@ auto parse_pattern_cond(std::vector<Token>::const_iterator it, const std::vector
     }
 }
 
+auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
+                                      const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    // Expects Ref
+    const auto maybe_ref1 = detail::parse_ref(it, end);
+    if (!maybe_ref1.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ref1, rest] = maybe_ref1.value();
+    it = rest;
+
+    // Expects =
+    if (it == end || !is_char<'='>(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    // Expects Ref
+    const auto maybe_ref2 = detail::parse_ref(it, end);
+    if (!maybe_ref2.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ref2, rest2] = maybe_ref2.value();
+    it = rest2;
+
+    return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
+}
+} // namespace qps::untyped
+
+namespace qps::untyped::detail {
 inline auto parse_attr_name(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
     -> std::optional<std::tuple<AttrName, std::vector<Token>::const_iterator>> {
     return std::nullopt;
@@ -180,48 +220,4 @@ auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::
     return std::nullopt;
 }
 
-auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<UntypedWithClause, std::vector<Token>::const_iterator>> {
-    if (it == end) {
-        return std::nullopt;
-    }
-
-    // Expects Ref
-    const auto maybe_ref1 = parse_ref(it, end);
-    if (!maybe_ref1.has_value()) {
-        return std::nullopt;
-    }
-    const auto& [ref1, rest] = maybe_ref1.value();
-    it = rest;
-
-    // Expects =
-    if (it == end || !is_char<'='>(*it)) {
-        return std::nullopt;
-    }
-    it = std::next(it);
-
-    // Expects Ref
-    const auto maybe_ref2 = parse_ref(it, end);
-    if (!maybe_ref2.has_value()) {
-        return std::nullopt;
-    }
-    const auto& [ref2, rest2] = maybe_ref2.value();
-    it = rest2;
-
-    return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
-}
 } // namespace qps::untyped::detail
-
-namespace qps::untyped {
-auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
-                                         const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
-    return detail::parse_pattern_cond(it, end);
-}
-
-auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
-                                      const std::vector<Token>::const_iterator& end)
-    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
-    return detail::parse_attr_cond(it, end);
-}
-} // namespace qps::untyped
