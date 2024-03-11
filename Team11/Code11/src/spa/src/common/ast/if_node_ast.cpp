@@ -68,7 +68,14 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& writ
 }
 
 auto IfNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
-    write_facade->add_statement(std::to_string(get_statement_number()), StatementType::If);
+    auto stmt_number = std::to_string(get_statement_number());
+    write_facade->add_statement(stmt_number, StatementType::If);
+
+    // populate patterns for if
+    auto var_names_cond_expr = get_vars_from_expr(cond_expr);
+    for (const auto& var_name : var_names_cond_expr) {
+        write_facade->add_if_var(stmt_number, var_name);
+    }
 }
 
 auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> std::unordered_set<std::string> {
