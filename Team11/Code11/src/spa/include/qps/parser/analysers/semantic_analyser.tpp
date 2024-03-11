@@ -13,7 +13,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace qps ::details {
+namespace qps ::detail {
 inline auto validate_pattern(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>&,
                              const untyped::UntypedPatternClause&, TypeList<>) -> std::optional<SyntacticPattern> {
     return std::nullopt;
@@ -92,4 +92,4 @@ auto untyped_clause_visitor(const Synonyms& declarations,
         }};
 };
 
-} // namespace qps::details
+} // namespace qps::detail
