@@ -2,24 +2,46 @@
 #pragma ide diagnostic ignored "bugprone-suspicious-missing-comma"
 #include "catch.hpp"
 
+#include "common/cfg/cfg.hpp"
 #include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include <unordered_set>
+#include <vector>
 
-auto get_stmt_nums_in_proc(sp::ProcMap proc_map, std::string proc_name) -> std::unordered_set<int> {
-    std::unordered_set<int> all_stmt_nums;
+/**
+ * @brief Verify if the start node of the CFG is the node with the smallest stmt num.
+ */
+auto verify_start_node(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     auto cfg = proc_map.at(proc_name);
+
+    auto actual_start_node = std::make_shared<sp::CfgNode>(); // Placeholder
+    int smallest_stmt_num = INT32_MAX;
+
     for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
-        auto stmt_nums = cfg_node->get();
-        all_stmt_nums.insert(stmt_nums.begin(), stmt_nums.end());
+        if (cfg_node->empty()) {
+            continue; // No stmt num to evaluate
+        }
+        auto node_stmt_nums = cfg_node->get();
+        auto node_smallest_stmt_num = node_stmt_nums.front(); // Get smallest stmt num in that node
+        if (node_smallest_stmt_num < smallest_stmt_num) {
+            actual_start_node = cfg_node; // Update node with smallest stmt num
+            smallest_stmt_num = node_smallest_stmt_num;
+        }
     }
-    return all_stmt_nums;
+
+    // Retrieve expected start node (for comparison)
+    auto expected_start_node = cfg->get_start_node();
+
+    return actual_start_node == expected_start_node;
 }
 
-auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
+/**
+ * @brief Get all procedure names from the Program CFG.
+ */
+auto get_proc_names(const sp::ProcMap& proc_map) -> std::unordered_set<std::string> {
     std::unordered_set<std::string> proc_names;
     for (const auto& [proc_name, cfg] : proc_map) {
         proc_names.insert(proc_name);
@@ -27,7 +49,10 @@ auto get_proc_names(sp::ProcMap proc_map) -> std::unordered_set<std::string> {
     return proc_names;
 }
 
-auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
+/**
+ * @brief Get the number of dummy nodes in the Program CFGs.
+ */
+auto get_dummy_nodes(const sp::ProcMap& proc_map) -> int {
     int num_dummy = 0;
     for (const auto& [proc_name, cfg] : proc_map) {
         for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
@@ -37,6 +62,82 @@ auto get_dummy_nodes(sp::ProcMap proc_map) -> int {
         }
     }
     return num_dummy;
+}
+
+/**
+ * @brief Get all stmt nums in a procedure.
+ */
+auto get_stmt_nums_in_proc(const sp::ProcMap& proc_map, const std::string& proc_name) -> std::unordered_set<int> {
+    std::unordered_set<int> all_stmt_nums;
+    auto cfg = proc_map.at(proc_name);
+    for (const auto& [cfg_node, outneighbours] : cfg->get_graph()) {
+        auto stmt_nums = cfg_node->get();
+        all_stmt_nums.insert(stmt_nums.begin(), stmt_nums.end());
+    }
+    return all_stmt_nums;
+}
+
+/**
+ * @brief Verify if the outneighbour stmt nums are equal to all stmt nums in the procedure.
+ */
+auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
+    std::unordered_set<int> stmt_nums{};
+
+    auto cfg = proc_map.at(proc_name);
+
+    // Add start node stmt nums to outneighbours_stmt_nums
+    auto start_node = cfg->get_start_node();
+    if (start_node && !(start_node->empty())) {
+        auto start_stmt_nums = start_node->get();
+        stmt_nums.insert(start_stmt_nums.begin(), start_stmt_nums.end());
+    }
+
+    // Add outneighbour node stmt nums to outneighbours_stmt_nums
+    auto graph = cfg->get_graph();
+    for (const auto& [cfg_node, outneighbours] : graph) {
+        if (outneighbours.first && !(outneighbours.first->empty())) {
+            auto first_stmt_nums = outneighbours.first->get();
+            stmt_nums.insert(first_stmt_nums.begin(), first_stmt_nums.end());
+        }
+        if (outneighbours.second && !(outneighbours.second->empty())) {
+            auto second_stmt_nums = outneighbours.second->get();
+            stmt_nums.insert(second_stmt_nums.begin(), second_stmt_nums.end());
+        }
+    }
+
+    // Start + outneighbours stmt nums must be EQUALS to all stmt nums in procedure.
+    auto all_stmt_nums = get_stmt_nums_in_proc(proc_map, proc_name);
+    return stmt_nums == all_stmt_nums;
+}
+
+auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node,
+                       std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes,
+                       std::unordered_set<int>& visited_stmt_nums) -> void {
+    if (std::find(visited_nodes.begin(), visited_nodes.end(), node) != visited_nodes.end()) {
+        return; // If node is visited, skip
+    }
+    const auto node_stmt_nums = node->get();
+    visited_nodes.push_back(node);
+    visited_stmt_nums.insert(node_stmt_nums.begin(), node_stmt_nums.end());
+
+    const auto outneighbours = cfg->get_outneighbours(node);
+    if (outneighbours.first) {
+        test_traverse_dfs(cfg, outneighbours.first, visited_nodes, visited_stmt_nums);
+    }
+    if (outneighbours.second) {
+        test_traverse_dfs(cfg, outneighbours.second, visited_nodes, visited_stmt_nums);
+    }
+}
+
+auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
+    std::vector<std::shared_ptr<sp::CfgNode>>
+        visited_nodes; // Sacrifice O(n) lookup to avoid more trouble implementing hash and equality fns for CfgNode.
+    std::unordered_set<int> visited_stmt_nums;
+    const auto cfg = proc_map.at(proc_name);
+    const auto start_node = cfg->get_start_node();
+    test_traverse_dfs(cfg, start_node, visited_nodes, visited_stmt_nums);
+    const bool is_all_nodes = (get_stmt_nums_in_proc(proc_map, proc_name) == visited_stmt_nums);
+    return is_all_nodes;
 }
 
 TEST_CASE("Test CFG Builder") {
@@ -115,12 +216,29 @@ TEST_CASE("Test CFG Builder") {
         auto proc_map = cfg_builder->get_proc_map();
         REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
+
         REQUIRE(get_stmt_nums_in_proc(proc_map, "main") == std::unordered_set<int>{1, 2, 3});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "readPoint") == std::unordered_set<int>{4, 5});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "printResults") == std::unordered_set<int>{6, 7, 8, 9});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") ==
                 std::unordered_set<int>{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23});
+
         REQUIRE(get_dummy_nodes(proc_map) == 0);
+
+        REQUIRE(verify_start_node(proc_map, "main"));
+        REQUIRE(verify_start_node(proc_map, "readPoint"));
+        REQUIRE(verify_start_node(proc_map, "printResults"));
+        REQUIRE(verify_start_node(proc_map, "computeCentroid"));
+
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "main"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "readPoint"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "printResults"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
+
+        REQUIRE(test_traverse(proc_map, "main"));
+        REQUIRE(test_traverse(proc_map, "readPoint"));
+        REQUIRE(test_traverse(proc_map, "printResults"));
+        REQUIRE(test_traverse(proc_map, "computeCentroid"));
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -138,8 +256,6 @@ TEST_CASE("Test CFG Builder") {
             }
         })";
 
-        auto ast = sp.process(input);
-
         /**
          * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
          * Graph.
@@ -152,11 +268,15 @@ TEST_CASE("Test CFG Builder") {
          * Node(2, 3, 4) -> OutNeighbours(Node(1))
          * Node(1) -> OutNeighbours(Node(2, 3, 4), Node(5))
          */
+        auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
+
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
-        // Write evaluation for if-else statements.
         REQUIRE(get_dummy_nodes(proc_map) == 1);
+        REQUIRE(verify_start_node(proc_map, "computeCentroid"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
+        REQUIRE(test_traverse(proc_map, "computeCentroid"));
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -197,6 +317,9 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(proc_map) == 3);
+        REQUIRE(verify_start_node(proc_map, "nesting"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "nesting"));
+        REQUIRE(test_traverse(proc_map, "nesting"));
     }
 }
 
