@@ -5,7 +5,6 @@
 #include "qps/parser/entities/relationship.hpp"
 
 #include <memory>
-#include <optional>
 #include <utility>
 
 namespace qps {
@@ -18,33 +17,32 @@ class ModifiesSEvaluator : public ClauseEvaluator {
 
     // e.g. Modifies(s1, v)
     [[nodiscard]] auto eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                       const std::shared_ptr<qps::VarSynonym>& var_syn) const -> std::optional<Table>;
+                                       const std::shared_ptr<qps::VarSynonym>& var_syn) const -> OutputTable;
 
     // e.g. Modifies(s1, "v")
     [[nodiscard]] auto eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                       const qps::QuotedIdent& identifier) const -> std::optional<Table>;
+                                       const qps::QuotedIdent& identifier) const -> OutputTable;
 
     // e.g. Modifies(s1, _)
     [[nodiscard]] auto eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                       const qps::WildCard&) const -> std::optional<Table>;
+                                       const qps::WildCard&) const -> OutputTable;
 
     // e.g. Modifies(3, v)
     [[nodiscard]] auto eval_modifies_s(const qps::Integer& stmt_num,
-                                       const std::shared_ptr<qps::VarSynonym>& var_syn) const -> std::optional<Table>;
+                                       const std::shared_ptr<qps::VarSynonym>& var_syn) const -> OutputTable;
 
     // e.g. Modifies(3, "v")
     [[nodiscard]] auto eval_modifies_s(const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. Modifies(3, _)
-    [[nodiscard]] auto eval_modifies_s(const qps::Integer& stmt_num, const qps::WildCard&) const
-        -> std::optional<Table>;
+    [[nodiscard]] auto eval_modifies_s(const qps::Integer& stmt_num, const qps::WildCard&) const -> OutputTable;
 
   public:
     ModifiesSEvaluator(std::shared_ptr<ReadFacade> read_facade, ModifiesS modifies_s)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), modifies_s(std::move(modifies_s)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> std::optional<Table> override;
+    [[nodiscard]] auto evaluate() const -> OutputTable override;
 };
 } // namespace qps

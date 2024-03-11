@@ -1,15 +1,19 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
+#include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/select.hpp"
+#include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <numeric>
-#include <optional>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace qps::detail {
@@ -279,7 +283,7 @@ void nested_loop_join_records(const Table& table1, const Table& table2, Table& n
 
 template <typename ColumnMergeStrategy, typename JoinRecordsStrategy>
 auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_merge_strategy,
-          JoinRecordsStrategy join_records_strategy) -> std::optional<Table> {
+          JoinRecordsStrategy join_records_strategy) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -293,10 +297,6 @@ auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_m
 
     // Step 2: join records
     join_records_strategy(table1, table2, new_table);
-
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
 
     return new_table;
 }
@@ -331,7 +331,7 @@ auto reorder_contents(std::vector<std::vector<std::string>>& table_contents, con
     }
 }
 
-auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table> {
+auto merge_join(const Table& table1, const Table& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -428,14 +428,10 @@ auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table
         curr_row1++;
     }
 
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
-
     return new_table;
 }
 
-auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
+auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -467,9 +463,9 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
  *
  * @param table1
  * @param table2
- * @return std::optional<Table>
+ * @return OutputTable
  */
-auto cross_join(const Table& table1, const Table& table2) -> std::optional<Table> {
+auto cross_join(const Table& table1, const Table& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -513,9 +509,6 @@ auto cross_join(const Table& table1, const Table& table2) -> std::optional<Table
             new_table.add_row(new_record);
         }
     }
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
 
     return new_table;
 }
@@ -525,9 +518,9 @@ auto cross_join(const Table& table1, const Table& table2) -> std::optional<Table
  *
  * @param table1
  * @param table2
- * @return std::optional<Table>
+ * @return OutputTable
  */
-auto cross_join(Table&& table1, Table&& table2) -> std::optional<Table> {
+auto cross_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -563,22 +556,88 @@ auto cross_join(Table&& table1, Table&& table2) -> std::optional<Table> {
             new_table.add_row(new_record);
         }
     }
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
 
     return new_table;
 }
 
-auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> std::optional<Table> {
+auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> OutputTable {
     return join(table1, table2, double_pointer_merge, nested_loop_join_records);
 }
-
 } // namespace qps::detail
 
 namespace qps {
-auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
-    return detail::join(table1, table2, detail::unordered_set_merge, detail::nested_loop_join_records);
+
+auto is_unit(const OutputTable& table) -> bool {
+    return std::holds_alternative<UnitTable>(table);
+}
+
+auto is_empty(const OutputTable& table) -> bool {
+    return std::holds_alternative<Table>(table) && std::get<Table>(table).empty();
+}
+
+auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
+    return std::visit(overloaded{
+                          [](const Table& table1, const Table& table2) -> OutputTable {
+                              return detail::join(table1, table2, detail::unordered_set_merge,
+                                                  detail::nested_loop_join_records);
+                          },
+                          [](const UnitTable&, const UnitTable&) -> OutputTable {
+                              return UnitTable{};
+                          },
+                          [](const Table& table, const UnitTable&) -> OutputTable {
+                              return table;
+                          },
+                          [](const UnitTable&, const Table& table) -> OutputTable {
+                              return table;
+                          },
+                      },
+                      table1, table2);
+}
+
+auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+    -> std::vector<std::string>;
+
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+    -> std::vector<std::string> {
+    return std::visit(overloaded{
+                          [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
+                              return table.empty() ? std::vector<std::string>{"False"}
+                                                   : std::vector<std::string>{"True"};
+                          },
+                          [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
+                              return {"True"};
+                          },
+                          [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(read_facade, elems);
+                          },
+                          [](const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(table, elems);
+                          },
+                      },
+                      table, reference);
+}
+
+auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+    -> std::vector<std::string> {
+    // TODO: Relax this constraint
+    for (const auto& elem : elems) {
+        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
+            throw std::runtime_error("Cannot handle non-synonym elements");
+        }
+    }
+
+    Synonyms synonyms;
+    for (const auto& elem : elems) {
+        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
+    }
+
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& synonym : synonyms) {
+        const auto responses = synonym->scan(read_facade);
+        results.insert(responses.begin(), responses.end());
+    }
+    return {results.begin(), results.end()};
 }
 
 auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
@@ -601,6 +660,63 @@ auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std
         results.insert(row.at(col_idx));
     }
     return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const Synonyms& synonyms) -> std::vector<std::string> {
+    if (table.get_column().empty()) {
+        // Table is empty --> contradiction
+        return {};
+    }
+
+    const auto column = table.get_column();
+    auto column_indices = std::vector<long>{};
+    for (const auto& synonym : synonyms) {
+        const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
+        if (col_idx == static_cast<long>(column.size())) {
+            // Synonym not found in table
+            return {};
+        }
+        column_indices.push_back(col_idx);
+    }
+
+    // All synonyms found in table -> Populate results
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& row : table.get_records()) {
+        auto curr_row = std::vector<std::string>{};
+        for (const auto& col_idx : column_indices) {
+            curr_row.push_back(row.at(col_idx));
+        }
+        results.insert(std::accumulate(curr_row.begin(), curr_row.end(), std::string{}));
+    }
+
+    return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const Reference& reference) -> std::vector<std::string> {
+    if (table.get_column().empty()) {
+        // Table is empty --> contradiction
+        return {};
+    }
+
+    return std::visit(overloaded{[](const BooleanReference&) -> std::vector<std::string> {
+                                     return {"True"};
+                                 },
+                                 [&table](const std::vector<Elem>& elems) -> std::vector<std::string> {
+                                     // TODO: Relax this constraint
+                                     for (const auto& elem : elems) {
+                                         if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
+                                             throw std::runtime_error("Cannot handle non-synonym elements");
+                                         }
+                                     }
+
+                                     Synonyms synonyms;
+                                     for (const auto& elem : elems) {
+                                         synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
+                                     }
+
+                                     return project(table, synonyms);
+                                 }},
+                      reference);
 }
 
 void print(const Table& table) {

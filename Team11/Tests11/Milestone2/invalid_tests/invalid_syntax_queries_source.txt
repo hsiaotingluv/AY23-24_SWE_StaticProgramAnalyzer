@@ -1,0 +1,8 @@
+procedure main {
+  read var;
+  if (var < 0) then {
+    print var;
+  } else {
+    print var;
+  }
+}
