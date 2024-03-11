@@ -4,21 +4,21 @@
 #include <array>
 
 namespace tokenizer {
-class DotTokenizer : public tokenizer::Tokenizer {
+class DotTokenizer final : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, ".", TokenType::Dot);
     }
 };
 
-class SingleEqualTokenizer : public tokenizer::Tokenizer {
+class SingleEqualTokenizer final : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, "=", TokenType::SingleEqual);
     }
 };
 
-class MiscellaneousTokenizer : public tokenizer::Tokenizer {
+class MiscellaneousTokenizer final : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 2>{
         std::make_shared<DotTokenizer>(), std::make_shared<SingleEqualTokenizer>()};

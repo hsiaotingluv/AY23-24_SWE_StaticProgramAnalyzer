@@ -4,7 +4,7 @@
 namespace qps {
 using namespace tokenizer;
 
-class WildCardTokenizer : public Tokenizer {
+class WildCardTokenizer final : public Tokenizer {
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override;
 };
