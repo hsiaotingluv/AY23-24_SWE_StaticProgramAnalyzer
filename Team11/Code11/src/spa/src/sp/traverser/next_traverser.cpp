@@ -58,7 +58,6 @@ auto NextTraverser::traverse_procedure(std::shared_ptr<Cfg> cfg) -> void {
  */
 auto NextTraverser::traverse(ProcMap cfgs) -> void {
     for (const auto& [proc_name, cfg] : cfgs) {
-        std::cout << *cfg << std::endl;
         traverse_procedure(cfg);
     }
 }
