@@ -1,0 +1,4 @@
+OUTPUT_DIRECTORY       = ./
+INPUT                  = ../include/
+EXTRACT_ALL            = YES
+RECURSIVE              = ALL
