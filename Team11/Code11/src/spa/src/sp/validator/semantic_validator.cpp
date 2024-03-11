@@ -37,7 +37,9 @@ auto SemanticValidator::validate_get_traversal_order(const std::shared_ptr<AstNo
     }
 
     // No recursive and cyclic call, use Topological sort to detect this
-    return topological_sort();
+    auto topo_sort = topological_sort();
+
+    return topo_sort;
 }
 
 auto SemanticValidator::build_graph(const std::shared_ptr<AstNode>& node, const std::string& caller_name) -> void {
