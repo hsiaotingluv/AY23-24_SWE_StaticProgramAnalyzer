@@ -36,7 +36,7 @@ class ClausesParser {
                 it = maybe_and.value();
             }
 
-            const auto maybe_success = Strategy::parse(it, end);
+            const auto maybe_success = Strategy::parse_clause(it, end);
             if (!maybe_success.has_value()) {
                 return std::nullopt;
             }

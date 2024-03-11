@@ -213,12 +213,14 @@ auto parse_attr_cond(std::vector<Token>::const_iterator it, const std::vector<To
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
-auto PatternParserStrategy::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
+                                         const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     return detail::parse_pattern_cond(it, end);
 }
 
-auto WithParserStrategy::parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
+                                      const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     return detail::parse_attr_cond(it, end);
 }
