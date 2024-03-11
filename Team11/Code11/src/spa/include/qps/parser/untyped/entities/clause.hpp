@@ -30,12 +30,17 @@ struct UntypedSuchThatClause {
 };
 
 struct UntypedPatternClause {
+  private:
+    static constexpr auto NUM_ARG = 2;
+
+  public:
     UntypedSynonym synonym;
     UntypedEntRef ent_ref;
     ExpressionSpec expression_spec;
     int num_arg;
 
-    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec, int num_arg = 2)
+    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec,
+                         int num_arg = NUM_ARG)
         : synonym(std::move(synonym)), ent_ref(std::move(ent_ref)), expression_spec(std::move(expression_spec)),
           num_arg(num_arg) {
     }
