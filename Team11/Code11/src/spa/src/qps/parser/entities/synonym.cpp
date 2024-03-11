@@ -102,7 +102,8 @@ auto ConstSynonym::get_keyword() const -> std::string {
     return keyword;
 }
 
-auto AnyStmtSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const -> std::unordered_set<std::string> {
+auto AnyStmtSynonym::scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const
+    -> std::unordered_set<std::string> {
     return read_facade->get_all_statements();
 }
 

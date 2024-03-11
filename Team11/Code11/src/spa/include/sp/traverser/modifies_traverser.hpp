@@ -7,7 +7,6 @@
 
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 
 namespace sp {
 
@@ -19,7 +18,8 @@ class ModifiesTraverser : public Traverser {
     std::shared_ptr<pkb::WriteFacade> write_facade;
 
   public:
-    explicit ModifiesTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
+    explicit ModifiesTraverser(std::shared_ptr<pkb::WriteFacade> write_facade)
+        : write_facade(std::move(write_facade)){};
     auto traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>& proc_topo_sort)
         -> std::shared_ptr<AstNode> override;
 };

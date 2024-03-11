@@ -54,7 +54,8 @@ class SourceProcessor {
           cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers), write_facade(write_facade) {
     }
 
-    static auto get_complete_sp(const std::shared_ptr<pkb::WriteFacade>& write_facade) -> std::shared_ptr<SourceProcessor> {
+    static auto get_complete_sp(const std::shared_ptr<pkb::WriteFacade>& write_facade)
+        -> std::shared_ptr<SourceProcessor> {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
             std::make_shared<ProgramParser>(), std::make_shared<StmtNumTraverser>(write_facade),
