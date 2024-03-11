@@ -14,7 +14,7 @@ namespace sp {
  */
 class CfgNode {
 
-    using StatementNumbers = std::vector<int>;
+    using StatementNumbers = std::vector<int>; // Need to maintain order
 
   private:
     StatementNumbers stmt_nums{};
@@ -50,7 +50,7 @@ class CfgNode {
             if (i != 0) {
                 os << ", ";
             }
-            os << cfg_node.stmt_nums[i];
+            os << cfg_node.stmt_nums.at(i);
         }
         os << ")";
         return os;
@@ -62,27 +62,52 @@ class CfgNode {
  * @note There is one Cfg per Procedure.
  */
 class Cfg {
-    using OutNeighbours =
-        std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>; // If and While CfgNode have 2 out-neighbours.
+    /**
+     * For normal Statements: OutNeighbours.first is the next node. OutNeighbours.second is nullptr.
+     * For If Statements: OutNeighbours.first is the then-block node. OutNeighbours.second is the else-block node.
+     * For While Statements: OutNeighbours.first is the loop-block node. OutNeighbours.second is next node after the
+     * While block.
+     */
+    using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>;
     using Graph =
         std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
     static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
 
   private:
+    std::shared_ptr<CfgNode> start_node;
     std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
     Graph graph{};
 
   public:
     explicit Cfg() {
-        current_node = std::make_shared<CfgNode>();
+        start_node = std::make_shared<CfgNode>();
+        current_node = start_node;
         add_node_to_graph();
     }
+
+    /**
+     * @brief Get the start node.
+     */
+    auto get_start_node() const -> std::shared_ptr<CfgNode> {
+        return start_node;
+    };
 
     /**
      * @brief Get the current node.
      */
     auto get_current_node() const -> std::shared_ptr<CfgNode> {
         return current_node;
+    };
+
+    /**
+     * @brief Get the associated OutNeighbours
+     */
+    auto get_outneighbours(std::shared_ptr<CfgNode> node) const -> OutNeighbours {
+        if (graph.find(node) == graph.end()) {
+            return EMPTY_OUTNEIGHBOURS;
+        } else {
+            return graph.at(node);
+        }
     };
 
     /**
@@ -119,11 +144,10 @@ class Cfg {
      */
     auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> outneighbour) -> void {
         // Fill the out-neighbours of current_node.
-        auto outneighbours = graph.at(current_node);
-        if (outneighbours.first) {
-            outneighbours.second = outneighbour;
+        if (graph.at(current_node).first) {
+            graph.at(current_node).second = outneighbour;
         } else {
-            outneighbours.first = outneighbour;
+            graph.at(current_node).first = outneighbour;
         }
     }
 
