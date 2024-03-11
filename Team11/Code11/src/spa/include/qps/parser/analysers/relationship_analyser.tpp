@@ -6,7 +6,7 @@
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 
-namespace qps::details {
+namespace qps::detail {
 template <typename T>
 auto to_stmt_ref(const Synonyms& declarations, const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                  const T& x) -> std::optional<StmtRef> {
@@ -157,4 +157,4 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
         }};
 };
 
-} // namespace qps::details
+} // namespace qps::detail
