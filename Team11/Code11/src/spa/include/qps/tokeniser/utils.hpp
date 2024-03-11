@@ -4,7 +4,6 @@
 
 template <int Index, template <typename> typename Tokeniser, typename T>
 inline void push_array_rec(T&, qps::TypeList<>) {
-    return;
 }
 
 template <int Index, template <typename> typename Tokeniser, typename T, typename Head, typename... Tails>

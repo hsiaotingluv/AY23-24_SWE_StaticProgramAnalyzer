@@ -33,7 +33,7 @@ struct SuchThatParserStrategy {
 
     using ClauseType = UntypedSuchThatClause;
 
-    static auto parse(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    static auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
         -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
         if (it == end) {
             return std::nullopt;
@@ -60,18 +60,26 @@ namespace qps::untyped::detail {
 template <typename T>
 auto parse_stmt_stmt(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedStmtStmtRel, std::vector<Token>::const_iterator>> {
-    constexpr auto EXPECTED_LENGTH = 6;
+    static constexpr auto EXPECTED_LENGTH = 6;
+
+    static constexpr auto KEYWORD_INDEX = 0;
+    static constexpr auto OPEN_BRACKET_INDEX = 1;
+    static constexpr auto FIRST_ARG_INDEX = 2;
+    static constexpr auto COMMA_INDEX = 3;
+    static constexpr auto SECOND_ARG_INDEX = 4;
+    static constexpr auto CLOSE_BRACKET_INDEX = 5;
+
     const auto keyword = std::string{T::keyword};
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }
 
-    const auto& maybe_keyword = *it;
-    const auto& maybe_open_bracket = *std::next(it, 1);
-    const auto& maybe_first_arg = *std::next(it, 2);
-    const auto& maybe_comma = *std::next(it, 3);
-    const auto& maybe_second_arg = *std::next(it, 4);
-    const auto& maybe_close_bracket = *std::next(it, 5);
+    const auto& maybe_keyword = *std::next(it, KEYWORD_INDEX);
+    const auto& maybe_open_bracket = *std::next(it, OPEN_BRACKET_INDEX);
+    const auto& maybe_first_arg = *std::next(it, FIRST_ARG_INDEX);
+    const auto& maybe_comma = *std::next(it, COMMA_INDEX);
+    const auto& maybe_second_arg = *std::next(it, SECOND_ARG_INDEX);
+    const auto& maybe_close_bracket = *std::next(it, CLOSE_BRACKET_INDEX);
 
     if (!is_relationship_keyword(maybe_keyword, keyword) || !is_open_bracket(maybe_open_bracket) ||
         !is_comma(maybe_comma) || !is_close_bracket(maybe_close_bracket)) {

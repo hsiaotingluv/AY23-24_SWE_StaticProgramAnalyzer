@@ -15,7 +15,7 @@
 
 namespace qps {
 
-class QueryProcessingSystemTokenizer : public Tokenizer {
+class QueryProcessingSystemTokenizer final : public Tokenizer {
   private:
     static inline const auto tokenizers = std::array<std::shared_ptr<Tokenizer>, 9>{
         std::make_shared<QPSRelationshipTokenizer>(), std::make_shared<QPSAttrNameTokenizer>(),
