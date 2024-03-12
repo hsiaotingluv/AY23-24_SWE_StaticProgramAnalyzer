@@ -31,7 +31,7 @@ static constexpr auto tuple_stmt_no_extractor = [](const auto& p) {
     return std::get<0>(p);
 };
 
-class PKB {
+class PkbManager {
   public:
     static std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> create_facades();
 
@@ -53,7 +53,7 @@ class PKB {
         return filter_by_statement_type(set, statement_type, identity_fun);
     }
 
-    PKB();
+    PkbManager();
 
     // Entity-related Read Operations
     std::unordered_set<std::string> get_entities();

@@ -2,7 +2,7 @@
 
 #include <utility>
 
-ReadFacade::ReadFacade(std::shared_ptr<PKB> pkb) : pkb(std::move(pkb)) {
+ReadFacade::ReadFacade(std::shared_ptr<PkbManager> pkb) : pkb(std::move(pkb)) {
 }
 
 std::unordered_set<std::string> ReadFacade::get_entities() {

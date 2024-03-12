@@ -2,7 +2,7 @@
 
 #include <utility>
 
-WriteFacade::WriteFacade(std::shared_ptr<PKB> pkb) : pkb(std::move(pkb)) {
+WriteFacade::WriteFacade(std::shared_ptr<PkbManager> pkb) : pkb(std::move(pkb)) {
 }
 
 void WriteFacade::add_procedure(std::string procedure) {

@@ -5,7 +5,7 @@
 
 TEST_CASE("Simple Entity Test") {
     SECTION("Procedure Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_procedure("procedure1");
 
@@ -17,7 +17,7 @@ TEST_CASE("Simple Entity Test") {
 
 TEST_CASE("Simple Statement Test") {
     SECTION("Statement Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_statement("1", StatementType::Read);
         write_facade->add_statement("2", StatementType::Print);
@@ -38,7 +38,7 @@ TEST_CASE("Simple Statement Test") {
 
 TEST_CASE("Follows and FollowsStar Relationship Test") {
     SECTION("Follows and FollowsStar Transitive Relationship Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -64,7 +64,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Get All Followee By Statement Type Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -91,7 +91,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Get All Followers By Statement Type Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -118,7 +118,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Get All followers Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -139,7 +139,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Get All Followee by Follower Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -160,7 +160,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Simple follows star relationship") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -172,7 +172,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Verifying absence of non-existent Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -183,7 +183,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Retrieving all Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -197,7 +197,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Getting keys from all follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -210,7 +210,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Getting values frm all Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "3");
         write_facade->add_follows("2", "4");
@@ -223,7 +223,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Retrieving statements followed by in Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "3");
         write_facade->finalise_pkb();
@@ -239,7 +239,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Retrieving statements following in Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "3");
         write_facade->finalise_pkb();
@@ -255,7 +255,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
     }
 
     SECTION("Adding and Verifying Complex Follows* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_follows("1", "2");
         write_facade->add_follows("2", "3");
@@ -293,7 +293,7 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
 
 TEST_CASE("Parent and ParentStar Relationship Test") {
     SECTION("Parent and ParentStar Transitive Relationship Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("1", "3");
@@ -319,7 +319,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Get All Parents By Statement Type Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -340,7 +340,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Get All Children By Statement Type Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -361,7 +361,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Get All Children Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -384,7 +384,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Get All Parent by Children Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -407,7 +407,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Adding and Verifying Parent* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -423,7 +423,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Verifying Absence of Non-existent Parent* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -439,7 +439,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Retrieving all parent* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -458,7 +458,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Getting keys from all parent* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("2", "3");
@@ -474,7 +474,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Getting Descendant Values from All Parent* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("1", "3");
@@ -489,7 +489,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Retrieving All Descendants of a Specific Ancestor in Parent* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "2");
         write_facade->add_parent("1", "3");
@@ -504,7 +504,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Retrieving All Ancestors of a Specific Descendant in Parent* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("1", "3");
         write_facade->add_parent("2", "3");
@@ -519,7 +519,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
     }
 
     SECTION("Adding and Verifying Complex Parent* relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_parent("4", "5");
         write_facade->add_parent("4", "6");
@@ -555,7 +555,7 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
 
 TEST_CASE("Modify Test") {
     SECTION("Simple Modify Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_statement_modifies_var("1", "x");
         write_facade->add_statement_modifies_var("1", "y");
@@ -570,7 +570,7 @@ TEST_CASE("Modify Test") {
     }
 
     SECTION("More complex modify test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_procedure_modifies_var("main", "x");
         write_facade->add_procedure_modifies_var("main", "y");
@@ -593,7 +593,7 @@ TEST_CASE("Modify Test") {
     }
 
     SECTION("Test get_statements_that_modify_var of certain type") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_statement_modifies_var("1", "x");
         write_facade->add_statement_modifies_var("1", "y");
@@ -613,7 +613,7 @@ TEST_CASE("Modify Test") {
 
 TEST_CASE("Use Test") {
     SECTION("Simple Use Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_statement_uses_var("1", "x");
         write_facade->add_statement_uses_var("1", "y");
@@ -628,7 +628,7 @@ TEST_CASE("Use Test") {
     }
 
     SECTION("More complex use test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_procedure_uses_var("main", "x");
         write_facade->add_procedure_uses_var("main", "y");
@@ -651,7 +651,7 @@ TEST_CASE("Use Test") {
     }
 
     SECTION("Test get_statements_that_use_var of certain type") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_statement_uses_var("1", "x");
         write_facade->add_statement_uses_var("1", "y");
@@ -671,7 +671,7 @@ TEST_CASE("Use Test") {
 
 TEST_CASE("Assignment Pattern Test") {
     SECTION("Simple Assignment Pattern Test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_assignment("1", "x", "1 ");
         write_facade->add_assignment("2", "y", "x ");
@@ -701,7 +701,7 @@ TEST_CASE("Assignment Pattern Test") {
     }
 
     SECTION("more complex assignment pattern test") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_assignment("1", "x", "1 ");
         write_facade->add_assignment("2", "y", "x ");
@@ -731,7 +731,7 @@ TEST_CASE("Assignment Pattern Test") {
 
 TEST_CASE("Calls and Calls* Relationship Test") {
     SECTION("Adding and Verifying Direct Calls Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -741,7 +741,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Verifying Absence of Non-existent Direct Calls Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -752,7 +752,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Direct Calls Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Logger");
@@ -781,7 +781,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Callees") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Utils");
@@ -795,7 +795,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Callers") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Utils", "Logger");
@@ -810,7 +810,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Callers for a Given Callee") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Logger", "Helper");
@@ -824,7 +824,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving Callers for Non-existent Callee Returns Empty Set") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         auto callers = read_facade->get_callers("NonExisting");
 
@@ -832,7 +832,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Callees for a Given Caller") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Logger");
@@ -846,7 +846,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving Callees for Non-existent Caller Returns Empty Set") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         auto callees = read_facade->get_callees("NonExisting");
 
@@ -854,7 +854,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Adding and Verifying Calls* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -865,7 +865,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Verifying Absence of Non-existent Calls* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -877,7 +877,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Calls* Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Logger");
@@ -908,7 +908,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Calls* Callees") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Utils");
@@ -923,7 +923,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Calls* Callers") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -938,7 +938,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Star Callers for a Given Callee") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -953,7 +953,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving Star Callers for Non-existent Callee Returns Empty Set") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         auto callers = read_facade->get_star_callers("NonExisting");
 
@@ -961,7 +961,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving All Star Callees for a Given Caller") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
@@ -976,7 +976,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
     }
 
     SECTION("Retrieving Star Callees for Non-existent Caller Returns Empty Set") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         auto callees = read_facade->get_star_callees("NonExisting");
 
@@ -986,7 +986,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
 TEST_CASE("Next Test") {
     SECTION("Add and Verify Direct Next Relationship") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_next("1", "2");
         write_facade->add_next("2", "3");
@@ -997,7 +997,7 @@ TEST_CASE("Next Test") {
     }
 
     SECTION("Get All Direct Next Relationships") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_next("1", "2");
         write_facade->add_next("2", "3");
@@ -1025,7 +1025,7 @@ TEST_CASE("Next Test") {
     }
 
     SECTION("Get All Previous of a Statement") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_next("1", "2");
         write_facade->add_next("3", "2");
@@ -1041,7 +1041,7 @@ TEST_CASE("Next Test") {
     }
 
     SECTION("Get Direct Next Successors") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_next("1", "2");
         write_facade->add_next("1", "3");
@@ -1055,7 +1055,7 @@ TEST_CASE("Next Test") {
     }
 
     SECTION("Get Direct Next Predecessors") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_next("1", "2");
         write_facade->add_next("3", "2");
@@ -1071,7 +1071,7 @@ TEST_CASE("Next Test") {
 
 TEST_CASE("If Pattern Test") {
     SECTION("Get all if statements with any variables") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_if_var("1", "x");
         write_facade->add_if_var("2", "y");
@@ -1086,7 +1086,7 @@ TEST_CASE("If Pattern Test") {
     }
 
     SECTION("Get all if statement with specific variables") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_if_var("1", "x");
         write_facade->add_if_var("2", "y");
@@ -1104,7 +1104,7 @@ TEST_CASE("If Pattern Test") {
     }
 
     SECTION("Get all variables inside ifs") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_if_var("1", "x");
         write_facade->add_if_var("1", "y");
@@ -1120,7 +1120,7 @@ TEST_CASE("If Pattern Test") {
     }
 
     SECTION("Get all variables inside specific if") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_if_var("1", "x");
         write_facade->add_if_var("1", "y");
@@ -1140,7 +1140,7 @@ TEST_CASE("If Pattern Test") {
     }
 
     SECTION("Get all if statement and variable pairs") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_if_var("1", "x");
         write_facade->add_if_var("1", "y");
@@ -1153,7 +1153,7 @@ TEST_CASE("If Pattern Test") {
 
 TEST_CASE("While Pattern Test") {
     SECTION("Get all while statements with any variables") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_while_var("1", "x");
         write_facade->add_while_var("2", "y");
@@ -1168,7 +1168,7 @@ TEST_CASE("While Pattern Test") {
     }
 
     SECTION("Get all while statement with specific variables") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_while_var("1", "x");
         write_facade->add_while_var("2", "y");
@@ -1186,7 +1186,7 @@ TEST_CASE("While Pattern Test") {
     }
 
     SECTION("Get all variables inside whiles") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_while_var("1", "x");
         write_facade->add_while_var("1", "y");
@@ -1202,7 +1202,7 @@ TEST_CASE("While Pattern Test") {
     }
 
     SECTION("Get all variables inside specific while") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_while_var("1", "x");
         write_facade->add_while_var("1", "y");
@@ -1222,7 +1222,7 @@ TEST_CASE("While Pattern Test") {
     }
 
     SECTION("Get all while statement and variable pairs") {
-        auto [read_facade, write_facade] = PKB::create_facades();
+        auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_while_var("1", "x");
         write_facade->add_while_var("1", "y");

@@ -1,11 +1,11 @@
 #include "catch.hpp"
 
 #include "pkb/facades/read_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 #include "sp/main.hpp"
 
-TEST_CASE("Test SP and PKB") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+TEST_CASE("Test SP and PkbManager") {
+    auto [read_facade, write_facade] = PkbManager::create_facades();
 
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
@@ -47,7 +47,7 @@ TEST_CASE("Test SP and PKB") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-    SECTION("Test SP and PKB Uses Website - success") {
+    SECTION("Test SP and PkbManager Uses Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -65,7 +65,7 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE_FALSE(read_facade->does_statement_use_var("18", "y"));
     }
 
-    SECTION("Test SP and PKB Parent Website - success") {
+    SECTION("Test SP and PkbManager Parent Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -82,7 +82,7 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE_FALSE(read_facade->has_parent_relation("14", "19"));
     }
 
-    SECTION("Test SP and PKB Modifies Website - success") {
+    SECTION("Test SP and PkbManager Modifies Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -99,7 +99,7 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE_FALSE(read_facade->does_procedure_modify_var("printResults", "normSq"));
     }
 
-    SECTION("Test SP and PKB Follows Website - success") {
+    SECTION("Test SP and PkbManager Follows Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -117,7 +117,7 @@ TEST_CASE("Test SP and PKB") {
         REQUIRE_FALSE(read_facade->has_follows_star_relation("21", "23"));
     }
 
-    SECTION("Test SP and PKB Assignment Pattern - success") {
+    SECTION("Test SP and PkbManager Assignment Pattern - success") {
         auto ast = sp->process(input);
 
         REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);

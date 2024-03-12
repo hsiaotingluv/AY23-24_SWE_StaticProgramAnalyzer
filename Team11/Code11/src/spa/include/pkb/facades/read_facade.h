@@ -4,14 +4,14 @@
 #include "pkb/common_types/entity.h"
 #include "pkb/common_types/procedure.h"
 #include "pkb/common_types/variable.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 #include <memory>
 #include <tuple>
 #include <unordered_set>
 
 class ReadFacade {
   public:
-    explicit ReadFacade(std::shared_ptr<PKB> pkb);
+    explicit ReadFacade(std::shared_ptr<PkbManager> pkb);
 
     // Entity-related Read Operations
     std::unordered_set<std::string> get_entities();
@@ -256,5 +256,5 @@ class ReadFacade {
     std::unordered_set<std::tuple<std::string, std::string>> get_all_while_stmt_var_pairs();
 
   private:
-    std::shared_ptr<PKB> pkb;
+    std::shared_ptr<PkbManager> pkb;
 };

@@ -5,14 +5,14 @@
 #include "pkb/common_types/entity.h"
 #include "pkb/common_types/procedure.h"
 #include "pkb/common_types/variable.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 #include <unordered_set>
 
 class WriteFacade {
   public:
     typedef std::unordered_set<std::string> StringSet;
 
-    explicit WriteFacade(std::shared_ptr<PKB> pkb);
+    explicit WriteFacade(std::shared_ptr<PkbManager> pkb);
 
     void add_procedure(std::string procedure);
 
@@ -47,5 +47,5 @@ class WriteFacade {
     void finalise_pkb();
 
   private:
-    std::shared_ptr<PKB> pkb;
+    std::shared_ptr<PkbManager> pkb;
 };

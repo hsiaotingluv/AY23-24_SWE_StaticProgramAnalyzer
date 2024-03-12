@@ -3,7 +3,7 @@
 #include "common/statement_type.hpp"
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser/entities/clause.hpp"
@@ -27,9 +27,9 @@ auto require_equal(const std::vector<std::string>& actual, const std::vector<std
 
 TEST_CASE("Test Evaluator Entities") {
     SECTION("Evaluate - All Variables") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto variable_strs = std::vector<std::string>{"v", "w", "x", "y", "z"};
         for (const auto& x : variable_strs) {
             write_facade->add_variable(x);
@@ -48,9 +48,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Procedures") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto procedure_strs = std::vector<std::string>{"p", "q", "r", "s", "t"};
         for (const auto& x : procedure_strs) {
             write_facade->add_procedure(x);
@@ -69,9 +69,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Constants") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto constant_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : constant_strs) {
             write_facade->add_constant(x);
@@ -90,9 +90,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Assigns") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto assign_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : assign_strs) {
             write_facade->add_statement(x, StatementType::Assign);
@@ -111,9 +111,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Ifs") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto if_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : if_strs) {
             write_facade->add_statement(x, StatementType::If);
@@ -132,9 +132,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Whiles") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto while_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : while_strs) {
             write_facade->add_statement(x, StatementType::While);
@@ -153,9 +153,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Calls") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto call_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : call_strs) {
             write_facade->add_statement(x, StatementType::Call);
@@ -174,9 +174,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Prints") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto print_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : print_strs) {
             write_facade->add_statement(x, StatementType::Print);
@@ -195,9 +195,9 @@ TEST_CASE("Test Evaluator Entities") {
     }
 
     SECTION("Evaluate - All Reads") {
-        const auto& [read_facade, write_facade] = PKB::create_facades();
+        const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-        // Populate PKB
+        // Populate PkbManager
         const auto read_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
         for (const auto& x : read_strs) {
             write_facade->add_statement(x, StatementType::Read);
@@ -217,9 +217,9 @@ TEST_CASE("Test Evaluator Entities") {
 }
 
 TEST_CASE("Test Evaluator Parent") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto if_strs = std::vector<std::string>{"1"};
     const auto while_strs = std::vector<std::string>{"3"};
     const auto assign_strs = std::vector<std::string>{"2", "4", "5"};
@@ -470,9 +470,9 @@ TEST_CASE("Test Evaluator Parent") {
 }
 
 TEST_CASE("Test Evaluator Parent*") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto if_strs = std::vector<std::string>{"1", "2"};
     const auto while_strs = std::vector<std::string>{"4", "5"};
     const auto assign_strs = std::vector<std::string>{"3", "6", "7"};
@@ -724,9 +724,9 @@ TEST_CASE("Test Evaluator Parent*") {
 }
 
 TEST_CASE("Test Evaluator Follows") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto assign_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
     for (const auto& x : assign_strs) {
         write_facade->add_statement(x, StatementType::Assign);
@@ -974,9 +974,9 @@ TEST_CASE("Test Evaluator Follows") {
 }
 
 TEST_CASE("Test Evaluator Pattern") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto assign_strs = std::vector<std::string>{"1", "2"};
     for (const auto& x : assign_strs) {
         write_facade->add_statement(x, StatementType::Assign);
@@ -1230,9 +1230,9 @@ TEST_CASE("Test Evaluator Pattern") {
 }
 
 TEST_CASE("Test Evaluator Follows*") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto assign_strs = std::vector<std::string>{"1", "2", "3", "4", "5"};
     for (const auto& x : assign_strs) {
         write_facade->add_statement(x, StatementType::Assign);
@@ -1429,9 +1429,9 @@ TEST_CASE("Test Evaluator Follows*") {
 }
 
 TEST_CASE("Test Evaluator UsesS") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     write_facade->add_statement("1", StatementType::Assign);
     write_facade->add_statement("2", StatementType::Print);
     write_facade->add_statement("3", StatementType::If);
@@ -1628,9 +1628,9 @@ TEST_CASE("Test Evaluator UsesS") {
 }
 
 TEST_CASE("Test Evaluator ModifiesS") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     write_facade->add_statement("1", StatementType::Assign);
     write_facade->add_statement("2", StatementType::Read);
     write_facade->add_statement("3", StatementType::If);
