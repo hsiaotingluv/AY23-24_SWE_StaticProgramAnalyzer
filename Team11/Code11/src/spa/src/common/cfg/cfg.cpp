@@ -7,8 +7,9 @@ auto CfgNode::get() const -> StatementNumbers {
     return stmt_nums;
 };
 
-auto CfgNode::add(int stmt_num) -> void {
+auto CfgNode::add(int stmt_num) -> int {
     stmt_nums.push_back(stmt_num);
+    return stmt_num;
 };
 
 auto CfgNode::empty() const -> bool {
@@ -51,32 +52,37 @@ auto Cfg::is_current_node_empty() const -> bool {
     return current_node->empty();
 }
 
-auto Cfg::add_stmt_to_node(int stmt_num) -> void {
+auto Cfg::add_stmt_to_node(int stmt_num) -> int {
     current_node->add(stmt_num);
+    return stmt_num;
 };
 
-auto Cfg::add_node_to_graph() -> void {
+auto Cfg::add_node_to_graph() -> std::shared_ptr<CfgNode> {
     auto edge = std::make_pair(current_node, EMPTY_OUTNEIGHBOURS);
     graph.insert(edge);
+    return current_node;
 }
 
-auto Cfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> void {
+auto Cfg::add_outneighbour_to_graph(std::shared_ptr<CfgNode> outneighbour) -> std::shared_ptr<CfgNode> {
     // Fill the out-neighbours of current_node.
     if (graph.at(current_node).first) {
         graph.at(current_node).second = outneighbour;
     } else {
         graph.at(current_node).first = outneighbour;
     }
+    return outneighbour;
 }
 
-auto Cfg::move_to(std::shared_ptr<CfgNode> node) -> void {
+auto Cfg::move_to(std::shared_ptr<CfgNode> node) -> std::shared_ptr<CfgNode> {
     current_node = std::move(node);
+    return node;
 };
 
-auto Cfg::link_and_move_to(std::shared_ptr<CfgNode> node) -> void {
+auto Cfg::link_and_move_to(std::shared_ptr<CfgNode> node) -> std::shared_ptr<CfgNode> {
     add_outneighbour_to_graph(node);
     move_to(node);
     add_node_to_graph();
+    return node;
 };
 
 auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream& {
