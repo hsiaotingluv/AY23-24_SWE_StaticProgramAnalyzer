@@ -294,7 +294,7 @@ void nested_loop_join_records(const Table& table1, const Table& table2, Table& n
 }
 
 template <typename ColumnMergeStrategy, typename JoinRecordsStrategy>
-auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_merge_strategy,
+auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strategy,
           JoinRecordsStrategy join_records_strategy) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
@@ -343,7 +343,7 @@ void reorder_contents(std::vector<std::vector<std::string>>& table_contents, con
     });
 }
 
-auto merge_join(const Table& table1, const Table& table2) -> OutputTable {
+auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -466,63 +466,8 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     if (common_column_idxs.empty()) {
         return cross_join(std::move(tableA), std::move(tableB));
     } else {
-        return merge_join(tableA, tableB);
+        return merge_join(std::move(tableA), std::move(tableB));
     }
-}
-
-/**
- * @brief Assumes that the input tables have no common column names
- *
- * @param table1
- * @param table2
- * @return OutputTable
- */
-auto cross_join(const Table& table1, const Table& table2) -> OutputTable {
-    // Step 0: Short-circuit if either table is empty
-    if (table1.empty()) {
-        return table2;
-    } else if (table2.empty()) {
-        return table1;
-    }
-
-    // Step 1: Reorder columns and rows
-    const auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
-    const auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
-
-    const auto& table1_contents = tableA.get_records();
-    const auto& table2_contents = tableB.get_records();
-    const auto& table1_column_names = tableA.get_column();
-    const auto& table2_column_names = tableB.get_column();
-
-    auto new_column = std::vector<std::shared_ptr<Synonym>>{};
-    new_column.reserve(table1_column_names.size() + table2_column_names.size());
-    new_column.insert(new_column.end(), table1_column_names.begin(), table1_column_names.end());
-    new_column.insert(new_column.end(), table2_column_names.begin(), table2_column_names.end());
-
-    auto new_table = Table{new_column};
-
-    const auto table1_mask = build_mapping(table1_column_names, new_column);
-    const auto table2_mask = build_mapping(table2_column_names, new_column);
-
-    // Step 2: join records
-    for (const auto& record1 : table1_contents) {
-        for (const auto& record2 : table2_contents) {
-            auto new_record = std::vector<std::string>(new_column.size(), "");
-
-            // Populate new_record with values from record1
-            for (int i = 0; i < static_cast<int>(record1.size()); i++) {
-                new_record[table1_mask.at(i)] = record1[i];
-            }
-
-            // Populate new_record with values from record2
-            for (int i = 0; i < static_cast<int>(record2.size()); i++) {
-                new_record[table2_mask.at(i)] = record2[i];
-            }
-            new_table.add_row(new_record);
-        }
-    }
-
-    return new_table;
 }
 
 /**
@@ -572,8 +517,8 @@ auto cross_join(Table&& table1, Table&& table2) -> OutputTable {
     return new_table;
 }
 
-auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> OutputTable {
-    return join(table1, table2, double_pointer_merge, nested_loop_join_records);
+auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTable {
+    return join(std::move(table1), std::move(table2), double_pointer_merge, nested_loop_join_records);
 }
 } // namespace qps::detail
 
@@ -587,23 +532,23 @@ auto is_empty(const OutputTable& table) -> bool {
     return std::holds_alternative<Table>(table) && std::get<Table>(table).empty();
 }
 
-auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
+auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable {
     return std::visit(overloaded{
-                          [](const Table& table1, const Table& table2) -> OutputTable {
-                              return detail::join(table1, table2, detail::unordered_set_merge,
+                          [](Table&& table1, Table&& table2) -> OutputTable {
+                              return detail::join(std::move(table1), std::move(table2), detail::unordered_set_merge,
                                                   detail::nested_loop_join_records);
                           },
-                          [](const UnitTable&, const UnitTable&) -> OutputTable {
+                          [](UnitTable&&, UnitTable&&) -> OutputTable {
                               return UnitTable{};
                           },
-                          [](const Table& table, const UnitTable&) -> OutputTable {
+                          [](Table&& table, UnitTable&&) -> OutputTable {
                               return table;
                           },
-                          [](const UnitTable&, const Table& table) -> OutputTable {
+                          [](UnitTable&&, Table&& table) -> OutputTable {
                               return table;
                           },
                       },
-                      table1, table2);
+                      std::move(table1), std::move(table2));
 }
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
