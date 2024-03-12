@@ -1,5 +1,6 @@
 #include "test_evaluator.hpp"
 
+using namespace pkb; 
 TEST_CASE("Test Evaluator UsesP") {
     const auto& [read_facade, write_facade] = PKB::create_facades();
 

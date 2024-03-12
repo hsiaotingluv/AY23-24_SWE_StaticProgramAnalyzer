@@ -2,6 +2,7 @@
 #include "qps/parser/entities/syntactic_pattern.hpp"
 #include "qps/parser/expression_parser.hpp"
 
+using namespace pkb; 
 TEST_CASE("Test Evaluator Pattern") {
     const auto& [read_facade, write_facade] = PKB::create_facades();
 

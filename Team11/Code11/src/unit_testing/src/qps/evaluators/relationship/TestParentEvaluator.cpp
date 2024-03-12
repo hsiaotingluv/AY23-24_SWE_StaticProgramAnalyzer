@@ -1,6 +1,7 @@
 #include "test_evaluator.hpp"
 
 using namespace qps;
+using namespace pkb; 
 
 TEST_CASE("Test Evaluator Parent") {
     const auto& [read_facade, write_facade] = PKB::create_facades();
