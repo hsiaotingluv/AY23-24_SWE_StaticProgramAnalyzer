@@ -1,5 +1,4 @@
 #include <catch.hpp>
-#include <memory>
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
@@ -606,9 +605,9 @@ TEST_CASE("Modify Test") {
 
         REQUIRE(read_facade->get_statements_that_modify_var("x", StatementType::Read).size() == 1);
         REQUIRE(read_facade->get_statements_that_modify_var("z", StatementType::Call).size() == 1);
-        REQUIRE(read_facade->get_statements_that_modify_var("x", StatementType::Print).size() == 0);
-        REQUIRE(read_facade->get_statements_that_modify_var("a", StatementType::If).size() == 0);
-        REQUIRE(read_facade->get_statements_that_modify_var("b", StatementType::Read).size() == 0);
+        REQUIRE(read_facade->get_statements_that_modify_var("x", StatementType::Print).empty());
+        REQUIRE(read_facade->get_statements_that_modify_var("a", StatementType::If).empty());
+        REQUIRE(read_facade->get_statements_that_modify_var("b", StatementType::Read).empty());
     }
 }
 
@@ -664,9 +663,9 @@ TEST_CASE("Use Test") {
 
         REQUIRE(read_facade->get_statements_that_use_var("x", StatementType::Read).size() == 1);
         REQUIRE(read_facade->get_statements_that_use_var("z", StatementType::Call).size() == 1);
-        REQUIRE(read_facade->get_statements_that_use_var("x", StatementType::Print).size() == 0);
-        REQUIRE(read_facade->get_statements_that_use_var("a", StatementType::If).size() == 0);
-        REQUIRE(read_facade->get_statements_that_use_var("b", StatementType::Read).size() == 0);
+        REQUIRE(read_facade->get_statements_that_use_var("x", StatementType::Print).empty());
+        REQUIRE(read_facade->get_statements_that_use_var("a", StatementType::If).empty());
+        REQUIRE(read_facade->get_statements_that_use_var("b", StatementType::Read).empty());
     }
 }
 
@@ -685,14 +684,14 @@ TEST_CASE("Assignment Pattern Test") {
         REQUIRE(read_facade->get_all_assignments_rhs("2 ").size() == 1);
         REQUIRE(read_facade->get_all_assignments_rhs("x ").size() == 1);
         REQUIRE(read_facade->get_all_assignments_rhs("y ").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_rhs("z ").size() == 0);
+        REQUIRE(read_facade->get_all_assignments_rhs("z ").empty());
 
         // Test exact lhs
         REQUIRE(read_facade->get_all_assignments_lhs("x").size() == 2);
         REQUIRE(read_facade->get_all_assignments_lhs("y").size() == 1);
         REQUIRE(read_facade->get_all_assignments_lhs("z").size() == 1);
         REQUIRE(read_facade->get_all_assignments_lhs("q").size() == 1);
-        REQUIRE(read_facade->get_all_assignments_lhs("p").size() == 0);
+        REQUIRE(read_facade->get_all_assignments_lhs("p").empty());
 
         // Test exact lhs and exact rhs
         REQUIRE(read_facade->get_all_assignments_lhs_rhs("x", "1 ").size() == 2);
@@ -719,7 +718,7 @@ TEST_CASE("Assignment Pattern Test") {
         REQUIRE(read_facade->get_all_assignments_rhs_partial("2 ").size() == 2);
         REQUIRE(read_facade->get_all_assignments_rhs_partial("x ").size() == 1);
         REQUIRE(read_facade->get_all_assignments_rhs_partial("y ").size() == 3);
-        REQUIRE(read_facade->get_all_assignments_rhs_partial("z ").size() == 0);
+        REQUIRE(read_facade->get_all_assignments_rhs_partial("z ").empty());
 
         // Test partial RHS match, exact lhs
         REQUIRE(read_facade->get_all_assignments_lhs_rhs_partial("x", "1 ").size() == 3);
@@ -1096,7 +1095,7 @@ TEST_CASE("If Pattern Test") {
         REQUIRE(read_facade->get_if_stmts_with_var("x").size() == 1);
         REQUIRE(read_facade->get_if_stmts_with_var("y").size() == 1);
         REQUIRE(read_facade->get_if_stmts_with_var("z").size() == 1);
-        REQUIRE(read_facade->get_if_stmts_with_var("a").size() == 0);
+        REQUIRE(read_facade->get_if_stmts_with_var("a").empty());
 
         REQUIRE(read_facade->get_if_stmts_with_var("x").count("1") == 1);
         REQUIRE(read_facade->get_if_stmts_with_var("y").count("2") == 1);
@@ -1130,7 +1129,7 @@ TEST_CASE("If Pattern Test") {
 
         REQUIRE(read_facade->get_vars_in_if("1").size() == 2);
         REQUIRE(read_facade->get_vars_in_if("2").size() == 2);
-        REQUIRE(read_facade->get_vars_in_if("3").size() == 0);
+        REQUIRE(read_facade->get_vars_in_if("3").empty());
 
         REQUIRE(read_facade->get_vars_in_if("1").count("x") == 1);
         REQUIRE(read_facade->get_vars_in_if("1").count("y") == 1);
@@ -1178,7 +1177,7 @@ TEST_CASE("While Pattern Test") {
         REQUIRE(read_facade->get_while_stmts_with_var("x").size() == 1);
         REQUIRE(read_facade->get_while_stmts_with_var("y").size() == 1);
         REQUIRE(read_facade->get_while_stmts_with_var("z").size() == 1);
-        REQUIRE(read_facade->get_while_stmts_with_var("a").size() == 0);
+        REQUIRE(read_facade->get_while_stmts_with_var("a").empty());
 
         REQUIRE(read_facade->get_while_stmts_with_var("x").count("1") == 1);
         REQUIRE(read_facade->get_while_stmts_with_var("y").count("2") == 1);
@@ -1212,7 +1211,7 @@ TEST_CASE("While Pattern Test") {
 
         REQUIRE(read_facade->get_vars_in_while("1").size() == 2);
         REQUIRE(read_facade->get_vars_in_while("2").size() == 2);
-        REQUIRE(read_facade->get_vars_in_while("3").size() == 0);
+        REQUIRE(read_facade->get_vars_in_while("3").empty());
 
         REQUIRE(read_facade->get_vars_in_while("1").count("x") == 1);
         REQUIRE(read_facade->get_vars_in_while("1").count("y") == 1);

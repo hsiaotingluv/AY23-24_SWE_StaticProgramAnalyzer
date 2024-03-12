@@ -99,9 +99,10 @@ void PKB::populate_call_star_from_direct(DirectStore direct_store, StarStore sta
     }
 }
 
+// ReadFacade APIs
 std::unordered_set<std::string> PKB::get_entities() {
     std::unordered_set<std::string> entities;
-    
+
     auto procedures = this->entity_store->get_procedures();
     auto vars = this->entity_store->get_variables();
     auto consts = this->entity_store->get_constants();
@@ -198,7 +199,7 @@ std::unordered_set<std::string> PKB::get_statements_that_modify_var(const std::s
 }
 
 std::unordered_set<std::string> PKB::get_statements_that_modify_var(const std::string& variable,
-                                                                           const StatementType& statement_type) {
+                                                                    const StatementType& statement_type) {
     auto stmts_pool = get_statements_that_modify_var(variable);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -319,7 +320,7 @@ std::unordered_set<std::string> PKB::get_statements_that_use_var(const std::stri
 }
 
 std::unordered_set<std::string> PKB::get_statements_that_use_var(const std::string& variable,
-                                                                        const StatementType& statement_type) {
+                                                                 const StatementType& statement_type) {
     auto stmts_pool = get_statements_that_use_var(variable);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -509,7 +510,7 @@ std::unordered_set<std::string> PKB::get_follows_stars_following(const std::stri
 }
 
 std::unordered_set<std::string> PKB::get_follows_stars_following(const std::string& stmt,
-                                                                        const StatementType& statement_type) const {
+                                                                 const StatementType& statement_type) const {
     auto stmts_pool = get_follows_stars_following(stmt);
 
     return this->filter_by_statement_type(stmts_pool, statement_type);
@@ -520,7 +521,7 @@ std::unordered_set<std::string> PKB::get_follows_stars_by(const std::string& stm
 }
 
 std::unordered_set<std::string> PKB::get_follows_stars_by(const std::string& stmt,
-                                                                 const StatementType& statement_type) const {
+                                                          const StatementType& statement_type) const {
     auto stmts_pool = get_follows_stars_by(stmt);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -556,7 +557,7 @@ std::unordered_set<std::string> PKB::get_children_of(const std::string& parent) 
 }
 
 std::unordered_set<std::string> PKB::get_children_of(const std::string& parent,
-                                                            const StatementType& statement_type) const {
+                                                     const StatementType& statement_type) const {
     auto stmts_pool = get_children_of(parent);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -607,7 +608,7 @@ std::unordered_set<std::string> PKB::get_children_star_of(const std::string& par
 }
 
 std::unordered_set<std::string> PKB::get_children_star_of(const std::string& parent,
-                                                                 const StatementType& statement_type) const {
+                                                          const StatementType& statement_type) const {
     auto stmts_pool = get_children_star_of(parent);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -617,7 +618,7 @@ std::unordered_set<std::string> PKB::get_parent_star_of(const std::string& child
 }
 
 std::unordered_set<std::string> PKB::get_parent_star_of(const std::string& child,
-                                                               const StatementType& statement_type) const {
+                                                        const StatementType& statement_type) const {
     auto stmts_pool = get_parent_star_of(child);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
@@ -752,15 +753,14 @@ std::unordered_set<std::string> PKB::get_all_assignments_lhs(const std::string& 
     return this->assignment_store->get_all_assignments_lhs(v);
 }
 
-std::unordered_set<std::string> PKB::get_all_assignments_lhs_rhs(const std::string& lhs,
-                                                                        const std::string& rhs) {
+std::unordered_set<std::string> PKB::get_all_assignments_lhs_rhs(const std::string& lhs, const std::string& rhs) {
     auto v = Variable(lhs);
 
     return this->assignment_store->get_all_assignments_lhs_rhs(v, rhs);
 }
 
 std::unordered_set<std::string> PKB::get_all_assignments_lhs_rhs_partial(const std::string& lhs,
-                                                                                const std::string& rhs) {
+                                                                         const std::string& rhs) {
     auto v = Variable(lhs);
 
     return this->assignment_store->get_all_assignments_lhs_rhs_partial(v, rhs);
@@ -854,10 +854,86 @@ std::unordered_set<std::tuple<std::string, std::string>> PKB::get_all_while_stmt
     return temp;
 }
 
+// WriteFacade APIs
+void PKB::add_procedure(std::string procedure) {
+    Procedure p = Procedure(std::move(procedure));
+
+    this->entity_store->add_procedure(p);
+}
+
+void PKB::add_variable(std::string variable) {
+    Variable v = Variable(std::move(variable));
+
+    this->entity_store->add_variable(v);
+}
+
+void PKB::add_constant(std::string constant) {
+    Constant c = Constant(std::move(constant));
+
+    this->entity_store->add_constant(c);
+}
+
+void PKB::add_statement(const std::string& statement_number, StatementType statement_type) {
+    this->statement_store->add(statement_number, statement_type);
+}
+
+void PKB::add_statement_modifies_var(const std::string& statement_number, std::string variable) {
+    auto v = Variable(std::move(variable));
+    this->statement_modifies_store->add(statement_number, v);
+}
+
+void PKB::add_procedure_modifies_var(std::string procedure, std::string variable) {
+    auto p = Procedure(std::move(procedure));
+    auto v = Variable(std::move(variable));
+    this->procedure_modifies_store->add(p, v);
+}
+
+void PKB::add_statement_uses_var(const std::string& statement_number, std::string variable) {
+    auto v = Variable(std::move(variable));
+    this->statement_uses_store->add(statement_number, v);
+}
+
+void PKB::add_procedure_uses_var(std::string procedure, std::string variable) {
+    auto p = Procedure(std::move(procedure));
+    auto v = Variable(std::move(variable));
+    this->procedure_uses_store->add(p, v);
+}
+
+void PKB::add_follows(const std::string& stmt1, const std::string& stmt2) {
+    this->direct_follows_store->add(stmt1, stmt2);
+}
+
+void PKB::add_parent(const std::string& parent, const std::string& child) {
+    this->direct_parent_store->add(parent, child);
+}
+
+void PKB::add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs) {
+    auto v = Variable(lhs);
+    this->assignment_store->add_assignment(statement_number, v, rhs);
+}
+
+void PKB::add_if_var(const std::string& statement_number, const std::string& variable) {
+    auto v = Variable(variable);
+    this->if_var_store->add(v, statement_number);
+}
+
+void PKB::add_while_var(const std::string& statement_number, const std::string& variable) {
+    auto v = Variable(variable);
+    this->while_var_store->add(v, statement_number);
+}
+
+void PKB::add_next(const std::string& stmt1, const std::string& stmt2) {
+    this->next_store->add(stmt1, stmt2);
+}
+
+void PKB::add_calls(const std::string& caller, const std::string& callee) {
+    auto caller_procedure = Procedure(caller);
+    auto callee_procedure = Procedure(callee);
+    this->direct_calls_store->add(caller_procedure, callee_procedure);
+}
+
 void PKB::finalise_pkb() {
     populate_star_from_direct(direct_follows_store, follows_star_store);
     populate_star_from_direct(direct_parent_store, parent_star_store);
     populate_call_star_from_direct(direct_calls_store, calls_star_store);
 }
-
-
