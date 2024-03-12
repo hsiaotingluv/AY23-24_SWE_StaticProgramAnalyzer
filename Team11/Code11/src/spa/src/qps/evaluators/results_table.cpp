@@ -17,6 +17,18 @@
 #include <vector>
 
 namespace qps::detail {
+auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
+    auto synonyms = Synonyms{};
+    synonyms.reserve(elems.size());
+    std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms),
+                   [](const auto& elem) -> std::shared_ptr<Synonym> {
+                       return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
+                                             return synonym;
+                                         }},
+                                         elem);
+                   });
+    return synonyms;
+}
 
 auto compare_rows(const std::vector<std::string>& row1, const std::vector<std::string>& row2,
                   const std::vector<int>& idxs) -> bool {
@@ -594,9 +606,51 @@ auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
                       table1, table2);
 }
 
-auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
-    -> std::vector<std::string>;
+    -> std::vector<std::string> {
+    const auto synonyms = detail::to_synonyms(elems);
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& synonym : synonyms) {
+        const auto responses = synonym->scan(read_facade);
+        results.insert(responses.begin(), responses.end());
+    }
+    return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
+    if (table.get_column().empty()) {
+        // Table is empty --> contradiction
+        return {};
+    }
+
+    const auto synonyms = detail::to_synonyms(elems);
+    const auto column = table.get_column();
+    auto column_indices = std::vector<long>{};
+    for (const auto& synonym : synonyms) {
+        const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
+        if (col_idx == static_cast<long>(column.size())) {
+            // Synonym not found in table
+            return {};
+        }
+        column_indices.push_back(col_idx);
+    }
+
+    // All synonyms found in table -> Populate results
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& row : table.get_records()) {
+        auto curr_row = std::vector<std::string>{};
+        for (const auto& col_idx : column_indices) {
+            curr_row.push_back(row.at(col_idx));
+        }
+        const auto str =
+            std::accumulate(curr_row.begin(), curr_row.end(), std::string{""}, [](const auto& a, const auto& b) {
+                return a + " " + b;
+            });
+        results.insert(str.empty() ? "" : str.substr(1));
+    }
+
+    return {results.begin(), results.end()};
+}
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
@@ -616,107 +670,6 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTa
                           },
                       },
                       table, reference);
-}
-
-auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
-    -> std::vector<std::string> {
-    // TODO: Relax this constraint
-    for (const auto& elem : elems) {
-        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
-            throw std::runtime_error("Cannot handle non-synonym elements");
-        }
-    }
-
-    Synonyms synonyms;
-    for (const auto& elem : elems) {
-        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
-    }
-
-    auto results = std::unordered_set<std::string>{};
-    for (const auto& synonym : synonyms) {
-        const auto responses = synonym->scan(read_facade);
-        results.insert(responses.begin(), responses.end());
-    }
-    return {results.begin(), results.end()};
-}
-
-auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
-    if (table.get_column().empty()) {
-        // Table is empty --> contradiction
-        return {};
-    }
-
-    const auto column = table.get_column();
-    const auto record = table.get_records();
-
-    const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
-    if (col_idx == static_cast<long>(column.size())) {
-        // Synonym not found in table
-        return {};
-    }
-
-    auto results = std::unordered_set<std::string>{};
-    for (const auto& row : record) {
-        results.insert(row.at(col_idx));
-    }
-    return {results.begin(), results.end()};
-}
-
-auto project(const Table& table, const Synonyms& synonyms) -> std::vector<std::string> {
-    if (table.get_column().empty()) {
-        // Table is empty --> contradiction
-        return {};
-    }
-
-    const auto column = table.get_column();
-    auto column_indices = std::vector<long>{};
-    for (const auto& synonym : synonyms) {
-        const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
-        if (col_idx == static_cast<long>(column.size())) {
-            // Synonym not found in table
-            return {};
-        }
-        column_indices.push_back(col_idx);
-    }
-
-    // All synonyms found in table -> Populate results
-    auto results = std::unordered_set<std::string>{};
-    for (const auto& row : table.get_records()) {
-        auto curr_row = std::vector<std::string>{};
-        for (const auto& col_idx : column_indices) {
-            curr_row.push_back(row.at(col_idx));
-        }
-        results.insert(std::accumulate(curr_row.begin(), curr_row.end(), std::string{}));
-    }
-
-    return {results.begin(), results.end()};
-}
-
-auto project(const Table& table, const Reference& reference) -> std::vector<std::string> {
-    if (table.get_column().empty()) {
-        // Table is empty --> contradiction
-        return {};
-    }
-
-    return std::visit(overloaded{[](const BooleanReference&) -> std::vector<std::string> {
-                                     return {"True"};
-                                 },
-                                 [&table](const std::vector<Elem>& elems) -> std::vector<std::string> {
-                                     // TODO: Relax this constraint
-                                     for (const auto& elem : elems) {
-                                         if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
-                                             throw std::runtime_error("Cannot handle non-synonym elements");
-                                         }
-                                     }
-
-                                     Synonyms synonyms;
-                                     for (const auto& elem : elems) {
-                                         synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
-                                     }
-
-                                     return project(table, synonyms);
-                                 }},
-                      reference);
 }
 
 void print(const Table& table) {
