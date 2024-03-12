@@ -12,33 +12,23 @@
 
 namespace qps {
 
-auto build_table(const std::shared_ptr<Synonym>& synonym, const std::shared_ptr<pkb::ReadFacade>& read_facade)
-    -> OutputTable {
-    auto table = Table{{synonym}};
-    for (const auto& result : synonym->scan(read_facade)) {
-        table.add_row({result});
-    }
-    return table;
-}
-
 auto build_table(const std::vector<Elem>& elems, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> OutputTable {
-    // TODO: Relax this constraint
-    for (const auto& elem : elems) {
-        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
-            throw std::runtime_error("Cannot handle non-synonym elements");
-        }
-    }
+    auto synonyms = Synonyms{};
+    synonyms.reserve(elems.size());
+    std::for_each(elems.begin(), elems.end(), [&synonyms](const auto& elem) {
+        return std::visit(overloaded{[&synonyms](const std::shared_ptr<Synonym>& synonym) {
+                              synonyms.push_back(synonym);
+                          }},
+                          elem);
+    });
 
-    Synonyms synonyms;
-    for (const auto& elem : elems) {
-        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
-    }
-
-    auto table = Table{synonyms};
+    auto table = Table{};
     for (const auto& synonym : synonyms) {
+        auto curr_table = Table{{synonym}};
         for (const auto& result : synonym->scan(read_facade)) {
-            table.add_row({result});
+            curr_table.add_row({result});
         }
+        table = std::get<Table>(detail::cross_join(table, curr_table));
     }
     return table;
 }
@@ -75,18 +65,20 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 
         if (evaluator == nullptr) {
             std::cerr << "Failed to create evaluator for clause: " << *clause << std::endl;
-            return {};
+            return project(read_facade, Table{}, query_obj.reference);
         }
 
         const auto next_table = evaluator->evaluate();
         if (is_empty(next_table)) {
-            return {};
+            std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
+            return project(read_facade, next_table, query_obj.reference);
         }
 
         curr_table = join(curr_table, next_table);
         if (is_empty(curr_table)) {
             // Conflict detected -> no results
-            return {};
+            std::cerr << "Conflict detected for clause: " << *clause << std::endl;
+            return project(read_facade, curr_table, query_obj.reference);
         }
     }
 
