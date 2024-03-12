@@ -11,7 +11,7 @@
 #include "sp/traverser/traverser.hpp"
 
 TEST_CASE("Usability Test on Next Traverser") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PKB::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     SECTION("Complex Program Code - success") {

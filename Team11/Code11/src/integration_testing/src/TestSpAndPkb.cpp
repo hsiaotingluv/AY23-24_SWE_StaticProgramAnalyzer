@@ -5,7 +5,7 @@
 #include "sp/main.hpp"
 
 TEST_CASE("Test SP and PKB - Basic SPA") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PKB::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     std::string input = R"(procedure main {
@@ -136,7 +136,7 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
 }
 
 TEST_CASE("Test SP and PKB - Advanced SPA") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PKB::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     std::string input = R"(procedure First {
@@ -208,3 +208,4 @@ TEST_CASE("Test SP and PKB - Advanced SPA") {
             REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
         }
     }
+}

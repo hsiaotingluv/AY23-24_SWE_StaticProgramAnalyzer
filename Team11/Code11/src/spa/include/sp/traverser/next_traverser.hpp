@@ -8,7 +8,7 @@
 namespace sp {
 
 class NextTraverser {
-    std::shared_ptr<WriteFacade> write_facade;
+    std::shared_ptr<pkb::WriteFacade> write_facade;
 
   private:
     auto traverse_node(std::shared_ptr<CfgNode> node) -> void;
@@ -17,7 +17,7 @@ class NextTraverser {
     auto traverse_procedure(std::shared_ptr<Cfg> cfg) -> void;
 
   public:
-    explicit NextTraverser(std::shared_ptr<WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
+    explicit NextTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
     auto traverse(ProcMap cfgs) -> void;
 };
 } // namespace sp
