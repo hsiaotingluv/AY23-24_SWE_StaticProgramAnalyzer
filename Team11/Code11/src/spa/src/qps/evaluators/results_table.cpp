@@ -602,11 +602,11 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTa
     -> std::vector<std::string> {
     return std::visit(overloaded{
                           [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
-                              return table.empty() ? std::vector<std::string>{"False"}
-                                                   : std::vector<std::string>{"True"};
+                              return table.empty() ? std::vector<std::string>{"FALSE"}
+                                                   : std::vector<std::string>{"TRUE"};
                           },
                           [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
-                              return {"True"};
+                              return {"TRUE"};
                           },
                           [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               return project(read_facade, elems);
