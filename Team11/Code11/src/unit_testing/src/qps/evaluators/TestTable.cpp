@@ -2,8 +2,6 @@
 
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include <algorithm>
-#include <chrono>
 #include <cstdlib>
 #include <functional>
 #include <memory>
