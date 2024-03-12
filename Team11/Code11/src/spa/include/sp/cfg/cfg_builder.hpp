@@ -6,8 +6,12 @@
 
 namespace sp {
 
-using ProcMap = std::unordered_map<std::string, std::shared_ptr<Cfg>>;        // Map of Procedure Name -> Cfg.
-using StmtNumMap = std::unordered_map<std::string, std::shared_ptr<CfgNode>>; // Map of Statement Number -> CfgNode.
+using ProcMap = std::unordered_map<std::string, std::shared_ptr<Cfg>>; // Map of Procedure Name -> Cfg.
+using StmtNumMap =
+    std::unordered_map<std::string,
+                       std::pair<std::string, std::shared_ptr<CfgNode>>>; // Map of Statement Number -> <ProcName,
+                                                                          // CfgNode>. ProcName helps you identify which
+                                                                          // CFG to traverse.
 
 class CfgBuilder {
   private:
@@ -22,12 +26,13 @@ class CfgBuilder {
     /**
      * @brief Populate the StmtNumMap within a specific Node.
      */
-    auto populate_stmt_num_map_by_node(StatementNumbers stmt_nums, std::shared_ptr<CfgNode> node) -> StatementNumbers;
+    auto populate_stmt_num_map_by_node(const StatementNumbers stmt_nums, const std::string proc_name,
+                                       const std::shared_ptr<CfgNode> node) -> StatementNumbers;
 
     /**
      * @brief Populate the StmtNumMap within a specific procedure.
      */
-    auto populate_stmt_num_map_by_procedure(Graph graph) -> Graph;
+    auto populate_stmt_num_map_by_procedure(const std::string proc_name, const Graph graph) -> Graph;
 
     /**
      * @brief Populate the StmtNumMap after the CFG is built.

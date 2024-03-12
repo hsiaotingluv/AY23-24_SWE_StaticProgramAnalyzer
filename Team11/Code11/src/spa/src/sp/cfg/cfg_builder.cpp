@@ -8,19 +8,20 @@ auto CfgBuilder::create_empty_cfg(const std::string proc_name) -> std::shared_pt
     return cfg;
 };
 
-auto CfgBuilder::populate_stmt_num_map_by_node(const StatementNumbers stmt_nums, const std::shared_ptr<CfgNode> node)
-    -> StatementNumbers {
+auto CfgBuilder::populate_stmt_num_map_by_node(const StatementNumbers stmt_nums, const std::string proc_name,
+                                               const std::shared_ptr<CfgNode> node) -> StatementNumbers {
     for (const auto& stmt_num : stmt_nums) { // Iterate through each statement number.
         const auto stmt_num_str = std::to_string(stmt_num);
-        stmt_num_map.insert(std::make_pair(stmt_num_str, node));
+        const auto node_info = std::make_pair(proc_name, node);
+        stmt_num_map.insert(std::make_pair(stmt_num_str, node_info));
     }
     return stmt_nums;
 }
 
-auto CfgBuilder::populate_stmt_num_map_by_procedure(const Graph graph) -> Graph {
+auto CfgBuilder::populate_stmt_num_map_by_procedure(const std::string proc_name, const Graph graph) -> Graph {
     for (const auto& [node, out_neighbours] : graph) { // Iterate through each CfgNode.
         const auto stmt_nums = node->get();
-        populate_stmt_num_map_by_node(stmt_nums, node);
+        populate_stmt_num_map_by_node(stmt_nums, proc_name, node);
     }
     return graph;
 }
@@ -28,7 +29,7 @@ auto CfgBuilder::populate_stmt_num_map_by_procedure(const Graph graph) -> Graph 
 auto CfgBuilder::populate_stmt_num_map() -> StmtNumMap {
     for (const auto& [proc_name, cfg] : proc_map) { // Iterate through each procedure's Cfg.
         const auto graph = cfg->get_graph();
-        populate_stmt_num_map_by_procedure(graph);
+        populate_stmt_num_map_by_procedure(proc_name, graph);
     }
     return stmt_num_map;
 };

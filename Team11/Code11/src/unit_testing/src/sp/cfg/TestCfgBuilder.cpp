@@ -152,7 +152,8 @@ auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) ->
  * @brief Verify if the StmtNumMap is correctly populated, by crossing check with the statement numbers in the CFGNode
  */
 auto verify_stmt_num_map(const sp::StmtNumMap& stmt_num_map) -> bool {
-    for (const auto& [stmt_num, cfg_node] : stmt_num_map) { // for each StmtNum-CfgNode pair
+    for (const auto& [stmt_num, cfg_node_info] : stmt_num_map) { // for each StmtNum-CfgNode pair
+        auto cfg_node = cfg_node_info.second;
         const auto node_stmt_nums = cfg_node->get();
         if (std::find(node_stmt_nums.begin(), node_stmt_nums.end(), stoi(stmt_num)) ==
             node_stmt_nums.end()) { // If StmtNum (int) does not belong to that CfgNode
