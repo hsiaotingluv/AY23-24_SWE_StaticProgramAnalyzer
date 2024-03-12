@@ -185,27 +185,27 @@ TEST_CASE("Test SP and PKB - Advanced SPA") {
         REQUIRE_FALSE(read_facade->has_next_relation("9", "10"));
         REQUIRE_FALSE(read_facade->has_next_relation("12", "14"));
         REQUIRE_FALSE(read_facade->has_next_relation("12", "15"));
+    }
 
-        SECTION("Test SP and PKB While and If Pattern - success") {
-            auto ast = sp->process(input);
+    SECTION("Test SP and PKB While and If Pattern - success") {
+        auto ast = sp->process(input);
 
-            REQUIRE(read_facade->get_if_stmts_with_var().size() == 1);
-            REQUIRE(read_facade->get_if_stmts_with_var("count").size() == 1);
-            REQUIRE(read_facade->get_if_stmts_with_var("flag").empty());
+        REQUIRE(read_facade->get_if_stmts_with_var().size() == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("count").size() == 1);
+        REQUIRE(read_facade->get_if_stmts_with_var("flag").empty());
 
-            REQUIRE(read_facade->get_while_stmts_with_var().size() == 1);
-            REQUIRE(read_facade->get_while_stmts_with_var("x").size() == 1);
-            REQUIRE(read_facade->get_while_stmts_with_var("y").size() == 1);
-        }
+        REQUIRE(read_facade->get_while_stmts_with_var().size() == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("x").size() == 1);
+        REQUIRE(read_facade->get_while_stmts_with_var("y").size() == 1);
+    }
 
-        SECTION("Test SP and PKB Populate calls - success") {
-            auto ast = sp->process(input);
+    SECTION("Test SP and PKB Populate calls - success") {
+        auto ast = sp->process(input);
 
-            REQUIRE(read_facade->get_all_calls_callers().size() == 2);
-            REQUIRE(read_facade->get_all_calls_callees().size() == 3);
-            REQUIRE(read_facade->get_callees("main").size() == 2);
-            REQUIRE(read_facade->get_callers("main").empty());
-            REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
-        }
+        REQUIRE(read_facade->get_all_calls_callers().size() == 2);
+        REQUIRE(read_facade->get_all_calls_callees().size() == 3);
+        REQUIRE(read_facade->get_callees("main").size() == 2);
+        REQUIRE(read_facade->get_callers("main").empty());
+        REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
     }
 }
