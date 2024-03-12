@@ -1,5 +1,3 @@
-#pragma once
-
 #include "sp/cfg/cfg_builder.hpp"
 
 namespace sp {
