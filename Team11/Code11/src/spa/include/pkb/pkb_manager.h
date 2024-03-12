@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/hashable_tuple.h"
 #include "pkb/stores/calls_store/calls_star_store.h"
 #include "pkb/stores/calls_store/direct_calls_store.h"
 #include "pkb/stores/entity_store.h"
@@ -51,6 +52,49 @@ class PkbManager {
     std::unordered_set<T> filter_by_statement_type(const std::unordered_set<T>& set,
                                                    StatementType statement_type) const {
         return filter_by_statement_type(set, statement_type, identity_fun);
+    }
+
+    template <class T>
+    std::unordered_set<std::string> get_name_list(const std::unordered_set<T>& set) const {
+        std::unordered_set<std::string> temp;
+        for (const T& entity : set) {
+            temp.insert(entity.getName());
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_string_entity_pairs(const std::unordered_set<T>& pairs) {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [s, v] : pairs) {
+            temp.insert(std::make_tuple(s, v.getName()));
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_entity_string_pairs(const std::unordered_set<T>& pairs) {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [v, s] : pairs) {
+            temp.insert(std::make_tuple(s, v.getName()));
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_entity_entity_pairs(const std::unordered_set<T>& pairs) {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [p, v] : pairs) {
+            temp.insert(std::make_tuple(p.getName(), v.getName()));
+        }
+
+        return temp;
     }
 
     PkbManager();

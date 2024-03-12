@@ -12,12 +12,12 @@
 
 using namespace qps;
 
-template <>
-struct std::hash<std::tuple<std::string, std::string>> {
-    auto operator()(const std::tuple<std::string, std::string>& tuple) const -> size_t {
-        return std::hash<std::string>{}(std::get<0>(tuple)) ^ std::hash<std::string>{}(std::get<1>(tuple));
-    }
-};
+//template <>
+//struct std::hash<std::tuple<std::string, std::string>> {
+//    auto operator()(const std::tuple<std::string, std::string>& tuple) const -> size_t {
+//        return std::hash<std::string>{}(std::get<0>(tuple)) ^ std::hash<std::string>{}(std::get<1>(tuple));
+//    }
+//};
 
 template <typename T>
 auto init_column_names(int num_col, std::string value) -> std::vector<std::shared_ptr<Synonym>> {
