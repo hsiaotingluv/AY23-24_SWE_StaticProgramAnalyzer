@@ -1,11 +1,13 @@
-#include "qps/evaluators/query_evaluator.hpp"
 #include "pkb/facades/read_facade.h"
+
+#include "qps/evaluators/query_evaluator.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -28,7 +30,7 @@ auto build_table(const std::vector<Elem>& elems, const std::shared_ptr<pkb::Read
         for (const auto& result : synonym->scan(read_facade)) {
             curr_table.add_row({result});
         }
-        table = std::get<Table>(detail::cross_join(table, curr_table));
+        table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
     }
     return table;
 }
@@ -68,13 +70,13 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
             return project(read_facade, Table{}, query_obj.reference);
         }
 
-        const auto next_table = evaluator->evaluate();
+        auto next_table = evaluator->evaluate();
         if (is_empty(next_table)) {
             std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
             return project(read_facade, next_table, query_obj.reference);
         }
 
-        curr_table = join(curr_table, next_table);
+        curr_table = join(std::move(curr_table), std::move(next_table));
         if (is_empty(curr_table)) {
             // Conflict detected -> no results
             std::cerr << "Conflict detected for clause: " << *clause << std::endl;
