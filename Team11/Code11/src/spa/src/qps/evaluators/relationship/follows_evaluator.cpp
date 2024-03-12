@@ -3,36 +3,9 @@
 namespace qps {
 
 auto FollowsEvaluator::select_eval_method() const {
-    return overloaded{
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_follows(stmt_syn_1, stmt_syn_2);
-        },
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_follows(stmt_syn_1, stmt_num_2);
-        },
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_follows(stmt_syn_1, wild_card_2);
-        },
-        [this](const qps::Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_follows(stmt_num_1, stmt_syn_2);
-        },
-        [this](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_follows(stmt_num_1, stmt_num_2);
-        },
-        [this](const qps::Integer& stmt_num_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_follows(stmt_num_1, wild_card_2);
-        },
-        [this](const qps::WildCard& wild_card_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_follows(wild_card_1, stmt_syn_2);
-        },
-        [this](const qps::WildCard& wild_card_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_follows(wild_card_1, stmt_num_2);
-        },
-
-        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_follows(wild_card_1, wild_card_2);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_follows(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto FollowsEvaluator::evaluate() const -> OutputTable {

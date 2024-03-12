@@ -1,5 +1,3 @@
-#pragma once
-
 #include <utility>
 
 #include "common/cfg/cfg.hpp"
