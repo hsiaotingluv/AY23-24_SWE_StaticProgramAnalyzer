@@ -10,7 +10,8 @@ namespace sp {
  */
 class NullNode : public AstNode {
   public:
-    explicit NullNode() : AstNode(NodeType::EmptyString) {}
+    explicit NullNode() : AstNode(NodeType::EmptyString) {
+    }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;

@@ -11,19 +11,21 @@
 namespace sp {
 
 /**
- * @brief Class to represent Abstract Syntax Node. 
+ * @brief Class to represent Abstract Syntax Node.
  */
 class AstNode {
   public:
     NodeType T;
 
-    explicit AstNode(NodeType T) : T(T) {}
+    explicit AstNode(NodeType T) : T(T) {
+    }
+
     virtual ~AstNode() = default;
-    
+
     /**
      * @brief Retrieves the children of th ASTNode.
      * @return A vector of shared pointers to the children of the ASTNode.
-    */
+     */
     virtual auto get_children() -> std::vector<std::shared_ptr<AstNode>> = 0;
     /**
      * @brief Retrieves the name of the ASTNode.

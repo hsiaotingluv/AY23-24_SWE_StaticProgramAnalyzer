@@ -16,7 +16,9 @@ class BinopNode : public ExprNode {
     std::shared_ptr<ExprNode> left{}, right{};
     std::string operator_token;
 
-    explicit BinopNode(NodeType T, std::string token) : ExprNode(T), operator_token(std::move(token)) {}
+    explicit BinopNode(NodeType T, std::string token) : ExprNode(T), operator_token(std::move(token)) {
+    }
+
     virtual ~BinopNode() = default;
 
     // AstNode methods.
@@ -33,7 +35,8 @@ class BinopNode : public ExprNode {
  */
 class MulNode : public BinopNode {
   public:
-    explicit MulNode() : BinopNode(NodeType::Mul, "*") {}
+    explicit MulNode() : BinopNode(NodeType::Mul, "*") {
+    }
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "MulNode";
@@ -45,7 +48,8 @@ class MulNode : public BinopNode {
  */
 class DivNode : public BinopNode {
   public:
-    explicit DivNode() : BinopNode(NodeType::Div, "/") {}
+    explicit DivNode() : BinopNode(NodeType::Div, "/") {
+    }
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "DivNode";

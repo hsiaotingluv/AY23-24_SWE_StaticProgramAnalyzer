@@ -5,8 +5,8 @@
 namespace sp {
 
 /**
- * @brief LogicalNode is a ASTNode represents a logical operation. 
- */ 
+ * @brief LogicalNode is a ASTNode represents a logical operation.
+ */
 class LogicalNode : public AstNode {
     using AstNode::AstNode;
 };
@@ -14,14 +14,16 @@ class LogicalNode : public AstNode {
 /**
  * @brief LogicalBinaryNode is a ASTNode represents a binary logical operation.
  * @note In short, LogicalBinaryNode represents a generic Logical Expression with 2 operands.
- 
+
  */
 class LogicalBinaryNode : public LogicalNode {
   public:
     std::shared_ptr<AstNode> left{}, right{};
 
     explicit LogicalBinaryNode(sp::NodeType T, std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : LogicalNode(T), left(std::move(left)), right(std::move(right)) {}
+        : LogicalNode(T), left(std::move(left)), right(std::move(right)) {
+    }
+
     virtual ~LogicalBinaryNode() = default;
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -35,7 +37,8 @@ class LogicalBinaryNode : public LogicalNode {
 class LogicalAndNode : public LogicalBinaryNode {
   public:
     explicit LogicalAndNode(std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : LogicalBinaryNode(sp::NodeType::LAnd, std::move(left), std::move(right)) {}
+        : LogicalBinaryNode(sp::NodeType::LAnd, std::move(left), std::move(right)) {
+    }
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "LogicalAndNode";
@@ -48,7 +51,8 @@ class LogicalAndNode : public LogicalBinaryNode {
 class LogicalOrNode : public LogicalBinaryNode {
   public:
     explicit LogicalOrNode(std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : LogicalBinaryNode(sp::NodeType::LOr, std::move(left), std::move(right)) {}
+        : LogicalBinaryNode(sp::NodeType::LOr, std::move(left), std::move(right)) {
+    }
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "LogicalOrNode";
@@ -63,7 +67,8 @@ class LogicalNotNode : public LogicalNode {
     std::shared_ptr<AstNode> cond_expr;
 
     explicit LogicalNotNode(std::shared_ptr<AstNode>& cond_expr)
-        : LogicalNode(sp::NodeType::LNot), cond_expr(cond_expr) {}
+        : LogicalNode(sp::NodeType::LNot), cond_expr(cond_expr) {
+    }
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;

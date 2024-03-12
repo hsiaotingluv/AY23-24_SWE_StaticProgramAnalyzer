@@ -26,7 +26,9 @@ class StatementNode : public AstNode, public DesignEntitiesMixin, public CfgMixi
     std::optional<uint32_t> statement_number;
 
   public:
-    explicit StatementNode(sp::NodeType T) : AstNode(T) {}
+    explicit StatementNode(sp::NodeType T) : AstNode(T) {
+    }
+
     virtual ~StatementNode() = default;
 
     auto set_statement_number(uint32_t statement_number) -> void;
@@ -42,8 +44,9 @@ class ReadNode : public StatementNode, public ModifiesMixin {
     std::shared_ptr<VarNode> var_node;
 
     explicit ReadNode(std::shared_ptr<VarNode> var_node)
-        : StatementNode(sp::NodeType::Read), var_node(std::move(var_node)) {}
-    
+        : StatementNode(sp::NodeType::Read), var_node(std::move(var_node)) {
+    }
+
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;
@@ -59,15 +62,16 @@ class ReadNode : public StatementNode, public ModifiesMixin {
 };
 
 /**
- * @brief PrintNode is an AST Node represents a Print statement. 
+ * @brief PrintNode is an AST Node represents a Print statement.
  */
 class PrintNode : public StatementNode, public UsesMixin {
   public:
     std::shared_ptr<VarNode> var_node;
 
     explicit PrintNode(std::shared_ptr<VarNode> var_node)
-        : StatementNode(sp::NodeType::Print), var_node(std::move(var_node)) {}
-    
+        : StatementNode(sp::NodeType::Print), var_node(std::move(var_node)) {
+    }
+
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;
@@ -89,8 +93,9 @@ class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
   public:
     std::string proc_name;
 
-    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), proc_name(std::move(variable)) {}
-    
+    explicit CallNode(std::string variable) : StatementNode(sp::NodeType::Call), proc_name(std::move(variable)) {
+    }
+
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;
@@ -131,7 +136,8 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
     IfNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<StatementListNode>& then_stmt_list,
            std::shared_ptr<StatementListNode>& else_stmt_list)
         : StatementNode(sp::NodeType::If), cond_expr(cond_expr), then_stmt_list(then_stmt_list),
-          else_stmt_list(else_stmt_list) {}
+          else_stmt_list(else_stmt_list) {
+    }
 
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -144,7 +150,7 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
     auto populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                const std::shared_ptr<ModifyMap>& modify_map)
         -> std::unordered_set<std::string> override;
-    // ParentMixin methods. 
+    // ParentMixin methods.
     auto populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void override;
     // UsesMixin methods.
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
@@ -173,6 +179,7 @@ class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin
     WhileNode(std::shared_ptr<AstNode>& cond_expr, std::shared_ptr<StatementListNode>& stmt_list)
         : StatementNode(sp::NodeType::While), cond_expr(cond_expr), stmt_list(stmt_list) {
     }
+
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;
@@ -208,6 +215,7 @@ class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMi
     AssignmentNode(std::shared_ptr<VarNode> variable, std::shared_ptr<ExprNode> expr)
         : StatementNode(sp::NodeType::Assign), variable(std::move(variable)), expr(std::move(expr)) {
     }
+
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;

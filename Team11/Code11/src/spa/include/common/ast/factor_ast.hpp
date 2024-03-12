@@ -16,7 +16,8 @@ class ConstantNode : public ExprNode, public DesignEntitiesMixin {
   public:
     std::string integer;
 
-    explicit ConstantNode(std::string& integer) : ExprNode(NodeType::Constant), integer(std::move(integer)) {}
+    explicit ConstantNode(std::string& integer) : ExprNode(NodeType::Constant), integer(std::move(integer)) {
+    }
 
     // ExprNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -36,7 +37,8 @@ class VarNode : public ExprNode, public DesignEntitiesMixin {
   public:
     std::string name;
 
-    explicit VarNode(std::string name) : ExprNode(NodeType::Variable), name(std::move(name)) {}
+    explicit VarNode(std::string name) : ExprNode(NodeType::Variable), name(std::move(name)) {
+    }
 
     // ExprNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;

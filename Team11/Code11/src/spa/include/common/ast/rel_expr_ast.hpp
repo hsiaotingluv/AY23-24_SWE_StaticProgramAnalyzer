@@ -12,7 +12,9 @@ class ComparatorNode : public sp::AstNode {
     std::shared_ptr<AstNode> left{}, right{};
 
     explicit ComparatorNode(NodeType T, std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : AstNode(T), left(std::move(left)), right(std::move(right)) {}
+        : AstNode(T), left(std::move(left)), right(std::move(right)) {
+    }
+
     virtual ~ComparatorNode() = default;
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
@@ -26,7 +28,8 @@ class ComparatorNode : public sp::AstNode {
 class GreaterThanNode : public ComparatorNode {
   public:
     explicit GreaterThanNode(std::shared_ptr<AstNode> left, std::shared_ptr<AstNode> right)
-        : ComparatorNode(NodeType::Gt, std::move(left), std::move(right)) {}
+        : ComparatorNode(NodeType::Gt, std::move(left), std::move(right)) {
+    }
 
     [[nodiscard]] auto get_node_name() const -> std::string override {
         return "GreaterThanNode";
