@@ -8,6 +8,7 @@
 #include "pkb/pkb.h"
 #include <unordered_set>
 
+namespace pkb {
 class WriteFacade {
   public:
     typedef std::unordered_set<std::string> StringSet;
@@ -49,3 +50,4 @@ class WriteFacade {
   private:
     std::shared_ptr<PKB> pkb;
 };
+} // namespace pkb

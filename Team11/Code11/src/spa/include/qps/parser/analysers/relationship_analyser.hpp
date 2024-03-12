@@ -13,7 +13,7 @@ class RelationshipAnalyser {
                         const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                         const untyped::UntypedRelationship& relationship) -> std::optional<Relationship> {
         return std::visit(
-            details::untyped_relationship_visitor<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping),
+            detail::untyped_relationship_visitor<StmtStmtList, StmtEntList, EntEntList>(declarations, mapping),
             relationship);
     }
 };

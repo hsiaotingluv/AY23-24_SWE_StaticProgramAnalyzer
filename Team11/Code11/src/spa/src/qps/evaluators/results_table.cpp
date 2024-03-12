@@ -21,7 +21,7 @@ namespace qps::detail {
 auto compare_rows(const std::vector<std::string>& row1, const std::vector<std::string>& row2,
                   const std::vector<int>& idxs) -> bool {
     for (auto idx : idxs) {
-        int compareResult = row1[idx].compare(row2[idx]);
+        const auto compareResult = row1[idx].compare(row2[idx]);
         if (compareResult != 0) {
             return compareResult < 0; // Sort by the i-th column
         }
@@ -440,8 +440,8 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     }
 
     // Step 1: Reorder columns and rows
-    const auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
-    const auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
+    auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
+    auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
 
     auto table1_contents = tableA.get_records();
     auto table2_contents = tableB.get_records();
@@ -595,10 +595,10 @@ auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable {
 }
 
 auto project(const Table& table, const Reference& reference) -> std::vector<std::string>;
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string>;
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
     return std::visit(overloaded{
                           [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
@@ -618,7 +618,7 @@ auto project(const std::shared_ptr<ReadFacade>& read_facade, const OutputTable& 
                       table, reference);
 }
 
-auto project(const std::shared_ptr<ReadFacade>& read_facade, const std::vector<Elem>& elems)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
     -> std::vector<std::string> {
     // TODO: Relax this constraint
     for (const auto& elem : elems) {

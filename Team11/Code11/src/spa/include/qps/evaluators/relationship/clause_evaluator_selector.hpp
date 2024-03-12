@@ -13,7 +13,7 @@
 #include "qps/parser/entities/relationship.hpp"
 
 namespace qps {
-auto clause_evaluator_selector(const std::shared_ptr<ReadFacade>& read_facade) {
+auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
     return overloaded{
 
         [read_facade](const qps::Follows& follows) -> std::shared_ptr<ClauseEvaluator> {

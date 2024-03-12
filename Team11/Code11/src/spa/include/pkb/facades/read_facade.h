@@ -9,6 +9,8 @@
 #include <tuple>
 #include <unordered_set>
 
+namespace pkb {
+
 class ReadFacade {
   public:
     explicit ReadFacade(std::shared_ptr<PKB> pkb);
@@ -204,9 +206,9 @@ class ReadFacade {
     // Calls-related Read Operations
     bool has_calls_relation(const std::string& caller, const std::string& callee) const;
 
-    std::unordered_set<std::string> get_all_calls_values() const;
+    std::unordered_set<std::string> get_all_calls_callees() const;
 
-    std::unordered_set<std::string> get_all_calls_keys() const;
+    std::unordered_set<std::string> get_all_calls_callers() const;
 
     std::unordered_set<std::string> get_callees(const std::string& caller) const;
 
@@ -248,3 +250,4 @@ class ReadFacade {
   private:
     std::shared_ptr<PKB> pkb;
 };
+} // namespace pkb

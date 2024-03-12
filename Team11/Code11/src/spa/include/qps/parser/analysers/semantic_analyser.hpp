@@ -73,7 +73,7 @@ auto analyse(const Synonyms& declarations, const std::unordered_map<std::string,
              const T& element) -> std::optional<Elem> {
     return std::visit(overloaded{[&](const untyped::UntypedSynonym& synonym) -> std::optional<Elem> {
                                      const auto& maybe_synonym =
-                                         details::is_synonym_declared(declarations, mapping, synonym);
+                                         detail::is_synonym_declared(declarations, mapping, synonym);
                                      if (!maybe_synonym.has_value()) {
                                          return std::nullopt;
                                      }
@@ -81,7 +81,7 @@ auto analyse(const Synonyms& declarations, const std::unordered_map<std::string,
                                  },
                                  [&](const untyped::UntypedAttrRef& attr_ref) -> std::optional<Elem> {
                                      const auto& maybe_synonym =
-                                         details::is_synonym_declared(declarations, mapping, attr_ref.synonym);
+                                         detail::is_synonym_declared(declarations, mapping, attr_ref.synonym);
                                      if (!maybe_synonym.has_value()) {
                                          return std::nullopt;
                                      }
@@ -115,7 +115,7 @@ class SemanticAnalyser {
     static auto analyse(const Synonyms& declarations, const UntypedQueryType& untyped_query)
         -> std::variant<Query, SemanticError> {
         // Declarations must be unique
-        const auto& maybe_mapping = details::enforce_unique_declarations(declarations);
+        const auto& maybe_mapping = detail::enforce_unique_declarations(declarations);
         if (!maybe_mapping.has_value()) {
             return SemanticError{"Non-unique mapping"};
         }
@@ -135,7 +135,7 @@ class SemanticAnalyser {
         std::vector<std::shared_ptr<Clause>> validated_clauses;
         for (const auto& clause : clauses) {
             const auto& maybe_validated_clause = std::visit(
-                details::untyped_clause_visitor<RelationshipAnalysersList, PatternAnalysersList>(declarations, mapping),
+                detail::untyped_clause_visitor<RelationshipAnalysersList, PatternAnalysersList>(declarations, mapping),
                 clause);
             if (!maybe_validated_clause.has_value()) {
                 return SemanticError{"Invalid clause"};
@@ -151,7 +151,7 @@ struct ReferenceAnalyser {
     auto operator()(const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
                     const Synonyms& declarations) const {
         return overloaded{[&declarations, &mapping](const untyped::UntypedBoolean&) -> std::optional<Reference> {
-                              const auto maybe_results = details::is_synonym_declared(
+                              const auto maybe_results = detail::is_synonym_declared(
                                   declarations, mapping,
                                   untyped::UntypedSynonym{IDENT{untyped::UntypedBoolean::keyword}});
                               if (maybe_results.has_value()) {

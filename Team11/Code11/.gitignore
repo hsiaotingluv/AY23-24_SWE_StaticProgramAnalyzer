@@ -1,3 +1,7 @@
 # Ignore build folder
 build/
 .vscode/
+
+# Doxygen generated files
+src/spa/docs/html
+src/spa/docs/latex

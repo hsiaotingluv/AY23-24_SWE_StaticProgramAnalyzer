@@ -10,7 +10,7 @@
 
 namespace tokenizer {
 template <typename T>
-class AttrNameTokeniser : public Tokenizer {
+class AttrNameTokeniser final : public Tokenizer {
     static_assert(qps::is_lexable_v<T>, "T must be lexable");
 
   public:
@@ -19,7 +19,7 @@ class AttrNameTokeniser : public Tokenizer {
     }
 };
 
-class QPSAttrNameTokenizer : public Tokenizer {
+class QPSAttrNameTokenizer final : public Tokenizer {
   private:
     static inline const auto tokenizers = []() {
         auto vector = std::array<std::shared_ptr<Tokenizer>, qps::num_elem_v<qps::AttrNameList>>{};

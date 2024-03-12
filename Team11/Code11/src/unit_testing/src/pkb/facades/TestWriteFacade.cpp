@@ -3,6 +3,8 @@
 #include "pkb/pkb.h"
 #include <memory>
 
+using namespace pkb;
+
 // Mock pkb for testing
 class MockPKB : public PKB {};
 
