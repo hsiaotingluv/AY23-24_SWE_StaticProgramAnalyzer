@@ -1,0 +1,175 @@
+1 - generated TC 1
+procedure p; Select p.procName such that Calls*(_,_)
+
+First, Fifth, Second, Fourth, Third, Sixth
+5000
+2 - generated TC 2
+procedure p; procedure q; Select <p.procName,q> such that Calls*(_,"Sixth")
+
+First First, First Second, First Sixth, Fifth First, Third Fifth, Third Second, Sixth Second, Fourth Third, Fifth Third, Third First, Third Fourth, Second Sixth, Third Sixth, Second Fourth, Sixth First, Sixth Fourth, Sixth Fifth, Sixth Third, First Third, Third Third, Fourth Second, Fifth Fourth, First Fifth, Sixth Sixth, Fourth Sixth, Fifth Sixth, Fourth Fifth, First Fourth, Fifth Second, Fourth First, Fourth Fourth, Second Third, Fifth Fifth, Second Second, Second Fifth, Second First
+5000
+3 - generated TC 3
+procedure p; procedure q; Select <p.procName,q> such that Calls*(_,"First")
+
+
+5000
+4 - generated TC 4
+procedure p; Select BOOLEAN such that Calls*("First",_)
+
+TRUE
+5000
+5 - generated TC 5
+procedure p; Select BOOLEAN such that Calls*("Fourth",_)
+
+TRUE
+5000
+6 - generated TC 6
+procedure p; Select p such that Calls*("First","Second")
+
+First, Fifth, Second, Fourth, Third, Sixth
+5000
+7 - generated TC 7
+procedure p; Select p such that Calls*("Sixth","Second")
+
+
+5000
+8 - generated TC 8
+procedure p; Select p such that Calls*(_,p)
+
+Third, Fourth, Sixth, Fifth, Second
+5000
+9 - generated TC 9
+procedure p; Select p such that Calls*(_,p) and Calls*(_,"First")
+
+
+5000
+10 - generated TC 10
+procedure p; Select p.procName such that Calls*("Fifth",p)
+
+Sixth
+5000
+11 - generated TC 11
+procedure p; Select p.procName such that Calls*("Fourth",p)
+
+Sixth, Fifth
+5000
+12 - generated TC 12
+procedure p; Select p.procName such that Calls*(p,_)
+
+First, Fifth, Third, Second, Fourth
+5000
+13 - generated TC 13
+procedure p; variable v; Select p.procName such that Calls*(p,_) with p.procName=v.varName
+
+
+5000
+14 - generated TC 14
+procedure p; Select p.procName such that Calls*(p,"Third")
+
+Second, First
+5000
+15 - generated TC 15
+procedure p; Select p.procName such that Calls*(p, "First")
+
+
+5000
+16 - generated TC 16
+procedure p,q; Select <p,q> such that Calls*(p, q)
+
+First Fifth, Fifth Sixth, Fourth Fifth, First Third, Third Fifth, Third Sixth, First Fourth, Second Fourth, Second Third, Second Fifth, First Sixth, Third Fourth, Second Sixth, First Second, Fourth Sixth
+5000
+17 - generated TC 17
+procedure p,q,z; Select <p,q,z> such that Calls*(p, q) such that Calls*(q,z)
+
+Fourth Fifth Sixth, Second Fifth Sixth, First Fifth Sixth, Third Fifth Sixth, First Fourth Sixth, Second Third Fifth, First Second Third, First Second Fourth, Second Fourth Sixth, First Third Sixth, Third Fourth Fifth, Second Third Sixth, First Second Fifth, First Second Sixth, First Third Fifth, Second Third Fourth, First Fourth Fifth, Third Fourth Sixth, First Third Fourth, Second Fourth Fifth
+5000
+18 - generated TC 18
+procedure p1,p2,p3,p4,p5; Select <p1,p2,p3,p4,p5> such that Calls*(p1, p2) and Calls*(p2,p3) such that Calls*(p3,p4) and Calls*(p4,p5)
+
+First Second Fourth Fifth Sixth, First Third Fourth Fifth Sixth, First Second Third Fourth Sixth, First Second Third Fourth Fifth, Second Third Fourth Fifth Sixth, First Second Third Fifth Sixth
+5000
+19 - generated TC 19
+procedure p1,p2,p3,p4,p5,p6; Select p1 such that Calls*(p1, p2) and Calls*(p2,p3) and Calls*(p3,p4) and Calls*(p4,p5) and Calls*(p5, p6)
+
+First
+5000
+20 - generated TC 20
+procedure p; Select p.procName such that Calls*(p,"Fourth")
+
+Third, Second, First
+5000
+21 - generated TC 21
+procedure p; Select p.procName such that Calls*(p,"Fifth")
+
+First, Fourth, Second, Third
+5000
+22 - generated TC 22
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Third") and Calls*(q, p)
+
+Second First
+5000
+23 - generated TC 23
+procedure p; procedure q; procedure r; Select <p.procName,q,r> such that Calls*(p,"Fourth") and Calls*(q,"Sixth") and Calls*(r, q)
+
+Third Fifth First, Second Third First, First Third First, Second Fifth Fourth, First Fifth Fourth, First Fifth Third, First Fifth Second, First Fourth Second, Second Fifth Third, First Fourth Third, Second Fourth Third, Third Fourth Second, Third Fifth Second, Second Fifth First, First Fifth First, First Fourth First, First Second First, Third Fourth Third, Second Third Second, First Third Second, Second Fourth First, Third Third Second, Second Fourth Second, Third Third First, Third Second First, Second Fifth Second, Third Fourth First, Third Fifth Third, Second Second First, Third Fifth Fourth
+5000
+24 - generated TC 24
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Second") and Calls*(q, p)
+
+
+5000
+25 - generated TC 25
+procedure p; Select p.procName such that Calls*(p,"Fourth") and Calls*(p,"Fifth")
+
+First, Second, Third
+5000
+26 - generated TC 26
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Fifth") and Calls*(q,"Sixth")
+
+First Fifth, Fourth Fifth, Second Fifth, Fourth First, Second First, Third Third, Second Third, Third Fifth, First Third, First First, Fourth Third, Third Second, Fourth Second, Second Second, First Second, Third Fourth, Third First, Fourth Fourth, Second Fourth, First Fourth
+5000
+27 - generated TC 27
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Sixth") and Calls*(q,"Fourth")
+
+First Third, Third First, Second First, Fourth First, Fifth First, Fifth Third, First First, Fourth Third, Third Second, Fifth Second, Third Third, Fourth Second, Second Second, First Second, Second Third
+5000
+28 - generated TC 28
+procedure p1,p2,p3,p4,p5; Select <p1,p2,p3,p4,p5> such that Calls*(p1, p2) and Calls*(p2,p3) and Calls*(p3,p4) and Calls*(p4,p5) and Calls*(p5, p1)
+
+
+5000
+29 - generated TC 29
+procedure p; Select p.procName such that Calls*(p,"Second") and Calls*(p,"Third")
+
+First
+5000
+30 - generated TC 30
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Fifth") and Calls*(q,"Sixth")
+
+First Fifth, Fourth Fifth, Second Fifth, Fourth First, Second First, Third Third, Second Third, Third Fifth, First Third, First First, Fourth Third, Third Second, Fourth Second, Second Second, First Second, Third Fourth, Third First, Fourth Fourth, Second Fourth, First Fourth
+5000
+31 - generated TC 31
+procedure p; procedure q; Select <p.procName,q> such that Calls*(p,"Sixth") and Calls*(q,"Fourth")
+
+First Third, Third First, Second First, Fourth First, Fifth First, Fifth Third, First First, Fourth Third, Third Second, Fifth Second, Third Third, Fourth Second, Second Second, First Second, Second Third
+5000
+32 - generated TC 32
+procedure p1,p2,p3,p4,p5,p6; Select <p1,p2,p3,p4,p5,p6> such that Calls*(p1, p2) and Calls*(p2,p3) and Calls*(p3,p4) and Calls*(p4,p5) and Calls*(p5,p6) and Calls*(p6,p1)
+
+
+5000
+33 - generated TC 33
+procedure p; Select p.procName such that Calls*(p,"Second") and Calls*(p,"Third")
+
+First
+5000
+34 - generated TC 34
+procedure p; procedure q; procedure r; Select <p.procName,q,r> such that Calls*(p,"Second") and Calls*(q,p) and Calls*(r,q)
+
+
+5000
+35 - generated TC 35
+procedure p; procedure q; procedure r; Select <p.procName,q,r> such that Calls*(p,"Third") and Calls*(q,p) and Calls*(r,q)
+
+
+5000
