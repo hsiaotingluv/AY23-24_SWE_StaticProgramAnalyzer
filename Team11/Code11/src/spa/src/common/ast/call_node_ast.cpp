@@ -21,11 +21,11 @@ auto CallNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return "<" + get_node_name() + " stmt_number=\"" + stmt_number + "\" proc_name=\"" + proc_name + "\" />";
 }
 
-auto CallNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto CallNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     write_facade->add_statement(std::to_string(get_statement_number()), StatementType::Call);
 }
 
-auto CallNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+auto CallNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(c,v)
     auto stmt_number = std::to_string(get_statement_number());
@@ -37,7 +37,7 @@ auto CallNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_f
     return modified_vars;
 }
 
-auto CallNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+auto CallNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                  const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(p, v) holds if there is a statement s in p.
     auto stmt_number = std::to_string(get_statement_number());
@@ -46,6 +46,11 @@ auto CallNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facad
         write_facade->add_statement_uses_var(stmt_number, var);
     }
     return var_names_proc_name;
+}
+
+auto CallNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+    auto stmt_num = get_statement_number();
+    cfg->add_stmt_to_node(stmt_num);
 }
 
 } // namespace sp

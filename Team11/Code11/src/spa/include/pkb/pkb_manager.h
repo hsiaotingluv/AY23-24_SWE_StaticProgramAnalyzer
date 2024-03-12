@@ -21,6 +21,7 @@
 #include <tuple>
 
 // Forward declaration of facades
+namespace pkb {
 class ReadFacade;
 class WriteFacade;
 
@@ -401,3 +402,4 @@ class PkbManager {
 
     friend class WriteFacade;
 };
+} // namespace pkb

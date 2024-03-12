@@ -106,7 +106,8 @@ void measure_evaluation(const std::vector<Query>& query_objects, const std::uniq
         for (const auto& result : results) {
             std::cout << result << " ";
         }
-        std::cout << std::endl << std::endl;
+        std::cout << std::endl;
+        std::cout << measured_times_ms.back() << "[ms]" << std::endl << std::endl;
 
         results.clear();
     }

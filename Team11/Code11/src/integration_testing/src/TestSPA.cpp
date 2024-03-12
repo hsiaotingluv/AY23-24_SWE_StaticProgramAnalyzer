@@ -9,6 +9,8 @@
 
 #include <unordered_set>
 
+using namespace pkb;
+
 template <typename T>
 void require_overlap(const T& actual, const std::unordered_set<std::string>& expected) {
     REQUIRE(actual.size() == expected.size());

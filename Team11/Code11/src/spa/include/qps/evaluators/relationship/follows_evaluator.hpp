@@ -9,7 +9,7 @@
 
 namespace qps {
 class FollowsEvaluator : public ClauseEvaluator {
-    std::shared_ptr<ReadFacade> read_facade;
+    std::shared_ptr<pkb::ReadFacade> read_facade;
     Follows follows;
 
     // visitor method to determine which method to employ per clause
@@ -19,43 +19,43 @@ class FollowsEvaluator : public ClauseEvaluator {
 
     // e.g. Follows(s1, s2)
     [[nodiscard]] auto eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> std::optional<Table>;
+                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable;
 
     // e.g. Follows(s1, 3)
     [[nodiscard]] auto eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                                    const qps::Integer& stmt_num_2) const -> std::optional<Table>;
+                                    const qps::Integer& stmt_num_2) const -> OutputTable;
 
     // e.g. Follows(s1, _)
     [[nodiscard]] auto eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::WildCard&) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. Follows(3, s2)
     [[nodiscard]] auto eval_follows(const qps::Integer& stmt_num_1,
-                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> std::optional<Table>;
+                                    const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable;
 
     // e.g. Follows(3, 4)
     [[nodiscard]] auto eval_follows(const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. Follows(3, _)
-    [[nodiscard]] auto eval_follows(const qps::Integer& stmt_num_1, const qps::WildCard&) const -> std::optional<Table>;
+    [[nodiscard]] auto eval_follows(const qps::Integer& stmt_num_1, const qps::WildCard&) const -> OutputTable;
 
     // e.g. Follows(_, s2)
     [[nodiscard]] auto eval_follows(const qps::WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
-        -> std::optional<Table>;
+        -> OutputTable;
 
     // e.g. Follows(_, 3)
-    [[nodiscard]] auto eval_follows(const qps::WildCard&, const qps::Integer& stmt_num_2) const -> std::optional<Table>;
+    [[nodiscard]] auto eval_follows(const qps::WildCard&, const qps::Integer& stmt_num_2) const -> OutputTable;
 
     // e.g. Follows(_, _)
-    [[nodiscard]] auto eval_follows(const qps::WildCard&, const qps::WildCard&) const -> std::optional<Table>;
+    [[nodiscard]] auto eval_follows(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    FollowsEvaluator(std::shared_ptr<ReadFacade> read_facade, Follows follows)
+    FollowsEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Follows follows)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), follows(std::move(follows)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> std::optional<Table> override;
+    [[nodiscard]] auto evaluate() const -> OutputTable override;
 };
 
 } // namespace qps

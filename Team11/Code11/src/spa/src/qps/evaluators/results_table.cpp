@@ -1,23 +1,39 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
+#include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/select.hpp"
+#include "qps/parser/entities/synonym.hpp"
+#include "qps/template_utils.hpp"
 
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <numeric>
-#include <optional>
 #include <set>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 namespace qps::detail {
+auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
+    auto synonyms = Synonyms{};
+    synonyms.reserve(elems.size());
+    std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms),
+                   [](const auto& elem) -> std::shared_ptr<Synonym> {
+                       return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
+                                             return synonym;
+                                         }},
+                                         elem);
+                   });
+    return synonyms;
+}
 
 auto compare_rows(const std::vector<std::string>& row1, const std::vector<std::string>& row2,
                   const std::vector<int>& idxs) -> bool {
     for (auto idx : idxs) {
-        int compareResult = row1[idx].compare(row2[idx]);
+        const auto compareResult = row1[idx].compare(row2[idx]);
         if (compareResult != 0) {
             return compareResult < 0; // Sort by the i-th column
         }
@@ -278,8 +294,8 @@ void nested_loop_join_records(const Table& table1, const Table& table2, Table& n
 }
 
 template <typename ColumnMergeStrategy, typename JoinRecordsStrategy>
-auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_merge_strategy,
-          JoinRecordsStrategy join_records_strategy) -> std::optional<Table> {
+auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strategy,
+          JoinRecordsStrategy join_records_strategy) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -293,10 +309,6 @@ auto join(const Table& table1, const Table& table2, ColumnMergeStrategy column_m
 
     // Step 2: join records
     join_records_strategy(table1, table2, new_table);
-
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
 
     return new_table;
 }
@@ -325,13 +337,13 @@ auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
               });
 }
 
-auto reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
-    for (auto& row : table_contents) {
+void reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
+    std::for_each(table_contents.begin(), table_contents.end(), [&order](auto& row) {
         reorder(row, order);
-    }
+    });
 }
 
-auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table> {
+auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -428,14 +440,10 @@ auto merge_join(const Table& table1, const Table& table2) -> std::optional<Table
         curr_row1++;
     }
 
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
-
     return new_table;
 }
 
-auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
+auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -444,8 +452,8 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
     }
 
     // Step 1: Reorder columns and rows
-    const auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
-    const auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
+    auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
+    auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
 
     auto table1_contents = tableA.get_records();
     auto table2_contents = tableB.get_records();
@@ -458,7 +466,7 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
     if (common_column_idxs.empty()) {
         return cross_join(std::move(tableA), std::move(tableB));
     } else {
-        return merge_join(tableA, tableB);
+        return merge_join(std::move(tableA), std::move(tableB));
     }
 }
 
@@ -467,67 +475,9 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> std::optional<Table> {
  *
  * @param table1
  * @param table2
- * @return std::optional<Table>
+ * @return OutputTable
  */
-auto cross_join(const Table& table1, const Table& table2) -> std::optional<Table> {
-    // Step 0: Short-circuit if either table is empty
-    if (table1.empty()) {
-        return table2;
-    } else if (table2.empty()) {
-        return table1;
-    }
-
-    // Step 1: Reorder columns and rows
-    const auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
-    const auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
-
-    const auto& table1_contents = tableA.get_records();
-    const auto& table2_contents = tableB.get_records();
-    const auto& table1_column_names = tableA.get_column();
-    const auto& table2_column_names = tableB.get_column();
-
-    auto new_column = std::vector<std::shared_ptr<Synonym>>{};
-    new_column.reserve(table1_column_names.size() + table2_column_names.size());
-    new_column.insert(new_column.end(), table1_column_names.begin(), table1_column_names.end());
-    new_column.insert(new_column.end(), table2_column_names.begin(), table2_column_names.end());
-
-    auto new_table = Table{new_column};
-
-    const auto table1_mask = build_mapping(table1_column_names, new_column);
-    const auto table2_mask = build_mapping(table2_column_names, new_column);
-
-    // Step 2: join records
-    for (const auto& record1 : table1_contents) {
-        for (const auto& record2 : table2_contents) {
-            auto new_record = std::vector<std::string>(new_column.size(), "");
-
-            // Populate new_record with values from record1
-            for (int i = 0; i < static_cast<int>(record1.size()); i++) {
-                new_record[table1_mask.at(i)] = record1[i];
-            }
-
-            // Populate new_record with values from record2
-            for (int i = 0; i < static_cast<int>(record2.size()); i++) {
-                new_record[table2_mask.at(i)] = record2[i];
-            }
-            new_table.add_row(new_record);
-        }
-    }
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
-
-    return new_table;
-}
-
-/**
- * @brief Assumes that the input tables have no common column names
- *
- * @param table1
- * @param table2
- * @return std::optional<Table>
- */
-auto cross_join(Table&& table1, Table&& table2) -> std::optional<Table> {
+auto cross_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -563,44 +513,110 @@ auto cross_join(Table&& table1, Table&& table2) -> std::optional<Table> {
             new_table.add_row(new_record);
         }
     }
-    if (new_table.empty()) {
-        return std::nullopt;
-    }
 
     return new_table;
 }
 
-auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> std::optional<Table> {
-    return join(table1, table2, double_pointer_merge, nested_loop_join_records);
+auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTable {
+    return join(std::move(table1), std::move(table2), double_pointer_merge, nested_loop_join_records);
 }
-
 } // namespace qps::detail
 
 namespace qps {
-auto join(const Table& table1, const Table& table2) -> std::optional<Table> {
-    return detail::join(table1, table2, detail::unordered_set_merge, detail::nested_loop_join_records);
+
+auto is_unit(const OutputTable& table) -> bool {
+    return std::holds_alternative<UnitTable>(table);
 }
 
-auto project(const Table& table, const std::shared_ptr<Synonym>& synonym) -> std::vector<std::string> {
+auto is_empty(const OutputTable& table) -> bool {
+    return std::holds_alternative<Table>(table) && std::get<Table>(table).empty();
+}
+
+auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable {
+    return std::visit(overloaded{
+                          [](Table&& table1, Table&& table2) -> OutputTable {
+                              return detail::cross_merge_join(std::move(table1), std::move(table2));
+                          },
+                          [](UnitTable&&, UnitTable&&) -> OutputTable {
+                              return UnitTable{};
+                          },
+                          [](Table&& table, UnitTable&&) -> OutputTable {
+                              return table;
+                          },
+                          [](UnitTable&&, Table&& table) -> OutputTable {
+                              return table;
+                          },
+                      },
+                      std::move(table1), std::move(table2));
+}
+
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const std::vector<Elem>& elems)
+    -> std::vector<std::string> {
+    const auto synonyms = detail::to_synonyms(elems);
+    auto results = std::unordered_set<std::string>{};
+    for (const auto& synonym : synonyms) {
+        const auto responses = synonym->scan(read_facade);
+        results.insert(responses.begin(), responses.end());
+    }
+    return {results.begin(), results.end()};
+}
+
+auto project(const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
     if (table.get_column().empty()) {
         // Table is empty --> contradiction
         return {};
     }
 
+    const auto synonyms = detail::to_synonyms(elems);
     const auto column = table.get_column();
-    const auto record = table.get_records();
-
-    const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
-    if (col_idx == static_cast<long>(column.size())) {
-        // Synonym not found in table
-        return {};
+    auto column_indices = std::vector<long>{};
+    for (const auto& synonym : synonyms) {
+        const auto col_idx = std::find(column.begin(), column.end(), synonym) - column.begin();
+        if (col_idx == static_cast<long>(column.size())) {
+            // Synonym not found in table
+            return {};
+        }
+        column_indices.push_back(col_idx);
     }
 
+    // All synonyms found in table -> Populate results
     auto results = std::unordered_set<std::string>{};
-    for (const auto& row : record) {
-        results.insert(row.at(col_idx));
+    for (const auto& row : table.get_records()) {
+        auto curr_row = std::vector<std::string>{};
+        for (const auto& col_idx : column_indices) {
+            curr_row.push_back(row.at(col_idx));
+        }
+        const auto str =
+            std::accumulate(curr_row.begin(), curr_row.end(), std::string{""}, [](const auto& a, const auto& b) {
+                return a + " " + b;
+            });
+        results.insert(str.empty() ? "" : str.substr(1));
     }
+
     return {results.begin(), results.end()};
+}
+
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+    -> std::vector<std::string> {
+    static constexpr auto TRUE_STRING = "TRUE";
+    static constexpr auto FALSE_STRING = "FALSE";
+
+    return std::visit(overloaded{
+                          [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
+                              return table.empty() ? std::vector<std::string>{FALSE_STRING}
+                                                   : std::vector<std::string>{TRUE_STRING};
+                          },
+                          [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
+                              return {TRUE_STRING};
+                          },
+                          [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(read_facade, elems);
+                          },
+                          [](const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              return project(table, elems);
+                          },
+                      },
+                      table, reference);
 }
 
 void print(const Table& table) {

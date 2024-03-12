@@ -9,11 +9,14 @@
 namespace sp {
 
 class SemanticValidator {
+  public:
     using CallGraph = std::unordered_map<std::string, std::unordered_set<std::string>>;
+
+  private:
     using CallSet = std::unordered_set<std::string>;
     using IndegreeMap = std::unordered_map<std::string, int>;
 
-    CallGraph dependency_graph{};
+    CallGraph dependency_graph{}; // from callee -> callers
     CallSet proc_name_set{};
     IndegreeMap indegree_map{};
 
@@ -23,5 +26,12 @@ class SemanticValidator {
   public:
     explicit SemanticValidator() = default;
     auto validate_get_traversal_order(const std::shared_ptr<AstNode>& program_node) -> std::vector<std::string>;
+
+    /**
+     * @brief The graph is populated after AST validation
+     */
+    auto get_call_graph() const -> const CallGraph& {
+        return dependency_graph;
+    };
 };
 } // namespace sp

@@ -2,8 +2,9 @@
 
 #include "pkb/facades/write_facade.h"
 
+using namespace pkb;
 TEST_CASE("write_facade Test") {
-    auto [read_facade, write_facade] = PkbManager::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
 
     SECTION("add_procedure") {
         REQUIRE_NOTHROW(write_facade->add_procedure("TestProcedure"));

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qps/parser/expression_parser.hpp"
+#include "qps/parser/untyped/entities/attribute.hpp"
 #include "qps/parser/untyped/entities/relationship.hpp"
 #include "qps/parser/untyped/entities/synonym.hpp"
 #include <variant>
@@ -29,19 +30,42 @@ struct UntypedSuchThatClause {
 };
 
 struct UntypedPatternClause {
-    UntypedSynonym assign_synonym;
+  private:
+    static constexpr auto NUM_ARG = 2;
+
+  public:
+    UntypedSynonym synonym;
     UntypedEntRef ent_ref;
     ExpressionSpec expression_spec;
+    int num_arg;
 
-    UntypedPatternClause(UntypedSynonym assign_synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec)
-        : assign_synonym(std::move(assign_synonym)), ent_ref(std::move(ent_ref)),
-          expression_spec(std::move(expression_spec)) {
+    UntypedPatternClause(UntypedSynonym synonym, UntypedEntRef ent_ref, ExpressionSpec expression_spec,
+                         int num_arg = NUM_ARG)
+        : synonym(std::move(synonym)), ent_ref(std::move(ent_ref)), expression_spec(std::move(expression_spec)),
+          num_arg(num_arg) {
     }
 
     auto operator==(const UntypedPatternClause& rhs) const -> bool {
-        return assign_synonym == rhs.assign_synonym && ent_ref == rhs.ent_ref && expression_spec == rhs.expression_spec;
+        return synonym == rhs.synonym && ent_ref == rhs.ent_ref && expression_spec == rhs.expression_spec;
     }
 };
 
-using UntypedClause = std::variant<UntypedSuchThatClause, UntypedPatternClause>;
+struct UntypedWithClause {
+    UntypedRef ref1;
+    UntypedRef ref2;
+
+    UntypedWithClause(UntypedRef ref1, UntypedRef ref2) : ref1(std::move(ref1)), ref2(std::move(ref2)) {
+    }
+
+    auto operator==(const UntypedWithClause& rhs) const -> bool {
+        return ref1 == rhs.ref1 && ref2 == rhs.ref2;
+    }
+
+    friend auto operator<<(std::ostream& os, const UntypedWithClause& clause) -> std::ostream& {
+        os << clause.ref1 << " = " << clause.ref2;
+        return os;
+    }
+};
+
+using UntypedClause = std::variant<UntypedSuchThatClause, UntypedPatternClause, UntypedWithClause>;
 } // namespace qps::untyped

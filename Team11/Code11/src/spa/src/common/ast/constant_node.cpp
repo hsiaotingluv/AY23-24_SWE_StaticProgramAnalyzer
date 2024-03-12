@@ -23,7 +23,7 @@ auto ConstantNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return integer + " ";
 }
 
-auto ConstantNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto ConstantNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     write_facade->add_constant(integer);
 }
 } // namespace sp

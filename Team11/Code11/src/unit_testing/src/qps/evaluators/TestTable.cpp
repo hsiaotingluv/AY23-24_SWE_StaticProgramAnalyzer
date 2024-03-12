@@ -2,8 +2,6 @@
 
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include <algorithm>
-#include <chrono>
 #include <cstdlib>
 #include <functional>
 #include <memory>
@@ -101,14 +99,18 @@ TEST_CASE("Test Join") {
         const auto expected_set = std::unordered_set<std::tuple<std::string, std::string>>{
             {"1", "x"}, {"1", "y"}, {"1", "z"}, {"2", "x"}, {"2", "y"}, {"2", "z"}, {"3", "x"}, {"3", "y"}, {"3", "z"}};
 
-        const auto result = join(table1, table2);
-        REQUIRE(result.has_value());
+        auto table1_variant = OutputTable{table1};
+        const auto result = join(std::move(table1_variant), std::move(table2));
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        REQUIRE(std::holds_alternative<Table>(result));
+        const auto table = std::get<Table>(result);
 
-        auto column = result.value().get_column();
+        auto column = table.get_column();
         const auto ordering = detail::sort_and_get_order(column);
 
         REQUIRE(column == expected_column);
-        auto records = result.value().get_records();
+        auto records = table.get_records();
         REQUIRE(records.size() == expected_set.size());
 
         for (auto& record : records) {
@@ -231,14 +233,14 @@ TEST_CASE("BENCHMARK - Cross Product") {
         // print(table2);
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::cross_join_with_conflict_checks(table1, table2);
+        auto result = detail::cross_join_with_conflict_checks(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-
-        // print(result.value());
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -261,13 +263,14 @@ TEST_CASE("BENCHMARK - Cross Product") {
         }
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::cross_join(table1, table2);
+        auto result = detail::cross_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-        // print(result.value());
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -290,40 +293,14 @@ TEST_CASE("BENCHMARK - Cross Product") {
         }
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::cross_join(std::move(table1), std::move(table2));
+        auto result = detail::merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-
-        timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
-    }
-
-    average = std::accumulate(timings.begin(), timings.end(), 0.0) / num_tries / 1000000.0;
-    std::cout << "\t[cross_join_moved]: " << average << "ms" << std::endl;
-
-    timings.clear();
-    for (int c = 0; c < num_tries; c++) {
-        const auto column1 = init_column_names<VarSynonym>(num_cols, "v");
-        auto table1 = Table{column1};
-        for (int i = 0; i < num_rows; i++) {
-            table1.add_row(init_row(num_cols, "x"));
-        }
-
-        const auto column2 = init_column_names<ConstSynonym>(num_cols, "c");
-        auto table2 = Table{column2};
-        for (int i = 0; i < num_rows; i++) {
-            table2.add_row(init_row(num_cols, "x"));
-        }
-
-        auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::merge_join(table1, table2);
-        auto end = std::chrono::high_resolution_clock::now();
-
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -346,46 +323,20 @@ TEST_CASE("BENCHMARK - Cross Product") {
         }
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::merge_join(std::move(table1), std::move(table2));
-        auto end = std::chrono::high_resolution_clock::now();
-
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
-
-        timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
-    }
-
-    average = std::accumulate(timings.begin(), timings.end(), 0.0) / num_tries / 1000000.0;
-    std::cout << "\t[merge_join_moved]: " << average << "ms" << std::endl;
-
-    timings.clear();
-    for (int c = 0; c < num_tries; c++) {
-        const auto column1 = init_column_names<VarSynonym>(num_cols, "v");
-        auto table1 = Table{column1};
-        for (int i = 0; i < num_rows; i++) {
-            table1.add_row(init_row(num_cols, "x"));
-        }
-
-        const auto column2 = init_column_names<ConstSynonym>(num_cols, "c");
-        auto table2 = Table{column2};
-        for (int i = 0; i < num_rows; i++) {
-            table2.add_row(init_row(num_cols, "x"));
-        }
-
-        auto begin = std::chrono::high_resolution_clock::now();
         auto result = detail::cross_merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols); // No overlapping synonyms
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
 
     average = std::accumulate(timings.begin(), timings.end(), 0.0) / num_tries / 1000000.0;
-    std::cout << "\t[cross_merge_join_moved]: " << average << "ms" << std::endl;
+    std::cout << "\t[cross_merge_join]: " << average << "ms" << std::endl;
 
     std::cout << std::endl;
 }
@@ -451,12 +402,14 @@ TEST_CASE("BENCHMARK - Inner Join") {
         }
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::cross_join_with_conflict_checks(table1, table2);
+        auto result = detail::cross_join_with_conflict_checks(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -515,12 +468,14 @@ TEST_CASE("BENCHMARK - Inner Join") {
         }
 
         auto begin = std::chrono::high_resolution_clock::now();
-        auto result = detail::merge_join(table1, table2);
+        auto result = detail::merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }
@@ -582,9 +537,11 @@ TEST_CASE("BENCHMARK - Inner Join") {
         auto result = detail::cross_merge_join(std::move(table1), std::move(table2));
         auto end = std::chrono::high_resolution_clock::now();
 
-        REQUIRE(result.has_value());
-        REQUIRE(result.value().get_column().size() == 2 * num_cols + num_overlap);
-        REQUIRE(result.value().get_records().size() == num_rows * num_rows / 4);
+        REQUIRE(!is_empty(result));
+        REQUIRE(!is_unit(result));
+        const auto table = std::get<Table>(result);
+        REQUIRE(table.get_column().size() == 2 * num_cols + num_overlap); // No overlapping synonyms
+        REQUIRE(table.get_records().size() == num_rows * num_rows / 4);
 
         timings.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count());
     }

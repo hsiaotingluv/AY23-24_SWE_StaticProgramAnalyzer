@@ -3,6 +3,8 @@
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
+using namespace pkb;
+
 TEST_CASE("Simple Entity Test") {
     SECTION("Procedure Test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
@@ -758,7 +760,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         write_facade->add_calls("Main", "Logger");
         write_facade->add_calls("Helper", "Validator");
 
-        auto calls_keys = read_facade->get_all_calls_keys();
+        auto calls_keys = read_facade->get_all_calls_callers();
 
         REQUIRE(calls_keys.size() == 2);
 
@@ -786,7 +788,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Utils");
 
-        auto callees = read_facade->get_all_calls_values();
+        auto callees = read_facade->get_all_calls_callees();
 
         REQUIRE(callees.size() == 2);
         REQUIRE(callees.find("Main") == callees.end());
@@ -800,7 +802,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Utils", "Logger");
 
-        auto callers = read_facade->get_all_calls_keys();
+        auto callers = read_facade->get_all_calls_callers();
 
         REQUIRE(callers.size() == 2);
         REQUIRE(callers.find("Main") != callers.end());

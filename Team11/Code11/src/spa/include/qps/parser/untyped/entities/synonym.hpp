@@ -23,13 +23,13 @@ struct UntypedSynonym {
         return name.get_value();
     }
 
-    auto operator<<(std::ostream& os) const -> std::ostream& {
-        os << name;
+    friend auto operator<<(std::ostream& os, const UntypedSynonym& synonym) -> std::ostream& {
+        os << synonym.name;
         return os;
     }
 };
 
 using UntypedStmtRef = std::variant<UntypedSynonym, WildCard, Integer>;
 using UntypedEntRef = std::variant<UntypedSynonym, WildCard, QuotedIdent>;
-using UntypedRef = std::variant<UntypedSynonym, WildCard, Integer, QuotedIdent>;
+using UntypedStmtEntRef = std::variant<UntypedSynonym, WildCard, Integer, QuotedIdent>;
 } // namespace qps::untyped

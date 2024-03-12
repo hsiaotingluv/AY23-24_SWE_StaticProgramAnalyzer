@@ -1,35 +1,29 @@
 #pragma once
 
 #include "common/tokeniser/tokenizer.hpp"
+#include "qps/parser/concepts.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/template_utils.hpp"
+
+#include "utils.hpp"
 #include <memory>
 
 namespace tokenizer {
 template <typename T>
-class RelationshipTokeniser : public Tokenizer {
+class RelationshipTokeniser final : public Tokenizer {
+    static_assert(qps::is_lexable_v<T>, "T must be lexable");
+
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
         return tokenize_string(input, T::keyword, TokenType::Relationship);
     }
 };
 
-template <int Index, typename T>
-inline void push_array_rec(T&, qps::TypeList<>) {
-    return;
-}
-
-template <int Index, typename T, typename Head, typename... Tails>
-void push_array_rec(T& vector, qps::TypeList<Head, Tails...>) {
-    vector.at(Index) = std::make_shared<RelationshipTokeniser<Head>>();
-    push_array_rec<Index + 1>(vector, qps::TypeList<Tails...>{});
-}
-
-class QPSRelationshipTokenizer : public Tokenizer {
+class QPSRelationshipTokenizer final : public Tokenizer {
   private:
     static inline const auto tokenizers = []() {
         auto vector = std::array<std::shared_ptr<Tokenizer>, qps::num_elem_v<qps::RelationshipList>>{};
-        push_array_rec<0>(vector, qps::RelationshipList{});
+        push_array_rec<0, RelationshipTokeniser>(vector, qps::RelationshipList{});
         return vector;
     }();
 

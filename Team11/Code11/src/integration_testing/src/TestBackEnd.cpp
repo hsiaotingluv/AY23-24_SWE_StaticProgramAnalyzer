@@ -11,6 +11,8 @@
 #include <memory>
 #include <unordered_set>
 
+using namespace pkb;
+
 TEST_CASE("Test pkb and QPS - Entities") {
     auto [read_facade, write_facade] = PkbManager::create_facades();
     const auto qps_parser = qps::DefaultParser{};

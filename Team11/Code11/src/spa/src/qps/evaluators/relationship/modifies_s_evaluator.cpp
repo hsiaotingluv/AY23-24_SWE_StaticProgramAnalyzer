@@ -4,48 +4,21 @@
 #include "qps/template_utils.hpp"
 
 #include <memory>
-#include <optional>
 
 namespace qps {
 
 auto ModifiesSEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Modifies(s1, v)
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-               const std::shared_ptr<qps::VarSynonym>& var_syn) -> std::optional<Table> {
-            return eval_modifies_s(stmt_synonym, var_syn);
-        },
-        // e.g. Modifies(s1, "v")
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-               const qps::QuotedIdent& identifier) -> std::optional<Table> {
-            return eval_modifies_s(stmt_synonym, identifier);
-        },
-        // e.g. Modifies(s1, _)
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-               const qps::WildCard& wild_card) -> std::optional<Table> {
-            return eval_modifies_s(stmt_synonym, wild_card);
-        },
-        // e.g. Modifies(3, v)
-        [this](const qps::Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var_syn) -> std::optional<Table> {
-            return eval_modifies_s(stmt_num, var_syn);
-        },
-        // e.g. Modifies(3, "v")
-        [this](const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) -> std::optional<Table> {
-            return eval_modifies_s(stmt_num, identifier);
-        },
-        // e.g. Modifies(3, _)
-        [this](const qps::Integer& stmt_num, const qps::WildCard& wild_card) -> std::optional<Table> {
-            return eval_modifies_s(stmt_num, wild_card);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_modifies_s(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
-auto ModifiesSEvaluator::evaluate() const -> std::optional<Table> {
+auto ModifiesSEvaluator::evaluate() const -> OutputTable {
     return std::visit(select_eval_method(), modifies_s.stmt, modifies_s.ent);
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                         const std::shared_ptr<qps::VarSynonym>& var_syn) const
-    -> std::optional<Table> {
+                                         const std::shared_ptr<qps::VarSynonym>& var_syn) const -> OutputTable {
     // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     const auto relevant_variables = var_syn->scan(read_facade);
@@ -63,14 +36,11 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
         }
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-                                         const QuotedIdent& identifier) const -> std::optional<Table> {
+                                         const QuotedIdent& identifier) const -> OutputTable {
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     const auto relevant_stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
 
@@ -82,14 +52,12 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
             table.add_row({stmt});
         }
     }
-    if (table.empty()) {
-        return std::nullopt;
-    }
+
     return table;
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const WildCard&) const
-    -> std::optional<Table> {
+    -> OutputTable {
     // TODO: Improve pkb API: Get all statement that modifies
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     auto table = Table{{stmt_synonym}};
@@ -108,37 +76,30 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
         }
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var_syn) const
-    -> std::optional<Table> {
+    -> OutputTable {
     const auto variables = read_facade->get_vars_modified_by_statement(stmt_num.value);
     auto table = Table{{var_syn}};
     for (const auto& v : variables) {
         table.add_row({v});
     }
 
-    if (table.empty()) {
-        return std::nullopt;
-    }
     return table;
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier) const
-    -> std::optional<Table> {
+auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier) const -> OutputTable {
     const auto does_modify = read_facade->does_statement_modify_var(stmt_num.value, identifier.get_value());
 
     if (!does_modify) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 }
 
-auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard&) const -> std::optional<Table> {
+auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard&) const -> OutputTable {
     auto does_statement_modify_var = false;
     const auto variables = read_facade->get_variables();
     const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
@@ -151,9 +112,9 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard
     }
 
     if (!does_statement_modify_var) {
-        return std::nullopt;
+        return Table{};
     }
-    return Table{};
+    return UnitTable{};
 };
 
 } // namespace qps

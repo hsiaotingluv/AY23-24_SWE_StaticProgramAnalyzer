@@ -2,6 +2,7 @@
 
 #include <utility>
 
+namespace pkb {
 ReadFacade::ReadFacade(std::shared_ptr<PkbManager> pkb) : pkb(std::move(pkb)) {
 }
 
@@ -362,11 +363,11 @@ bool ReadFacade::has_calls_relation(const std::string& caller, const std::string
     return this->pkb->has_calls_relation(caller, callee);
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_calls_values() const {
+std::unordered_set<std::string> ReadFacade::get_all_calls_callees() const {
     return this->pkb->get_all_calls_values();
 }
 
-std::unordered_set<std::string> ReadFacade::get_all_calls_keys() const {
+std::unordered_set<std::string> ReadFacade::get_all_calls_callers() const {
     return this->pkb->get_all_calls_keys();
 }
 
@@ -459,3 +460,4 @@ std::unordered_set<std::string> ReadFacade::get_vars_in_while(const std::string&
 std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_while_stmt_var_pairs() {
     return this->pkb->get_all_while_stmt_var_pairs();
 }
+} // namespace pkb

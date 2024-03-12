@@ -2,6 +2,7 @@
 
 #include <utility>
 
+namespace pkb {
 WriteFacade::WriteFacade(std::shared_ptr<PkbManager> pkb) : pkb(std::move(pkb)) {
 }
 
@@ -68,3 +69,4 @@ void WriteFacade::add_calls(const std::string& caller, const std::string& callee
 void WriteFacade::finalise_pkb() {
     this->pkb->finalise_pkb();
 }
+} // namespace pkb
