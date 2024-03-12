@@ -1,4 +1,18 @@
+#include "common/statement_type.hpp"
 #include "test_evaluator.hpp"
+
+#include "pkb/facades/read_facade.h"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb.h"
+
+#include "qps/evaluators/query_evaluator.hpp"
+#include "qps/parser/entities/clause.hpp"
+#include "qps/parser/entities/synonym.hpp"
+
+#include <memory>
+#include <vector>
+
+using namespace qps;
 
 TEST_CASE("Test Evaluator Entities") {
     SECTION("Evaluate - All Variables") {
@@ -190,10 +204,3 @@ TEST_CASE("Test Evaluator Entities") {
         require_equal(evaluator.evaluate(query), read_strs);
     }
 }
-
-
-
-
-
-
-

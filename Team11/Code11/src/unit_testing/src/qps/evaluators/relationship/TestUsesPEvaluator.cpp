@@ -1,6 +1,20 @@
 #include "test_evaluator.hpp"
 
-using namespace pkb; 
+#include "pkb/facades/read_facade.h"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb.h"
+
+#include "qps/evaluators/query_evaluator.hpp"
+#include "qps/parser/entities/clause.hpp"
+#include "qps/parser/entities/synonym.hpp"
+
+#include <memory>
+#include <vector>
+
+using namespace qps;
+
+using namespace pkb;
+
 TEST_CASE("Test Evaluator UsesP") {
     const auto& [read_facade, write_facade] = PKB::create_facades();
 
@@ -21,15 +35,15 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(p, v)") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                        std::make_shared<VarSynonym>("v"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
-                },
+                std::make_shared<VarSynonym>("v"),
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"proc1", "proc2"});
@@ -37,15 +51,15 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select v such that Uses(p, v)") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                        std::make_shared<VarSynonym>("v"),
-                },
+            Synonyms{
+                std::make_shared<ProcSynonym>("p"),
                 std::make_shared<VarSynonym>("v"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
-                },
+            },
+            std::make_shared<VarSynonym>("v"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"a", "b"});
@@ -53,14 +67,13 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(p, \"a\")") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"proc1"});
@@ -68,14 +81,14 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(p, _)") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"proc1", "proc2"});
@@ -83,14 +96,13 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select v such that Uses(\"p\", v)") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<VarSynonym>("v"),
-                },
+            Synonyms{
                 std::make_shared<VarSynonym>("v"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{QuotedIdent("proc1"), std::make_shared<VarSynonym>("v")}),
-                },
+            },
+            std::make_shared<VarSynonym>("v"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), std::make_shared<VarSynonym>("v")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"a"});
@@ -98,14 +110,13 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(\"p\", \"v\") returns all procedures if true") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{QuotedIdent("proc1"), QuotedIdent("a")}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), QuotedIdent("a")}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"proc1", "proc2", "proc3"});
@@ -113,14 +124,13 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(\"p\", \"v\") returns no procedures if false") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{QuotedIdent("proc3"), QuotedIdent("b")}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), QuotedIdent("b")}),
+            },
         };
 
         REQUIRE(evaluator.evaluate(query).empty());
@@ -128,14 +138,13 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(\"p\", _) returns all procedures if true") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{QuotedIdent("proc1"), WildCard()}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), WildCard()}),
+            },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"proc1", "proc2", "proc3"});
@@ -143,17 +152,15 @@ TEST_CASE("Test Evaluator UsesP") {
 
     SECTION("Evaluate - Select p such that Uses(\"p\", _) returns no procedures if false") {
         const auto query = Query{
-                Synonyms{
-                        std::make_shared<ProcSynonym>("p"),
-                },
+            Synonyms{
                 std::make_shared<ProcSynonym>("p"),
-                std::vector<std::shared_ptr<Clause>>{
-                        std::make_shared<SuchThatClause>(
-                                UsesP{QuotedIdent("proc3"), WildCard()}),
-                },
+            },
+            std::make_shared<ProcSynonym>("p"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), WildCard()}),
+            },
         };
 
         REQUIRE(evaluator.evaluate(query).empty());
     }
-
 }
