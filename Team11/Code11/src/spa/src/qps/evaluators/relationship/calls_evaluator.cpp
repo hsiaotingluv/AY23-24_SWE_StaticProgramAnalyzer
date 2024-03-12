@@ -60,7 +60,7 @@ auto CallsEvaluator::eval_calls(const std::shared_ptr<ProcSynonym> &proc_syn_1,
                                 const std::shared_ptr<ProcSynonym> &proc_syn_2) const -> OutputTable {
     // TODO improve pkb api with get all caller-callee pairs
     auto table = Table{{proc_syn_1, proc_syn_2}};
-    const auto all_callers = read_facade->get_all_calls_keys();
+    const auto all_callers = read_facade->get_all_calls_callers();
     for (const auto& caller : all_callers) {
         const auto callees = read_facade->get_callees(caller);
         for (const auto& callee : callees) {
@@ -83,7 +83,7 @@ auto CallsEvaluator::eval_calls(const std::shared_ptr<ProcSynonym> &proc_syn_1,
 auto CallsEvaluator::eval_calls(const std::shared_ptr<ProcSynonym> &proc_syn_1,
                                 const WildCard &) const -> OutputTable {
     auto table = Table{{proc_syn_1}};
-    const auto all_callers = read_facade->get_all_calls_keys();
+    const auto all_callers = read_facade->get_all_calls_callers();
     for (const auto& caller : all_callers) {
         table.add_row({caller});
     }
@@ -127,7 +127,7 @@ auto CallsEvaluator::eval_calls(const QuotedIdent &quoted_proc_1,
 auto CallsEvaluator::eval_calls(const WildCard &,
                                 const std::shared_ptr<ProcSynonym> &proc_syn_2) const -> OutputTable {
     auto table = Table{{proc_syn_2}};
-    const auto all_callees = read_facade->get_all_calls_values();
+    const auto all_callees = read_facade->get_all_calls_callees();
     for (const auto& callee : all_callees) {
         table.add_row({callee});
     }
@@ -145,9 +145,7 @@ auto CallsEvaluator::eval_calls(const WildCard &,
     return UnitTable{};
 }
 
-auto CallsEvaluator::eval_calls(const WildCard &,
-                                const WildCard &) const -> OutputTable {
-    const auto all_callers = read_facade->get_all_calls_values();
+    const auto all_callers = read_facade->get_all_calls_callees();
 
     if (all_callers.empty()) {
         return Table{};
