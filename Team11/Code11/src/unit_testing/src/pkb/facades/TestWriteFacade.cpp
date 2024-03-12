@@ -3,6 +3,7 @@
 #include "pkb/facades/write_facade.h"
 
 using namespace pkb;
+
 TEST_CASE("write_facade Test") {
     auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
 
