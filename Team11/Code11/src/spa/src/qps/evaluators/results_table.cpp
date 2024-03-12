@@ -535,8 +535,7 @@ auto is_empty(const OutputTable& table) -> bool {
 auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable {
     return std::visit(overloaded{
                           [](Table&& table1, Table&& table2) -> OutputTable {
-                              return detail::join(std::move(table1), std::move(table2), detail::unordered_set_merge,
-                                                  detail::nested_loop_join_records);
+                              return detail::cross_merge_join(std::move(table1), std::move(table2));
                           },
                           [](UnitTable&&, UnitTable&&) -> OutputTable {
                               return UnitTable{};
