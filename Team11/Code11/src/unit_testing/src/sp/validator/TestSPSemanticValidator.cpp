@@ -17,7 +17,9 @@ TEST_CASE("Test SP Semantic Validator") {
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {
         std::make_shared<sp::StmtNumTraverser>(write_facade)};
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, stmt_num_traverser, cfg_builder, design_abstr_traversers};
+    auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
+    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, cfg_builder,
+                                  design_abstr_traversers, next_traverser};
     auto semantic_validator = sp::SemanticValidator();
 
     SECTION("complex program Code 4 - success") {
