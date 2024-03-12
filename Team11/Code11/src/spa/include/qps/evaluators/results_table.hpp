@@ -61,7 +61,7 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
     v = v_copy;
 }
 
-auto join(const OutputTable& table1, const OutputTable& table2) -> OutputTable;
+auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable;
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
 void print(const Table& table);
@@ -79,14 +79,9 @@ auto ordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
                        const std::vector<std::shared_ptr<Synonym>>& column2) -> std::vector<std::shared_ptr<Synonym>>;
 
 // Join strategies
-auto cross_join_with_conflict_checks(const Table& table1, const Table& table2) -> OutputTable;
-
-auto cross_join(const Table& table1, const Table& table2) -> OutputTable;
+auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTable;
 auto cross_join(Table&& table1, Table&& table2) -> OutputTable;
-
-auto merge_join(const Table& table1, const Table& table2) -> OutputTable;
-// auto merge_join(Table&& table1, Table&& table2) -> OutputTable;
-
+auto merge_join(Table&& table1, Table&& table2) -> OutputTable;
 auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable;
 
 } // namespace detail

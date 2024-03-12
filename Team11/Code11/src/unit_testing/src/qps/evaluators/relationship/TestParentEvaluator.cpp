@@ -62,7 +62,7 @@ TEST_CASE("Test Evaluator Parent") {
             std::make_shared<IfSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Parent{std::make_shared<IfSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
             },
         };
 
