@@ -40,12 +40,13 @@ auto insert(std::vector<std::tuple<StatementNumber, StatementNumber>>& rs, const
     }
 }
 
-auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1, const Procedure& p2) -> void {
+auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1, const Procedure& p2)
+    -> void {
     rs.emplace_back(p1, p2);
 }
 
 auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1,
-            const std::unordered_set<Procedure>& p2) -> void {
+                      const std::unordered_set<Procedure>& p2) -> void {
     for (const auto& p : p2) {
         insert_procedure(rs, p1, p);
     }

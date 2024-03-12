@@ -600,7 +600,6 @@ bool ReadFacade::has_calls_star_relation(const std::string& caller, const std::s
     return this->pkb->calls_star_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
 }
 
-
 std::unordered_set<std::string> ReadFacade::get_all_calls_star_values() const {
     auto procedures = this->pkb->calls_star_store->get_all_vals();
 
