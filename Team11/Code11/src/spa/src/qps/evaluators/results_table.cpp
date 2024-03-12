@@ -337,10 +337,10 @@ auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
               });
 }
 
-auto reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
-    for (auto& row : table_contents) {
+void reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
+    std::for_each(table_contents.begin(), table_contents.end(), [&order](auto& row) {
         reorder(row, order);
-    }
+    });
 }
 
 auto merge_join(const Table& table1, const Table& table2) -> OutputTable {
@@ -654,13 +654,16 @@ auto project(const Table& table, const std::vector<Elem>& elems) -> std::vector<
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
+    static constexpr auto TRUE_STRING = "TRUE";
+    static constexpr auto FALSE_STRING = "FALSE";
+
     return std::visit(overloaded{
                           [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
-                              return table.empty() ? std::vector<std::string>{"FALSE"}
-                                                   : std::vector<std::string>{"TRUE"};
+                              return table.empty() ? std::vector<std::string>{FALSE_STRING}
+                                                   : std::vector<std::string>{TRUE_STRING};
                           },
                           [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
-                              return {"TRUE"};
+                              return {TRUE_STRING};
                           },
                           [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               return project(read_facade, elems);
