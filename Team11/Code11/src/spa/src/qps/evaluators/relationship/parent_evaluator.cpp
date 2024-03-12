@@ -3,44 +3,9 @@
 namespace qps {
 
 auto ParentEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Parent(s1, s2)
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-               const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_parent(stmt_syn_1, stmt_syn_2);
-        },
-        // e.g. Parent(s1, 3)
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_parent(stmt_syn_1, stmt_num_2);
-        },
-        // e.g. Parent(s1, _)
-        [this](const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_parent(stmt_syn_1, wild_card_2);
-        },
-        // e.g. Parent(3, s2)
-        [this](const qps::Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_parent(stmt_num_1, stmt_syn_2);
-        },
-        // e.g. Parent(3, 4)
-        [this](const qps::Integer& stmt_num_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_parent(stmt_num_1, stmt_num_2);
-        },
-        // e.g. Parent(3, _)
-        [this](const qps::Integer& stmt_num_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_parent(stmt_num_1, wild_card_2);
-        },
-        // e.g. Parent(_, s2)
-        [this](const qps::WildCard& wild_card_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) -> OutputTable {
-            return eval_parent(wild_card_1, stmt_syn_2);
-        },
-        // e.g. Parent(_, 3)
-        [this](const qps::WildCard& wild_card_1, const qps::Integer& stmt_num_2) -> OutputTable {
-            return eval_parent(wild_card_1, stmt_num_2);
-        },
-        // e.g. Parent(_, _)
-        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_parent(wild_card_1, wild_card_2);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_parent(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto ParentEvaluator::evaluate() const -> OutputTable {

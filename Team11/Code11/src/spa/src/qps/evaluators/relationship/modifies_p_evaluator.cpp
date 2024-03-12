@@ -5,32 +5,9 @@
 namespace qps {
 
 auto ModifiesPEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Modifies(p, v)
-        [this](const std::shared_ptr<ProcSynonym>& proc_synonym,
-               const std::shared_ptr<VarSynonym>& var_synonym) -> OutputTable {
-            return eval_modifies_p(proc_synonym, var_synonym);
-        },
-        // e.g. Modifies(p, "v")
-        [this](const std::shared_ptr<ProcSynonym>& proc_synonym, const qps::QuotedIdent& quoted_var) -> OutputTable {
-            return eval_modifies_p(proc_synonym, quoted_var);
-        },
-        // e.g. Modifies(p, _)
-        [this](const std::shared_ptr<ProcSynonym>& proc_synonym, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_modifies_p(proc_synonym, wild_card);
-        },
-        // e.g. Modifies("p", v)
-        [this](const qps::QuotedIdent& quoted_proc, const std::shared_ptr<VarSynonym>& var_synonym) -> OutputTable {
-            return eval_modifies_p(quoted_proc, var_synonym);
-        },
-        // e.g. Modifies("p", "v")
-        [this](const qps::QuotedIdent& quoted_proc, const qps::QuotedIdent& quoted_var) -> OutputTable {
-            return eval_modifies_p(quoted_proc, quoted_var);
-        },
-        // e.g. Modifies("p", _)
-        [this](const qps::QuotedIdent& quoted_proc, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_modifies_p(quoted_proc, wild_card);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_modifies_p(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto ModifiesPEvaluator::evaluate() const -> OutputTable {

@@ -3,45 +3,9 @@
 namespace qps {
 
 auto CallsEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Calls(p, q)
-        [this](const std::shared_ptr<ProcSynonym>& proc_syn_1,
-               const std::shared_ptr<ProcSynonym>& proc_syn_2) -> OutputTable {
-            return eval_calls(proc_syn_1, proc_syn_2);
-        },
-        // e.g. Calls(p, "q")
-        [this](const std::shared_ptr<ProcSynonym>& proc_syn_1, const QuotedIdent& quoted_proc_2) -> OutputTable {
-            return eval_calls(proc_syn_1, quoted_proc_2);
-        },
-        // e.g. Calls(p, _)
-        [this](const std::shared_ptr<ProcSynonym>& proc_syn_1, const WildCard& wild_card_2) -> OutputTable {
-            return eval_calls(proc_syn_1, wild_card_2);
-        },
-        // e.g. Calls("p", q)
-        [this](const QuotedIdent& quoted_proc_1, const std::shared_ptr<ProcSynonym>& proc_syn_2) -> OutputTable {
-            return eval_calls(quoted_proc_1, proc_syn_2);
-        },
-        // e.g. Calls("p", "q")
-        [this](const QuotedIdent& quoted_proc_1, const QuotedIdent& quoted_proc_2) -> OutputTable {
-            return eval_calls(quoted_proc_1, quoted_proc_2);
-        },
-        // e.g. Calls("p", _)
-        [this](const QuotedIdent& quoted_proc_1, const WildCard& wild_card_2) -> OutputTable {
-            return eval_calls(quoted_proc_1, wild_card_2);
-        },
-        // e.g. Calls(_, q)
-        [this](const WildCard& wild_card_1, const std::shared_ptr<ProcSynonym>& proc_syn_2) -> OutputTable {
-            return eval_calls(wild_card_1, proc_syn_2);
-        },
-        // e.g. Calls(_, "q")
-        [this](const WildCard& wild_card_1, const QuotedIdent& quoted_proc_2) -> OutputTable {
-            return eval_calls(wild_card_1, quoted_proc_2);
-        },
-        // e.g. Calls(_, _)
-        [this](const WildCard& wild_card_1, const WildCard& wild_card_2) -> OutputTable {
-            return eval_calls(wild_card_1, wild_card_2);
-        },
-    };
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_calls(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto CallsEvaluator::evaluate() const -> OutputTable {

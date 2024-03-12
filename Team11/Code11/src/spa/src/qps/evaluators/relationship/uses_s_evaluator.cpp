@@ -1,37 +1,13 @@
 #include "qps/evaluators/relationship/uses_s_evaluator.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include <memory>
-#include <optional>
 
 namespace qps {
 
 auto UsesSEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Uses(a/pn/s, v)
-        [this](const std::shared_ptr<StmtSynonym>& stmt_synonym,
-               const std::shared_ptr<VarSynonym>& var_synonym) -> OutputTable {
-            return eval_uses_s(stmt_synonym, var_synonym);
-        },
-        // e.g. Uses(a/pn/s, "v")
-        [this](const std::shared_ptr<StmtSynonym>& stmt_synonym, const qps::QuotedIdent& quoted_ident) -> OutputTable {
-            return eval_uses_s(stmt_synonym, quoted_ident);
-        },
-        // e.g. Uses(a/pn/s, _)
-        [this](const std::shared_ptr<StmtSynonym>& stmt_synonym, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_uses_s(stmt_synonym, wild_card);
-        },
-        // e.g. Uses(3, v)
-        [this](const qps::Integer& stmt_num, const std::shared_ptr<VarSynonym>& var_synonym) -> OutputTable {
-            return eval_uses_s(stmt_num, var_synonym);
-        },
-        // e.g. Uses(3, "v")
-        [this](const qps::Integer& stmt_num, const qps::QuotedIdent& quoted_ident) -> OutputTable {
-            return eval_uses_s(stmt_num, quoted_ident);
-        },
-        // e.g. Uses(3, _)
-        [this](const qps::Integer& stmt_num, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_uses_s(stmt_num, wild_card);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_uses_s(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto UsesSEvaluator::evaluate() const -> OutputTable {

@@ -2,43 +2,9 @@
 
 namespace qps {
 auto PatternAssignEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. pattern a(x, _"v"_)
-        [this](const std::shared_ptr<Synonym>& synonym, const qps::PartialMatch& partial_match) -> OutputTable {
-            return eval_pattern(synonym, partial_match);
-        },
-        // e.g. pattern a(x, _)
-        [this](const std::shared_ptr<Synonym>& synonym, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_pattern(synonym, wild_card);
-        },
-        // e.g. pattern a("x", _"v"_)
-        [this](const qps::QuotedIdent& quoted_ident, const qps::PartialMatch& partial_match) -> OutputTable {
-            return eval_pattern(quoted_ident, partial_match);
-        },
-        // e.g. pattern a("x", _)
-        [this](const qps::QuotedIdent& quoted_ident, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_pattern(quoted_ident, wild_card);
-        },
-        // e.g. pattern a(_, _"v"_)
-        [this](const qps::WildCard& wild_card, const qps::PartialMatch& partial_match) -> OutputTable {
-            return eval_pattern(wild_card, partial_match);
-        },
-        // e.g. pattern a(_, _)
-        [this](const qps::WildCard& wild_card_1, const qps::WildCard& wild_card_2) -> OutputTable {
-            return eval_pattern(wild_card_1, wild_card_2);
-        },
-        // e.g. pattern a(_, "v")
-        [this](const WildCard& wild_card, const ExactMatch& exact) -> OutputTable {
-            return eval_pattern(wild_card, exact);
-        },
-        // e.g. pattern a(x, "v")
-        [this](const std::shared_ptr<Synonym>& synonym, const ExactMatch& exact) -> OutputTable {
-            return eval_pattern(synonym, exact);
-        },
-        // e.g. pattern a("x", "v")
-        [this](const QuotedIdent& quoted_ident, const ExactMatch& exact) -> OutputTable {
-            return eval_pattern(quoted_ident, exact);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_pattern(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto PatternAssignEvaluator::evaluate() const -> OutputTable {

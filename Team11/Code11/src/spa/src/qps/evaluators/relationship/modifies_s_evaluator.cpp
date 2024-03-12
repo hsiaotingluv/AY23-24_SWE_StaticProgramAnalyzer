@@ -8,33 +8,9 @@
 namespace qps {
 
 auto ModifiesSEvaluator::select_eval_method() const {
-    return overloaded{
-        // e.g. Modifies(s1, v)
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-               const std::shared_ptr<qps::VarSynonym>& var_syn) -> OutputTable {
-            return eval_modifies_s(stmt_synonym, var_syn);
-        },
-        // e.g. Modifies(s1, "v")
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
-               const qps::QuotedIdent& identifier) -> OutputTable {
-            return eval_modifies_s(stmt_synonym, identifier);
-        },
-        // e.g. Modifies(s1, _)
-        [this](const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_modifies_s(stmt_synonym, wild_card);
-        },
-        // e.g. Modifies(3, v)
-        [this](const qps::Integer& stmt_num, const std::shared_ptr<qps::VarSynonym>& var_syn) -> OutputTable {
-            return eval_modifies_s(stmt_num, var_syn);
-        },
-        // e.g. Modifies(3, "v")
-        [this](const qps::Integer& stmt_num, const qps::QuotedIdent& identifier) -> OutputTable {
-            return eval_modifies_s(stmt_num, identifier);
-        },
-        // e.g. Modifies(3, _)
-        [this](const qps::Integer& stmt_num, const qps::WildCard& wild_card) -> OutputTable {
-            return eval_modifies_s(stmt_num, wild_card);
-        }};
+    return overloaded{[this](auto&& arg1, auto&& arg2) -> OutputTable {
+        return eval_modifies_s(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+    }};
 }
 
 auto ModifiesSEvaluator::evaluate() const -> OutputTable {
