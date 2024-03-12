@@ -12,33 +12,23 @@
 
 namespace qps {
 
-auto build_table(const std::shared_ptr<Synonym>& synonym, const std::shared_ptr<pkb::ReadFacade>& read_facade)
-    -> OutputTable {
-    auto table = Table{{synonym}};
-    for (const auto& result : synonym->scan(read_facade)) {
-        table.add_row({result});
-    }
-    return table;
-}
-
 auto build_table(const std::vector<Elem>& elems, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> OutputTable {
-    // TODO: Relax this constraint
-    for (const auto& elem : elems) {
-        if (!std::holds_alternative<std::shared_ptr<Synonym>>(elem)) {
-            throw std::runtime_error("Cannot handle non-synonym elements");
-        }
-    }
+    auto synonyms = Synonyms{};
+    synonyms.reserve(elems.size());
+    std::for_each(elems.begin(), elems.end(), [&synonyms](const auto& elem) {
+        return std::visit(overloaded{[&synonyms](const std::shared_ptr<Synonym>& synonym) {
+                              synonyms.push_back(synonym);
+                          }},
+                          elem);
+    });
 
-    Synonyms synonyms;
-    for (const auto& elem : elems) {
-        synonyms.push_back(std::get<std::shared_ptr<Synonym>>(elem));
-    }
-
-    auto table = Table{synonyms};
+    auto table = Table{};
     for (const auto& synonym : synonyms) {
+        auto curr_table = Table{{synonym}};
         for (const auto& result : synonym->scan(read_facade)) {
-            table.add_row({result});
+            curr_table.add_row({result});
         }
+        table = std::get<Table>(detail::cross_join(table, curr_table));
     }
     return table;
 }
