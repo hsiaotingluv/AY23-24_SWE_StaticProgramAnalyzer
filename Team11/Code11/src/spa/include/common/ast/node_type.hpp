@@ -1,6 +1,10 @@
 #pragma once
 
 namespace sp {
+
+/**
+ * @brief NodeType is an enum class that represents the type of an AST Node.
+ */
 enum class NodeType {
     EmptyString,
 
@@ -44,5 +48,4 @@ enum class NodeType {
     // Program
     Program,
 };
-
 } // namespace sp

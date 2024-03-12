@@ -3,6 +3,10 @@
 #include "common/ast/ast.hpp"
 
 namespace sp {
+
+/**
+ * @brief ProgramNode is an AST Node represents the whole SIMPLE source code.
+ */
 class ProgramNode : public AstNode {
   public:
     std::vector<std::shared_ptr<AstNode>> procedures;
