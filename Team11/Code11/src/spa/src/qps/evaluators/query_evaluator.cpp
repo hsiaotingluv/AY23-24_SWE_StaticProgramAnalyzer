@@ -65,18 +65,20 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 
         if (evaluator == nullptr) {
             std::cerr << "Failed to create evaluator for clause: " << *clause << std::endl;
-            return {};
+            return project(read_facade, Table{}, query_obj.reference);
         }
 
         const auto next_table = evaluator->evaluate();
         if (is_empty(next_table)) {
-            return {};
+            std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
+            return project(read_facade, next_table, query_obj.reference);
         }
 
         curr_table = join(curr_table, next_table);
         if (is_empty(curr_table)) {
             // Conflict detected -> no results
-            return {};
+            std::cerr << "Conflict detected for clause: " << *clause << std::endl;
+            return project(read_facade, curr_table, query_obj.reference);
         }
     }
 
