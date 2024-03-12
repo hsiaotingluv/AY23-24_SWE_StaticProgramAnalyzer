@@ -125,7 +125,7 @@ class SourceProcessor {
         // Step 5. Execute Next Traverser
         next_traverser->traverse(cfgs);
 
-        // Step 5. If writing to pkb, finalise pkb.
+        // Step 6. If writing to pkb, finalise pkb.
         if (write_facade != nullptr) {
             write_facade->finalise_pkb();
         }

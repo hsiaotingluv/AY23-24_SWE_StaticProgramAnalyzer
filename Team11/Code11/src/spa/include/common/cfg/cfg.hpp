@@ -7,15 +7,15 @@
 #include <vector>
 
 namespace sp {
+
+using StatementNumbers = std::vector<int>; // Need to maintain order
+
 /**
  * @brief CfgNode represents a Control Flow Graph's Node.
  * @note If or While CfgNode must have 1 statement number. Otherwise, other CfgNode can have multiple consecutive
  * statement numbers.
  */
 class CfgNode {
-
-    using StatementNumbers = std::vector<int>; // Need to maintain order
-
   private:
     StatementNumbers stmt_nums{};
 
@@ -41,6 +41,10 @@ class CfgNode {
     friend auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream&;
 };
 
+using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>;
+using Graph =
+    std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
+
 /**
  * @brief Cfg represents a Control Flow Graph, a directed graph of CfgNodes.
  * @note There is one Cfg per Procedure.
@@ -52,9 +56,6 @@ class Cfg {
      * For While Statements: OutNeighbours.first is the loop-block node. OutNeighbours.second is next node after the
      * While block.
      */
-    using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>;
-    using Graph =
-        std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
     static inline const OutNeighbours EMPTY_OUTNEIGHBOURS = std::make_pair(nullptr, nullptr);
 
   private:
