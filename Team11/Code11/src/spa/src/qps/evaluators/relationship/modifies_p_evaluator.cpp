@@ -80,7 +80,7 @@ auto ModifiesPEvaluator::eval_modifies_p(const QuotedIdent& quoted_proc, const Q
 
 auto ModifiesPEvaluator::eval_modifies_p(const QuotedIdent& quoted_proc, const WildCard&) const -> OutputTable {
     const auto proc_name_string = quoted_proc.get_value();
-    bool proc_modifies_var = read_facade->does_procedure_modify_any_var(proc_name_string);
+    bool proc_modifies_var = read_facade->contains_procedure_modify_var_key(proc_name_string);
 
     if (!proc_modifies_var) {
         return Table{};

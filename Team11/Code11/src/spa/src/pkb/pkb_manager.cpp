@@ -101,7 +101,7 @@ void PkbManager::populate_call_star_from_direct(DirectStore direct_store, StarSt
 }
 
 // ReadFacade APIs
-std::unordered_set<std::string> PkbManager::get_entities() {
+std::unordered_set<std::string> PkbManager::get_entities() const {
     std::unordered_set<std::string> entities;
 
     auto procedures = this->entity_store->get_procedures();
@@ -121,208 +121,242 @@ std::unordered_set<std::string> PkbManager::get_entities() {
     return entities;
 }
 
-std::unordered_set<std::string> PkbManager::get_procedures() {
+std::unordered_set<std::string> PkbManager::get_procedures() const {
     auto procedures = this->entity_store->get_procedures();
     return this->get_name_list(procedures);
 }
 
-std::unordered_set<std::string> PkbManager::get_variables() {
+std::unordered_set<std::string> PkbManager::get_variables() const {
     auto vars = this->entity_store->get_variables();
     return this->get_name_list(vars);
 }
 
-std::unordered_set<std::string> PkbManager::get_constants() {
+std::unordered_set<std::string> PkbManager::get_constants() const {
     auto consts = this->entity_store->get_constants();
     return this->get_name_list(consts);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_statements() {
+std::unordered_set<std::string> PkbManager::get_all_statements() const {
     return this->statement_store->get_all_keys();
 }
 
-std::unordered_set<std::string> PkbManager::get_assign_statements() {
+std::unordered_set<std::string> PkbManager::get_assign_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::Assign);
 }
 
-std::unordered_set<std::string> PkbManager::get_if_statements() {
+std::unordered_set<std::string> PkbManager::get_if_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::If);
 }
 
-std::unordered_set<std::string> PkbManager::get_while_statements() {
+std::unordered_set<std::string> PkbManager::get_while_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::While);
 }
 
-std::unordered_set<std::string> PkbManager::get_read_statements() {
+std::unordered_set<std::string> PkbManager::get_read_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::Read);
 }
 
-std::unordered_set<std::string> PkbManager::get_print_statements() {
+std::unordered_set<std::string> PkbManager::get_print_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::Print);
 }
 
-std::unordered_set<std::string> PkbManager::get_call_statements() {
+std::unordered_set<std::string> PkbManager::get_call_statements() const {
     return this->statement_store->get_keys_by_val(StatementType::Call);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_modified_by_statement(const std::string& s) {
+std::unordered_set<std::string> PkbManager::get_vars_modified_by_statement(const std::string& s) const {
     auto variables = this->statement_modifies_store->get_vals_by_key(s);
     return this->get_name_list(variables);
 }
 
-std::unordered_set<std::string> PkbManager::get_statements_that_modify_var(const std::string& variable) {
+std::unordered_set<std::string> PkbManager::get_statements_that_modify_var(const std::string& variable) const {
     auto v = Variable(variable);
     return this->statement_modifies_store->get_keys_by_val(v);
 }
 
 std::unordered_set<std::string> PkbManager::get_statements_that_modify_var(const std::string& variable,
-                                                                           const StatementType& statement_type) {
+                                                                           const StatementType& statement_type) const {
     auto stmts_pool = get_statements_that_modify_var(variable);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
 
-bool PkbManager::does_statement_modify_var(const std::string& statement, const std::string& variable) {
-    auto v = Variable(variable);
+bool PkbManager::has_statement_modify_var() const {
+    return this->statement_modifies_store->has_relationship();
+}
 
+bool PkbManager::does_statement_modify_var(const std::string& statement, const std::string& variable) const {
+    auto v = Variable(variable);
     return this->statement_modifies_store->contains_key_val_pair(statement, v);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_statements_that_modify() {
+bool PkbManager::contains_statement_modify_var_key(const std::string& statement_number) const {
+    return this->statement_modifies_store->contains_key(statement_number);
+}
+
+bool PkbManager::contains_statement_modify_var_value(const std::string& variable) const {
+    auto v = Variable(variable);
+    return this->statement_modifies_store->contains_val(v);
+}
+
+std::unordered_set<std::string> PkbManager::get_all_statements_that_modify() const {
     return this->statement_modifies_store->get_all_keys();
 };
 
-std::unordered_set<std::string> PkbManager::get_all_statements_that_modify(const StatementType& statement_type) {
+std::unordered_set<std::string> PkbManager::get_all_statements_that_modify(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_modify();
     return this->filter_by_statement_type(stmts_pool, statement_type);
 };
 
-bool PkbManager::does_statement_modify_any_var(const std::string& statement_number) {
-    return this->statement_modifies_store->contains_key(statement_number);
-}
-
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_modify_pairs() {
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_modify_pairs() const {
     auto pairs = this->statement_modifies_store->get_all_pairs();
     return this->get_tuple_list_from_string_entity_pairs(pairs);
 }
 
 std::unordered_set<std::tuple<std::string, std::string>>
-PkbManager::get_all_statements_and_var_modify_pairs(const StatementType& statement_type) {
+PkbManager::get_all_statements_and_var_modify_pairs(const StatementType& statement_type) const {
     auto pairs = get_all_statements_and_var_modify_pairs();
     return this->filter_by_statement_type(pairs, statement_type, tuple_stmt_no_extractor);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_procedures_that_modify() {
+std::unordered_set<std::string> PkbManager::get_all_procedures_that_modify() const {
     auto procedures = this->procedure_modifies_store->get_all_keys();
     return this->get_name_list(procedures);
 }
 
-bool PkbManager::does_procedure_modify_any_var(const std::string& procedure) {
-    auto p = Procedure(procedure);
-    return this->procedure_modifies_store->contains_key(p);
+bool PkbManager::has_procedure_modify_var() const {
+    return this->procedure_modifies_store->has_relationship();
 }
 
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_procedures_and_var_modify_pairs() {
-    auto pairs = this->procedure_modifies_store->get_all_pairs();
-    return this->get_tuple_list_from_entity_entity_pairs(pairs);
-}
-
-std::unordered_set<std::string> PkbManager::get_vars_modified_by_procedure(const std::string& procedure) {
-    auto p = Procedure(procedure);
-    auto variables = this->procedure_modifies_store->get_vals_by_key(p);
-    return this->get_name_list(variables);
-}
-
-std::unordered_set<std::string> PkbManager::get_procedures_that_modify_var(const std::string& variable) {
-    auto v = Variable(variable);
-    auto procedures = this->procedure_modifies_store->get_keys_by_val(v);
-    return this->get_name_list(procedures);
-}
-
-bool PkbManager::does_procedure_modify_var(const std::string& procedure, const std::string& variable) {
+bool PkbManager::does_procedure_modify_var(const std::string& procedure, const std::string& variable) const {
     auto v = Variable(variable);
     auto p = Procedure(procedure);
     return this->procedure_modifies_store->contains_key_val_pair(p, v);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_used_by_statement(const std::string& s) {
+bool PkbManager::contains_procedure_modify_var_key(const std::string& procedure) const {
+    auto p = Procedure(procedure);
+    return this->procedure_modifies_store->contains_key(p);
+}
+
+bool PkbManager::contains_procedure_modify_var_value(const std::string& variable) const {
+    auto v = Variable(variable);
+    return this->procedure_modifies_store->contains_val(v);
+}
+
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_procedures_and_var_modify_pairs() const {
+    auto pairs = this->procedure_modifies_store->get_all_pairs();
+    return this->get_tuple_list_from_entity_entity_pairs(pairs);
+}
+
+std::unordered_set<std::string> PkbManager::get_vars_modified_by_procedure(const std::string& procedure) const {
+    auto p = Procedure(procedure);
+    auto variables = this->procedure_modifies_store->get_vals_by_key(p);
+    return this->get_name_list(variables);
+}
+
+std::unordered_set<std::string> PkbManager::get_procedures_that_modify_var(const std::string& variable) const {
+    auto v = Variable(variable);
+    auto procedures = this->procedure_modifies_store->get_keys_by_val(v);
+    return this->get_name_list(procedures);
+}
+
+std::unordered_set<std::string> PkbManager::get_vars_used_by_statement(const std::string& s) const {
     auto variables = this->statement_uses_store->get_vals_by_key(s);
     return this->get_name_list(variables);
 }
 
-std::unordered_set<std::string> PkbManager::get_statements_that_use_var(const std::string& variable) {
+std::unordered_set<std::string> PkbManager::get_statements_that_use_var(const std::string& variable) const {
     auto v = Variable(variable);
     return this->statement_uses_store->get_keys_by_val(v);
 }
 
 std::unordered_set<std::string> PkbManager::get_statements_that_use_var(const std::string& variable,
-                                                                        const StatementType& statement_type) {
+                                                                        const StatementType& statement_type) const {
     auto stmts_pool = get_statements_that_use_var(variable);
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
 
-bool PkbManager::does_statement_use_var(const std::string& statement, const std::string& variable) {
+bool PkbManager::has_statement_use_var() const {
+    return this->statement_uses_store->has_relationship();
+}
+
+bool PkbManager::does_statement_use_var(const std::string& statement, const std::string& variable) const {
     auto v = Variable(variable);
     return this->statement_uses_store->contains_key_val_pair(statement, v);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_used_by_procedure(const std::string& procedure) {
+bool PkbManager::contains_statement_use_var_key(const std::string& statement_number) const {
+    return this->statement_uses_store->contains_key(statement_number);
+}
+
+bool PkbManager::contains_statement_use_var_value(const std::string& variable) const {
+    auto v = Variable(variable);
+    return this->statement_uses_store->contains_val(v);
+}
+
+std::unordered_set<std::string> PkbManager::get_vars_used_by_procedure(const std::string& procedure) const {
     auto p = Procedure(procedure);
     auto variables = this->procedure_uses_store->get_vals_by_key(p);
     return this->get_name_list(variables);
 }
 
-std::unordered_set<std::string> PkbManager::get_procedures_that_use_var(const std::string& variable) {
+std::unordered_set<std::string> PkbManager::get_procedures_that_use_var(const std::string& variable) const {
     auto v = Variable(variable);
     auto procedures = this->procedure_uses_store->get_keys_by_val(v);
     return this->get_name_list(procedures);
 }
 
-bool PkbManager::does_procedure_use_var(const std::string& procedure, const std::string& variable) {
+bool PkbManager::has_procedure_use_var() const {
+    return this->procedure_uses_store->has_relationship();
+}
+
+bool PkbManager::does_procedure_use_var(const std::string& procedure, const std::string& variable) const {
     auto v = Variable(variable);
     auto p = Procedure(procedure);
     return this->procedure_uses_store->contains_key_val_pair(p, v);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_statements_that_use() {
+bool PkbManager::contains_procedure_use_var_key(const std::string& procedure) const {
+    auto p = Procedure(procedure);
+    return this->procedure_uses_store->contains_key(p);
+}
+
+bool PkbManager::contains_procedure_use_var_value(const std::string& variable) const {
+    auto v = Variable(variable);
+    return this->procedure_uses_store->contains_val(v);
+}
+
+std::unordered_set<std::string> PkbManager::get_all_statements_that_use() const {
     return this->statement_uses_store->get_all_keys();
 };
 
-std::unordered_set<std::string> PkbManager::get_all_statements_that_use(const StatementType& statement_type) {
+std::unordered_set<std::string> PkbManager::get_all_statements_that_use(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_use();
     return this->filter_by_statement_type(stmts_pool, statement_type);
 };
 
-bool PkbManager::does_statement_use_any_var(const std::string& statement_number) {
-    return this->statement_uses_store->contains_key(statement_number);
-}
-
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_use_pairs() {
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_use_pairs() const {
     auto pairs = this->statement_uses_store->get_all_pairs();
     return this->get_tuple_list_from_string_entity_pairs(pairs);
 }
 
 std::unordered_set<std::tuple<std::string, std::string>>
-PkbManager::get_all_statements_and_var_use_pairs(const StatementType& statement_type) {
+PkbManager::get_all_statements_and_var_use_pairs(const StatementType& statement_type) const {
     auto pairs = get_all_statements_and_var_use_pairs();
     return this->filter_by_statement_type(pairs, statement_type, tuple_stmt_no_extractor);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_procedures_that_use() {
+std::unordered_set<std::string> PkbManager::get_all_procedures_that_use() const {
     auto procedures = this->procedure_uses_store->get_all_keys();
     return this->get_name_list(procedures);
 }
 
-bool PkbManager::does_procedure_use_any_var(const std::string& procedure) {
-    auto p = Procedure(procedure);
-    return this->procedure_uses_store->contains_key(p);
-}
-
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_procedures_and_var_use_pairs() {
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_procedures_and_var_use_pairs() const {
     auto pairs = this->procedure_uses_store->get_all_pairs();
     return this->get_tuple_list_from_entity_entity_pairs(pairs);
 }
 
 std::unordered_map<std::string, std::string> PkbManager::get_all_follows() const {
-    //    return this->follows_store->get_all_follows();
     return this->direct_follows_store->get_all();
 }
 
@@ -344,8 +378,20 @@ std::unordered_set<std::string> PkbManager::get_all_follows_values(const Stateme
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
 
+bool PkbManager::has_follows_relation() const {
+    return this->direct_follows_store->has_relationship();
+}
+
 bool PkbManager::has_follows_relation(const std::string& stmt1, const std::string& stmt2) const {
     return this->direct_follows_store->contains_key_val_pair(stmt1, stmt2);
+}
+
+bool PkbManager::contains_follows_key(const std::string& stmt) const {
+    return this->direct_follows_store->contains_key(stmt);
+}
+
+bool PkbManager::contains_follows_value(const std::string& stmt) const {
+    return this->direct_follows_store->contains_val(stmt);
 }
 
 std::string PkbManager::get_statement_following(const std::string& s) const {
@@ -376,8 +422,20 @@ std::string PkbManager::get_statement_followed_by(const std::string& s, const St
     return "";
 }
 
+bool PkbManager::has_follows_star_relation() const {
+    return this->follows_star_store->has_relationship();
+}
+
 bool PkbManager::has_follows_star_relation(const std::string& stmt1, const std::string& stmt2) const {
     return this->follows_star_store->contains_key_val_pair(stmt1, stmt2);
+}
+
+bool PkbManager::contains_follows_star_key(const std::string& stmt) const {
+    return this->follows_star_store->contains_key(stmt);
+}
+
+bool PkbManager::contains_follows_star_value(const std::string& stmt) const {
+    return this->follows_star_store->contains_val(stmt);
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_follows_star() const {
@@ -422,8 +480,20 @@ std::unordered_set<std::string> PkbManager::get_follows_stars_by(const std::stri
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
 
+bool PkbManager::has_parent_relation() const {
+    return this->direct_parent_store->has_relationship();
+}
+
 bool PkbManager::has_parent_relation(const std::string& parent, const std::string& child) const {
     return this->direct_parent_store->contains_key_val_pair(parent, child);
+}
+
+bool PkbManager::contains_parent_key(const std::string& stmt) const {
+    return this->follows_star_store->contains_key(stmt);
+}
+
+bool PkbManager::contains_parent_value(const std::string& stmt) const {
+    return this->follows_star_store->contains_val(stmt);
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_parent() const {
@@ -472,8 +542,20 @@ std::string PkbManager::get_parent_of(const std::string& child, const StatementT
     return "";
 }
 
+bool PkbManager::has_parent_star_relation() const {
+    return this->parent_star_store->has_relationship();
+}
+
 bool PkbManager::has_parent_star_relation(const std::string& parent, const std::string& child) const {
     return this->parent_star_store->contains_key_val_pair(parent, child);
+}
+
+bool PkbManager::contains_parent_star_key(const std::string& parent) const {
+    return this->parent_star_store->contains_key(parent);
+}
+
+bool PkbManager::contains_parent_star_value(const std::string& child) const {
+    return this->parent_star_store->contains_val(child);
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_parent_star() const {
@@ -518,8 +600,20 @@ std::unordered_set<std::string> PkbManager::get_parent_star_of(const std::string
     return this->filter_by_statement_type(stmts_pool, statement_type);
 }
 
+bool PkbManager::has_next_relation() const {
+    return this->next_store->has_relationship();
+}
+
 bool PkbManager::has_next_relation(const std::string& before, const std::string& after) const {
     return this->next_store->contains_key_val_pair(before, after);
+}
+
+bool PkbManager::contains_next_key(const std::string& before) const {
+    return this->next_store->contains_key(before);
+}
+
+bool PkbManager::contains_next_value(const std::string& after) const {
+    return this->next_store->contains_val(after);
 }
 
 std::unordered_set<std::string> PkbManager::get_all_next_keys() const {
@@ -538,8 +632,20 @@ std::unordered_set<std::string> PkbManager::get_previous_of(const std::string& a
     return this->next_store->get_keys_by_val(after);
 }
 
+bool PkbManager::has_calls_relation() const {
+    return this->direct_calls_store->has_relationship();
+}
+
 bool PkbManager::has_calls_relation(const std::string& caller, const std::string& callee) const {
     return this->direct_calls_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
+}
+
+bool PkbManager::contains_calls_key(const std::string& caller) const {
+    return this->direct_calls_store->contains_key(Procedure(caller));
+}
+
+bool PkbManager::contains_calls_value(const std::string& callee) const {
+    return this->direct_calls_store->contains_val(Procedure(callee));
 }
 
 std::unordered_set<std::string> PkbManager::get_all_calls_values() const {
@@ -562,8 +668,20 @@ std::unordered_set<std::string> PkbManager::get_callers(const std::string& calle
     return this->get_name_list(procedures);
 }
 
+bool PkbManager::has_calls_star_relation() const {
+    return this->calls_star_store->has_relationship();
+}
+
 bool PkbManager::has_calls_star_relation(const std::string& caller, const std::string& callee) const {
     return this->calls_star_store->contains_key_val_pair(Procedure(caller), Procedure(callee));
+}
+
+bool PkbManager::contains_calls_star_key(const std::string& caller) const {
+    return this->calls_star_store->contains_key(Procedure(caller));
+}
+
+bool PkbManager::contains_calls_star_value(const std::string& callee) const {
+    return this->calls_star_store->contains_val(Procedure(callee));
 }
 
 std::unordered_set<std::string> PkbManager::get_all_calls_star_values() const {
@@ -586,75 +704,75 @@ std::unordered_set<std::string> PkbManager::get_star_callers(const std::string& 
     return this->get_name_list(procedures);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_assignments_rhs(const std::string& rhs) {
+std::unordered_set<std::string> PkbManager::get_all_assignments_rhs(const std::string& rhs) const {
     return this->assignment_store->get_all_assignments_rhs(rhs);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_assignments_rhs_partial(const std::string& rhs) {
+std::unordered_set<std::string> PkbManager::get_all_assignments_rhs_partial(const std::string& rhs) const {
     return this->assignment_store->get_all_assignments_rhs_partial(rhs);
 }
 
-std::unordered_set<std::string> PkbManager::get_all_assignments_lhs(const std::string& lhs) {
+std::unordered_set<std::string> PkbManager::get_all_assignments_lhs(const std::string& lhs) const {
     auto v = Variable(lhs);
     return this->assignment_store->get_all_assignments_lhs(v);
 }
 
 std::unordered_set<std::string> PkbManager::get_all_assignments_lhs_rhs(const std::string& lhs,
-                                                                        const std::string& rhs) {
+                                                                        const std::string& rhs) const {
     auto v = Variable(lhs);
     return this->assignment_store->get_all_assignments_lhs_rhs(v, rhs);
 }
 
 std::unordered_set<std::string> PkbManager::get_all_assignments_lhs_rhs_partial(const std::string& lhs,
-                                                                                const std::string& rhs) {
+                                                                                const std::string& rhs) const {
     auto v = Variable(lhs);
     return this->assignment_store->get_all_assignments_lhs_rhs_partial(v, rhs);
 }
 
-std::unordered_set<std::string> PkbManager::get_if_stmts_with_var() {
+std::unordered_set<std::string> PkbManager::get_if_stmts_with_var() const {
     return this->if_var_store->get_all_vals();
 }
 
-std::unordered_set<std::string> PkbManager::get_if_stmts_with_var(const std::string& variable) {
+std::unordered_set<std::string> PkbManager::get_if_stmts_with_var(const std::string& variable) const {
     auto v = Variable(variable);
     return this->if_var_store->get_vals_by_key(v);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_in_any_if() {
+std::unordered_set<std::string> PkbManager::get_vars_in_any_if() const {
     auto temp = this->if_var_store->get_all_keys();
     return this->get_name_list(temp);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_in_if(const std::string& if_stmt) {
+std::unordered_set<std::string> PkbManager::get_vars_in_if(const std::string& if_stmt) const {
     auto temp = this->if_var_store->get_keys_by_val(if_stmt);
     return this->get_name_list(temp);
 }
 
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_if_stmt_var_pairs() {
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_if_stmt_var_pairs() const {
     auto pairs = this->if_var_store->get_all_pairs();
     return this->get_tuple_list_from_entity_string_pairs(pairs);
 }
 
-std::unordered_set<std::string> PkbManager::get_while_stmts_with_var() {
+std::unordered_set<std::string> PkbManager::get_while_stmts_with_var() const {
     return this->while_var_store->get_all_vals();
 }
 
-std::unordered_set<std::string> PkbManager::get_while_stmts_with_var(const std::string& variable) {
+std::unordered_set<std::string> PkbManager::get_while_stmts_with_var(const std::string& variable) const {
     auto v = Variable(variable);
     return this->while_var_store->get_vals_by_key(v);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_in_any_while() {
+std::unordered_set<std::string> PkbManager::get_vars_in_any_while() const {
     auto temp = this->while_var_store->get_all_keys();
     return this->get_name_list(temp);
 }
 
-std::unordered_set<std::string> PkbManager::get_vars_in_while(const std::string& while_stmt) {
+std::unordered_set<std::string> PkbManager::get_vars_in_while(const std::string& while_stmt) const {
     auto temp = this->while_var_store->get_keys_by_val(while_stmt);
     return this->get_name_list(temp);
 }
 
-std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_while_stmt_var_pairs() {
+std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_while_stmt_var_pairs() const {
     auto pairs = this->while_var_store->get_all_pairs();
     return this->get_tuple_list_from_entity_string_pairs(pairs);
 }

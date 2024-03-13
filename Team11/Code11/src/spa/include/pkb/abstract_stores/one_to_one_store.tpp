@@ -11,6 +11,11 @@ void OneToOneStore<KeyType, ValueType>::add(const KeyType& key, const ValueType&
     reverse_map.insert({value, key});
 }
 
+template <class KeyType, class ValueType>
+bool OneToOneStore<KeyType, ValueType>::has_relationship() const {
+    return !forward_map.empty();
+}
+
 template <typename KeyType, typename ValueType>
 bool OneToOneStore<KeyType, ValueType>::contains_key_val_pair(const KeyType& key, const ValueType& value) const {
     auto it = forward_map.find(key);

@@ -85,7 +85,7 @@ auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const QuotedIdent& quo
 
 auto UsesSEvaluator::eval_uses_s(const Integer& stmt_num, const WildCard&) const -> OutputTable {
     const auto stmt_num_string = stmt_num.value;
-    bool stmt_uses_var = read_facade->does_statement_use_any_var(stmt_num_string);
+    bool stmt_uses_var = read_facade->contains_statement_use_var_key(stmt_num_string);
 
     if (!stmt_uses_var) {
         return Table{};

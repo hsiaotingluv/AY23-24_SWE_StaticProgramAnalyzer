@@ -583,15 +583,15 @@ TEST_CASE("Modify Test") {
         write_facade->add_statement_modifies_var("2", "z");
 
         REQUIRE(read_facade->get_all_statements_that_modify().size() == 2);
-        REQUIRE(read_facade->does_statement_modify_any_var("1"));
+        REQUIRE(read_facade->contains_statement_modify_var_key("1"));
         REQUIRE(read_facade->get_all_statements_and_var_modify_pairs().size() == 4);
         REQUIRE(read_facade->get_all_procedures_that_modify().size() == 2);
-        REQUIRE(read_facade->does_procedure_modify_any_var("main"));
+        REQUIRE(read_facade->contains_procedure_modify_var_key("main"));
         REQUIRE(read_facade->get_all_procedures_and_var_modify_pairs().size() == 3);
 
         // Negative testcases
-        REQUIRE_FALSE(read_facade->does_statement_modify_any_var("3"));
-        REQUIRE_FALSE(read_facade->does_procedure_modify_any_var("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_statement_modify_var_key("3"));
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var_key("nonexistent"));
     }
 
     SECTION("Test get_statements_that_modify_var of certain type") {
@@ -641,15 +641,15 @@ TEST_CASE("Use Test") {
         write_facade->add_statement_uses_var("2", "z");
 
         REQUIRE(read_facade->get_all_statements_that_use().size() == 2);
-        REQUIRE(read_facade->does_statement_use_any_var("1"));
+        REQUIRE(read_facade->contains_statement_use_var_key("1"));
         REQUIRE(read_facade->get_all_statements_and_var_use_pairs().size() == 4);
         REQUIRE(read_facade->get_all_procedures_that_use().size() == 2);
-        REQUIRE(read_facade->does_procedure_use_any_var("main"));
+        REQUIRE(read_facade->contains_procedure_use_var_key("main"));
         REQUIRE(read_facade->get_all_procedures_and_var_use_pairs().size() == 3);
 
         // Negative testcases
-        REQUIRE_FALSE(read_facade->does_statement_use_any_var("3"));
-        REQUIRE_FALSE(read_facade->does_procedure_use_any_var("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var_key("3"));
+        REQUIRE_FALSE(read_facade->contains_procedure_use_var_key("nonexistent"));
     }
 
     SECTION("Test get_statements_that_use_var of certain type") {

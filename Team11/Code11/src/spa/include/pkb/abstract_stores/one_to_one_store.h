@@ -11,6 +11,7 @@ class OneToOneStore {
     OneToOneStore();
 
     void add(const KeyType& key, const ValueType& value);
+    bool has_relationship() const;
     bool contains_key_val_pair(const KeyType& key, const ValueType& value) const;
     bool contains_key(const KeyType& key) const;
     bool contains_val(const ValueType& value) const;
