@@ -339,6 +339,24 @@ TEST_CASE("Test QPS - advanced Relationships") {
             Calls{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}});
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
+
+    SECTION("CallsT") {
+        const auto query = "procedure p; Select p such that Calls*(p, \"q\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 1);
+        require_value<ProcSynonym>(result.declared[0], "p");
+
+        require_value<ProcSynonym>(result.reference, "p");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            CallsT{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
 }
 
 TEST_CASE("Test QPS - long queries") {

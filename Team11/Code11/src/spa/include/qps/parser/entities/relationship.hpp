@@ -352,7 +352,7 @@ struct ModifiesP {
 
 using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
-using DefaultEntEntList = TypeList<UsesP, ModifiesP, Calls, CallsT>;
+using DefaultEntEntList = TypeList<UsesP, ModifiesP, CallsT, Calls>;
 
 using RelationshipList = concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>;
 using Relationship = type_list_to_variant_t<RelationshipList>;
