@@ -171,6 +171,22 @@ struct ParentT {
     }
 };
 
+struct Affects {
+    StmtRef stmt1;
+    StmtRef stmt2;
+
+    static constexpr auto keyword = "Affects";
+
+    Affects(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const Affects& parentT) -> std::ostream&;
+
+    auto operator==(const Affects& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
+};
+
 struct Calls {
     ProcedureRef procedure1;
     ProcedureRef procedure2;
@@ -398,7 +414,7 @@ struct ModifiesP {
     }
 };
 
-using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent, NextT, Next>;
+using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent, NextT, Next, Affects>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
 using DefaultEntEntList = TypeList<UsesP, ModifiesP, CallsT, Calls>;
 
