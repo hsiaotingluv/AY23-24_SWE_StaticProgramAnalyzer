@@ -28,7 +28,7 @@ class CfgNode {
     /**
      * @brief Add a statement number.
      */
-    auto add(int stmt_num) -> int;
+    auto add(int const stmt_num) -> int;
 
     /**
      * @brief Check if the CfgNode has no statement numbers.
@@ -38,7 +38,7 @@ class CfgNode {
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
      */
-    friend auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, CfgNode const& cfg_node) -> std::ostream&;
 };
 
 using OutNeighbours = std::pair<std::shared_ptr<CfgNode>, std::shared_ptr<CfgNode>>;
@@ -83,7 +83,7 @@ class Cfg {
     /**
      * @brief Get the associated OutNeighbours
      */
-    auto get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNeighbours;
+    auto get_outneighbours(std::shared_ptr<CfgNode> const& node) const -> OutNeighbours;
 
     /**
      * @brief Get the graph.
@@ -98,7 +98,7 @@ class Cfg {
     /**
      * @brief Add a statement number to the current node.
      */
-    auto add_stmt_to_node(int stmt_num) -> int;
+    auto add_stmt_to_node(int const stmt_num) -> int;
 
     /**
      * @brief Add a new node to the graph, with empty out-neighbours.
@@ -108,24 +108,24 @@ class Cfg {
     /**
      * @brief Add a new node to the graph and link it to the current node.
      */
-    auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> outneighbour) -> std::shared_ptr<CfgNode>;
+    auto add_outneighbour_to_graph(std::shared_ptr<CfgNode> const& outneighbour) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Move current node to the next node (Need not be a outneighbour node).
      * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
-    auto move_to(std::shared_ptr<CfgNode> node) -> std::shared_ptr<CfgNode>;
+    auto move_to(std::shared_ptr<CfgNode> const& node) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
      * @note Default way to traverse the Cfg.
      */
-    auto link_and_move_to(std::shared_ptr<CfgNode> node) -> std::shared_ptr<CfgNode>;
+    auto link_and_move_to(std::shared_ptr<CfgNode> const& node) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
      * 11, 12))"
      */
-    friend auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, Cfg const& cfg) -> std::ostream&;
 };
 } // namespace sp

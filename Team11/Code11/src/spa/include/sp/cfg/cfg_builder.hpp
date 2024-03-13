@@ -21,18 +21,18 @@ class CfgBuilder {
     /**
      * @brief Initialise an empty Cfg for the given Procedure Name.
      */
-    auto create_empty_cfg(std::string proc_name) -> std::shared_ptr<Cfg>;
+    auto create_empty_cfg(std::string const& proc_name) -> std::shared_ptr<Cfg>;
 
     /**
      * @brief Populate the StmtNumMap within a specific Node.
      */
-    auto populate_stmt_num_map_by_node(const StatementNumbers stmt_nums, const std::string proc_name,
-                                       const std::shared_ptr<CfgNode> node) -> StatementNumbers;
+    auto populate_stmt_num_map_by_node(StatementNumbers const& stmt_nums, std::string const& proc_name,
+                                       std::shared_ptr<CfgNode> const& node) -> StatementNumbers;
 
     /**
      * @brief Populate the StmtNumMap within a specific procedure.
      */
-    auto populate_stmt_num_map_by_procedure(const std::string proc_name, const Graph graph) -> Graph;
+    auto populate_stmt_num_map_by_procedure(std::string const& proc_name, Graph const& graph) -> Graph;
 
     /**
      * @brief Populate the StmtNumMap after the CFG is built.
@@ -53,11 +53,11 @@ class CfgBuilder {
     /**
      * @brief Build a Control Flow Graph for the given Program ASTNode.
      */
-    auto build(std::shared_ptr<AstNode> ast) -> ProcMap;
+    auto build(std::shared_ptr<AstNode> const& ast) -> ProcMap;
 
     /**
      * @brief Construct a string representation of the Control Flow Graph.
      */
-    friend auto operator<<(std::ostream& os, const CfgBuilder& cfg_builder) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, CfgBuilder const& cfg_builder) -> std::ostream&;
 };
 } // namespace sp
