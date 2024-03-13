@@ -24,8 +24,11 @@ auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
     std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms),
                    [](const auto& elem) -> std::shared_ptr<Synonym> {
                        return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
-                                             return synonym;
-                                         }},
+                                                        return synonym;
+                                                    },
+                                                    [](const AttrRef& attr_ref) -> std::shared_ptr<Synonym> {
+                                                        return attr_ref.synonym;
+                                                    }},
                                          elem);
                    });
     return synonyms;

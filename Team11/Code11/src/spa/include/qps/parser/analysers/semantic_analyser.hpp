@@ -80,12 +80,12 @@ auto analyse(const Synonyms& declarations, const std::unordered_map<std::string,
                                      return std::make_optional(Elem{maybe_synonym.value()});
                                  },
                                  [&](const untyped::UntypedAttrRef& attr_ref) -> std::optional<Elem> {
-                                     const auto& maybe_synonym =
-                                         detail::is_synonym_declared(declarations, mapping, attr_ref.synonym);
-                                     if (!maybe_synonym.has_value()) {
+                                     const auto& maybe_attr_ref =
+                                         detail::validate_attr_ref(declarations, mapping, attr_ref);
+                                     if (!maybe_attr_ref.has_value()) {
                                          return std::nullopt;
                                      }
-                                     return std::make_optional(Elem{maybe_synonym.value()});
+                                     return std::make_optional(Elem{maybe_attr_ref.value()});
                                  }},
                       element);
 }
