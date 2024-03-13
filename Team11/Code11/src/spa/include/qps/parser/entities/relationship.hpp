@@ -74,6 +74,30 @@ struct FollowsT {
     }
 };
 
+struct Next {
+    /**
+     * @brief A Next relationship is a relationship between two statements where the first statement is executed
+     * before the second statement.
+     *
+     * @param stmt1
+     * @param stmt2
+     */
+    StmtRef stmt1;
+    StmtRef stmt2;
+
+    static constexpr auto keyword = "Next";
+
+  public:
+    Next(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const Next& follows) -> std::ostream&;
+
+    auto operator==(const Next& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
+};
+
 struct Parent {
     /**
      * @brief A Parent relationship is a relationship between two statements where the first statement is the parent
@@ -350,7 +374,7 @@ struct ModifiesP {
     }
 };
 
-using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
+using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent, Next>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
 using DefaultEntEntList = TypeList<UsesP, ModifiesP, CallsT, Calls>;
 
