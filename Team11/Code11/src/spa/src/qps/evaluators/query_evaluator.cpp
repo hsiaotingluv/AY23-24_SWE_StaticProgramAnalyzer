@@ -12,7 +12,7 @@ namespace qps {
 auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     const auto reference = query_obj.reference;
 
-    auto curr_table = build_table(reference, read_facade);
+    auto curr_table = OutputTable{UnitTable{}};
 
     if (query_obj.clauses.empty()) {
         // Short-circuit if there are no clauses
