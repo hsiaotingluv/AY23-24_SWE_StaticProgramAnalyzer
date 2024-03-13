@@ -29,77 +29,6 @@ auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std
     return {std::move(read_facade), std::move(write_facade)};
 };
 
-auto insert(std::vector<std::tuple<StatementNumber, StatementNumber>>& rs, const StatementNumber& s1,
-            const StatementNumber& s2) -> void {
-    rs.emplace_back(s1, s2);
-}
-
-auto insert(std::vector<std::tuple<StatementNumber, StatementNumber>>& rs, const StatementNumber& s1,
-            const std::unordered_set<StatementNumber>& s2) -> void {
-    for (const auto& s : s2) {
-        insert(rs, s1, s);
-    }
-}
-
-auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1, const Procedure& p2)
-    -> void {
-    rs.emplace_back(p1, p2);
-}
-
-auto insert_procedure(std::vector<std::tuple<Procedure, Procedure>>& rs, const Procedure& p1,
-                      const std::unordered_set<Procedure>& p2) -> void {
-    for (const auto& p : p2) {
-        insert_procedure(rs, p1, p);
-    }
-}
-
-template <class DirectStore, class StarStore>
-void PkbManager::populate_star_from_direct(DirectStore direct_store, StarStore star_store) {
-    // extract all the direct relationships into a vector of tuples
-    std::vector<std::tuple<StatementNumber, StatementNumber>> relationships;
-
-    for (const auto& pair : direct_store->get_all()) {
-        insert(relationships, pair.first, pair.second);
-    }
-
-    // sort relationships by the second element of the tuple
-    std::sort(relationships.begin(), relationships.end(), [](const auto& a, const auto& b) {
-        return stoi(std::get<1>(a)) < stoi(std::get<1>(b));
-    });
-
-    // populate star_store, starting from the last element of relationships
-    for (auto it = relationships.rbegin(); it != relationships.rend(); ++it) {
-        const auto& [s1, s2] = *it;
-        star_store->add(s1, s2);
-
-        // add all the star relationships from s2 to s1
-        for (const auto& s3 : star_store->get_vals_by_key(s2)) {
-            star_store->add(s1, s3);
-        }
-    }
-}
-
-template <class DirectStore, class StarStore>
-void PkbManager::populate_call_star_from_direct(DirectStore direct_store, StarStore star_store) {
-    // extract all the direct relationships into a vector of tuples
-    std::vector<std::tuple<Procedure, Procedure>> relationships;
-
-    for (const auto& pair : direct_store->get_all()) {
-        insert_procedure(relationships, pair.first, pair.second);
-    }
-
-    // populate star_store, starting from the last element of relationships
-    for (auto it = relationships.rbegin(); it != relationships.rend(); ++it) {
-        const auto& [s1, s2] = *it;
-        star_store->add(s1, s2);
-
-        // add all the star relationships from s2 to s1
-        for (const auto& s3 : star_store->get_vals_by_key(s2)) {
-            star_store->add(s1, s3);
-        }
-    }
-}
-
 // ReadFacade APIs
 std::unordered_set<std::string> PkbManager::get_entities() const {
     std::unordered_set<std::string> entities;
@@ -109,13 +38,13 @@ std::unordered_set<std::string> PkbManager::get_entities() const {
     auto consts = this->entity_store->get_constants();
 
     for (const Procedure& p : procedures) {
-        entities.insert(p.getName());
+        entities.insert(p.get_name());
     }
     for (const Variable& v : vars) {
-        entities.insert(v.getName());
+        entities.insert(v.get_name());
     }
     for (const Constant& c : consts) {
-        entities.insert(c.getName());
+        entities.insert(c.get_name());
     }
 
     return entities;
@@ -852,9 +781,73 @@ void PkbManager::add_calls(const std::string& caller, const std::string& callee)
     this->direct_calls_store->add(caller_procedure, callee_procedure);
 }
 
-void PkbManager::finalise_pkb() {
-    populate_star_from_direct(direct_follows_store, follows_star_store);
-    populate_star_from_direct(direct_parent_store, parent_star_store);
-    populate_call_star_from_direct(direct_calls_store, calls_star_store);
+template <class Key, class Value>
+auto insert(std::vector<std::tuple<Key, Value>>& rs, const Key& s1, const Value& s2) -> void {
+    rs.emplace_back(s1, s2);
+}
+
+template <class Key, class Value>
+auto insert(std::vector<std::tuple<Key, Value>>& rs, const Key& s1, const std::unordered_set<Value>& s2) -> void {
+    for (const auto& s : s2) {
+        insert(rs, s1, s);
+    }
+}
+
+template <class DirectStore, class StarStore, class OrderingStrategy>
+void PkbManager::populate_star_from_direct(std::shared_ptr<DirectStore> direct_store,
+                                           std::shared_ptr<StarStore> star_store, OrderingStrategy ordering_strategy) {
+    // extract all the direct relationships into a vector of tuples
+    static_assert(std::is_same_v<typename DirectStore::Key, typename StarStore::Key>, "Key types must be the same");
+    static_assert(std::is_same_v<typename DirectStore::Value, typename StarStore::Value>,
+                  "Value types must be the same");
+
+    std::vector<std::tuple<typename DirectStore::Key, typename DirectStore::Value>> relationships;
+    std::vector<std::string> procedure_order{};
+
+    for (const auto& pair : direct_store->get_all()) {
+        insert(relationships, pair.first, pair.second);
+    }
+
+    std::sort(relationships.begin(), relationships.end(), ordering_strategy);
+
+    // populate star_store, starting from the last element of relationships
+    for (auto it = relationships.rbegin(); it != relationships.rend(); ++it) {
+        const auto& [s1, s2] = *it;
+        star_store->add(s1, s2);
+
+        // add all the star relationships from s2 to s1
+        for (const auto& s3 : star_store->get_vals_by_key(s2)) {
+            star_store->add(s1, s3);
+        }
+    }
+}
+
+struct OrderingBySecondElement {
+    template <class T>
+    auto operator()(const T& a, const T& b) const -> bool {
+        return stoi(std::get<1>(a)) < stoi(std::get<1>(b));
+    }
+};
+
+class OrderingByIndexMap {
+    std::unordered_map<std::string, unsigned long> order_map;
+
+  public:
+    explicit OrderingByIndexMap(const std::vector<std::string>& order) {
+        for (unsigned long i = 0; i < order.size(); i++) {
+            order_map.insert({order[i], i});
+        }
+    };
+
+    template <class T>
+    auto operator()(const T& a, const T& b) const -> bool {
+        return order_map.at(std::get<1>(a).get_name()) > order_map.at(std::get<1>(b).get_name());
+    }
+};
+
+void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_order) {
+    populate_star_from_direct(direct_follows_store, follows_star_store, OrderingBySecondElement{});
+    populate_star_from_direct(direct_parent_store, parent_star_store, OrderingBySecondElement{});
+    populate_star_from_direct(direct_calls_store, calls_star_store, OrderingByIndexMap{procedure_order});
 }
 } // namespace pkb

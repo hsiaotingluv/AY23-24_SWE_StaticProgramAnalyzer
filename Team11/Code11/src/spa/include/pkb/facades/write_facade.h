@@ -45,7 +45,7 @@ class WriteFacade {
 
     void add_while_var(const std::string& statement_number, const std::string& variable);
 
-    void finalise_pkb();
+    void finalise_pkb(const std::vector<std::string>& procedure_order = {});
 
   private:
     std::shared_ptr<PkbManager> pkb;

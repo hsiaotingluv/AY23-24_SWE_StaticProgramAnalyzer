@@ -66,7 +66,7 @@ void WriteFacade::add_calls(const std::string& caller, const std::string& callee
     this->pkb->add_calls(caller, callee);
 }
 
-void WriteFacade::finalise_pkb() {
-    this->pkb->finalise_pkb();
+void WriteFacade::finalise_pkb(const std::vector<std::string>& procedure_order) {
+    this->pkb->finalise_pkb(procedure_order);
 }
 } // namespace pkb

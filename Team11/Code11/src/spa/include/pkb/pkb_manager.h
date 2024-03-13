@@ -59,7 +59,7 @@ class PkbManager {
     std::unordered_set<std::string> get_name_list(const std::unordered_set<T>& set) const {
         std::unordered_set<std::string> temp;
         for (const T& entity : set) {
-            temp.insert(entity.getName());
+            temp.insert(entity.get_name());
         }
 
         return temp;
@@ -70,7 +70,7 @@ class PkbManager {
     get_tuple_list_from_string_entity_pairs(const std::unordered_set<T>& pairs) const {
         std::unordered_set<std::tuple<std::string, std::string>> temp;
         for (const auto& [s, v] : pairs) {
-            temp.insert(std::make_tuple(s, v.getName()));
+            temp.insert(std::make_tuple(s, v.get_name()));
         }
 
         return temp;
@@ -81,7 +81,7 @@ class PkbManager {
     get_tuple_list_from_entity_string_pairs(const std::unordered_set<T>& pairs) const {
         std::unordered_set<std::tuple<std::string, std::string>> temp;
         for (const auto& [v, s] : pairs) {
-            temp.insert(std::make_tuple(s, v.getName()));
+            temp.insert(std::make_tuple(s, v.get_name()));
         }
 
         return temp;
@@ -92,7 +92,7 @@ class PkbManager {
     get_tuple_list_from_entity_entity_pairs(const std::unordered_set<T>& pairs) const {
         std::unordered_set<std::tuple<std::string, std::string>> temp;
         for (const auto& [p, v] : pairs) {
-            temp.insert(std::make_tuple(p.getName(), v.getName()));
+            temp.insert(std::make_tuple(p.get_name(), v.get_name()));
         }
 
         return temp;
@@ -433,7 +433,7 @@ class PkbManager {
 
     void add_while_var(const std::string& statement_number, const std::string& variable);
 
-    void finalise_pkb();
+    void finalise_pkb(const std::vector<std::string>& procedure_order);
 
   private:
     std::shared_ptr<EntityStore> entity_store;
@@ -453,8 +453,9 @@ class PkbManager {
     std::shared_ptr<IfVarStore> if_var_store;
     std::shared_ptr<WhileVarStore> while_var_store;
 
-    template <class DirectStore, class StarStore>
-    void populate_star_from_direct(DirectStore direct_store, StarStore star_store);
+    template <class DirectStore, class StarStore, class OrderingStrategy>
+    void populate_star_from_direct(std::shared_ptr<DirectStore> direct_store, std::shared_ptr<StarStore> star_store,
+                                   OrderingStrategy ordering_strategy);
 
     template <class DirectStore, class StarStore>
     void populate_call_star_from_direct(DirectStore direct_store, StarStore star_store);

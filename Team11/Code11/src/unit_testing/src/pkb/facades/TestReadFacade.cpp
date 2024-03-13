@@ -877,7 +877,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         write_facade->add_calls("Helper", "Logger");
 
         REQUIRE(read_facade->has_calls_relation());
-//        REQUIRE(read_facade->has_calls_star_relation());
+        //        REQUIRE(read_facade->has_calls_star_relation());
 
         REQUIRE(read_facade->contains_calls_key("Main"));
         REQUIRE(read_facade->contains_calls_key("Helper"));
@@ -885,18 +885,18 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         REQUIRE(read_facade->contains_calls_value("Helper"));
         REQUIRE(read_facade->contains_calls_value("Logger"));
 
-//        REQUIRE(read_facade->contains_calls_star_key("Main"));
-//        REQUIRE(read_facade->contains_calls_star_key("Helper"));
-//
-//        REQUIRE(read_facade->contains_calls_star_value("Helper"));
-//        REQUIRE(read_facade->contains_calls_star_value("Logger"));
+        //        REQUIRE(read_facade->contains_calls_star_key("Main"));
+        //        REQUIRE(read_facade->contains_calls_star_key("Helper"));
+        //
+        //        REQUIRE(read_facade->contains_calls_star_value("Helper"));
+        //        REQUIRE(read_facade->contains_calls_star_value("Logger"));
 
         // Negative testcases
         REQUIRE_FALSE(read_facade->contains_calls_key("Logger"));
         REQUIRE_FALSE(read_facade->contains_calls_value("Main"));
 
-//        REQUIRE_FALSE(read_facade->contains_calls_star_key("Logger"));
-//        REQUIRE_FALSE(read_facade->contains_calls_star_value("Main"));
+        //        REQUIRE_FALSE(read_facade->contains_calls_star_key("Logger"));
+        //        REQUIRE_FALSE(read_facade->contains_calls_star_value("Main"));
     }
 
     SECTION("Adding and Verifying Direct Calls Relationships") {
