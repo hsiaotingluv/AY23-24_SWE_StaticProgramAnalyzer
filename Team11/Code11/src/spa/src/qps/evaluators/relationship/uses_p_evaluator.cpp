@@ -68,7 +68,7 @@ auto UsesPEvaluator::eval_uses_p(const QuotedIdent& quoted_proc, const QuotedIde
     const auto proc_name_string = quoted_proc.get_value();
     const auto var_name_string = quoted_var.get_value();
 
-    const bool proc_uses_var = read_facade->does_procedure_use_var(proc_name_string, var_name_string);
+    const bool proc_uses_var = read_facade->contains_procedure_use_var(proc_name_string, var_name_string);
 
     if (!proc_uses_var) {
         return Table{};

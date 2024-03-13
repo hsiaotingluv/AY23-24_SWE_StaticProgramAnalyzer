@@ -48,7 +48,7 @@ class ReadFacade {
 
     bool has_statement_modify_var() const;
 
-    bool does_statement_modify_var(const std::string& statement_number, const std::string& variable) const;
+    bool contains_statement_modify_var(const std::string& statement_number, const std::string& variable) const;
 
     bool contains_statement_modify_var_key(const std::string& statement_number) const;
 
@@ -60,7 +60,7 @@ class ReadFacade {
 
     bool has_procedure_modify_var() const;
 
-    bool does_procedure_modify_var(const std::string& procedure, const std::string& variable) const;
+    bool contains_procedure_modify_var(const std::string& procedure, const std::string& variable) const;
 
     bool contains_procedure_modify_var_key(const std::string& procedure) const;
 
@@ -89,7 +89,7 @@ class ReadFacade {
 
     bool has_statement_use_var() const;
 
-    bool does_statement_use_var(const std::string& statement_number, const std::string& variable) const;
+    bool contains_statement_use_var(const std::string& statement_number, const std::string& variable) const;
 
     bool contains_statement_use_var_key(const std::string& statement_number) const;
 
@@ -101,7 +101,7 @@ class ReadFacade {
 
     bool has_procedure_use_var() const;
 
-    bool does_procedure_use_var(const std::string& procedure, const std::string& variable) const;
+    bool contains_procedure_use_var(const std::string& procedure, const std::string& variable) const;
 
     bool contains_procedure_use_var_key(const std::string& procedure) const;
 

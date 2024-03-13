@@ -184,7 +184,7 @@ bool PkbManager::has_statement_modify_var() const {
     return this->statement_modifies_store->has_relationship();
 }
 
-bool PkbManager::does_statement_modify_var(const std::string& statement, const std::string& variable) const {
+bool PkbManager::contains_statement_modify_var(const std::string& statement, const std::string& variable) const {
     auto v = Variable(variable);
     return this->statement_modifies_store->contains_key_val_pair(statement, v);
 }
@@ -227,7 +227,7 @@ bool PkbManager::has_procedure_modify_var() const {
     return this->procedure_modifies_store->has_relationship();
 }
 
-bool PkbManager::does_procedure_modify_var(const std::string& procedure, const std::string& variable) const {
+bool PkbManager::contains_procedure_modify_var(const std::string& procedure, const std::string& variable) const {
     auto v = Variable(variable);
     auto p = Procedure(procedure);
     return this->procedure_modifies_store->contains_key_val_pair(p, v);
@@ -280,7 +280,7 @@ bool PkbManager::has_statement_use_var() const {
     return this->statement_uses_store->has_relationship();
 }
 
-bool PkbManager::does_statement_use_var(const std::string& statement, const std::string& variable) const {
+bool PkbManager::contains_statement_use_var(const std::string& statement, const std::string& variable) const {
     auto v = Variable(variable);
     return this->statement_uses_store->contains_key_val_pair(statement, v);
 }
@@ -310,7 +310,7 @@ bool PkbManager::has_procedure_use_var() const {
     return this->procedure_uses_store->has_relationship();
 }
 
-bool PkbManager::does_procedure_use_var(const std::string& procedure, const std::string& variable) const {
+bool PkbManager::contains_procedure_use_var(const std::string& procedure, const std::string& variable) const {
     auto v = Variable(variable);
     auto p = Procedure(procedure);
     return this->procedure_uses_store->contains_key_val_pair(p, v);

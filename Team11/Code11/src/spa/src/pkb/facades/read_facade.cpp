@@ -67,8 +67,8 @@ bool ReadFacade::has_statement_modify_var() const {
     return this->pkb->has_statement_modify_var();
 }
 
-bool ReadFacade::does_statement_modify_var(const std::string& statement_number, const std::string& variable) const {
-    return this->pkb->does_statement_modify_var(statement_number, variable);
+bool ReadFacade::contains_statement_modify_var(const std::string& statement_number, const std::string& variable) const {
+    return this->pkb->contains_statement_modify_var(statement_number, variable);
 }
 
 bool ReadFacade::contains_statement_modify_var_key(const std::string& statement_number) const {
@@ -116,8 +116,8 @@ bool ReadFacade::has_procedure_modify_var() const {
     return this->pkb->has_procedure_modify_var();
 }
 
-bool ReadFacade::does_procedure_modify_var(const std::string& procedure, const std::string& variable) const {
-    return this->pkb->does_procedure_modify_var(procedure, variable);
+bool ReadFacade::contains_procedure_modify_var(const std::string& procedure, const std::string& variable) const {
+    return this->pkb->contains_procedure_modify_var(procedure, variable);
 }
 
 bool ReadFacade::contains_procedure_modify_var_key(const std::string& procedure) const {
@@ -145,8 +145,8 @@ bool ReadFacade::has_statement_use_var() const {
     return this->pkb->has_statement_use_var();
 }
 
-bool ReadFacade::does_statement_use_var(const std::string& statement_number, const std::string& variable) const {
-    return this->pkb->does_statement_use_var(statement_number, variable);
+bool ReadFacade::contains_statement_use_var(const std::string& statement_number, const std::string& variable) const {
+    return this->pkb->contains_statement_use_var(statement_number, variable);
 }
 
 bool ReadFacade::contains_statement_use_var_key(const std::string& statement_number) const {
@@ -169,8 +169,8 @@ bool ReadFacade::has_procedure_use_var() const {
     return this->pkb->has_procedure_use_var();
 }
 
-bool ReadFacade::does_procedure_use_var(const std::string& procedure, const std::string& variable) const {
-    return this->pkb->does_procedure_use_var(procedure, variable);
+bool ReadFacade::contains_procedure_use_var(const std::string& procedure, const std::string& variable) const {
+    return this->pkb->contains_procedure_use_var(procedure, variable);
 }
 
 bool ReadFacade::contains_procedure_use_var_key(const std::string& procedure) const {

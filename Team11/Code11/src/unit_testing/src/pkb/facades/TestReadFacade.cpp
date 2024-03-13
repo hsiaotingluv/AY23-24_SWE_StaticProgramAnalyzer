@@ -663,8 +663,8 @@ TEST_CASE("Modify Test") {
         write_facade->add_statement_modify_var("2", "x");
         write_facade->add_statement_modify_var("2", "z");
 
-        REQUIRE(read_facade->does_statement_modify_var("1", "x"));
-        REQUIRE(!read_facade->does_statement_modify_var("1", "z"));
+        REQUIRE(read_facade->contains_statement_modify_var("1", "x"));
+        REQUIRE(!read_facade->contains_statement_modify_var("1", "z"));
         REQUIRE(read_facade->get_statements_that_modify_var("x").size() == 2);
         REQUIRE(read_facade->get_statements_that_modify_var("z").size() == 1);
         REQUIRE(read_facade->get_vars_modified_by_statement("1").size() == 2);
@@ -760,8 +760,8 @@ TEST_CASE("Use Test") {
         write_facade->add_statement_use_var("2", "x");
         write_facade->add_statement_use_var("2", "z");
 
-        REQUIRE(read_facade->does_statement_use_var("1", "x"));
-        REQUIRE(!read_facade->does_statement_use_var("1", "z"));
+        REQUIRE(read_facade->contains_statement_use_var("1", "x"));
+        REQUIRE(!read_facade->contains_statement_use_var("1", "z"));
         REQUIRE(read_facade->get_statements_that_use_var("x").size() == 2);
         REQUIRE(read_facade->get_statements_that_use_var("z").size() == 1);
         REQUIRE(read_facade->get_vars_used_by_statement("1").size() == 2);

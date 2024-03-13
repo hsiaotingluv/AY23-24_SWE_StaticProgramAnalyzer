@@ -53,16 +53,16 @@ TEST_CASE("Test SP and PkbManager") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#uses
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->does_statement_use_var("16", "x"));
-        REQUIRE(read_facade->does_statement_use_var("19", "count"));
-        REQUIRE(read_facade->does_statement_use_var("19", "cenX"));
-        REQUIRE(read_facade->does_procedure_use_var("main", "cenX"));
-        REQUIRE(read_facade->does_procedure_use_var("main", "flag"));
-        REQUIRE(read_facade->does_procedure_use_var("computeCentroid", "x"));
+        REQUIRE(read_facade->contains_statement_use_var("16", "x"));
+        REQUIRE(read_facade->contains_statement_use_var("19", "count"));
+        REQUIRE(read_facade->contains_statement_use_var("19", "cenX"));
+        REQUIRE(read_facade->contains_procedure_use_var("main", "cenX"));
+        REQUIRE(read_facade->contains_procedure_use_var("main", "flag"));
+        REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "x"));
 
-        REQUIRE_FALSE(read_facade->does_statement_use_var("12", "count"));
-        REQUIRE_FALSE(read_facade->does_statement_use_var("19", "flag"));
-        REQUIRE_FALSE(read_facade->does_statement_use_var("18", "y"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("12", "count"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("19", "flag"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("18", "y"));
     }
 
     SECTION("Test SP and PkbManager Parent Website - success") {
@@ -88,15 +88,15 @@ TEST_CASE("Test SP and PkbManager") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->does_statement_modify_var("10", "count"));
-        REQUIRE(read_facade->does_statement_modify_var("16", "cenX"));
-        REQUIRE(read_facade->does_statement_modify_var("18", "x"));
-        REQUIRE(read_facade->does_statement_modify_var("19", "flag"));
-        REQUIRE(read_facade->does_statement_modify_var("14", "x"));
-        REQUIRE(read_facade->does_procedure_modify_var("main", "y"));
+        REQUIRE(read_facade->contains_statement_modify_var("10", "count"));
+        REQUIRE(read_facade->contains_statement_modify_var("16", "cenX"));
+        REQUIRE(read_facade->contains_statement_modify_var("18", "x"));
+        REQUIRE(read_facade->contains_statement_modify_var("19", "flag"));
+        REQUIRE(read_facade->contains_statement_modify_var("14", "x"));
+        REQUIRE(read_facade->contains_procedure_modify_var("main", "y"));
 
-        REQUIRE_FALSE(read_facade->does_statement_modify_var("14", "flag"));
-        REQUIRE_FALSE(read_facade->does_procedure_modify_var("printResults", "normSq"));
+        REQUIRE_FALSE(read_facade->contains_statement_modify_var("14", "flag"));
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var("printResults", "normSq"));
     }
 
     SECTION("Test SP and PkbManager Follows Website - success") {
