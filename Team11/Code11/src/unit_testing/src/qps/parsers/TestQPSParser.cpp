@@ -376,6 +376,23 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
+    SECTION("NextT") {
+        const auto query = "stmt s; Select s such that Next*(s, 1)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 1);
+        require_value<AnyStmtSynonym>(result.declared[0], "s");
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            NextT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
 }
 
 TEST_CASE("Test QPS - long queries") {

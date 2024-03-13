@@ -127,4 +127,9 @@ auto operator<<(std::ostream& os, const Next& next) -> std::ostream& {
     os << "Next(" << next.stmt1 << ", " << next.stmt1 << ")";
     return os;
 }
+
+auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream& {
+    os << "Next*(" << nextT.stmt1 << ", " << nextT.stmt1 << ")";
+    return os;
+}
 } // namespace qps
