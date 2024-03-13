@@ -26,10 +26,10 @@ TEST_CASE("Test Evaluator ModifiesS") {
 
     write_facade->add_variable("a");
     write_facade->add_variable("b");
-    write_facade->add_statement_modifies_var("1", "a");
-    write_facade->add_statement_modifies_var("2", "b");
-    write_facade->add_statement_modifies_var("3", "a");
-    write_facade->add_statement_modifies_var("4", "b");
+    write_facade->add_statement_modify_var("1", "a");
+    write_facade->add_statement_modify_var("2", "b");
+    write_facade->add_statement_modify_var("3", "a");
+    write_facade->add_statement_modify_var("4", "b");
 
     write_facade->finalise_pkb();
 

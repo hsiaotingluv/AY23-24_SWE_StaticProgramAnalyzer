@@ -48,11 +48,33 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         write_facade->add_follows("4", "5");
         write_facade->finalise_pkb();
 
+        REQUIRE(read_facade->contains_follows_key("1"));
+        REQUIRE(read_facade->contains_follows_key("2"));
+        REQUIRE(read_facade->contains_follows_key("3"));
+        REQUIRE(read_facade->contains_follows_key("4"));
+
+        REQUIRE(read_facade->contains_follows_value("2"));
+        REQUIRE(read_facade->contains_follows_value("3"));
+        REQUIRE(read_facade->contains_follows_value("4"));
+        REQUIRE(read_facade->contains_follows_value("5"));
+
+        REQUIRE(read_facade->has_follows_relation());
         REQUIRE(read_facade->has_follows_relation("1", "2"));
         REQUIRE(read_facade->has_follows_relation("2", "3"));
         REQUIRE(read_facade->has_follows_relation("3", "4"));
         REQUIRE(read_facade->has_follows_relation("4", "5"));
 
+        REQUIRE(read_facade->contains_follows_star_key("1"));
+        REQUIRE(read_facade->contains_follows_star_key("2"));
+        REQUIRE(read_facade->contains_follows_star_key("3"));
+        REQUIRE(read_facade->contains_follows_star_key("4"));
+
+        REQUIRE(read_facade->contains_follows_star_value("2"));
+        REQUIRE(read_facade->contains_follows_star_value("3"));
+        REQUIRE(read_facade->contains_follows_star_value("4"));
+        REQUIRE(read_facade->contains_follows_star_value("5"));
+
+        REQUIRE(read_facade->has_follows_star_relation());
         REQUIRE(read_facade->has_follows_star_relation("1", "2"));
         REQUIRE(read_facade->has_follows_star_relation("1", "3"));
         REQUIRE(read_facade->has_follows_star_relation("1", "4"));
@@ -63,6 +85,13 @@ TEST_CASE("Follows and FollowsStar Relationship Test") {
         REQUIRE(read_facade->has_follows_star_relation("3", "4"));
         REQUIRE(read_facade->has_follows_star_relation("3", "5"));
         REQUIRE(read_facade->has_follows_star_relation("4", "5"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_follows_key("6"));
+        REQUIRE_FALSE(read_facade->contains_follows_value("1"));
+
+        REQUIRE_FALSE(read_facade->contains_follows_star_key("6"));
+        REQUIRE_FALSE(read_facade->contains_follows_star_value("1"));
     }
 
     SECTION("Get All Followee By Statement Type Test") {
@@ -305,6 +334,18 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         write_facade->add_parent("6", "7");
         write_facade->finalise_pkb();
 
+        REQUIRE(read_facade->contains_parent_key("1"));
+        REQUIRE(read_facade->contains_parent_key("3"));
+        REQUIRE(read_facade->contains_parent_key("6"));
+
+        REQUIRE(read_facade->contains_parent_value("2"));
+        REQUIRE(read_facade->contains_parent_value("3"));
+        REQUIRE(read_facade->contains_parent_value("4"));
+        REQUIRE(read_facade->contains_parent_value("5"));
+        REQUIRE(read_facade->contains_parent_value("6"));
+        REQUIRE(read_facade->contains_parent_value("7"));
+
+        REQUIRE(read_facade->has_parent_relation());
         REQUIRE(read_facade->has_parent_relation("1", "2"));
         REQUIRE(read_facade->has_parent_relation("1", "3"));
         REQUIRE(read_facade->has_parent_relation("3", "4"));
@@ -312,12 +353,31 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
         REQUIRE(read_facade->has_parent_relation("3", "6"));
         REQUIRE(read_facade->has_parent_relation("6", "7"));
 
+        REQUIRE(read_facade->contains_parent_star_key("1"));
+        REQUIRE(read_facade->contains_parent_star_key("3"));
+        REQUIRE(read_facade->contains_parent_star_key("6"));
+
+        REQUIRE(read_facade->contains_parent_star_value("2"));
+        REQUIRE(read_facade->contains_parent_star_value("3"));
+        REQUIRE(read_facade->contains_parent_star_value("4"));
+        REQUIRE(read_facade->contains_parent_star_value("5"));
+        REQUIRE(read_facade->contains_parent_star_value("6"));
+        REQUIRE(read_facade->contains_parent_star_value("7"));
+
+        REQUIRE(read_facade->has_parent_star_relation());
         REQUIRE(read_facade->has_parent_star_relation("1", "2"));
         REQUIRE(read_facade->has_parent_star_relation("1", "3"));
         REQUIRE(read_facade->has_parent_star_relation("1", "4"));
         REQUIRE(read_facade->has_parent_star_relation("1", "5"));
         REQUIRE(read_facade->has_parent_star_relation("1", "6"));
         REQUIRE(read_facade->has_parent_star_relation("1", "7"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_parent_key("2"));
+        REQUIRE_FALSE(read_facade->contains_parent_value("1"));
+
+        REQUIRE_FALSE(read_facade->contains_parent_star_key("4"));
+        REQUIRE_FALSE(read_facade->contains_parent_star_value("1"));
     }
 
     SECTION("Get All Parents By Statement Type Test") {
@@ -556,13 +616,52 @@ TEST_CASE("Parent and ParentStar Relationship Test") {
 }
 
 TEST_CASE("Modify Test") {
+    SECTION("Contains Statement Modify Variable Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_statement_modify_var("1", "x");
+        write_facade->add_statement_modify_var("1", "y");
+        write_facade->add_statement_modify_var("2", "x");
+        write_facade->add_statement_modify_var("2", "z");
+
+        REQUIRE(read_facade->has_statement_modify_var());
+        REQUIRE(read_facade->contains_statement_modify_var_key("1"));
+        REQUIRE(read_facade->contains_statement_modify_var_key("2"));
+        REQUIRE(read_facade->contains_statement_modify_var_value("x"));
+        REQUIRE(read_facade->contains_statement_modify_var_value("y"));
+        REQUIRE(read_facade->contains_statement_modify_var_value("z"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_statement_modify_var_key("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_statement_modify_var_value("nonexistent"));
+    }
+
+    SECTION("Procedure Modify Variable Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_procedure_modify_var("main", "x");
+        write_facade->add_procedure_modify_var("main", "y");
+        write_facade->add_procedure_modify_var("helper", "z");
+
+        REQUIRE(read_facade->has_procedure_modify_var());
+        REQUIRE(read_facade->contains_procedure_modify_var_key("main"));
+        REQUIRE(read_facade->contains_procedure_modify_var_key("helper"));
+        REQUIRE(read_facade->contains_procedure_modify_var_value("x"));
+        REQUIRE(read_facade->contains_procedure_modify_var_value("y"));
+        REQUIRE(read_facade->contains_procedure_modify_var_value("z"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var_key("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var_value("nonexistent"));
+    }
+
     SECTION("Simple Modify Test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_statement_modifies_var("1", "x");
-        write_facade->add_statement_modifies_var("1", "y");
-        write_facade->add_statement_modifies_var("2", "x");
-        write_facade->add_statement_modifies_var("2", "z");
+        write_facade->add_statement_modify_var("1", "x");
+        write_facade->add_statement_modify_var("1", "y");
+        write_facade->add_statement_modify_var("2", "x");
+        write_facade->add_statement_modify_var("2", "z");
 
         REQUIRE(read_facade->does_statement_modify_var("1", "x"));
         REQUIRE(!read_facade->does_statement_modify_var("1", "z"));
@@ -574,13 +673,13 @@ TEST_CASE("Modify Test") {
     SECTION("More complex modify test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_procedure_modifies_var("main", "x");
-        write_facade->add_procedure_modifies_var("main", "y");
-        write_facade->add_procedure_modifies_var("helper", "z");
-        write_facade->add_statement_modifies_var("1", "x");
-        write_facade->add_statement_modifies_var("1", "y");
-        write_facade->add_statement_modifies_var("2", "x");
-        write_facade->add_statement_modifies_var("2", "z");
+        write_facade->add_procedure_modify_var("main", "x");
+        write_facade->add_procedure_modify_var("main", "y");
+        write_facade->add_procedure_modify_var("helper", "z");
+        write_facade->add_statement_modify_var("1", "x");
+        write_facade->add_statement_modify_var("1", "y");
+        write_facade->add_statement_modify_var("2", "x");
+        write_facade->add_statement_modify_var("2", "z");
 
         REQUIRE(read_facade->get_all_statements_that_modify().size() == 2);
         REQUIRE(read_facade->contains_statement_modify_var_key("1"));
@@ -597,10 +696,10 @@ TEST_CASE("Modify Test") {
     SECTION("Test get_statements_that_modify_var of certain type") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_statement_modifies_var("1", "x");
-        write_facade->add_statement_modifies_var("1", "y");
-        write_facade->add_statement_modifies_var("2", "x");
-        write_facade->add_statement_modifies_var("2", "z");
+        write_facade->add_statement_modify_var("1", "x");
+        write_facade->add_statement_modify_var("1", "y");
+        write_facade->add_statement_modify_var("2", "x");
+        write_facade->add_statement_modify_var("2", "z");
 
         write_facade->add_statement("1", StatementType::Read);
         write_facade->add_statement("2", StatementType::Call);
@@ -614,13 +713,52 @@ TEST_CASE("Modify Test") {
 }
 
 TEST_CASE("Use Test") {
+    SECTION("Contains Statement Use Variable Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_statement_use_var("1", "x");
+        write_facade->add_statement_use_var("1", "y");
+        write_facade->add_statement_use_var("2", "x");
+        write_facade->add_statement_use_var("2", "z");
+
+        REQUIRE(read_facade->has_statement_use_var());
+        REQUIRE(read_facade->contains_statement_use_var_key("1"));
+        REQUIRE(read_facade->contains_statement_use_var_key("2"));
+        REQUIRE(read_facade->contains_statement_use_var_value("x"));
+        REQUIRE(read_facade->contains_statement_use_var_value("y"));
+        REQUIRE(read_facade->contains_statement_use_var_value("z"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_statement_use_var_key("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var_value("nonexistent"));
+    }
+
+    SECTION("Contains Procedure Use Variable Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_procedure_use_var("main", "x");
+        write_facade->add_procedure_use_var("main", "y");
+        write_facade->add_procedure_use_var("helper", "z");
+
+        REQUIRE(read_facade->has_procedure_use_var());
+        REQUIRE(read_facade->contains_procedure_use_var_key("main"));
+        REQUIRE(read_facade->contains_procedure_use_var_key("helper"));
+        REQUIRE(read_facade->contains_procedure_use_var_value("x"));
+        REQUIRE(read_facade->contains_procedure_use_var_value("y"));
+        REQUIRE(read_facade->contains_procedure_use_var_value("z"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_procedure_use_var_key("nonexistent"));
+        REQUIRE_FALSE(read_facade->contains_procedure_use_var_value("nonexistent"));
+    }
+
     SECTION("Simple Use Test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_statement_uses_var("1", "x");
-        write_facade->add_statement_uses_var("1", "y");
-        write_facade->add_statement_uses_var("2", "x");
-        write_facade->add_statement_uses_var("2", "z");
+        write_facade->add_statement_use_var("1", "x");
+        write_facade->add_statement_use_var("1", "y");
+        write_facade->add_statement_use_var("2", "x");
+        write_facade->add_statement_use_var("2", "z");
 
         REQUIRE(read_facade->does_statement_use_var("1", "x"));
         REQUIRE(!read_facade->does_statement_use_var("1", "z"));
@@ -632,13 +770,13 @@ TEST_CASE("Use Test") {
     SECTION("More complex use test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_procedure_uses_var("main", "x");
-        write_facade->add_procedure_uses_var("main", "y");
-        write_facade->add_procedure_uses_var("helper", "z");
-        write_facade->add_statement_uses_var("1", "x");
-        write_facade->add_statement_uses_var("1", "y");
-        write_facade->add_statement_uses_var("2", "x");
-        write_facade->add_statement_uses_var("2", "z");
+        write_facade->add_procedure_use_var("main", "x");
+        write_facade->add_procedure_use_var("main", "y");
+        write_facade->add_procedure_use_var("helper", "z");
+        write_facade->add_statement_use_var("1", "x");
+        write_facade->add_statement_use_var("1", "y");
+        write_facade->add_statement_use_var("2", "x");
+        write_facade->add_statement_use_var("2", "z");
 
         REQUIRE(read_facade->get_all_statements_that_use().size() == 2);
         REQUIRE(read_facade->contains_statement_use_var_key("1"));
@@ -655,10 +793,10 @@ TEST_CASE("Use Test") {
     SECTION("Test get_statements_that_use_var of certain type") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
-        write_facade->add_statement_uses_var("1", "x");
-        write_facade->add_statement_uses_var("1", "y");
-        write_facade->add_statement_uses_var("2", "x");
-        write_facade->add_statement_uses_var("2", "z");
+        write_facade->add_statement_use_var("1", "x");
+        write_facade->add_statement_use_var("1", "y");
+        write_facade->add_statement_use_var("2", "x");
+        write_facade->add_statement_use_var("2", "z");
 
         write_facade->add_statement("1", StatementType::Read);
         write_facade->add_statement("2", StatementType::Call);
@@ -732,6 +870,35 @@ TEST_CASE("Assignment Pattern Test") {
 }
 
 TEST_CASE("Calls and Calls* Relationship Test") {
+    SECTION("Contains Calls and Calls* Relationships Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_calls("Main", "Helper");
+        write_facade->add_calls("Helper", "Logger");
+
+        REQUIRE(read_facade->has_calls_relation());
+        REQUIRE(read_facade->has_calls_star_relation());
+
+        REQUIRE(read_facade->contains_calls_key("Main"));
+        REQUIRE(read_facade->contains_calls_key("Helper"));
+
+        REQUIRE(read_facade->contains_calls_value("Helper"));
+        REQUIRE(read_facade->contains_calls_value("Logger"));
+
+        REQUIRE(read_facade->contains_calls_star_key("Main"));
+        REQUIRE(read_facade->contains_calls_star_key("Helper"));
+
+        REQUIRE(read_facade->contains_calls_star_value("Helper"));
+        REQUIRE(read_facade->contains_calls_star_value("Logger"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_calls_key("Logger"));
+        REQUIRE_FALSE(read_facade->contains_calls_value("Main"));
+
+        REQUIRE_FALSE(read_facade->contains_calls_star_key("Logger"));
+        REQUIRE_FALSE(read_facade->contains_calls_star_value("Main"));
+    }
+
     SECTION("Adding and Verifying Direct Calls Relationships") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
@@ -987,6 +1154,25 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 }
 
 TEST_CASE("Next Test") {
+    SECTION("Contains Next Relationship Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_next("1", "2");
+        write_facade->add_next("2", "3");
+
+        REQUIRE(read_facade->has_next_relation());
+
+        REQUIRE(read_facade->contains_next_key("1"));
+        REQUIRE(read_facade->contains_next_key("2"));
+
+        REQUIRE(read_facade->contains_next_value("2"));
+        REQUIRE(read_facade->contains_next_value("3"));
+
+        // Negative testcases
+        REQUIRE_FALSE(read_facade->contains_next_key("3"));
+        REQUIRE_FALSE(read_facade->contains_next_value("1"));
+    }
+
     SECTION("Add and Verify Direct Next Relationship") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 

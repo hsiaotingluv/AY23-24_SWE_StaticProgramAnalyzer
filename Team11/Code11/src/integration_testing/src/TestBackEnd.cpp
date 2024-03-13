@@ -218,7 +218,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
     write_facade->add_statement("2", StatementType::Call);
     write_facade->add_variable("x");
 
-    write_facade->add_statement_modifies_var("1", "x");
+    write_facade->add_statement_modify_var("1", "x");
 
     SECTION("Test Query - all variables modified by statement") {
         const auto query = R"(variable v; Select v such that Modifies(1, v))";

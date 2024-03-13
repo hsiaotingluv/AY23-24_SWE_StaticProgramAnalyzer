@@ -489,11 +489,11 @@ bool PkbManager::has_parent_relation(const std::string& parent, const std::strin
 }
 
 bool PkbManager::contains_parent_key(const std::string& stmt) const {
-    return this->follows_star_store->contains_key(stmt);
+    return this->direct_parent_store->contains_key(stmt);
 }
 
 bool PkbManager::contains_parent_value(const std::string& stmt) const {
-    return this->follows_star_store->contains_val(stmt);
+    return this->direct_parent_store->contains_val(stmt);
 }
 
 std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_parent() const {
@@ -797,23 +797,23 @@ void PkbManager::add_statement(const std::string& statement_number, StatementTyp
     this->statement_store->add(statement_number, statement_type);
 }
 
-void PkbManager::add_statement_modifies_var(const std::string& statement_number, std::string variable) {
+void PkbManager::add_statement_modify_var(const std::string& statement_number, std::string variable) {
     auto v = Variable(std::move(variable));
     this->statement_modifies_store->add(statement_number, v);
 }
 
-void PkbManager::add_procedure_modifies_var(std::string procedure, std::string variable) {
+void PkbManager::add_procedure_modify_var(std::string procedure, std::string variable) {
     auto p = Procedure(std::move(procedure));
     auto v = Variable(std::move(variable));
     this->procedure_modifies_store->add(p, v);
 }
 
-void PkbManager::add_statement_uses_var(const std::string& statement_number, std::string variable) {
+void PkbManager::add_statement_use_var(const std::string& statement_number, std::string variable) {
     auto v = Variable(std::move(variable));
     this->statement_uses_store->add(statement_number, v);
 }
 
-void PkbManager::add_procedure_uses_var(std::string procedure, std::string variable) {
+void PkbManager::add_procedure_use_var(std::string procedure, std::string variable) {
     auto p = Procedure(std::move(procedure));
     auto v = Variable(std::move(variable));
     this->procedure_uses_store->add(p, v);

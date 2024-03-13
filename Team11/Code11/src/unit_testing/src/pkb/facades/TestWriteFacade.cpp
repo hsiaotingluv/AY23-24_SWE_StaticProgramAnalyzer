@@ -23,20 +23,20 @@ TEST_CASE("write_facade Test") {
         REQUIRE_NOTHROW(write_facade->add_statement("1", StatementType::Assign));
     }
 
-    SECTION("add_statement_modifies_var") {
-        REQUIRE_NOTHROW(write_facade->add_statement_modifies_var("1", "TestVariable"));
+    SECTION("add_statement_modify_var") {
+        REQUIRE_NOTHROW(write_facade->add_statement_modify_var("1", "TestVariable"));
     }
 
-    SECTION("add_procedure_modifies_var") {
-        REQUIRE_NOTHROW(write_facade->add_procedure_modifies_var("TestProcedure", "TestVariable"));
+    SECTION("add_procedure_modify_var") {
+        REQUIRE_NOTHROW(write_facade->add_procedure_modify_var("TestProcedure", "TestVariable"));
     }
 
-    SECTION("add_statement_uses_var") {
-        REQUIRE_NOTHROW(write_facade->add_statement_uses_var("1", "TestVariable"));
+    SECTION("add_statement_use_var") {
+        REQUIRE_NOTHROW(write_facade->add_statement_use_var("1", "TestVariable"));
     }
 
-    SECTION("add_procedure_uses_var") {
-        REQUIRE_NOTHROW(write_facade->add_procedure_uses_var("TestProcedure", "TestVariable"));
+    SECTION("add_procedure_use_var") {
+        REQUIRE_NOTHROW(write_facade->add_procedure_use_var("TestProcedure", "TestVariable"));
     }
 
     SECTION("add_follows") {

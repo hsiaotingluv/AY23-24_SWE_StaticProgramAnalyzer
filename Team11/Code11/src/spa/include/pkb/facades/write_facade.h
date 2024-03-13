@@ -23,13 +23,13 @@ class WriteFacade {
 
     void add_statement(const std::string& statement_number, StatementType type);
 
-    void add_statement_modifies_var(const std::string& statement_number, std::string variable);
+    void add_statement_modify_var(const std::string& statement_number, std::string variable);
 
-    void add_procedure_modifies_var(std::string procedure, std::string variable);
+    void add_procedure_modify_var(std::string procedure, std::string variable);
 
-    void add_statement_uses_var(const std::string& statement_number, std::string variable);
+    void add_statement_use_var(const std::string& statement_number, std::string variable);
 
-    void add_procedure_uses_var(std::string procedure, std::string variable);
+    void add_procedure_use_var(std::string procedure, std::string variable);
 
     void add_follows(const std::string& stmt1, const std::string& stmt2);
 

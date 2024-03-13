@@ -33,10 +33,10 @@ TEST_CASE("Test Evaluator Pattern") {
     write_facade->add_constant("2");
 
     write_facade->add_assignment("1", "x", "y z 2 * +");
-    write_facade->add_statement_modifies_var("1", "x");
+    write_facade->add_statement_modify_var("1", "x");
 
     write_facade->add_assignment("2", "z", "1");
-    write_facade->add_statement_modifies_var("2", "z");
+    write_facade->add_statement_modify_var("2", "z");
     auto evaluator = QueryEvaluator{read_facade};
 
     SECTION("Evaluate - Select a such that Pattern a (\"x\", _)") {

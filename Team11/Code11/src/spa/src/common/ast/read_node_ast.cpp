@@ -30,7 +30,7 @@ auto ReadNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& wr
 auto ReadNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<ModifyMap>&) -> std::unordered_set<std::string> {
     auto stmt_number = std::to_string(get_statement_number());
-    write_facade->add_statement_modifies_var(stmt_number, var_node->name);
+    write_facade->add_statement_modify_var(stmt_number, var_node->name);
 
     return {var_node->name};
 }

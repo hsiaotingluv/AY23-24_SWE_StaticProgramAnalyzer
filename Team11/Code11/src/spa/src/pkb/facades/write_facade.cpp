@@ -22,20 +22,20 @@ void WriteFacade::add_statement(const std::string& statement_number, StatementTy
     this->pkb->add_statement(statement_number, statement_type);
 }
 
-void WriteFacade::add_statement_modifies_var(const std::string& statement_number, std::string variable) {
-    this->pkb->add_statement_modifies_var(statement_number, std::move(variable));
+void WriteFacade::add_statement_modify_var(const std::string& statement_number, std::string variable) {
+    this->pkb->add_statement_modify_var(statement_number, std::move(variable));
 }
 
-void WriteFacade::add_procedure_modifies_var(std::string procedure, std::string variable) {
-    this->pkb->add_procedure_modifies_var(std::move(procedure), std::move(variable));
+void WriteFacade::add_procedure_modify_var(std::string procedure, std::string variable) {
+    this->pkb->add_procedure_modify_var(std::move(procedure), std::move(variable));
 }
 
-void WriteFacade::add_statement_uses_var(const std::string& statement_number, std::string variable) {
-    this->pkb->add_statement_uses_var(statement_number, std::move(variable));
+void WriteFacade::add_statement_use_var(const std::string& statement_number, std::string variable) {
+    this->pkb->add_statement_use_var(statement_number, std::move(variable));
 }
 
-void WriteFacade::add_procedure_uses_var(std::string procedure, std::string variable) {
-    this->pkb->add_procedure_uses_var(std::move(procedure), std::move(variable));
+void WriteFacade::add_procedure_use_var(std::string procedure, std::string variable) {
+    this->pkb->add_procedure_use_var(std::move(procedure), std::move(variable));
 }
 
 void WriteFacade::add_follows(const std::string& stmt1, const std::string& stmt2) {

@@ -61,7 +61,7 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& writ
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_statement_modifies_var(stmt_number, var);
+        write_facade->add_statement_modify_var(stmt_number, var);
     }
 
     return combined_set;
@@ -142,7 +142,7 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_fa
 
     // Add all variables to the PkbManager.
     for (const auto& var_name : combined_set) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
+        write_facade->add_statement_use_var(stmt_number, var_name);
     }
 
     return combined_set;

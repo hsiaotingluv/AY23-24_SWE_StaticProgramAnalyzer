@@ -26,8 +26,8 @@ TEST_CASE("Test Evaluator UsesP") {
     write_facade->add_variable("b");
     write_facade->add_variable("c");
 
-    write_facade->add_procedure_uses_var("proc1", "a");
-    write_facade->add_procedure_uses_var("proc2", "b");
+    write_facade->add_procedure_use_var("proc1", "a");
+    write_facade->add_procedure_use_var("proc2", "b");
 
     write_facade->finalise_pkb();
 

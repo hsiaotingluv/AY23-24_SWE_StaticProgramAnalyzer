@@ -26,8 +26,8 @@ TEST_CASE("Test Evaluator ModifiesP") {
     write_facade->add_variable("b");
     write_facade->add_variable("c");
 
-    write_facade->add_procedure_modifies_var("proc1", "a");
-    write_facade->add_procedure_modifies_var("proc2", "b");
+    write_facade->add_procedure_modify_var("proc1", "a");
+    write_facade->add_procedure_modify_var("proc2", "b");
 
     write_facade->finalise_pkb();
 
