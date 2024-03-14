@@ -3,6 +3,7 @@
 #include "common/hashable_tuple.h"
 #include "pkb/stores/calls_store/calls_star_store.h"
 #include "pkb/stores/calls_store/direct_calls_store.h"
+#include "pkb/stores/calls_store/stmt_no_to_proc_called_store.h"
 #include "pkb/stores/entity_store.h"
 #include "pkb/stores/follows_store/direct_follows_store.h"
 #include "pkb/stores/follows_store/follows_star_store.h"
@@ -352,6 +353,8 @@ class PkbManager {
 
     std::unordered_set<std::string> get_callers(const std::string& callee) const;
 
+    std::string get_procedure_name_called_by(const std::string& stmt_number) const;
+
     bool has_calls_star_relation() const;
 
     bool has_calls_star_relation(const std::string& caller, const std::string& callee) const;
@@ -429,6 +432,8 @@ class PkbManager {
 
     void add_calls(const std::string& caller, const std::string& callee);
 
+    void add_stmt_no_proc_called_mapping(const std::string& stmt_no, const std::string& proc_called);
+
     void add_if_var(const std::string& statement_number, const std::string& variable);
 
     void add_while_var(const std::string& statement_number, const std::string& variable);
@@ -452,6 +457,7 @@ class PkbManager {
     std::shared_ptr<CallsStarStore> calls_star_store;
     std::shared_ptr<IfVarStore> if_var_store;
     std::shared_ptr<WhileVarStore> while_var_store;
+    std::shared_ptr<StmtNoToProcCalledStore> stmt_no_to_proc_called_store;
 
     template <class DirectStore, class StarStore, class OrderingStrategy>
     void populate_star_from_direct(std::shared_ptr<DirectStore> direct_store, std::shared_ptr<StarStore> star_store,

@@ -483,6 +483,10 @@ std::unordered_set<std::string> ReadFacade::get_callers(const std::string& calle
     return this->pkb->get_callers(callee);
 }
 
+std::string ReadFacade::get_procedure_name_called_by(const std::string& stmt_number) const {
+    return this->pkb->get_procedure_name_called_by(stmt_number);
+}
+
 bool ReadFacade::has_calls_star_relation() const {
     return this->pkb->has_calls_star_relation();
 }

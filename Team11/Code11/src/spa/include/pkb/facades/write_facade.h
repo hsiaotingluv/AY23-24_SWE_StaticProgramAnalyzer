@@ -7,6 +7,7 @@
 #include "pkb/common_types/variable.h"
 #include "pkb/pkb_manager.h"
 #include <unordered_set>
+#include <vector>
 
 namespace pkb {
 class WriteFacade {
@@ -40,6 +41,8 @@ class WriteFacade {
     void add_next(const std::string& stmt1, const std::string& stmt2);
 
     void add_calls(const std::string& caller, const std::string& callee);
+
+    void add_stmt_no_proc_called_mapping(const std::string& stmt_no, const std::string& proc_called);
 
     void add_if_var(const std::string& statement_number, const std::string& variable);
 

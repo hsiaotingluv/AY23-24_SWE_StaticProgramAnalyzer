@@ -18,7 +18,8 @@ PkbManager::PkbManager()
       statement_uses_store(std::make_shared<StatementUsesStore>()),
       assignment_store(std::make_shared<AssignmentStore>()), next_store(std::make_shared<NextStore>()),
       direct_calls_store(std::make_shared<DirectCallsStore>()), calls_star_store(std::make_shared<CallsStarStore>()),
-      if_var_store(std::make_shared<IfVarStore>()), while_var_store(std::make_shared<WhileVarStore>()) {
+      if_var_store(std::make_shared<IfVarStore>()), while_var_store(std::make_shared<WhileVarStore>()),
+      stmt_no_to_proc_called_store(std::make_shared<StmtNoToProcCalledStore>()) {
 }
 
 auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
@@ -597,6 +598,11 @@ std::unordered_set<std::string> PkbManager::get_callers(const std::string& calle
     return this->get_name_list(procedures);
 }
 
+std::string PkbManager::get_procedure_name_called_by(const std::string& stmt_number) const {
+    Procedure p = this->stmt_no_to_proc_called_store->get_val_by_key(stmt_number);
+    return p.get_name();
+}
+
 bool PkbManager::has_calls_star_relation() const {
     return this->calls_star_store->has_relationship();
 }
@@ -779,6 +785,11 @@ void PkbManager::add_calls(const std::string& caller, const std::string& callee)
     auto caller_procedure = Procedure(caller);
     auto callee_procedure = Procedure(callee);
     this->direct_calls_store->add(caller_procedure, callee_procedure);
+}
+
+void PkbManager::add_stmt_no_proc_called_mapping(const std::string& stmt_no, const std::string& proc_called) {
+    auto p = Procedure(proc_called);
+    this->stmt_no_to_proc_called_store->add(stmt_no, p);
 }
 
 template <class Key, class Value>

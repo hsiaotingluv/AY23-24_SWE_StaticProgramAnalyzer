@@ -66,6 +66,10 @@ void WriteFacade::add_calls(const std::string& caller, const std::string& callee
     this->pkb->add_calls(caller, callee);
 }
 
+void WriteFacade::add_stmt_no_proc_called_mapping(const std::string& stmt_no, const std::string& proc_called) {
+    this->pkb->add_stmt_no_proc_called_mapping(stmt_no, proc_called);
+}
+
 void WriteFacade::finalise_pkb(const std::vector<std::string>& procedure_order) {
     this->pkb->finalise_pkb(procedure_order);
 }

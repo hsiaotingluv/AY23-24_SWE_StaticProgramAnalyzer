@@ -875,9 +875,10 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         REQUIRE(read_facade->has_calls_relation());
-        //        REQUIRE(read_facade->has_calls_star_relation());
+        REQUIRE(read_facade->has_calls_star_relation());
 
         REQUIRE(read_facade->contains_calls_key("Main"));
         REQUIRE(read_facade->contains_calls_key("Helper"));
@@ -885,18 +886,18 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         REQUIRE(read_facade->contains_calls_value("Helper"));
         REQUIRE(read_facade->contains_calls_value("Logger"));
 
-        //        REQUIRE(read_facade->contains_calls_star_key("Main"));
-        //        REQUIRE(read_facade->contains_calls_star_key("Helper"));
-        //
-        //        REQUIRE(read_facade->contains_calls_star_value("Helper"));
-        //        REQUIRE(read_facade->contains_calls_star_value("Logger"));
+        REQUIRE(read_facade->contains_calls_star_key("Main"));
+        REQUIRE(read_facade->contains_calls_star_key("Helper"));
+
+        REQUIRE(read_facade->contains_calls_star_value("Helper"));
+        REQUIRE(read_facade->contains_calls_star_value("Logger"));
 
         // Negative testcases
         REQUIRE_FALSE(read_facade->contains_calls_key("Logger"));
         REQUIRE_FALSE(read_facade->contains_calls_value("Main"));
 
-        //        REQUIRE_FALSE(read_facade->contains_calls_star_key("Logger"));
-        //        REQUIRE_FALSE(read_facade->contains_calls_star_value("Main"));
+        REQUIRE_FALSE(read_facade->contains_calls_star_key("Logger"));
+        REQUIRE_FALSE(read_facade->contains_calls_star_value("Main"));
     }
 
     SECTION("Adding and Verifying Direct Calls Relationships") {
@@ -1212,6 +1213,21 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         auto callees = read_facade->get_star_callees("NonExisting");
 
         REQUIRE(callees.empty());
+    }
+}
+
+TEST_CASE("Statement number to procedure called mapping test") {
+    SECTION("Simple statement number to procedure called mapping test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_stmt_no_proc_called_mapping("1", "Helper");
+        write_facade->add_stmt_no_proc_called_mapping("2", "Helper");
+        write_facade->add_stmt_no_proc_called_mapping("3", "Foobar");
+
+        REQUIRE(read_facade->get_procedure_name_called_by("1") == "Helper");
+        REQUIRE(read_facade->get_procedure_name_called_by("2") == "Helper");
+        REQUIRE(read_facade->get_procedure_name_called_by("3") == "Foobar");
+        REQUIRE(read_facade->get_procedure_name_called_by("4").empty());
     }
 }
 

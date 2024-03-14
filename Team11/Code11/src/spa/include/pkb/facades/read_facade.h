@@ -265,6 +265,8 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_callers(const std::string& callee) const;
 
+    std::string get_procedure_name_called_by(const std::string& stmt_number) const;
+
     bool has_calls_star_relation() const;
 
     bool has_calls_star_relation(const std::string& caller, const std::string& callee) const;
