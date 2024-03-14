@@ -22,7 +22,9 @@ auto CallNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
 }
 
 auto CallNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
-    write_facade->add_statement(std::to_string(get_statement_number()), StatementType::Call);
+    auto stmt_no = std::to_string(get_statement_number());
+    write_facade->add_statement(stmt_no, StatementType::Call);
+    write_facade->add_stmt_no_proc_called_mapping(stmt_no, proc_name);
 }
 
 auto CallNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
