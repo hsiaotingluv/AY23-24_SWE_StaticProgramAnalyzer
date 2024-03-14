@@ -26,9 +26,9 @@ class CfgNode {
     auto get() const -> StatementNumbers;
 
     /**
-     * @brief Construct a new Cfg Node object
+     * @brief Add a statement number.
      */
-    auto add(int stmt_num) -> void;
+    auto add(int const stmt_num) -> int;
 
     /**
      * @brief Check if the CfgNode has no statement numbers.
@@ -98,29 +98,29 @@ class Cfg {
     /**
      * @brief Add a statement number to the current node.
      */
-    auto add_stmt_to_node(int stmt_num) -> void;
+    auto add_stmt_to_node(int const stmt_num) -> int;
 
     /**
      * @brief Add a new node to the graph, with empty out-neighbours.
      */
-    auto add_node_to_graph() -> void;
+    auto add_node_to_graph() -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Add a new node to the graph and link it to the current node.
      */
-    auto add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> void;
+    auto add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Move current node to the next node (Need not be a outneighbour node).
      * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
-    auto move_to(std::shared_ptr<CfgNode> node) -> void;
+    auto move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
      * @note Default way to traverse the Cfg.
      */
-    auto link_and_move_to(std::shared_ptr<CfgNode> node) -> void;
+    auto link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
