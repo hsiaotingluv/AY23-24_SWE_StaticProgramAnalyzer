@@ -26,7 +26,7 @@ TEST_CASE("Test Evaluator Calls") {
     write_facade->add_calls("proc1", "proc2");
     write_facade->add_calls("proc2", "proc3");
 
-    write_facade->finalise_pkb();
+    write_facade->finalise_pkb({"proc3", "proc2", "proc1"});
 
     auto evaluator = QueryEvaluator{read_facade};
 

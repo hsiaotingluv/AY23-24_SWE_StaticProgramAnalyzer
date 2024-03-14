@@ -1027,7 +1027,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         REQUIRE(read_facade->has_calls_star_relation("Main", "Helper"));
         REQUIRE(read_facade->has_calls_star_relation("Helper", "Logger"));
@@ -1038,7 +1038,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         REQUIRE_FALSE(read_facade->has_calls_star_relation("Logger", "Helper"));
         REQUIRE_FALSE(read_facade->has_calls_star_relation("Main", "Main"));
@@ -1051,7 +1051,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Main", "Logger");
         write_facade->add_calls("Helper", "Validator");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Validator", "Helper", "Logger", "Main"});
 
         auto calls_keys = read_facade->get_all_calls_star_keys();
 
@@ -1081,7 +1081,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Utils");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Utils", "Helper", "Main"});
 
         auto callees = read_facade->get_all_calls_star_values();
 
@@ -1096,7 +1096,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         auto callers = read_facade->get_all_calls_star_keys();
 
@@ -1111,7 +1111,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         auto callers = read_facade->get_star_callers("Logger");
 
@@ -1119,6 +1119,68 @@ TEST_CASE("Calls and Calls* Relationship Test") {
         REQUIRE(callers.find("Main") != callers.end());
         REQUIRE(callers.find("Helper") != callers.end());
         REQUIRE(callers.find("Logger") == callers.end());
+    }
+
+    SECTION("More complex calls* relationship test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_calls("A", "B");
+        write_facade->add_calls("B", "C");
+        write_facade->add_calls("C", "D");
+        write_facade->add_calls("B", "D");
+        write_facade->add_calls("D", "E");
+        write_facade->add_calls("E", "F");
+        write_facade->add_calls("D", "G");
+        write_facade->add_calls("G", "H");
+        write_facade->add_calls("H", "I");
+        write_facade->add_calls("A", "I");
+        write_facade->add_calls("H", "J");
+        write_facade->add_calls("K", "J");
+
+        write_facade->finalise_pkb({"J", "K", "I", "H", "G", "F", "E", "D", "C", "B", "A"});
+
+        REQUIRE(read_facade->has_calls_star_relation("A", "B"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "C"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "D"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "E"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "F"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "G"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "H"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "I"));
+        REQUIRE(read_facade->has_calls_star_relation("A", "J"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("A", "K"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "C"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "D"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "E"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "F"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "G"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "H"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "I"));
+        REQUIRE(read_facade->has_calls_star_relation("B", "J"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("B", "K"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "D"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "E"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "F"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "G"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "H"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "I"));
+        REQUIRE(read_facade->has_calls_star_relation("C", "J"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("C", "K"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "E"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "F"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "G"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "H"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "I"));
+        REQUIRE(read_facade->has_calls_star_relation("D", "J"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("D", "K"));
+        REQUIRE(read_facade->has_calls_star_relation("E", "F"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "G"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "H"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "I"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "J"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "K"));
+        REQUIRE_FALSE(read_facade->has_calls_star_relation("E", "D"));
+        REQUIRE(read_facade->has_calls_star_relation("K", "J"));
     }
 
     SECTION("Retrieving Star Callers for Non-existent Callee Returns Empty Set") {
@@ -1134,7 +1196,7 @@ TEST_CASE("Calls and Calls* Relationship Test") {
 
         write_facade->add_calls("Main", "Helper");
         write_facade->add_calls("Helper", "Logger");
-        write_facade->finalise_pkb();
+        write_facade->finalise_pkb({"Logger", "Helper", "Main"});
 
         auto callees = read_facade->get_star_callees("Main");
 
