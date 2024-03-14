@@ -50,7 +50,7 @@ auto require_value_bool(const Variant& reference, std::string value) -> bool {
 
 template <typename T, typename Variant,
           std::enable_if_t<qps::is_variant_member_v<std::shared_ptr<qps::Synonym>, Variant>, bool> = true>
-auto require_value(const Variant& reference, std::string value) -> bool {
+void require_value(const Variant& reference, std::string value) {
     REQUIRE(require_value_bool<T>(reference, value));
 }
 
