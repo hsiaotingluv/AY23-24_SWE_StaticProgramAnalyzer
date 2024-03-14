@@ -16,7 +16,7 @@ auto CfgNode::empty() const -> bool {
     return stmt_nums.empty();
 };
 
-auto operator<<(std::ostream& os, CfgNode const& cfg_node) -> std::ostream& {
+auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream& {
     os << "Node(";
     for (size_t i = 0; i < cfg_node.stmt_nums.size(); i++) {
         if (i != 0) {
@@ -36,7 +36,7 @@ auto Cfg::get_current_node() const -> std::shared_ptr<CfgNode> {
     return current_node;
 };
 
-auto Cfg::get_outneighbours(std::shared_ptr<CfgNode> const& node) const -> OutNeighbours {
+auto Cfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNeighbours {
     if (graph.find(node) == graph.end()) {
         return EMPTY_OUTNEIGHBOURS;
     } else {
@@ -63,7 +63,7 @@ auto Cfg::add_node_to_graph() -> std::shared_ptr<CfgNode> {
     return current_node;
 }
 
-auto Cfg::add_outneighbour_to_graph(std::shared_ptr<CfgNode> const& outneighbour) -> std::shared_ptr<CfgNode> {
+auto Cfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> std::shared_ptr<CfgNode> {
     // Fill the out-neighbours of current_node.
     if (graph.at(current_node).first) {
         graph.at(current_node).second = outneighbour;
@@ -73,19 +73,19 @@ auto Cfg::add_outneighbour_to_graph(std::shared_ptr<CfgNode> const& outneighbour
     return outneighbour;
 }
 
-auto Cfg::move_to(std::shared_ptr<CfgNode> const& node) -> std::shared_ptr<CfgNode> {
+auto Cfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
     current_node = std::move(node);
     return node;
 };
 
-auto Cfg::link_and_move_to(std::shared_ptr<CfgNode> const& node) -> std::shared_ptr<CfgNode> {
+auto Cfg::link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
     add_outneighbour_to_graph(node);
     move_to(node);
     add_node_to_graph();
     return node;
 };
 
-auto operator<<(std::ostream& os, Cfg const& cfg) -> std::ostream& {
+auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream& {
     auto graph = cfg.graph;
     for (const auto& [node, outneighbours] : graph) {
         os << *node << " -> OutNeighbours(";
