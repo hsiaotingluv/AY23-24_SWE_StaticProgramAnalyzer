@@ -40,16 +40,16 @@ run_clang_tidy() {
     echo "Running clang-tidy on all files in $1"
 
     if [ $VERBOSE = "true" ]; then
-        find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' \) -exec echo {} \;
+        find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' -o -iname '*.tpp' \) -exec echo {} \;
     fi
     sleep 2
-    find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' \) -exec clang-tidy {} -p $2\
+    find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' -o -iname '*.tpp' \) -exec clang-tidy {} -p $2\
     -header-filter=.*\
     -checks=-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter,-cppcoreguidelines-special-member-functions \;
 }
 
 run_clang_format() {
-    find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' \) -exec clang-format -style=file -i {} \;
+    find "$1" \( -iname '*.h' -o -iname '*.cpp' -o -iname '*.hpp' -o -iname '*.tpp' \) -exec clang-format -style=file -i {} \;
 }
 
 run() {    
