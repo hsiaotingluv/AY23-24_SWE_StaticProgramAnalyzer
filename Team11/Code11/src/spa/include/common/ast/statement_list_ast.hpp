@@ -23,6 +23,6 @@ class StatementListNode : public sp::AstNode, public sp::CfgMixin {
     [[nodiscard]] auto to_xml() const -> std::string override;
 
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 } // namespace sp

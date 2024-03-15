@@ -175,7 +175,7 @@ auto IfNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_
     }
 }
 
-auto IfNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto IfNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto if_node = std::make_shared<CfgNode>();
     auto then_node = std::make_shared<CfgNode>();
     auto else_node = std::make_shared<CfgNode>();

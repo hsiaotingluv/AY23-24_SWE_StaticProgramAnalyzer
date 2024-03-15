@@ -2,14 +2,14 @@
 
 namespace sp {
 
-auto CfgBuilder::create_empty_cfg(const std::string& proc_name) -> std::shared_ptr<Cfg> {
-    auto cfg = std::make_shared<Cfg>();
+auto ProgramCfgs::create_empty_cfg(const std::string& proc_name) -> std::shared_ptr<ProcedureCfg> {
+    auto cfg = std::make_shared<ProcedureCfg>();
     proc_map.insert(std::make_pair(proc_name, cfg)); // Add the Cfg to the ProcMap.
     return cfg;
 };
 
-auto CfgBuilder::populate_stmt_num_map_by_node(const StatementNumbers& stmt_nums, const std::string& proc_name,
-                                               const std::shared_ptr<CfgNode>& node) -> StatementNumbers {
+auto ProgramCfgs::populate_stmt_num_map_by_node(const StatementNumbers& stmt_nums, const std::string& proc_name,
+                                                const std::shared_ptr<CfgNode>& node) -> StatementNumbers {
     for (const auto& stmt_num : stmt_nums) { // Iterate through each statement number.
         auto stmt_num_str = std::to_string(stmt_num);
         auto node_info = std::make_pair(proc_name, node);
@@ -18,7 +18,7 @@ auto CfgBuilder::populate_stmt_num_map_by_node(const StatementNumbers& stmt_nums
     return stmt_nums;
 }
 
-auto CfgBuilder::populate_stmt_num_map_by_procedure(const std::string& proc_name, const Graph& graph) -> Graph {
+auto ProgramCfgs::populate_stmt_num_map_by_procedure(const std::string& proc_name, const Graph& graph) -> Graph {
     for (const auto& [node, out_neighbours] : graph) { // Iterate through each CfgNode.
         auto stmt_nums = node->get();
         populate_stmt_num_map_by_node(stmt_nums, proc_name, node);
@@ -26,7 +26,7 @@ auto CfgBuilder::populate_stmt_num_map_by_procedure(const std::string& proc_name
     return graph;
 }
 
-auto CfgBuilder::populate_stmt_num_map() -> StmtNumMap {
+auto ProgramCfgs::populate_stmt_num_map() -> StmtNumMap {
     for (const auto& [proc_name, cfg] : proc_map) { // Iterate through each procedure's Cfg.
         auto graph = cfg->get_graph();
         populate_stmt_num_map_by_procedure(proc_name, graph);
@@ -34,15 +34,15 @@ auto CfgBuilder::populate_stmt_num_map() -> StmtNumMap {
     return stmt_num_map;
 };
 
-auto CfgBuilder::get_proc_map() const -> ProcMap {
+auto ProgramCfgs::get_proc_map() const -> ProcMap {
     return proc_map;
 };
 
-auto CfgBuilder::get_stmt_num_map() const -> StmtNumMap {
+auto ProgramCfgs::get_stmt_num_map() const -> StmtNumMap {
     return stmt_num_map;
 };
 
-auto CfgBuilder::build(const std::shared_ptr<AstNode>& ast) -> ProcMap {
+auto ProgramCfgs::build(const std::shared_ptr<AstNode>& ast) -> ProcMap {
     auto prog_node = std::dynamic_pointer_cast<ProgramNode>(ast);
     for (const auto& node : prog_node->procedures) {
         auto proc_node = std::dynamic_pointer_cast<ProcedureNode>(node);
@@ -58,7 +58,7 @@ auto CfgBuilder::build(const std::shared_ptr<AstNode>& ast) -> ProcMap {
     return proc_map;
 }
 
-auto operator<<(std::ostream& os, const CfgBuilder& cfg_builder) -> std::ostream& {
+auto operator<<(std::ostream& os, const ProgramCfgs& cfg_builder) -> std::ostream& {
     auto proc_map = cfg_builder.proc_map;
     for (const auto& [proc_name, cfg] : proc_map) {
         os << proc_name << ":\n" << *cfg;
