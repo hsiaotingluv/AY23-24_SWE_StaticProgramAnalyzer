@@ -154,7 +154,7 @@ TEST_CASE("Test SP and PKB - Advanced SPA") {
           z = 5;
           v = z;
           print v; })";
-    
+
     auto [read_facade, write_facade] = pkb::PKB::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
