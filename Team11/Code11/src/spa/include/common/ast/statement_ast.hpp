@@ -58,7 +58,7 @@ class ReadNode : public StatementNode, public ModifiesMixin {
     auto populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade, const std::shared_ptr<ModifyMap>&)
         -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 
 /**
@@ -83,7 +83,7 @@ class PrintNode : public StatementNode, public UsesMixin {
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade, const std::shared_ptr<UsesMap>&) const
         -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 
 /**
@@ -111,7 +111,7 @@ class CallNode : public StatementNode, public ModifiesMixin, public UsesMixin {
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 
 /**
@@ -156,7 +156,7 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 
 /**
@@ -197,7 +197,7 @@ class WhileNode : public StatementNode, public ModifiesMixin, public ParentMixin
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 
 /**
@@ -230,6 +230,6 @@ class AssignmentNode : public StatementNode, public ModifiesMixin, public UsesMi
     auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
     // CfgMixin methods.
-    auto build_cfg(std::shared_ptr<Cfg> cfg) -> void override;
+    auto build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void override;
 };
 } // namespace sp

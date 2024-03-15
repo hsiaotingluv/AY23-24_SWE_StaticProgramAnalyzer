@@ -48,7 +48,7 @@ auto NextTraverser::traverse_edges(const std::shared_ptr<CfgNode>& node, const O
 /**
  * @brief Extract the Next Relationships within a procedure.
  */
-auto NextTraverser::traverse_procedure(const std::shared_ptr<Cfg>& cfg) -> void {
+auto NextTraverser::traverse_procedure(const std::shared_ptr<ProcedureCfg>& cfg) -> void {
     auto graph = cfg->get_graph();
     for (const auto& [node, outneighbours] : graph) {
         traverse_node(node);
@@ -65,7 +65,7 @@ auto NextTraverser::traverse_procedure(const std::shared_ptr<Cfg>& cfg) -> void 
 
 /**
  * @brief Extract the Next Relationships for the Program.
- * @note ProcMap is an alias for std::unordered_map<std::string, std::shared_ptr<Cfg>>
+ * @note ProcMap is an alias for std::unordered_map<std::string, std::shared_ptr<ProcedureCfg>>
  */
 auto NextTraverser::traverse(const ProcMap& cfgs) -> void {
     for (const auto& [proc_name, cfg] : cfgs) {
