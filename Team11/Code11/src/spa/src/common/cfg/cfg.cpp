@@ -7,7 +7,7 @@ auto CfgNode::get() const -> StatementNumbers {
     return stmt_nums;
 };
 
-auto CfgNode::add(int const stmt_num) -> int {
+auto CfgNode::add(int stmt_num) -> int {
     stmt_nums.push_back(stmt_num);
     return stmt_num;
 };
@@ -52,7 +52,7 @@ auto Cfg::is_current_node_empty() const -> bool {
     return current_node->empty();
 }
 
-auto Cfg::add_stmt_to_node(int const stmt_num) -> int {
+auto Cfg::add_stmt_to_node(int stmt_num) -> int {
     current_node->add(stmt_num);
     return stmt_num;
 };
