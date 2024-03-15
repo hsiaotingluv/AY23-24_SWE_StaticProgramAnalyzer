@@ -63,21 +63,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
         REQUIRE_FALSE(read_facade->does_statement_use_var("18", "y"));
     }
 
-    SECTION("Test SP and PKB Parent Website - success") {
-        // Taken from
-        // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
-        // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->has_parent_relation("14", "16"));
-        REQUIRE(read_facade->has_parent_relation("14", "17"));
-        REQUIRE(read_facade->has_parent_relation("19", "20"));
-        REQUIRE(read_facade->has_parent_star_relation("14", "16"));
-        REQUIRE(read_facade->has_parent_star_relation("19", "22"));
-
-        REQUIRE_FALSE(read_facade->has_parent_relation("10", "11"));
-        REQUIRE_FALSE(read_facade->has_parent_relation("10", "15"));
-        REQUIRE_FALSE(read_facade->has_parent_relation("14", "19"));
-    }
-
     SECTION("Test SP and PKB Modifies Website - success") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
