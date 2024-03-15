@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MODE="all" # One of ["all", "sp", "pkb", "qps", "tests"]
+MODE="all" # One of ["all", "sp", "pkb", "qps", "common", "tests"]
 RUN_CLANG_TIDY="true"
 VERBOSE="false"
 
@@ -67,6 +67,7 @@ fi
 SP_PATHS=("src/spa/src/sp/" "src/spa/include/sp/")
 PKB_PATHS=("src/spa/src/pkb/" "src/spa/include/pkb/")
 QPS_PATHS=("src/spa/src/qps/" "src/spa/include/qps/")
+COMMON_PATHS=("src/spa/src/common/" "src/spa/include/common/")
 TEST_PATHS=("src/unit_testing/" "src/integration_testing/")
 ALL_PATHS=("src/spa" "src/unit_testing" "src/integration_testing/" "src/autotester")
 
@@ -95,6 +96,13 @@ elif test $MODE = "qps"; then
     echo "Lint on all files in QPS"
 
     for i in "${QPS_PATHS[@]}"
+    do
+        run $i $PATH_TO_COMPILE_COMMANDS
+    done
+elif test $MODE = "common"; then
+    echo "Lint on all files in common"
+
+    for i in "${COMMON_PATHS[@]}"
     do
         run $i $PATH_TO_COMPILE_COMMANDS
     done
