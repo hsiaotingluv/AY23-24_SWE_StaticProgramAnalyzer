@@ -148,20 +148,52 @@ auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) ->
     return is_all_nodes;
 }
 
+// Statement Number Map related tests (Start).
+
 /**
  * @brief Verify if the StmtNumMap is correctly populated, by crossing check with the statement numbers in the CFGNode
  */
-auto verify_stmt_num_map(const sp::StmtNumMap& stmt_num_map) -> bool {
+auto verify_stmt_num_map(const sp::ProcMap& proc_map, const sp::StmtNumMap& stmt_num_map,
+                         const std::unordered_set<std::string> proc_names) -> bool {
     for (const auto& [stmt_num, cfg_node_info] : stmt_num_map) { // for each StmtNum-CfgNode pair
+        // Verify Procedure Name
+        auto proc_name = cfg_node_info.first;
+        if (std::find(proc_names.begin(), proc_names.end(), proc_name) ==
+            proc_names.end()) { // If Proc Name is not valid.
+            return false;
+        }
+        // Verify CFGNode
         auto cfg_node = cfg_node_info.second;
         const auto node_stmt_nums = cfg_node->get();
         if (std::find(node_stmt_nums.begin(), node_stmt_nums.end(), stoi(stmt_num)) ==
             node_stmt_nums.end()) { // If StmtNum (int) does not belong to that CfgNode
             return false;
         }
+        // Verify if CFGNode is in that ProcedureName
+        if (proc_map.find(proc_name) == proc_map.end()) { // If Proc Name is not in the Procedure Map.
+            return false;
+        }
+        auto cfg = proc_map.at(proc_name);
+        auto graph = cfg->get_graph();
+        if (graph.find(cfg_node) == graph.end()) { // If CfgNode does not belong to the correct CFG graph.
+            return false;
+        }
     }
     return true;
 }
+
+/**
+ * @brief Get all Procedure Names stored in the Statement Number Map.
+ */
+auto get_proc_names_in_stmt_num_map(const sp::StmtNumMap& stmt_num_map) -> std::unordered_set<std::string> {
+    std::unordered_set<std::string> proc_names;
+    for (const auto& [stmt_num, cfg_node_info] : stmt_num_map) {
+        proc_names.insert(cfg_node_info.first);
+    }
+    return proc_names;
+}
+
+// Statement Number Map related tests (End)
 
 TEST_CASE("Test CFG Builder") {
     auto tokenizer_runner =
@@ -214,8 +246,6 @@ TEST_CASE("Test CFG Builder") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-        auto ast = sp.process(input);
-
         /**
          * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
          * Graph.
@@ -236,11 +266,12 @@ TEST_CASE("Test CFG Builder") {
          * Node(1, 2, 3) -> OutNeighbours()
          */
 
+        auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
         auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto stmt_names = std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"};
 
-        REQUIRE(get_proc_names(proc_map) ==
-                std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
+        REQUIRE(get_proc_names(proc_map) == stmt_names);
 
         REQUIRE(get_stmt_nums_in_proc(proc_map, "main") == std::unordered_set<int>{1, 2, 3});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "readPoint") == std::unordered_set<int>{4, 5});
@@ -265,7 +296,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(test_traverse(proc_map, "printResults"));
         REQUIRE(test_traverse(proc_map, "computeCentroid"));
 
-        REQUIRE(verify_stmt_num_map(stmt_num_map));
+        REQUIRE(verify_stmt_num_map(proc_map, stmt_num_map, stmt_names));
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -298,14 +329,15 @@ TEST_CASE("Test CFG Builder") {
         auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
         auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto stmt_names = std::unordered_set<std::string>{"computeCentroid"};
 
-        REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
+        REQUIRE(get_proc_names(proc_map) == stmt_names);
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
         REQUIRE(get_dummy_nodes(proc_map) == 1);
         REQUIRE(verify_start_node(proc_map, "computeCentroid"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
         REQUIRE(test_traverse(proc_map, "computeCentroid"));
-        REQUIRE(verify_stmt_num_map(stmt_num_map));
+        REQUIRE(verify_stmt_num_map(proc_map, stmt_num_map, stmt_names));
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -344,14 +376,15 @@ TEST_CASE("Test CFG Builder") {
         auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
         auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto stmt_names = std::unordered_set<std::string>{"nesting"};
 
-        REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
+        REQUIRE(get_proc_names(proc_map) == stmt_names);
         REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(proc_map) == 3);
         REQUIRE(verify_start_node(proc_map, "nesting"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "nesting"));
         REQUIRE(test_traverse(proc_map, "nesting"));
-        REQUIRE(verify_stmt_num_map(stmt_num_map));
+        REQUIRE(verify_stmt_num_map(proc_map, stmt_num_map, stmt_names));
     }
 }
 
