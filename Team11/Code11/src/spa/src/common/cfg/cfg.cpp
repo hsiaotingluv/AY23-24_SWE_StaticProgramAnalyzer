@@ -74,7 +74,7 @@ auto Cfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour
 }
 
 auto Cfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
-    current_node = std::move(node);
+    current_node = node;
     return node;
 };
 

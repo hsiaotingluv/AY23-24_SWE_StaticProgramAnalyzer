@@ -121,9 +121,9 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
   private:
     [[nodiscard]] auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const
         -> std::unordered_set<std::string>;
-    auto get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
-                                 const std::shared_ptr<UsesMap>& uses_map,
-                                 const std::shared_ptr<StatementListNode>& node) const
+    [[nodiscard]] static auto get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
+                                                      const std::shared_ptr<UsesMap>& uses_map,
+                                                      const std::shared_ptr<StatementListNode>& node)
         -> std::unordered_set<std::string>;
     [[nodiscard]] static auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node)
         -> std::unordered_set<std::string>;
