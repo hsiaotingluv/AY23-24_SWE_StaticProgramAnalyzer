@@ -18,7 +18,7 @@ class CallGraphTraverser {
             return;
         }
 
-        for (auto& [callee, callers] : call_graph) {
+        for (const auto& [callee, callers] : call_graph) {
             for (const auto& caller : callers) {
                 write_facade->add_calls(caller, callee);
             }
