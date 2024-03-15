@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/ast/ast.hpp"
 #include "common/cfg/cfg.hpp"
 
 namespace sp {

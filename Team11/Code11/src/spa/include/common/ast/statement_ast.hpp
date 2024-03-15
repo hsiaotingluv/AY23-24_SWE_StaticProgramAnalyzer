@@ -29,7 +29,7 @@ class StatementNode : public AstNode, public DesignEntitiesMixin, public CfgMixi
     explicit StatementNode(sp::NodeType T) : AstNode(T) {
     }
 
-    virtual ~StatementNode() = default;
+    ~StatementNode() override = default;
 
     auto set_statement_number(uint32_t statement_number) -> void;
     [[nodiscard]] auto get_statement_number() const -> int;
@@ -121,9 +121,9 @@ class IfNode : public StatementNode, public ModifiesMixin, public ParentMixin, p
   private:
     [[nodiscard]] auto get_vars_from_expr(const std::shared_ptr<AstNode>& node) const
         -> std::unordered_set<std::string>;
-    auto get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
-                                 const std::shared_ptr<UsesMap>& uses_map,
-                                 const std::shared_ptr<StatementListNode>& node) const
+    [[nodiscard]] static auto get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
+                                                      const std::shared_ptr<UsesMap>& uses_map,
+                                                      const std::shared_ptr<StatementListNode>& node)
         -> std::unordered_set<std::string>;
     [[nodiscard]] static auto get_stmt_nums(const std::shared_ptr<StatementListNode>& node)
         -> std::unordered_set<std::string>;

@@ -1,4 +1,6 @@
 #include "sp/cfg/cfg_builder.hpp"
+#include "common/ast/procedure_ast.hpp"
+#include "common/ast/program_ast.hpp"
 
 namespace sp {
 

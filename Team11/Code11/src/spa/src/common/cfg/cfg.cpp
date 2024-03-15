@@ -1,13 +1,13 @@
-#include <utility>
-
 #include "common/cfg/cfg.hpp"
+#include <iostream>
+#include <utility>
 
 namespace sp {
 auto CfgNode::get() const -> StatementNumbers {
     return stmt_nums;
 };
 
-auto CfgNode::add(int const stmt_num) -> int {
+auto CfgNode::add(int stmt_num) -> int {
     stmt_nums.push_back(stmt_num);
     return stmt_num;
 };
@@ -52,7 +52,7 @@ auto ProcedureCfg::is_current_node_empty() const -> bool {
     return current_node->empty();
 }
 
-auto ProcedureCfg::add_stmt_to_node(int const stmt_num) -> int {
+auto ProcedureCfg::add_stmt_to_node(int stmt_num) -> int {
     current_node->add(stmt_num);
     return stmt_num;
 };
@@ -74,7 +74,7 @@ auto ProcedureCfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& out
 }
 
 auto ProcedureCfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
-    current_node = std::move(node);
+    current_node = node;
     return node;
 };
 
