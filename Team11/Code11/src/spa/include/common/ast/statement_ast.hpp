@@ -29,7 +29,7 @@ class StatementNode : public AstNode, public DesignEntitiesMixin, public CfgMixi
     explicit StatementNode(sp::NodeType T) : AstNode(T) {
     }
 
-    virtual ~StatementNode() = default;
+    ~StatementNode() override = default;
 
     auto set_statement_number(uint32_t statement_number) -> void;
     [[nodiscard]] auto get_statement_number() const -> int;

@@ -24,7 +24,7 @@ class LogicalBinaryNode : public LogicalNode {
         : LogicalNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
-    virtual ~LogicalBinaryNode() = default;
+    ~LogicalBinaryNode() override = default;
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto identifier() const -> std::stringstream override;
