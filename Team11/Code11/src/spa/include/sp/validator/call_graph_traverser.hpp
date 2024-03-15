@@ -1,9 +1,10 @@
 #pragma once
 
-#include <utility>
+#include "sp/validator/semantic_validator.hpp"
+#include "pkb/facades/write_facade.h"
 
-#include "memory"
-#include "semantic_validator.hpp"
+#include <utility>
+#include <memory>
 
 namespace sp {
 class CallGraphTraverser {

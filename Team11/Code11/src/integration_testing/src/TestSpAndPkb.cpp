@@ -5,9 +5,6 @@
 #include "sp/main.hpp"
 
 TEST_CASE("Test SP and PKB - Basic SPA") {
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
-    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
-
     std::string input = R"(procedure main {
             flag = 0;
             call computeCentroid;
@@ -46,9 +43,11 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-    SECTION("Test SP and PKB Uses Website - success") {
-        auto ast = sp->process(input);
+    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
+    auto ast = sp->process(input);
 
+    SECTION("Test SP and PKB Uses Website - success") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#uses
         // computeCentroid starts with stmt 10
@@ -65,8 +64,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB Parent Website - success") {
-        auto ast = sp->process(input);
-
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
         // computeCentroid starts with stmt 10
@@ -82,8 +79,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB Modifies Website - success") {
-        auto ast = sp->process(input);
-
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
         // computeCentroid starts with stmt 10
@@ -99,8 +94,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB Follows Website - success") {
-        auto ast = sp->process(input);
-
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#follows--follows
         // computeCentroid starts with stmt 10
@@ -117,8 +110,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB Assignment Pattern - success") {
-        auto ast = sp->process(input);
-
         REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);
         REQUIRE(read_facade->get_all_assignments_lhs("count").size() == 2);
         REQUIRE(read_facade->get_all_assignments_lhs("cenX").size() == 3);
@@ -135,8 +126,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB While and If Pattern - success") {
-        auto ast = sp->process(input);
-
         REQUIRE(read_facade->get_if_stmts_with_var().size() == 1);
         REQUIRE(read_facade->get_if_stmts_with_var("count").size() == 1);
         REQUIRE(read_facade->get_if_stmts_with_var("flag").empty());
@@ -147,8 +136,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     }
 
     SECTION("Test SP and PKB Populate calls - success") {
-        auto ast = sp->process(input);
-
         REQUIRE(read_facade->get_all_calls_callers().size() == 2);
         REQUIRE(read_facade->get_all_calls_callees().size() == 3);
         REQUIRE(read_facade->get_callees("main").size() == 2);
@@ -158,9 +145,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
 }
 
 TEST_CASE("Test SP and PKB - Advanced SPA") {
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
-    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
-
     std::string input = R"(procedure First {
       read x;
       read z;
@@ -185,13 +169,15 @@ TEST_CASE("Test SP and PKB - Advanced SPA") {
           z = 5;
           v = z;
           print v; })";
+    
+    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
+    auto ast = sp->process(input);
 
     SECTION("Test SP and PKB Next Website - success") {
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/advanced-spa-requirements/design-abstractions.html
         // computeCentroid starts with stmt 10
-        auto ast = sp->process(input);
-
         REQUIRE(read_facade->has_next_relation("4", "5"));
         REQUIRE(read_facade->has_next_relation("5", "6"));
         REQUIRE(read_facade->has_next_relation("6", "7"));
