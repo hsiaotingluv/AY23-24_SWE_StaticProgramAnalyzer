@@ -1,8 +1,6 @@
 #pragma once
 
 #include <string>
-#include <typeinfo>
-#include <unordered_set>
 #include <utility>
 
 class Entity {

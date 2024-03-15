@@ -1,4 +1,6 @@
 #include "sp/traverser/follows_traverser.hpp"
+#include "common/ast/statement_ast.hpp"
+#include "common/ast/statement_list_ast.hpp"
 
 namespace sp {
 

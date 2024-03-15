@@ -1,8 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <sstream>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -23,17 +21,17 @@ class CfgNode {
     /**
      * @brief Get all statement numbers in the CfgNode.
      */
-    auto get() const -> StatementNumbers;
+    [[nodiscard]] auto get() const -> StatementNumbers;
 
     /**
      * @brief Add a statement number.
      */
-    auto add(int const stmt_num) -> int;
+    auto add(int stmt_num) -> int;
 
     /**
      * @brief Check if the CfgNode has no statement numbers.
      */
-    auto empty() const -> bool;
+    [[nodiscard]] auto empty() const -> bool;
 
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
@@ -64,9 +62,7 @@ class Cfg {
     Graph graph{};
 
   public:
-    explicit Cfg() {
-        start_node = std::make_shared<CfgNode>();
-        current_node = start_node;
+    explicit Cfg() : start_node(std::make_shared<CfgNode>()), current_node(start_node) {
         add_node_to_graph();
     }
 
@@ -98,7 +94,7 @@ class Cfg {
     /**
      * @brief Add a statement number to the current node.
      */
-    auto add_stmt_to_node(int const stmt_num) -> int;
+    auto add_stmt_to_node(int stmt_num) -> int;
 
     /**
      * @brief Add a new node to the graph, with empty out-neighbours.
