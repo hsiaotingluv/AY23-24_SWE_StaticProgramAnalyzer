@@ -99,7 +99,7 @@ auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> s
 
 auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<UsesMap>& uses_map,
-                                     const std::shared_ptr<StatementListNode>& node) const
+                                     const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
     auto combined_set = std::unordered_set<std::string>();
     auto stmts = node->statements;

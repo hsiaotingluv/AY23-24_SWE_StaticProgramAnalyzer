@@ -5,7 +5,7 @@ namespace sp {
 /**
  * @brief Extract the Next Relationships between statements within a CFG node.
  */
-auto NextTraverser::traverse_node(std::shared_ptr<CfgNode> node) -> void {
+auto NextTraverser::traverse_node(const std::shared_ptr<CfgNode>& node) -> void {
     auto stmt_nums = node->get();
     for (size_t i = 1; i < stmt_nums.size(); i++) {
         auto prev_stmt_num = stmt_nums.at(i - 1);
@@ -18,7 +18,8 @@ auto NextTraverser::traverse_node(std::shared_ptr<CfgNode> node) -> void {
  * @brief Extract the Next Relationships between the last statement of a node and the first statement of its
  * outneighbour.
  */
-auto NextTraverser::traverse_edge(std::shared_ptr<CfgNode> node, std::shared_ptr<CfgNode> outneighbour) -> void {
+auto NextTraverser::traverse_edge(const std::shared_ptr<CfgNode>& node, const std::shared_ptr<CfgNode>& outneighbour)
+    -> void {
     auto prev_node_stmt_nums = node->get();
     auto prev_node_final_stmt_num = std::to_string(prev_node_stmt_nums.back());
 
@@ -32,7 +33,7 @@ auto NextTraverser::traverse_edge(std::shared_ptr<CfgNode> node, std::shared_ptr
  * @brief Extract the Next Relationships between the last statement of a node and the first statements of its
  * outneighbours.
  */
-auto NextTraverser::traverse_edges(std::shared_ptr<CfgNode> node, OutNeighbours outneighbours) -> void {
+auto NextTraverser::traverse_edges(const std::shared_ptr<CfgNode>& node, const OutNeighbours& outneighbours) -> void {
     auto is_first_outneighbour_non_empty = outneighbours.first && !(outneighbours.first->empty());
     auto is_second_outneighbour_non_empty = outneighbours.second && !(outneighbours.second->empty());
 
@@ -47,7 +48,7 @@ auto NextTraverser::traverse_edges(std::shared_ptr<CfgNode> node, OutNeighbours 
 /**
  * @brief Extract the Next Relationships within a procedure.
  */
-auto NextTraverser::traverse_procedure(std::shared_ptr<Cfg> cfg) -> void {
+auto NextTraverser::traverse_procedure(const std::shared_ptr<Cfg>& cfg) -> void {
     auto graph = cfg->get_graph();
     for (const auto& [node, outneighbours] : graph) {
         traverse_node(node);
@@ -66,7 +67,7 @@ auto NextTraverser::traverse_procedure(std::shared_ptr<Cfg> cfg) -> void {
  * @brief Extract the Next Relationships for the Program.
  * @note ProcMap is an alias for std::unordered_map<std::string, std::shared_ptr<Cfg>>
  */
-auto NextTraverser::traverse(ProcMap cfgs) -> void {
+auto NextTraverser::traverse(const ProcMap& cfgs) -> void {
     for (const auto& [proc_name, cfg] : cfgs) {
         traverse_procedure(cfg);
     }

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "common/ast/ast.hpp"
-#include "common/ast/statement_list_ast.hpp" // No circular imports
 #include "pkb/facades/write_facade.h"
 
 namespace sp {

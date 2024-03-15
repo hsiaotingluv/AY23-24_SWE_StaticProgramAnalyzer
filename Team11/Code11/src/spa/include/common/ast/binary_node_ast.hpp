@@ -19,7 +19,7 @@ class BinopNode : public ExprNode {
     explicit BinopNode(NodeType T, std::string token) : ExprNode(T), operator_token(std::move(token)) {
     }
 
-    virtual ~BinopNode() = default;
+    ~BinopNode() override = default;
 
     // AstNode methods.
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;

@@ -14,7 +14,7 @@ auto TokenizerRunner::apply_tokeniser(std::string input, bool debug) const -> st
         if (!res.has_value()) {
             std::stringstream error_message;
             error_message << "Tokeniser error!\n"
-                          << "Found unexpected token: " << input.substr(0, input.find("\n")) << std::endl;
+                          << "Found unexpected token: " << input.substr(0, input.find('\n')) << std::endl;
             throw std::runtime_error(error_message.str());
         } else {
             const auto& [res_success, rest] = res.value();
