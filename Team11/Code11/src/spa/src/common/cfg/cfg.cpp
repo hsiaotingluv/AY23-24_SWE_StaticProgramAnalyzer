@@ -1,6 +1,6 @@
-#include <utility>
-
 #include "common/cfg/cfg.hpp"
+#include <iostream>
+#include <utility>
 
 namespace sp {
 auto CfgNode::get() const -> StatementNumbers {

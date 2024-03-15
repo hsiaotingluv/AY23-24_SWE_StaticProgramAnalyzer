@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/ast/ast.hpp"
 #include "pkb/facades/write_facade.h"
 
 namespace sp {

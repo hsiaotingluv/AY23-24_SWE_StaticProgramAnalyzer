@@ -1,8 +1,5 @@
 #pragma once
-
-#include <utility>
-
-#include "memory"
+#include "pkb/facades/write_facade.h"
 #include "semantic_validator.hpp"
 
 namespace sp {

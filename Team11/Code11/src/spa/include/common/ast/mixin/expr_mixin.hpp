@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/ast/ast.hpp"
-#include <type_traits>
 
 namespace sp {
 

@@ -3,7 +3,6 @@
 #include "common/cfg/cfg.hpp"
 #include "pkb/facades/write_facade.h"
 #include "sp/cfg/cfg_builder.hpp"
-#include "sp/traverser/traverser.hpp"
 
 namespace sp {
 
