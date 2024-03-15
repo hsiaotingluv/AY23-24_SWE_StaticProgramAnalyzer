@@ -7,7 +7,7 @@
 /**
  * Parent(s1, s2) holds for any type of statements.
  * Statements are 'read', 'print', 'call', 'while', 'if'
- * Fun fact: If s1 is 'read', 'print', 'call', then Parent(s1,s2) must be False. 
+ * Fun fact: If s1 is 'read', 'print', 'call', then Parent(s1,s2) must be False.
  */
 
 TEST_CASE("Test Parent - All Statement Types") {
@@ -111,7 +111,7 @@ TEST_CASE("Test SP and PKB - Advanced SPA with nested While & If loops") {
                 then {read me;}
                 else {read me;}}
         })";
-    
+
     auto [read_facade, write_facade] = pkb::PKB::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
