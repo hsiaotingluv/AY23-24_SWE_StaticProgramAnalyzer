@@ -99,4 +99,17 @@ auto consume_and(std::vector<Token>::const_iterator it, const std::vector<Token>
     }
     return std::next(it);
 }
+
+auto consume_not(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::vector<Token>::const_iterator> {
+    if (it == end) {
+        return std::nullopt;
+    }
+
+    const auto& maybe_not = *it;
+    if (!is_keyword(maybe_not, "not")) {
+        return std::nullopt;
+    }
+    return std::next(it);
+}
 } // namespace qps::untyped::detail

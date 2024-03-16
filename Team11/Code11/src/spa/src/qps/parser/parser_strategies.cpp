@@ -19,8 +19,16 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
                                          const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     static constexpr auto EXPECTED_LENGTH = 6;
+    static constexpr auto EARLY_EXIT_NUM_ARG = 2;
+    static constexpr auto LATE_EXIT_NUM_ARG = 3;
+
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
+    }
+
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects string
@@ -72,7 +80,8 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     const auto maybe_close_bracket = *it;
     if (is_close_bracket(maybe_close_bracket)) {
         it = std::next(it, 1);
-        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+        return std::make_tuple(
+            UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value(), EARLY_EXIT_NUM_ARG}, it);
     } else {
         // Expects comma
         const auto maybe_comma = *it;
@@ -101,7 +110,8 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
             return std::nullopt;
         }
 
-        return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec, 3}, it);
+        return std::make_tuple(
+            UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value(), LATE_EXIT_NUM_ARG}, it);
     }
 }
 
@@ -110,6 +120,11 @@ auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     if (it == end) {
         return std::nullopt;
+    }
+
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects Ref
@@ -134,7 +149,7 @@ auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     const auto& [ref2, rest2] = maybe_ref2.value();
     it = rest2;
 
-    return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
+    return std::make_tuple(UntypedWithClause{ref1, ref2, maybe_not.has_value()}, it);
 }
 } // namespace qps::untyped
 
