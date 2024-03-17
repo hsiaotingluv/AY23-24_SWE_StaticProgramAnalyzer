@@ -42,7 +42,7 @@ TEST_CASE("Test Evaluator UsesP") {
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}, false),
             },
         };
 
@@ -58,7 +58,7 @@ TEST_CASE("Test Evaluator UsesP") {
             std::make_shared<VarSynonym>("v"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}, false),
             },
         };
 
@@ -72,7 +72,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")}),
+                std::make_shared<SuchThatClause>(UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")}, false),
             },
         };
 
@@ -87,7 +87,7 @@ TEST_CASE("Test Evaluator UsesP") {
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}),
+                    UsesP{std::make_shared<ProcSynonym>("p"), std::make_shared<VarSynonym>("v")}, false),
             },
         };
 
@@ -101,7 +101,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<VarSynonym>("v"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), std::make_shared<VarSynonym>("v")}),
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), std::make_shared<VarSynonym>("v")}, false),
             },
         };
 
@@ -115,7 +115,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), QuotedIdent("a")}),
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), QuotedIdent("a")}, false),
             },
         };
 
@@ -129,7 +129,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), QuotedIdent("b")}),
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), QuotedIdent("b")}, false),
             },
         };
 
@@ -143,7 +143,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), WildCard()}),
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc1"), WildCard()}, false),
             },
         };
 
@@ -157,7 +157,7 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), WildCard()}),
+                std::make_shared<SuchThatClause>(UsesP{QuotedIdent("proc3"), WildCard()}, false),
             },
         };
 

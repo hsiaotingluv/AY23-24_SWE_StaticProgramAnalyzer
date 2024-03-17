@@ -59,7 +59,7 @@ static auto visit_such_that_clause(const Synonyms& declarations,
         return std::nullopt;
     }
 
-    return std::make_shared<SuchThatClause>(maybe_rel_ref.value());
+    return std::make_shared<SuchThatClause>(maybe_rel_ref.value(), such_that.is_negated);
 }
 
 template <typename PatternAnalysersList>
@@ -71,7 +71,7 @@ static auto visit_pattern_clause(const Synonyms& declarations,
     if (!maybe_syntactic_pattern.has_value()) {
         return std::nullopt;
     }
-    return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
+    return std::make_shared<PatternClause>(maybe_syntactic_pattern.value(), pattern.is_negated);
 }
 
 static auto visit_with_clause(const Synonyms& declarations,
@@ -93,7 +93,7 @@ static auto visit_with_clause(const Synonyms& declarations,
     }
     const auto& [ref1, ref2] = maybe_valid_combi.value();
 
-    return std::make_shared<WithClause>(ref1, ref2);
+    return std::make_shared<WithClause>(ref1, ref2, with.is_negated);
 }
 
 template <typename RelationshipAnalysersList, typename PatternAnalysersList>
