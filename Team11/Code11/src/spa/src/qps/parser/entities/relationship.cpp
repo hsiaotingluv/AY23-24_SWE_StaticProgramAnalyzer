@@ -133,8 +133,8 @@ auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream& {
     return os;
 }
 
-auto operator<<(std::ostream& os, const Affects& nextT) -> std::ostream& {
-    os << "Affects(" << nextT.stmt1 << ", " << nextT.stmt1 << ")";
+auto operator<<(std::ostream& os, const Affects& affects) -> std::ostream& {
+    os << "Affects(" << affects.stmt1 << ", " << affects.stmt1 << ")";
     return os;
 }
 } // namespace qps

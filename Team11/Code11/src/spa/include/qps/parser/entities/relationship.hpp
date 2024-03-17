@@ -91,7 +91,7 @@ struct Next {
     Next(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
     }
 
-    friend auto operator<<(std::ostream& os, const Next& follows) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const Next& next) -> std::ostream&;
 
     auto operator==(const Next& other) const -> bool {
         return stmt1 == other.stmt1 && stmt2 == other.stmt2;
@@ -115,7 +115,7 @@ struct NextT {
     NextT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
     }
 
-    friend auto operator<<(std::ostream& os, const NextT& followsT) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream&;
 
     auto operator==(const NextT& other) const -> bool {
         return stmt1 == other.stmt1 && stmt2 == other.stmt2;
@@ -180,7 +180,7 @@ struct Affects {
     Affects(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
     }
 
-    friend auto operator<<(std::ostream& os, const Affects& parentT) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const Affects& affects) -> std::ostream&;
 
     auto operator==(const Affects& other) const -> bool {
         return stmt1 == other.stmt1 && stmt2 == other.stmt2;
