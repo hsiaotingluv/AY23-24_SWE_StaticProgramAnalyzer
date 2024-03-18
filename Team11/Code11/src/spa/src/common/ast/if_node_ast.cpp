@@ -99,7 +99,7 @@ auto IfNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -> s
 
 auto IfNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<UsesMap>& uses_map,
-                                     const std::shared_ptr<StatementListNode>& node) const
+                                     const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
     auto combined_set = std::unordered_set<std::string>();
     auto stmts = node->statements;
@@ -175,7 +175,7 @@ auto IfNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_
     }
 }
 
-auto IfNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto IfNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto if_node = std::make_shared<CfgNode>();
     auto then_node = std::make_shared<CfgNode>();
     auto else_node = std::make_shared<CfgNode>();

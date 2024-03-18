@@ -15,7 +15,7 @@ class ComparatorNode : public sp::AstNode {
         : AstNode(T), left(std::move(left)), right(std::move(right)) {
     }
 
-    virtual ~ComparatorNode() = default;
+    ~ComparatorNode() override = default;
 
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto identifier() const -> std::stringstream override;

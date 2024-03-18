@@ -1,13 +1,13 @@
-#include <utility>
-
 #include "common/cfg/cfg.hpp"
+#include <iostream>
+#include <utility>
 
 namespace sp {
 auto CfgNode::get() const -> StatementNumbers {
     return stmt_nums;
 };
 
-auto CfgNode::add(int const stmt_num) -> int {
+auto CfgNode::add(int stmt_num) -> int {
     stmt_nums.push_back(stmt_num);
     return stmt_num;
 };
@@ -28,15 +28,15 @@ auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream& {
     return os;
 }
 
-auto Cfg::get_start_node() const -> std::shared_ptr<CfgNode> {
+auto ProcedureCfg::get_start_node() const -> std::shared_ptr<CfgNode> {
     return start_node;
 };
 
-auto Cfg::get_current_node() const -> std::shared_ptr<CfgNode> {
+auto ProcedureCfg::get_current_node() const -> std::shared_ptr<CfgNode> {
     return current_node;
 };
 
-auto Cfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNeighbours {
+auto ProcedureCfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNeighbours {
     if (graph.find(node) == graph.end()) {
         return EMPTY_OUTNEIGHBOURS;
     } else {
@@ -44,26 +44,26 @@ auto Cfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNe
     }
 };
 
-auto Cfg::get_graph() const -> Graph {
+auto ProcedureCfg::get_graph() const -> Graph {
     return graph;
 };
 
-auto Cfg::is_current_node_empty() const -> bool {
+auto ProcedureCfg::is_current_node_empty() const -> bool {
     return current_node->empty();
 }
 
-auto Cfg::add_stmt_to_node(int const stmt_num) -> int {
+auto ProcedureCfg::add_stmt_to_node(int stmt_num) -> int {
     current_node->add(stmt_num);
     return stmt_num;
 };
 
-auto Cfg::add_node_to_graph() -> std::shared_ptr<CfgNode> {
+auto ProcedureCfg::add_node_to_graph() -> std::shared_ptr<CfgNode> {
     auto edge = std::make_pair(current_node, EMPTY_OUTNEIGHBOURS);
     graph.insert(edge);
     return current_node;
 }
 
-auto Cfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> std::shared_ptr<CfgNode> {
+auto ProcedureCfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> std::shared_ptr<CfgNode> {
     // Fill the out-neighbours of current_node.
     if (graph.at(current_node).first) {
         graph.at(current_node).second = outneighbour;
@@ -73,19 +73,19 @@ auto Cfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour
     return outneighbour;
 }
 
-auto Cfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
-    current_node = std::move(node);
+auto ProcedureCfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
+    current_node = node;
     return node;
 };
 
-auto Cfg::link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
+auto ProcedureCfg::link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
     add_outneighbour_to_graph(node);
     move_to(node);
     add_node_to_graph();
     return node;
 };
 
-auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream& {
+auto operator<<(std::ostream& os, const ProcedureCfg& cfg) -> std::ostream& {
     auto graph = cfg.graph;
     for (const auto& [node, outneighbours] : graph) {
         os << *node << " -> OutNeighbours(";

@@ -6,22 +6,23 @@
 
 namespace sp {
 
-using ProcMap = std::unordered_map<std::string, std::shared_ptr<Cfg>>; // Map of Procedure Name -> Cfg.
+using ProcMap =
+    std::unordered_map<std::string, std::shared_ptr<ProcedureCfg>>; // Map of Procedure Name -> ProcedureCfg.
 using StmtNumMap =
     std::unordered_map<std::string,
                        std::pair<std::string, std::shared_ptr<CfgNode>>>; // Map of Statement Number -> <ProcName,
                                                                           // CfgNode>. ProcName helps you identify which
                                                                           // CFG to traverse.
 
-class CfgBuilder {
+class ProgramCfgs {
   private:
     ProcMap proc_map{};        // Only 1 Proc Map for the entire Program.
     StmtNumMap stmt_num_map{}; // Only 1 Stmt Num Map for the entire Program.
 
     /**
-     * @brief Initialise an empty Cfg for the given Procedure Name.
+     * @brief Initialise an empty ProcedureCfg for the given Procedure Name.
      */
-    auto create_empty_cfg(const std::string& proc_name) -> std::shared_ptr<Cfg>;
+    auto create_empty_cfg(const std::string& proc_name) -> std::shared_ptr<ProcedureCfg>;
 
     /**
      * @brief Populate the StmtNumMap within a specific Node.
@@ -58,6 +59,6 @@ class CfgBuilder {
     /**
      * @brief Construct a string representation of the Control Flow Graph.
      */
-    friend auto operator<<(std::ostream& os, const CfgBuilder& cfg_builder) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const ProgramCfgs& cfg_builder) -> std::ostream&;
 };
 } // namespace sp

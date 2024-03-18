@@ -150,7 +150,7 @@ auto WhileNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& wri
     }
 }
 
-auto WhileNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto WhileNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto while_node = std::make_shared<CfgNode>();
     auto loop_node = std::make_shared<CfgNode>();
     auto end_node = std::make_shared<CfgNode>();

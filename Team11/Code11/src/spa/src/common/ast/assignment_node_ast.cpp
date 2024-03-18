@@ -73,7 +73,7 @@ auto AssignmentNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& 
     return var_names;
 }
 
-auto AssignmentNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto AssignmentNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num);
 }

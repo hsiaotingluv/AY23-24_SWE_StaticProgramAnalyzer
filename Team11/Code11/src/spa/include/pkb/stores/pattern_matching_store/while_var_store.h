@@ -4,6 +4,4 @@
 #include "pkb/common_types/statement_number.h"
 #include "pkb/common_types/variable.h"
 
-#include <string>
-
 class WhileVarStore : public ManyToManyStore<Variable, StatementNumber> {};
