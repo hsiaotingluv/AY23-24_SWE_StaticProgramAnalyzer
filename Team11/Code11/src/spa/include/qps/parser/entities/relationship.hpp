@@ -77,7 +77,7 @@ struct FollowsT {
 struct Next {
     /**
      * @brief A Next relationship is a relationship between two statements where the first statement is executed
-     * before the second statement.
+     * before the second statement, and there are no other statements that are executed between the two statements.
      *
      * @param stmt1
      * @param stmt2
@@ -101,7 +101,7 @@ struct Next {
 struct NextT {
     /**
      * @brief A Next* relationship is a relationship between two statements where the first statement is executed
-     * before the second statement, and there are no other statements that are executed between the two statements.
+     * before the second statement.
      *
      * @param stmt1
      * @param stmt2
