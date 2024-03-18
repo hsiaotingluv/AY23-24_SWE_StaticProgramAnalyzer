@@ -30,7 +30,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 
     for (const auto& stmt : stmt_vec) {
         for (const auto& v : var_vec) {
-            if (read_facade->does_statement_modify_var(stmt, v)) {
+            if (read_facade->contains_statement_modify_var(stmt, v)) {
                 table.add_row({stmt, v});
             }
         }
@@ -91,7 +91,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const std::sha
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedIdent& identifier) const -> OutputTable {
-    const auto does_modify = read_facade->does_statement_modify_var(stmt_num.value, identifier.get_value());
+    const auto does_modify = read_facade->contains_statement_modify_var(stmt_num.value, identifier.get_value());
 
     if (!does_modify) {
         return Table{};
@@ -100,18 +100,18 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const QuotedId
 }
 
 auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard&) const -> OutputTable {
-    auto does_statement_modify_var = false;
+    auto contains_statement_modify_var = false;
     const auto variables = read_facade->get_variables();
     const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
 
     for (const auto& var : var_vec) {
-        if (read_facade->does_statement_modify_var(stmt_num.value, var)) {
-            does_statement_modify_var = true;
+        if (read_facade->contains_statement_modify_var(stmt_num.value, var)) {
+            contains_statement_modify_var = true;
             break;
         }
     }
 
-    if (!does_statement_modify_var) {
+    if (!contains_statement_modify_var) {
         return Table{};
     }
     return UnitTable{};

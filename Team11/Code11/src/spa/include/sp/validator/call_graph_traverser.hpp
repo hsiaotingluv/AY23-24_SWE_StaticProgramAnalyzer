@@ -1,8 +1,5 @@
 #pragma once
-
-#include <utility>
-
-#include "memory"
+#include "pkb/facades/write_facade.h"
 #include "semantic_validator.hpp"
 
 namespace sp {
@@ -21,7 +18,7 @@ class CallGraphTraverser {
             return;
         }
 
-        for (auto& [callee, callers] : call_graph) {
+        for (const auto& [callee, callers] : call_graph) {
             for (const auto& caller : callers) {
                 write_facade->add_calls(caller, callee);
             }

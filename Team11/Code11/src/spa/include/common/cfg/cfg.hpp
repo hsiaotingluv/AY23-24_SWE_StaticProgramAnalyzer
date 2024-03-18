@@ -1,8 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <sstream>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -23,17 +21,17 @@ class CfgNode {
     /**
      * @brief Get all statement numbers in the CfgNode.
      */
-    auto get() const -> StatementNumbers;
+    [[nodiscard]] auto get() const -> StatementNumbers;
 
     /**
-     * @brief Construct a new Cfg Node object
+     * @brief Add a statement number.
      */
-    auto add(int stmt_num) -> void;
+    auto add(int stmt_num) -> int;
 
     /**
      * @brief Check if the CfgNode has no statement numbers.
      */
-    auto empty() const -> bool;
+    [[nodiscard]] auto empty() const -> bool;
 
     /**
      * @brief Construct a string representation of the CfgNode. e.g. "Node(4, 5, 6)"
@@ -46,10 +44,10 @@ using Graph =
     std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
 
 /**
- * @brief Cfg represents a Control Flow Graph, a directed graph of CfgNodes.
- * @note There is one Cfg per Procedure.
+ * @brief ProcedureCfg represents a Control Flow Graph, a directed graph of CfgNodes.
+ * @note There is one ProcedureCfg per Procedure.
  */
-class Cfg {
+class ProcedureCfg {
     /**
      * For normal Statements: OutNeighbours.first is the next node. OutNeighbours.second is nullptr.
      * For If Statements: OutNeighbours.first is the then-block node. OutNeighbours.second is the else-block node.
@@ -60,13 +58,11 @@ class Cfg {
 
   private:
     std::shared_ptr<CfgNode> start_node;
-    std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
+    std::shared_ptr<CfgNode> current_node; // Used only to build the ProcedureCfg.
     Graph graph{};
 
   public:
-    explicit Cfg() {
-        start_node = std::make_shared<CfgNode>();
-        current_node = start_node;
+    explicit ProcedureCfg() : start_node(std::make_shared<CfgNode>()), current_node(start_node) {
         add_node_to_graph();
     }
 
@@ -98,34 +94,34 @@ class Cfg {
     /**
      * @brief Add a statement number to the current node.
      */
-    auto add_stmt_to_node(int stmt_num) -> void;
+    auto add_stmt_to_node(int stmt_num) -> int;
 
     /**
      * @brief Add a new node to the graph, with empty out-neighbours.
      */
-    auto add_node_to_graph() -> void;
+    auto add_node_to_graph() -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Add a new node to the graph and link it to the current node.
      */
-    auto add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> void;
+    auto add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& outneighbour) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Move current node to the next node (Need not be a outneighbour node).
      * @note This is only explicitly used for If CfgNode to build both branches of the If statement.
      */
-    auto move_to(std::shared_ptr<CfgNode> node) -> void;
+    auto move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode>;
 
     /**
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
-     * @note Default way to traverse the Cfg.
+     * @note Default way to traverse the ProcedureCfg.
      */
-    auto link_and_move_to(std::shared_ptr<CfgNode> node) -> void;
+    auto link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode>;
 
     /**
-     * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
-     * 11, 12))"
+     * @brief Construct a string representation of the ProcedureCfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9),
+     * Node(10, 11, 12))"
      */
-    friend auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const ProcedureCfg& cfg) -> std::ostream&;
 };
 } // namespace sp

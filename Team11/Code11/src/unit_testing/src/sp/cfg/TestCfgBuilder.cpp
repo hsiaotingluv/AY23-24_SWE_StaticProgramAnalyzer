@@ -112,7 +112,10 @@ auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::strin
     return stmt_nums == all_stmt_nums;
 }
 
-auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node,
+/**
+ * @brief Traverse the CFG using DFS for testing.
+ */
+auto test_traverse_dfs(const std::shared_ptr<sp::ProcedureCfg> cfg, const std::shared_ptr<sp::CfgNode> node,
                        std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes,
                        std::unordered_set<int>& visited_stmt_nums) -> void {
     if (std::find(visited_nodes.begin(), visited_nodes.end(), node) != visited_nodes.end()) {
@@ -131,6 +134,9 @@ auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr
     }
 }
 
+/**
+ * @brief Verify if the CFG can be traversed and correctly visits every CFGNode.
+ */
 auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) -> bool {
     std::vector<std::shared_ptr<sp::CfgNode>>
         visited_nodes; // Sacrifice O(n) lookup to avoid more trouble implementing hash and equality fns for CfgNode.
@@ -142,12 +148,27 @@ auto test_traverse(const sp::ProcMap& proc_map, const std::string& proc_name) ->
     return is_all_nodes;
 }
 
+/**
+ * @brief Verify if the StmtNumMap is correctly populated, by crossing check with the statement numbers in the CFGNode
+ */
+auto verify_stmt_num_map(const sp::StmtNumMap& stmt_num_map) -> bool {
+    for (const auto& [stmt_num, cfg_node_info] : stmt_num_map) { // for each StmtNum-CfgNode pair
+        auto cfg_node = cfg_node_info.second;
+        const auto node_stmt_nums = cfg_node->get();
+        if (std::find(node_stmt_nums.begin(), node_stmt_nums.end(), stoi(stmt_num)) ==
+            node_stmt_nums.end()) { // If StmtNum (int) does not belong to that CfgNode
+            return false;
+        }
+    }
+    return true;
+}
+
 TEST_CASE("Test CFG Builder") {
     auto tokenizer_runner =
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
-    auto [read_facade, write_facade] = PKB::create_facades();
-    auto cfg_builder = std::make_shared<sp::CfgBuilder>();
+    auto [read_facade, write_facade] = PkbManager::create_facades();
+    auto cfg_builder = std::make_shared<sp::ProgramCfgs>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
     auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
@@ -216,6 +237,8 @@ TEST_CASE("Test CFG Builder") {
          */
 
         auto proc_map = cfg_builder->get_proc_map();
+        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+
         REQUIRE(get_proc_names(proc_map) ==
                 std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"});
 
@@ -241,6 +264,8 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(test_traverse(proc_map, "readPoint"));
         REQUIRE(test_traverse(proc_map, "printResults"));
         REQUIRE(test_traverse(proc_map, "computeCentroid"));
+
+        REQUIRE(verify_stmt_num_map(stmt_num_map));
     }
 
     SECTION("Single Procedure ending with If Statement - success") {
@@ -272,6 +297,7 @@ TEST_CASE("Test CFG Builder") {
          */
         auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
+        auto stmt_num_map = cfg_builder->get_stmt_num_map();
 
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"computeCentroid"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "computeCentroid") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7, 8});
@@ -279,6 +305,7 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(verify_start_node(proc_map, "computeCentroid"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "computeCentroid"));
         REQUIRE(test_traverse(proc_map, "computeCentroid"));
+        REQUIRE(verify_stmt_num_map(stmt_num_map));
     }
 
     SECTION("Multiple If Statements ending with Elses - success") {
@@ -316,12 +343,15 @@ TEST_CASE("Test CFG Builder") {
 
         auto ast = sp.process(input);
         auto proc_map = cfg_builder->get_proc_map();
+        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+
         REQUIRE(get_proc_names(proc_map) == std::unordered_set<std::string>{"nesting"});
         REQUIRE(get_stmt_nums_in_proc(proc_map, "nesting") == std::unordered_set<int>{1, 2, 3, 4, 5, 6, 7});
         REQUIRE(get_dummy_nodes(proc_map) == 3);
         REQUIRE(verify_start_node(proc_map, "nesting"));
         REQUIRE(verify_outneighbour_stmt_nums(proc_map, "nesting"));
         REQUIRE(test_traverse(proc_map, "nesting"));
+        REQUIRE(verify_stmt_num_map(stmt_num_map));
     }
 }
 

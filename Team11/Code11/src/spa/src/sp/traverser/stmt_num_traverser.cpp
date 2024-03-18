@@ -1,4 +1,6 @@
 #include "sp/traverser/stmt_num_traverser.hpp"
+#include "common/ast/node_type_checker.hpp"
+#include "common/ast/statement_ast.hpp"
 
 namespace sp {
 

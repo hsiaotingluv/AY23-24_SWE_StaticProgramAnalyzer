@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser/entities/clause.hpp"
@@ -16,9 +16,9 @@ using namespace qps;
 using namespace pkb;
 
 TEST_CASE("Test Evaluator UsesP") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     write_facade->add_procedure("proc1");
     write_facade->add_procedure("proc2");
     write_facade->add_procedure("proc3");
@@ -26,8 +26,8 @@ TEST_CASE("Test Evaluator UsesP") {
     write_facade->add_variable("b");
     write_facade->add_variable("c");
 
-    write_facade->add_procedure_uses_var("proc1", "a");
-    write_facade->add_procedure_uses_var("proc2", "b");
+    write_facade->add_procedure_use_var("proc1", "a");
+    write_facade->add_procedure_use_var("proc2", "b");
 
     write_facade->finalise_pkb();
 

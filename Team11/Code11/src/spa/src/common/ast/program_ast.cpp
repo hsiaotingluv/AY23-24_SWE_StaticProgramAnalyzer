@@ -22,7 +22,7 @@ auto ProgramNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
 
 [[nodiscard]] auto ProgramNode::to_xml() const -> std::string {
     auto xml = "<" + get_node_name() + ">";
-    for (auto const& proc : procedures) {
+    for (const auto& proc : procedures) {
         xml += proc->to_xml();
     }
     xml += "</" + get_node_name() + ">";
