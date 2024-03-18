@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "common/statement_type.hpp"
 #include "qps/evaluators/query_evaluator.hpp"
@@ -14,7 +14,7 @@
 using namespace pkb;
 
 TEST_CASE("Test pkb and QPS - Entities") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PkbManager::create_facades();
     const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
@@ -82,7 +82,7 @@ TEST_CASE("Test pkb and QPS - Entities") {
 }
 
 TEST_CASE("Test pkb and QPS - Statements") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PkbManager::create_facades();
     const auto qps_parser = qps::DefaultParser{};
 
     // Populate the pkb with some data
@@ -208,7 +208,7 @@ TEST_CASE("Test pkb and QPS - Statements") {
 }
 
 TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PkbManager::create_facades();
 
     const auto qps_parser = qps::DefaultParser{};
 
@@ -218,7 +218,7 @@ TEST_CASE("Test pkb and QPS - Modifies(stmt, var)") {
     write_facade->add_statement("2", StatementType::Call);
     write_facade->add_variable("x");
 
-    write_facade->add_statement_modifies_var("1", "x");
+    write_facade->add_statement_modify_var("1", "x");
 
     SECTION("Test Query - all variables modified by statement") {
         const auto query = R"(variable v; Select v such that Modifies(1, v))";

@@ -8,6 +8,8 @@
 template <class KeyType, class ValueType>
 class ManyToOneStore {
   public:
+    using Key = KeyType;
+    using Value = ValueType;
     ManyToOneStore();
 
     void add(const KeyType& key, const ValueType& value);

@@ -127,7 +127,7 @@ class SourceProcessor {
 
         // Step 6. If writing to pkb, finalise pkb.
         if (write_facade != nullptr) {
-            write_facade->finalise_pkb();
+            write_facade->finalise_pkb(procedure_topology_orders);
         }
 
 #ifdef DEBUG

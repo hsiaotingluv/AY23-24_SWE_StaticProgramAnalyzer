@@ -61,7 +61,7 @@ auto IfNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& writ
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_statement_modifies_var(stmt_number, var);
+        write_facade->add_statement_modify_var(stmt_number, var);
     }
 
     return combined_set;
@@ -140,9 +140,9 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_fa
         combined_set.insert(var_name);
     }
 
-    // Add all variables to the PKB.
+    // Add all variables to the PkbManager.
     for (const auto& var_name : combined_set) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
+        write_facade->add_statement_use_var(stmt_number, var_name);
     }
 
     return combined_set;
@@ -150,7 +150,7 @@ auto IfNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_fa
 
 auto IfNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
-    // Parent* relationship) are handled by PKB.
+    // Parent* relationship) are handled by PkbManager.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
     for (const auto& statement : statements) {

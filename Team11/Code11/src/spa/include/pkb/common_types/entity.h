@@ -12,7 +12,7 @@ class Entity {
         return name == other.name;
     };
 
-    [[nodiscard]] std::string getName() const {
+    [[nodiscard]] std::string get_name() const {
         return name;
     }
 

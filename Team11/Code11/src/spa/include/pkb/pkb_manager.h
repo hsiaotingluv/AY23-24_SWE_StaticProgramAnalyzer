@@ -1,19 +1,107 @@
 #pragma once
 
-#include "pkb/common_types/constant.h"
-#include "pkb/common_types/entity.h"
-#include "pkb/common_types/procedure.h"
-#include "pkb/common_types/variable.h"
-#include "pkb/pkb_manager.h"
+#include "common/hashable_tuple.h"
+#include "pkb/stores/calls_store/calls_star_store.h"
+#include "pkb/stores/calls_store/direct_calls_store.h"
+#include "pkb/stores/calls_store/stmt_no_to_proc_called_store.h"
+#include "pkb/stores/entity_store.h"
+#include "pkb/stores/follows_store/direct_follows_store.h"
+#include "pkb/stores/follows_store/follows_star_store.h"
+#include "pkb/stores/modifies_store/procedure_modifies_store.h"
+#include "pkb/stores/modifies_store/statement_modifies_store.h"
+#include "pkb/stores/next_store.h"
+#include "pkb/stores/parent_store/direct_parent_store.h"
+#include "pkb/stores/parent_store/parent_star_store.h"
+#include "pkb/stores/pattern_matching_store/assignment_store.h"
+#include "pkb/stores/pattern_matching_store/if_var_store.h"
+#include "pkb/stores/pattern_matching_store/while_var_store.h"
+#include "pkb/stores/statement_store.h"
+#include "pkb/stores/uses_store/procedure_uses_store.h"
+#include "pkb/stores/uses_store/statement_uses_store.h"
 #include <memory>
 #include <tuple>
-#include <unordered_set>
 
+// Forward declaration of facades
 namespace pkb {
-class ReadFacade {
-  public:
-    explicit ReadFacade(std::shared_ptr<PkbManager> pkb);
+class ReadFacade;
+class WriteFacade;
 
+static constexpr auto identity_fun = [](const auto& s) {
+    return s;
+};
+
+static constexpr auto tuple_stmt_no_extractor = [](const auto& p) {
+    return std::get<0>(p);
+};
+
+class PkbManager {
+  public:
+    static std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> create_facades();
+
+    template <class T, class Extractor>
+    std::unordered_set<T> filter_by_statement_type(const std::unordered_set<T>& set, StatementType statement_type,
+                                                   Extractor extractor) const {
+        std::unordered_set<T> filtered;
+        for (const auto& elem : set) {
+            if (statement_store->get_val_by_key(extractor(elem)) == statement_type) {
+                filtered.insert(elem);
+            }
+        }
+        return filtered;
+    }
+
+    template <class T>
+    std::unordered_set<T> filter_by_statement_type(const std::unordered_set<T>& set,
+                                                   StatementType statement_type) const {
+        return filter_by_statement_type(set, statement_type, identity_fun);
+    }
+
+    template <class T>
+    std::unordered_set<std::string> get_name_list(const std::unordered_set<T>& set) const {
+        std::unordered_set<std::string> temp;
+        for (const T& entity : set) {
+            temp.insert(entity.get_name());
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_string_entity_pairs(const std::unordered_set<T>& pairs) const {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [s, v] : pairs) {
+            temp.insert(std::make_tuple(s, v.get_name()));
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_entity_string_pairs(const std::unordered_set<T>& pairs) const {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [v, s] : pairs) {
+            temp.insert(std::make_tuple(s, v.get_name()));
+        }
+
+        return temp;
+    }
+
+    template <class T>
+    std::unordered_set<std::tuple<std::string, std::string>>
+    get_tuple_list_from_entity_entity_pairs(const std::unordered_set<T>& pairs) const {
+        std::unordered_set<std::tuple<std::string, std::string>> temp;
+        for (const auto& [p, v] : pairs) {
+            temp.insert(std::make_tuple(p.get_name(), v.get_name()));
+        }
+
+        return temp;
+    }
+
+    PkbManager();
+
+    // Read APIs
     // Entity-related Read Operations
     std::unordered_set<std::string> get_entities() const;
 
@@ -103,7 +191,7 @@ class ReadFacade {
 
     bool contains_procedure_use_var(const std::string& procedure, const std::string& variable) const;
 
-    bool contains_procedure_use_var_key(const std::string& procedure) const;
+    bool contains_procedure_use_var_key(const std::string& statement_number) const;
 
     bool contains_procedure_use_var_value(const std::string& variable) const;
 
@@ -257,9 +345,9 @@ class ReadFacade {
 
     bool contains_calls_value(const std::string& callee) const;
 
-    std::unordered_set<std::string> get_all_calls_callees() const;
+    std::unordered_set<std::string> get_all_calls_values() const;
 
-    std::unordered_set<std::string> get_all_calls_callers() const;
+    std::unordered_set<std::string> get_all_calls_keys() const;
 
     std::unordered_set<std::string> get_callees(const std::string& caller) const;
 
@@ -317,7 +405,69 @@ class ReadFacade {
 
     std::unordered_set<std::tuple<std::string, std::string>> get_all_while_stmt_var_pairs() const;
 
+    // Write APIs
+    void add_procedure(std::string procedure);
+
+    void add_variable(std::string variable);
+
+    void add_constant(std::string constant);
+
+    void add_statement(const std::string& statement_number, StatementType type);
+
+    void add_statement_modify_var(const std::string& statement_number, std::string variable);
+
+    void add_procedure_modify_var(std::string procedure, std::string variable);
+
+    void add_statement_use_var(const std::string& statement_number, std::string variable);
+
+    void add_procedure_use_var(std::string procedure, std::string variable);
+
+    void add_follows(const std::string& stmt1, const std::string& stmt2);
+
+    void add_parent(const std::string& parent, const std::string& child);
+
+    void add_assignment(const std::string& statement_number, const std::string& lhs, const std::string& rhs);
+
+    void add_next(const std::string& stmt1, const std::string& stmt2);
+
+    void add_calls(const std::string& caller, const std::string& callee);
+
+    void add_stmt_no_proc_called_mapping(const std::string& stmt_no, const std::string& proc_called);
+
+    void add_if_var(const std::string& statement_number, const std::string& variable);
+
+    void add_while_var(const std::string& statement_number, const std::string& variable);
+
+    void finalise_pkb(const std::vector<std::string>& procedure_order);
+
   private:
-    std::shared_ptr<PkbManager> pkb;
+    std::shared_ptr<EntityStore> entity_store;
+    std::shared_ptr<StatementStore> statement_store;
+    std::shared_ptr<DirectFollowsStore> direct_follows_store;
+    std::shared_ptr<FollowsStarStore> follows_star_store;
+    std::shared_ptr<DirectParentStore> direct_parent_store;
+    std::shared_ptr<ParentStarStore> parent_star_store;
+    std::shared_ptr<ProcedureModifiesStore> procedure_modifies_store;
+    std::shared_ptr<StatementModifiesStore> statement_modifies_store;
+    std::shared_ptr<ProcedureUsesStore> procedure_uses_store;
+    std::shared_ptr<StatementUsesStore> statement_uses_store;
+    std::shared_ptr<AssignmentStore> assignment_store;
+    std::shared_ptr<NextStore> next_store;
+    std::shared_ptr<DirectCallsStore> direct_calls_store;
+    std::shared_ptr<CallsStarStore> calls_star_store;
+    std::shared_ptr<IfVarStore> if_var_store;
+    std::shared_ptr<WhileVarStore> while_var_store;
+    std::shared_ptr<StmtNoToProcCalledStore> stmt_no_to_proc_called_store;
+
+    template <class DirectStore, class StarStore, class OrderingStrategy>
+    void populate_star_from_direct(std::shared_ptr<DirectStore> direct_store, std::shared_ptr<StarStore> star_store,
+                                   OrderingStrategy ordering_strategy);
+
+    template <class DirectStore, class StarStore>
+    void populate_call_star_from_direct(DirectStore direct_store, StarStore star_store);
+
+    friend class ReadFacade;
+
+    friend class WriteFacade;
 };
 } // namespace pkb

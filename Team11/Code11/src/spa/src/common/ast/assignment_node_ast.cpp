@@ -38,7 +38,7 @@ auto AssignmentNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacad
     // Modifies(a, v)
     auto stmt_number = std::to_string(get_statement_number());
     auto var_node = std::dynamic_pointer_cast<VarNode>(variable);
-    write_facade->add_statement_modifies_var(stmt_number, var_node->name);
+    write_facade->add_statement_modify_var(stmt_number, var_node->name);
 
     return {var_node->name};
 }
@@ -68,7 +68,7 @@ auto AssignmentNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& 
     auto stmt_number = std::to_string(get_statement_number());
     auto var_names = get_vars_from_expr(expr);
     for (const auto& var_name : var_names) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
+        write_facade->add_statement_use_var(stmt_number, var_name);
     }
     return var_names;
 }

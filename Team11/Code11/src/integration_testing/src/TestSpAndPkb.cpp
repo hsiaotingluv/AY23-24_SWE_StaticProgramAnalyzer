@@ -1,11 +1,12 @@
 #include "catch.hpp"
 
 #include "pkb/facades/read_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 #include "sp/main.hpp"
 
-TEST_CASE("Test SP and PKB - Basic SPA") {
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+TEST_CASE("Test SP and PkbManager") {
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
+
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     std::string input = R"(procedure main {
@@ -46,25 +47,25 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-    SECTION("Test SP and PKB Uses Website - success") {
+    SECTION("Test SP and PkbManager Uses Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#uses
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->does_statement_use_var("16", "x"));
-        REQUIRE(read_facade->does_statement_use_var("19", "count"));
-        REQUIRE(read_facade->does_statement_use_var("19", "cenX"));
-        REQUIRE(read_facade->does_procedure_use_var("main", "cenX"));
-        REQUIRE(read_facade->does_procedure_use_var("main", "flag"));
-        REQUIRE(read_facade->does_procedure_use_var("computeCentroid", "x"));
+        REQUIRE(read_facade->contains_statement_use_var("16", "x"));
+        REQUIRE(read_facade->contains_statement_use_var("19", "count"));
+        REQUIRE(read_facade->contains_statement_use_var("19", "cenX"));
+        REQUIRE(read_facade->contains_procedure_use_var("main", "cenX"));
+        REQUIRE(read_facade->contains_procedure_use_var("main", "flag"));
+        REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "x"));
 
-        REQUIRE_FALSE(read_facade->does_statement_use_var("12", "count"));
-        REQUIRE_FALSE(read_facade->does_statement_use_var("19", "flag"));
-        REQUIRE_FALSE(read_facade->does_statement_use_var("18", "y"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("12", "count"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("19", "flag"));
+        REQUIRE_FALSE(read_facade->contains_statement_use_var("18", "y"));
     }
 
-    SECTION("Test SP and PKB Parent Website - success") {
+    SECTION("Test SP and PkbManager Parent Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -81,24 +82,24 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
         REQUIRE_FALSE(read_facade->has_parent_relation("14", "19"));
     }
 
-    SECTION("Test SP and PKB Modifies Website - success") {
+    SECTION("Test SP and PkbManager Modifies Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
         // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#code-5
         // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->does_statement_modify_var("10", "count"));
-        REQUIRE(read_facade->does_statement_modify_var("16", "cenX"));
-        REQUIRE(read_facade->does_statement_modify_var("18", "x"));
-        REQUIRE(read_facade->does_statement_modify_var("19", "flag"));
-        REQUIRE(read_facade->does_statement_modify_var("14", "x"));
-        REQUIRE(read_facade->does_procedure_modify_var("main", "y"));
+        REQUIRE(read_facade->contains_statement_modify_var("10", "count"));
+        REQUIRE(read_facade->contains_statement_modify_var("16", "cenX"));
+        REQUIRE(read_facade->contains_statement_modify_var("18", "x"));
+        REQUIRE(read_facade->contains_statement_modify_var("19", "flag"));
+        REQUIRE(read_facade->contains_statement_modify_var("14", "x"));
+        REQUIRE(read_facade->contains_procedure_modify_var("main", "y"));
 
-        REQUIRE_FALSE(read_facade->does_statement_modify_var("14", "flag"));
-        REQUIRE_FALSE(read_facade->does_procedure_modify_var("printResults", "normSq"));
+        REQUIRE_FALSE(read_facade->contains_statement_modify_var("14", "flag"));
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var("printResults", "normSq"));
     }
 
-    SECTION("Test SP and PKB Follows Website - success") {
+    SECTION("Test SP and PkbManager Follows Website - success") {
         auto ast = sp->process(input);
 
         // Taken from
@@ -116,7 +117,7 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
         REQUIRE_FALSE(read_facade->has_follows_star_relation("21", "23"));
     }
 
-    SECTION("Test SP and PKB Assignment Pattern - success") {
+    SECTION("Test SP and PkbManager Assignment Pattern - success") {
         auto ast = sp->process(input);
 
         REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);
@@ -158,7 +159,7 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
 }
 
 TEST_CASE("Test SP and PKB - Advanced SPA") {
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 
     std::string input = R"(procedure First {

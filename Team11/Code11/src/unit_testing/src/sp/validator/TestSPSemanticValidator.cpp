@@ -12,7 +12,8 @@ TEST_CASE("Test SP Semantic Validator") {
     auto tokenizer_runner =
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
-    auto [_, write_facade] = PKB::create_facades();
+
+    auto [_, write_facade] = PkbManager::create_facades();
     auto cfg_builder = std::make_shared<sp::ProgramCfgs>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {
