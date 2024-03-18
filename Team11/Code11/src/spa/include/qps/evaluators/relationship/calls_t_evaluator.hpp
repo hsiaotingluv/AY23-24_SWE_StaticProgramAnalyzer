@@ -4,7 +4,7 @@
 
 namespace qps {
     class CallsTEvaluator : public ClauseEvaluator {
-        std::shared_ptr<ReadFacade> read_facade;
+        std::shared_ptr<pkb::ReadFacade> read_facade;
         CallsT calls_t;
 
         [[nodiscard]] auto select_eval_method() const;
@@ -46,7 +46,7 @@ namespace qps {
                                         const qps::WildCard&) const -> OutputTable;
 
     public:
-        CallsTEvaluator(std::shared_ptr<ReadFacade>read_facade, CallsT calls_t)
+        CallsTEvaluator(std::shared_ptr<pkb::ReadFacade>read_facade, CallsT calls_t)
                 : ClauseEvaluator(), read_facade(std::move(read_facade)), calls_t(std::move(calls_t)) {
         }
 
