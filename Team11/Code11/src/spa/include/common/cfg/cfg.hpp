@@ -44,10 +44,10 @@ using Graph =
     std::unordered_map<std::shared_ptr<CfgNode>, OutNeighbours>; // Adjacency List of CfgNodes -> OutNeighbours.
 
 /**
- * @brief Cfg represents a Control Flow Graph, a directed graph of CfgNodes.
- * @note There is one Cfg per Procedure.
+ * @brief ProcedureCfg represents a Control Flow Graph, a directed graph of CfgNodes.
+ * @note There is one ProcedureCfg per Procedure.
  */
-class Cfg {
+class ProcedureCfg {
     /**
      * For normal Statements: OutNeighbours.first is the next node. OutNeighbours.second is nullptr.
      * For If Statements: OutNeighbours.first is the then-block node. OutNeighbours.second is the else-block node.
@@ -58,11 +58,11 @@ class Cfg {
 
   private:
     std::shared_ptr<CfgNode> start_node;
-    std::shared_ptr<CfgNode> current_node; // Used only to build the Cfg.
+    std::shared_ptr<CfgNode> current_node; // Used only to build the ProcedureCfg.
     Graph graph{};
 
   public:
-    explicit Cfg() : start_node(std::make_shared<CfgNode>()), current_node(start_node) {
+    explicit ProcedureCfg() : start_node(std::make_shared<CfgNode>()), current_node(start_node) {
         add_node_to_graph();
     }
 
@@ -114,14 +114,14 @@ class Cfg {
 
     /**
      * @brief Add outneighbour node to the graph and move current node to the outneighbour node.
-     * @note Default way to traverse the Cfg.
+     * @note Default way to traverse the ProcedureCfg.
      */
     auto link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode>;
 
     /**
-     * @brief Construct a string representation of the Cfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9), Node(10,
-     * 11, 12))"
+     * @brief Construct a string representation of the ProcedureCfg. e.g. "Node(4, 5, 6) -> OutNeighbours(Node(7, 8, 9),
+     * Node(10, 11, 12))"
      */
-    friend auto operator<<(std::ostream& os, const Cfg& cfg) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const ProcedureCfg& cfg) -> std::ostream&;
 };
 } // namespace sp

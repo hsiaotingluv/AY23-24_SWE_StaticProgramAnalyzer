@@ -115,7 +115,7 @@ auto verify_outneighbour_stmt_nums(const sp::ProcMap& proc_map, const std::strin
 /**
  * @brief Traverse the CFG using DFS for testing.
  */
-auto test_traverse_dfs(const std::shared_ptr<sp::Cfg> cfg, const std::shared_ptr<sp::CfgNode> node,
+auto test_traverse_dfs(const std::shared_ptr<sp::ProcedureCfg> cfg, const std::shared_ptr<sp::CfgNode> node,
                        std::vector<std::shared_ptr<sp::CfgNode>>& visited_nodes,
                        std::unordered_set<int>& visited_stmt_nums) -> void {
     if (std::find(visited_nodes.begin(), visited_nodes.end(), node) != visited_nodes.end()) {
@@ -168,7 +168,7 @@ TEST_CASE("Test CFG Builder") {
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
     auto [read_facade, write_facade] = PkbManager::create_facades();
-    auto cfg_builder = std::make_shared<sp::CfgBuilder>();
+    auto cfg_builder = std::make_shared<sp::ProgramCfgs>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
     auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);

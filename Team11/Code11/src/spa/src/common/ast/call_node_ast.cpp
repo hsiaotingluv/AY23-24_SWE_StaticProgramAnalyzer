@@ -50,7 +50,7 @@ auto CallNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_
     return var_names_proc_name;
 }
 
-auto CallNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto CallNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num);
 }

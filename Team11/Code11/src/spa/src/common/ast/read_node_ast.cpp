@@ -35,7 +35,7 @@ auto ReadNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& wr
     return {var_node->name};
 }
 
-auto ReadNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto ReadNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num);
 }
