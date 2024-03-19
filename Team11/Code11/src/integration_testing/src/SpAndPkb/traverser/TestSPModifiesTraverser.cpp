@@ -69,17 +69,27 @@ TEST_CASE("Test Modifies - All Statement Types") {
         REQUIRE_FALSE(read_facade->contains_procedure_modify_var("printResults", "normSq"));
     }
 
-    SECTION("Test Modifies with Procedures and Calls - success") {
-        // Procedures
-        REQUIRE(read_facade->contains_procedure_modify_var("main", "flag"));
-        REQUIRE(read_facade->contains_procedure_modify_var("computeCentroid", "normSq"));
-        REQUIRE(read_facade->contains_procedure_modify_var("computeCentroid", "count"));
-
-        // Calls Statement
-        REQUIRE(read_facade->contains_statement_modify_var("2", "count"));
-        REQUIRE(read_facade->contains_statement_modify_var("2", "cenX"));
-        REQUIRE(read_facade->contains_statement_modify_var("2", "y"));
-        REQUIRE(read_facade->contains_statement_modify_var("18", "x"));
+    SECTION("Test Modifies for every Statement Types - success") {
+        // Assign Statement
+        REQUIRE(read_facade->contains_statement_modify_var("10", "count"));
+        // Read Statement
+        REQUIRE(read_facade->contains_statement_modify_var("4", "x"));
+        // While Statement
+        REQUIRE(read_facade->contains_statement_modify_var("14", "count")); // statement s in container
+        REQUIRE(read_facade->contains_statement_modify_var(
+            "14", "x")); // procedure call c in the container, so Modifies(s, v) must hold
+        // If Statement
+        REQUIRE(read_facade->contains_statement_modify_var("19", "flag")); // statement s in then stmtlist
+        REQUIRE(read_facade->contains_statement_modify_var("19", "cenX")); // statement s in else stmtlist
+        // Call Statement
+        REQUIRE(read_facade->contains_statement_modify_var("2", "flag")); // direct
+        REQUIRE(read_facade->contains_statement_modify_var("2", "cenX")); // direct
+        REQUIRE(read_facade->contains_statement_modify_var("2", "x"));    // indirect
+        REQUIRE(read_facade->contains_statement_modify_var("2", "y"));    // indirect
+        // Procedure
+        REQUIRE(read_facade->contains_procedure_modify_var("main", "flag"));              // indirect
+        REQUIRE(read_facade->contains_procedure_modify_var("computeCentroid", "normSq")); // direct
+        REQUIRE(read_facade->contains_procedure_modify_var("computeCentroid", "count"));  // direct
     }
 
     SECTION("Test Modifies across edge cases - failure") {
@@ -91,31 +101,58 @@ TEST_CASE("Test Modifies - All Statement Types") {
     }
 }
 
-TEST_CASE("Test Modifies - Advanced SPA with nested While & If loops") {
+TEST_CASE("Test Modifies - Complex Call Relationship") {
     std::string input = R"(
-        procedure First {
-            while (x==1) {
-                while (x==2) {
-                    while (x==3) {
-                        read me;
-                    }
-                    read her;
-                }
-                read him;
-            }
-            if (x==1)
-            then { 
-                if (x==2)
-                then {read me;}
-                else {read me;}}
-            else {
-                if (x==(1/0))
-                then {read me;}
-                else {read me;}}
-            print fake;
-        })";
+        procedure main {
+            x = 0;
+            call proc1;
+        }
+
+        procedure proc1 {
+            y = 0;
+            call proc2;
+            call proc3;
+        }
+
+        procedure proc2 {
+            z = 0;
+            call proc3;
+            call proc4;
+        }
+
+        procedure proc3 {
+            a = 0;
+            call proc5;
+        }
+
+        procedure proc4 {
+            b = 0;
+        }
+
+        procedure proc5 {
+            c = 0;
+        }
+        
+        procedure proc6 {
+            d = 0;
+        }
+        )";
 
     auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
+
+    SECTION("Test Modifies across Complex Call Relationship - success") {
+        REQUIRE(read_facade->contains_procedure_modify_var("main", "c"));
+        REQUIRE(read_facade->contains_statement_modify_var("2", "b"));
+        REQUIRE(read_facade->contains_statement_modify_var("2", "c"));
+    }
+
+    SECTION("Test Modifies across Complex Call Relationship - failure") {
+        // Uses Relationship but not Modifies Relationship - failure.
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var("proc4", "c"));
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var(
+            "proc2", "y")); // Should not be able to access caller's variables.
+        REQUIRE_FALSE(read_facade->contains_procedure_modify_var("main", "d")); // Disjoint Call Graph
+    }
 }
