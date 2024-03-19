@@ -5,8 +5,8 @@
 #include "sp/main.hpp"
 
 /**
- * Modifies (s, v) holds for all statements, except 'print'
- * i.e. Modifies(s, v) works on 'assign', 'read', 'while', 'if', 'call'
+ * Modifies (stmt, v) holds for all statements, except 'print'
+ * i.e. Modifies(stmt, v) works on 'assign', 'read', 'while', 'if', 'call'
  * Modifies (p, v) holds for procedure. This requires a deep search of nested statements for variables.
  */
 
