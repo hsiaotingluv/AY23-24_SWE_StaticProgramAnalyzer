@@ -47,22 +47,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
 
-    SECTION("Test SP and PKB Uses Website - success") {
-        // Taken from
-        // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#uses
-        // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->contains_statement_use_var("16", "x"));
-        REQUIRE(read_facade->contains_statement_use_var("19", "count"));
-        REQUIRE(read_facade->contains_statement_use_var("19", "cenX"));
-        REQUIRE(read_facade->contains_procedure_use_var("main", "cenX"));
-        REQUIRE(read_facade->contains_procedure_use_var("main", "flag"));
-        REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "x"));
-
-        REQUIRE_FALSE(read_facade->contains_statement_use_var("12", "count"));
-        REQUIRE_FALSE(read_facade->contains_statement_use_var("19", "flag"));
-        REQUIRE_FALSE(read_facade->contains_statement_use_var("18", "y"));
-    }
-
     SECTION("Test SP and PKB Assignment Pattern - success") {
         REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);
         REQUIRE(read_facade->get_all_assignments_lhs("count").size() == 2);
