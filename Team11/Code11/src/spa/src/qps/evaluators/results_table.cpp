@@ -31,6 +31,21 @@ auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
     return synonyms;
 }
 
+auto get_mapping_from_synonyms_to_table_names(const Synonyms& table_column_names, const Synonyms& synonyms)
+    -> std::vector<int> {
+    auto new_idx_to_old_idx = std::vector<int>{};
+    new_idx_to_old_idx.reserve(synonyms.size());
+    for (const auto& synonym : synonyms) {
+        for (int i = 0; i < static_cast<int>(table_column_names.size()); i++) {
+            if (table_column_names[i] == synonym) {
+                new_idx_to_old_idx.push_back(i);
+                break;
+            }
+        }
+    }
+    return new_idx_to_old_idx;
+}
+
 auto compare_rows(const std::vector<std::string>& row1, const std::vector<std::string>& row2,
                   const std::vector<int>& idxs) -> bool {
     for (auto idx : idxs) {
@@ -601,21 +616,7 @@ auto to_string(const Table& table, const std::vector<int>& column_indices) -> st
  */
 auto project(const Table& table, const Synonyms& synonyms) -> Table {
     // Contract: synonyms <= table.get_column()
-    const auto new_idx_to_old_idx = [&]() {
-        const auto column_names = table.get_column();
-        auto new_idx_to_old_idx = std::vector<int>{};
-        new_idx_to_old_idx.reserve(synonyms.size());
-        std::for_each(synonyms.begin(), synonyms.end(),
-                      [&new_idx_to_old_idx, &column_names](const auto& synonym) -> void {
-                          for (int i = 0; i < static_cast<int>(column_names.size()); i++) {
-                              if (column_names[i] == synonym) {
-                                  new_idx_to_old_idx.push_back(i);
-                                  break;
-                              }
-                          }
-                      });
-        return new_idx_to_old_idx;
-    }();
+    const auto& new_idx_to_old_idx = detail::get_mapping_from_synonyms_to_table_names(table.get_column(), synonyms);
 
     auto new_table = Table{synonyms};
     for (const auto& row : table.get_records()) {
@@ -685,22 +686,8 @@ auto build_and_project(const std::shared_ptr<pkb::ReadFacade>& read_facade, cons
                                                  std::get<Table>(detail::build_table(missing_synonyms, read_facade))));
 
     // Reorder the columns to match the requested order
-    const auto new_idx_to_old_idx = [&final_table, &synonyms]() {
-        const auto column_names = final_table.get_column();
-        auto new_idx_to_old_idx = std::vector<int>{};
-        new_idx_to_old_idx.reserve(synonyms.size());
-        std::for_each(synonyms.begin(), synonyms.end(),
-                      [&new_idx_to_old_idx, &column_names](const auto& synonym) -> void {
-                          for (int i = 0; i < static_cast<int>(column_names.size()); i++) {
-                              if (column_names[i] == synonym) {
-                                  new_idx_to_old_idx.push_back(i);
-                                  break;
-                              }
-                          }
-                      });
-        return new_idx_to_old_idx;
-    }();
-
+    const auto& new_idx_to_old_idx =
+        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), synonyms);
     return to_string(final_table, new_idx_to_old_idx);
 }
 
