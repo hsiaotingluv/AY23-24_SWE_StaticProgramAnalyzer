@@ -5,3 +5,6 @@ build/
 # Doxygen generated files
 src/spa/docs/html
 src/spa/docs/latex
+
+# Benchmark script
+benchmark.sh
