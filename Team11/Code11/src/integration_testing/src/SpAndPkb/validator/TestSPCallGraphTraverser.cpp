@@ -1,5 +1,8 @@
 #include "catch.hpp"
+
 #include "pkb/facades/read_facade.h"
+#include "pkb/pkb_manager.h"
+#include "sp/main.hpp"
 #include "sp/validator/call_graph_traverser.hpp"
 
 using namespace sp;
@@ -13,6 +16,59 @@ auto traverse(const sp::SemanticValidator::CallGraph& call_graph) -> std::shared
     auto call_graph_traverser = std::make_shared<CallGraphTraverser>(write_facade);
     call_graph_traverser->traverse(call_graph);
     return read_facade;
+}
+
+TEST_CASE("Test Call Graph Traverser - Basic SPA") {
+    std::string input = R"(
+        procedure main {
+            flag = 0;
+            call computeCentroid;
+            call printResults;
+        }
+
+        procedure readPoint {
+            read x;
+            read y;
+        }
+
+        procedure printResults {
+            print flag;
+            print cenX;
+            print cenY;
+            print normSq;
+        }
+
+        procedure computeCentroid {
+            count = 0;
+            cenX = 0;
+            cenY = 0;
+            call readPoint;
+            while ((x != 0) && (y != 0)) {
+                count = count + 1;
+                cenX = cenX + x;
+                cenY = cenY + y;
+                call readPoint;
+            }
+            if (count == 0) then {
+                flag = 1;
+            } else {
+                cenX = cenX / count;
+                cenY = cenY / count;
+            }
+            normSq = cenX * cenX + cenY * cenY;
+        })";
+
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
+    auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
+    auto ast = sp->process(input);
+
+    SECTION("Test SP and PKB Populate calls - success") {
+        REQUIRE(read_facade->get_all_calls_callers().size() == 2);
+        REQUIRE(read_facade->get_all_calls_callees().size() == 3);
+        REQUIRE(read_facade->get_callees("main").size() == 2);
+        REQUIRE(read_facade->get_callers("main").empty());
+        REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
+    }
 }
 
 TEST_CASE("Test SP Call Graph Traverser - Simple Usability Tests") {

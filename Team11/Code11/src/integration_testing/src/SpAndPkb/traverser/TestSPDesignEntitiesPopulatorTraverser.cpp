@@ -73,12 +73,4 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
         REQUIRE(read_facade->get_while_stmts_with_var("x").size() == 1);
         REQUIRE(read_facade->get_while_stmts_with_var("y").size() == 1);
     }
-
-    SECTION("Test SP and PKB Populate calls - success") {
-        REQUIRE(read_facade->get_all_calls_callers().size() == 2);
-        REQUIRE(read_facade->get_all_calls_callees().size() == 3);
-        REQUIRE(read_facade->get_callees("main").size() == 2);
-        REQUIRE(read_facade->get_callers("main").empty());
-        REQUIRE(read_facade->get_callers("computeCentroid").size() == 1);
-    }
 }
