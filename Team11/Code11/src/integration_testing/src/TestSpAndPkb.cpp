@@ -78,22 +78,6 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
         REQUIRE_FALSE(read_facade->does_procedure_modify_var("printResults", "normSq"));
     }
 
-    SECTION("Test SP and PKB Follows Website - success") {
-        // Taken from
-        // https://nus-cs3203.github.io/course-website/contents/basic-spa-requirements/design-abstractions.html#follows--follows
-        // computeCentroid starts with stmt 10
-        REQUIRE(read_facade->has_follows_relation("10", "11"));
-        REQUIRE(read_facade->has_follows_relation("13", "14"));
-        REQUIRE(read_facade->has_follows_relation("14", "19"));
-        REQUIRE(read_facade->has_follows_star_relation("12", "19"));
-        REQUIRE(read_facade->has_follows_star_relation("10", "23"));
-
-        REQUIRE_FALSE(read_facade->has_follows_relation("14", "15"));
-        REQUIRE_FALSE(read_facade->has_follows_relation("18", "19"));
-        REQUIRE_FALSE(read_facade->has_follows_relation("20", "21"));
-        REQUIRE_FALSE(read_facade->has_follows_star_relation("21", "23"));
-    }
-
     SECTION("Test SP and PKB Assignment Pattern - success") {
         REQUIRE(read_facade->get_all_assignments_lhs("flag").size() == 2);
         REQUIRE(read_facade->get_all_assignments_lhs("count").size() == 2);

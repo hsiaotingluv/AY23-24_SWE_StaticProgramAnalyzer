@@ -91,7 +91,7 @@ TEST_CASE("Test Parent - All Statement Types") {
     }
 }
 
-TEST_CASE("Test SP and PKB - Advanced SPA with nested While & If loops") {
+TEST_CASE("Test Parent - Advanced SPA with nested While & If loops") {
     std::string input = R"(
         procedure First {
             while (x==1) {
