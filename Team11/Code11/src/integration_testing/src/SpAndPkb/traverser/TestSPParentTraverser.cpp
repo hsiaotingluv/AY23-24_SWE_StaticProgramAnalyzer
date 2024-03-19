@@ -6,8 +6,9 @@
 
 /**
  * Parent(s1, s2) holds for any type of statements.
- * Statements are 'read', 'print', 'call', 'while', 'if'
- * Fun fact: If s1 is 'read', 'print', 'call', then Parent(s1,s2) must be False.
+ * Statements are 'read', 'print', 'assign', 'call', 'while', 'if'
+ * Fun fact: If s1 is 'read', 'print', 'assign', 'call', then Parent(s1,s2) must be False.
+ * Fun fact: If s2 >= s1, Parent(s1, s2) must be False.
  */
 
 TEST_CASE("Test Parent - All Statement Types") {

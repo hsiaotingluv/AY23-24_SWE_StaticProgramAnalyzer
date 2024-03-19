@@ -6,8 +6,9 @@
 
 /**
  * Follows (s1, s2) holds for any type of statements.
- * Statements are 'read', 'print', 'call', 'while', 'if'
- * One Point: Follows(s1, s2) != Follows(s2, s1).
+ * Statements are 'read', 'print', 'assign', 'call', 'while', 'if'
+ * Fun fact: Follows(s1, s2) != Follows(s2, s1).
+ * Fun fact: If s2 >= s1, Follows(s1, s2) must be False.
  */
 
 TEST_CASE("Test Follows - All Statement Types") {
