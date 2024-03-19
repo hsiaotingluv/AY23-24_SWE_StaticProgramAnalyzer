@@ -31,7 +31,8 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 
         if (evaluator == nullptr) {
             std::cerr << "Failed to create evaluator for clause: " << *clause << std::endl;
-            return project(read_facade, Table{}, query_obj.reference);
+            auto empty_table = OutputTable{Table{}};
+            return project(read_facade, empty_table, query_obj.reference);
         }
 
         auto next_table = evaluator->evaluate();
