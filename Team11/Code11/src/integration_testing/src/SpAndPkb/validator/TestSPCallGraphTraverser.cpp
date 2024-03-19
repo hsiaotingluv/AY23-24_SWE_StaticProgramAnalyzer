@@ -9,7 +9,7 @@ using ProcNames = std::unordered_set<std::string>;
  * @brief Traverse the CallGraph while resetting the Facades for testing purposes.
  */
 auto traverse(const sp::SemanticValidator::CallGraph& call_graph) -> std::shared_ptr<pkb::ReadFacade> {
-    auto [read_facade, write_facade] = pkb::PKB::create_facades(); // Wipe cache
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades(); // Wipe cache
     auto call_graph_traverser = std::make_shared<CallGraphTraverser>(write_facade);
     call_graph_traverser->traverse(call_graph);
     return read_facade;

@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "pkb/facades/read_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 #include "sp/main.hpp"
 
 /**
@@ -51,7 +51,7 @@ TEST_CASE("Test Parent - All Statement Types") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
 
@@ -113,7 +113,7 @@ TEST_CASE("Test Parent - Advanced SPA with nested While & If loops") {
                 else {read me;}}
         })";
 
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
 

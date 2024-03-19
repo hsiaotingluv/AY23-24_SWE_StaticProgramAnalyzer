@@ -43,7 +43,7 @@ TEST_CASE("Test SP and PKB - Basic SPA") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
 
@@ -124,7 +124,7 @@ TEST_CASE("Test SP and PKB - Advanced SPA") {
           v = z;
           print v; })";
 
-    auto [read_facade, write_facade] = pkb::PKB::create_facades();
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
     auto ast = sp->process(input);
 
