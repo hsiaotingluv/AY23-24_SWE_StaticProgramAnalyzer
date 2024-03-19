@@ -14,6 +14,10 @@ auto CallsEvaluator::evaluate() const -> OutputTable {
 
 auto CallsEvaluator::eval_calls(const std::shared_ptr<ProcSynonym>& proc_syn_1,
                                 const std::shared_ptr<ProcSynonym>& proc_syn_2) const -> OutputTable {
+    // No recursion in SIMPLE
+    if (proc_syn_1 == proc_syn_2) {
+        return Table{};
+    }
     // TODO improve pkb api with get all caller-callee pairs
     auto table = Table{{proc_syn_1, proc_syn_2}};
     const auto all_callers = read_facade->get_all_calls_callers();
