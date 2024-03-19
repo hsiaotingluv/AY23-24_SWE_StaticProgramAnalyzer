@@ -78,17 +78,18 @@ TEST_CASE("Test Uses - All Statement Types") {
         REQUIRE(read_facade->contains_statement_use_var("6", "flag"));
         // While Statement
         REQUIRE(read_facade->contains_statement_use_var("14", "count")); // statement s in container
-        REQUIRE(read_facade->contains_statement_use_var("14", "cenX")); // procedure call c in the container, so Uses(s, v) must hold
+        REQUIRE(read_facade->contains_statement_use_var(
+            "14", "cenX")); // procedure call c in the container, so Uses(s, v) must hold
         // If Statement
         REQUIRE(read_facade->contains_statement_use_var("19", "count")); // statement s in then stmtlist
-        REQUIRE(read_facade->contains_statement_use_var("19", "cenX")); // statement s in else stmtlist
+        REQUIRE(read_facade->contains_statement_use_var("19", "cenX"));  // statement s in else stmtlist
         // Call Statement
-        REQUIRE(read_facade->contains_statement_use_var("2", "count")); // direct
-        REQUIRE(read_facade->contains_statement_use_var("2", "cenX")); // direct
-        REQUIRE(read_facade->contains_statement_use_var("2", "flag")); // indirect
+        REQUIRE(read_facade->contains_statement_use_var("2", "count"));  // direct
+        REQUIRE(read_facade->contains_statement_use_var("2", "cenX"));   // direct
+        REQUIRE(read_facade->contains_statement_use_var("2", "flag"));   // indirect
         REQUIRE(read_facade->contains_statement_use_var("2", "normSq")); // indirect
         // Procedure
-        REQUIRE(read_facade->contains_statement_use_var("main", "flag")); // indirect
+        REQUIRE(read_facade->contains_statement_use_var("main", "flag"));              // indirect
         REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "normSq")); // indirect
         REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "count"));  // direct
     }
@@ -152,8 +153,8 @@ TEST_CASE("Test Uses - Complex Call Relationship") {
     SECTION("Test Uses across Complex Call Relationship - failure") {
         // Modifies Relationship but not Uses Relationship - failure.
         REQUIRE_FALSE(read_facade->contains_procedure_use_var("proc4", "b"));
-        REQUIRE_FALSE(read_facade->contains_procedure_use_var(
-            "proc2", "u")); // Should not be able to access caller's variables.
+        REQUIRE_FALSE(
+            read_facade->contains_procedure_use_var("proc2", "u")); // Should not be able to access caller's variables.
         REQUIRE_FALSE(read_facade->contains_procedure_use_var("main", "q")); // Disjoint Call Graph
     }
 }
