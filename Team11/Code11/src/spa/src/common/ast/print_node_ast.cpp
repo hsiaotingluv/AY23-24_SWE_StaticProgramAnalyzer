@@ -32,11 +32,11 @@ auto PrintNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write
                                   const std::shared_ptr<UsesMap>&) const -> std::unordered_set<std::string> {
     // Uses(pn, v) holds if variable v appears in pn.
     auto stmt_number = std::to_string(get_statement_number());
-    write_facade->add_statement_uses_var(stmt_number, var_node->name);
+    write_facade->add_statement_use_var(stmt_number, var_node->name);
     return {var_node->name};
 }
 
-auto PrintNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto PrintNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num);
 }

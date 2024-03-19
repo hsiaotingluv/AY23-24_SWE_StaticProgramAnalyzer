@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser/entities/clause.hpp"
@@ -15,9 +15,9 @@ using namespace qps;
 using namespace pkb;
 
 TEST_CASE("Test Evaluator ModifiesS") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     write_facade->add_statement("1", StatementType::Assign);
     write_facade->add_statement("2", StatementType::Read);
     write_facade->add_statement("3", StatementType::If);
@@ -26,10 +26,10 @@ TEST_CASE("Test Evaluator ModifiesS") {
 
     write_facade->add_variable("a");
     write_facade->add_variable("b");
-    write_facade->add_statement_modifies_var("1", "a");
-    write_facade->add_statement_modifies_var("2", "b");
-    write_facade->add_statement_modifies_var("3", "a");
-    write_facade->add_statement_modifies_var("4", "b");
+    write_facade->add_statement_modify_var("1", "a");
+    write_facade->add_statement_modify_var("2", "b");
+    write_facade->add_statement_modify_var("3", "a");
+    write_facade->add_statement_modify_var("4", "b");
 
     write_facade->finalise_pkb();
 

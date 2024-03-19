@@ -30,12 +30,12 @@ auto ReadNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& wr
 auto ReadNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                      const std::shared_ptr<ModifyMap>&) -> std::unordered_set<std::string> {
     auto stmt_number = std::to_string(get_statement_number());
-    write_facade->add_statement_modifies_var(stmt_number, var_node->name);
+    write_facade->add_statement_modify_var(stmt_number, var_node->name);
 
     return {var_node->name};
 }
 
-auto ReadNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto ReadNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto stmt_num = get_statement_number();
     cfg->add_stmt_to_node(stmt_num);
 }

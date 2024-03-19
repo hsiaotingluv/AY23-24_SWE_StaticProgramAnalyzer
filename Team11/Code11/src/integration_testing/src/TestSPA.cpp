@@ -2,7 +2,7 @@
 
 #include "sp/main.hpp"
 
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser.hpp"
@@ -60,7 +60,7 @@ static auto input_generator = []() -> std::string {
 };
 
 TEST_CASE("Test SPA - Entities") {
-    auto [read_facade, write_facade] = PKB::create_facades();
+    auto [read_facade, write_facade] = PkbManager::create_facades();
 
     auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
 

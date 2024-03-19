@@ -35,7 +35,7 @@ class SourceProcessor {
     std::shared_ptr<TokenizerRunner> tokenizer_runner;
     std::shared_ptr<Parser> parser;
     std::shared_ptr<StmtNumTraverser> stmt_num_traverser;
-    std::shared_ptr<CfgBuilder> cfg_builder;
+    std::shared_ptr<ProgramCfgs> cfg_builder;
     std::vector<std::shared_ptr<Traverser>> design_abstr_traversers;
     std::shared_ptr<NextTraverser> next_traverser;
     std::shared_ptr<pkb::WriteFacade> write_facade;
@@ -44,18 +44,18 @@ class SourceProcessor {
 
   public:
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
-                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<CfgBuilder> cfg_builder,
+                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> cfg_builder,
                     const std::vector<std::shared_ptr<Traverser>>& traversers,
-                    const std::shared_ptr<NextTraverser> next_traverser)
+                    std::shared_ptr<NextTraverser> next_traverser)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
           cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers),
           next_traverser(std::move(next_traverser)) {
     }
 
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
-                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<CfgBuilder> cfg_builder,
+                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> cfg_builder,
                     const std::vector<std::shared_ptr<Traverser>>&& traversers,
-                    const std::shared_ptr<NextTraverser> next_traverser,
+                    std::shared_ptr<NextTraverser> next_traverser,
                     const std::shared_ptr<pkb::WriteFacade>& write_facade)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
           cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers),
@@ -67,7 +67,7 @@ class SourceProcessor {
         return std::make_shared<SourceProcessor>(
             std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<SourceProcessorTokenizer>(), true),
             std::make_shared<ProgramParser>(), std::make_shared<StmtNumTraverser>(write_facade),
-            std::make_shared<CfgBuilder>(),
+            std::make_shared<ProgramCfgs>(),
             std::vector<std::shared_ptr<Traverser>>{
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
@@ -127,7 +127,7 @@ class SourceProcessor {
 
         // Step 6. If writing to pkb, finalise pkb.
         if (write_facade != nullptr) {
-            write_facade->finalise_pkb();
+            write_facade->finalise_pkb(procedure_topology_orders);
         }
 
 #ifdef DEBUG

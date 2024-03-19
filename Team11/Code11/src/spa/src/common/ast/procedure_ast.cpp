@@ -44,7 +44,7 @@ auto ProcedureNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_procedure_modifies_var(proc_name, var);
+        write_facade->add_procedure_modify_var(proc_name, var);
     }
 
     modify_map->insert(std::make_pair(proc_name, combined_set));
@@ -76,7 +76,7 @@ auto ProcedureNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& w
     // Uses(p, v) holds if there is a statement s in p
     auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
     for (const auto& var_name : var_names_stmt_list) {
-        write_facade->add_procedure_uses_var(proc_name, var_name);
+        write_facade->add_procedure_use_var(proc_name, var_name);
     }
     uses_map->insert(std::make_pair(proc_name, var_names_stmt_list));
     return var_names_stmt_list;

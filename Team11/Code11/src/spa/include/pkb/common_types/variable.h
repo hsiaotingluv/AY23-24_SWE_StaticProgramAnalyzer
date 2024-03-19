@@ -1,8 +1,6 @@
 #pragma once
 
 #include "entity.h"
-#include <string>
-#include <utility>
 
 class Variable : public Entity {
   public:

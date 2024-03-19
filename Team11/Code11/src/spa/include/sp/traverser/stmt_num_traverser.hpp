@@ -1,8 +1,7 @@
 #pragma once
 
+#include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
-
-#include <memory>
 
 namespace sp {
 

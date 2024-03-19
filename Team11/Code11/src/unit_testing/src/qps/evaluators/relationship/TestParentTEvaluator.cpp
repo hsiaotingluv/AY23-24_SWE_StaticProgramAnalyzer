@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser/entities/clause.hpp"
@@ -15,9 +15,9 @@ using namespace qps;
 using namespace pkb;
 
 TEST_CASE("Test Evaluator Parent*") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto if_strs = std::vector<std::string>{"1", "2"};
     const auto while_strs = std::vector<std::string>{"4", "5"};
     const auto assign_strs = std::vector<std::string>{"3", "6", "7"};

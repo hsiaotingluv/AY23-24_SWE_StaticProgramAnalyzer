@@ -4,6 +4,7 @@
 #include "qps/template_utils.hpp"
 
 #include "qps/evaluators/relationship/calls_evaluator.hpp"
+#include "qps/evaluators/relationship/calls_t_evaluator.hpp"
 #include "qps/evaluators/relationship/follows_evaluator.hpp"
 #include "qps/evaluators/relationship/follows_t_evaluator.hpp"
 #include "qps/evaluators/relationship/modifies_p_evaluator.hpp"
@@ -53,6 +54,10 @@ auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_faca
 
         [read_facade](const qps::Calls& calls) -> std::shared_ptr<ClauseEvaluator> {
             return std::make_shared<CallsEvaluator>(read_facade, calls);
+        },
+
+        [read_facade](const qps::CallsT& calls) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<CallsTEvaluator>(read_facade, calls);
         },
 
         // TODO: move this to a separate file

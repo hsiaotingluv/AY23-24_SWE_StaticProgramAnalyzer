@@ -59,7 +59,7 @@ auto WhileNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& w
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_statement_modifies_var(stmt_number, var);
+        write_facade->add_statement_modify_var(stmt_number, var);
     }
 
     return combined_set;
@@ -121,9 +121,9 @@ auto WhileNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write
         combined_set.insert(var_name);
     }
 
-    // Add all variables to the PKB.
+    // Add all variables to the PkbManager.
     for (const auto& var_name : combined_set) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
+        write_facade->add_statement_use_var(stmt_number, var_name);
     }
 
     return combined_set;
@@ -131,7 +131,7 @@ auto WhileNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write
 
 auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
-    // Parent* relationship) are handled by PKB.
+    // Parent* relationship) are handled by PkbManager.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
     for (const auto& statement : statements) {
@@ -150,7 +150,7 @@ auto WhileNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& wri
     }
 }
 
-auto WhileNode::build_cfg(std::shared_ptr<Cfg> cfg) -> void {
+auto WhileNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
     auto while_node = std::make_shared<CfgNode>();
     auto loop_node = std::make_shared<CfgNode>();
     auto end_node = std::make_shared<CfgNode>();

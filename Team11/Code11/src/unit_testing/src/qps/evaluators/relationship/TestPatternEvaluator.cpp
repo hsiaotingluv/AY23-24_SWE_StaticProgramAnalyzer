@@ -2,7 +2,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/parser/entities/clause.hpp"
@@ -18,9 +18,9 @@ using namespace qps;
 using namespace pkb;
 
 TEST_CASE("Test Evaluator Pattern") {
-    const auto& [read_facade, write_facade] = PKB::create_facades();
+    const auto& [read_facade, write_facade] = PkbManager::create_facades();
 
-    // Populate PKB
+    // Populate PkbManager
     const auto assign_strs = std::vector<std::string>{"1", "2"};
     for (const auto& x : assign_strs) {
         write_facade->add_statement(x, StatementType::Assign);
@@ -33,10 +33,10 @@ TEST_CASE("Test Evaluator Pattern") {
     write_facade->add_constant("2");
 
     write_facade->add_assignment("1", "x", "y z 2 * +");
-    write_facade->add_statement_modifies_var("1", "x");
+    write_facade->add_statement_modify_var("1", "x");
 
     write_facade->add_assignment("2", "z", "1");
-    write_facade->add_statement_modifies_var("2", "z");
+    write_facade->add_statement_modify_var("2", "z");
     auto evaluator = QueryEvaluator{read_facade};
 
     SECTION("Evaluate - Select a such that Pattern a (\"x\", _)") {

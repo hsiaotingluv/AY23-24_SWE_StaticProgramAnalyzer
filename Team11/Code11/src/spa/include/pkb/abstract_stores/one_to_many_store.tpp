@@ -12,6 +12,11 @@ void OneToManyStore<KeyType, ValueType>::add(const KeyType& key, const ValueType
 }
 
 template <class KeyType, class ValueType>
+bool OneToManyStore<KeyType, ValueType>::has_relationship() const {
+    return !forward_map.empty();
+}
+
+template <class KeyType, class ValueType>
 bool OneToManyStore<KeyType, ValueType>::contains_key_val_pair(const KeyType& key, const ValueType& value) const {
     auto it = forward_map.find(key);
     return it != forward_map.end() && it->second.find(value) != it->second.end();

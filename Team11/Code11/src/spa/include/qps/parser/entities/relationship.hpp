@@ -74,6 +74,54 @@ struct FollowsT {
     }
 };
 
+struct Next {
+    /**
+     * @brief A Next relationship is a relationship between two statements where the first statement is executed
+     * before the second statement, and there are no other statements that are executed between the two statements.
+     *
+     * @param stmt1
+     * @param stmt2
+     */
+    StmtRef stmt1;
+    StmtRef stmt2;
+
+    static constexpr auto keyword = "Next";
+
+  public:
+    Next(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const Next& next) -> std::ostream&;
+
+    auto operator==(const Next& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
+};
+
+struct NextT {
+    /**
+     * @brief A Next* relationship is a relationship between two statements where the first statement is executed
+     * before the second statement.
+     *
+     * @param stmt1
+     * @param stmt2
+     */
+    StmtRef stmt1;
+    StmtRef stmt2;
+
+    static constexpr auto keyword = "Next*";
+
+  public:
+    NextT(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream&;
+
+    auto operator==(const NextT& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
+};
+
 struct Parent {
     /**
      * @brief A Parent relationship is a relationship between two statements where the first statement is the parent
@@ -119,6 +167,22 @@ struct ParentT {
     friend auto operator<<(std::ostream& os, const ParentT& parentT) -> std::ostream&;
 
     auto operator==(const ParentT& other) const -> bool {
+        return stmt1 == other.stmt1 && stmt2 == other.stmt2;
+    }
+};
+
+struct Affects {
+    StmtRef stmt1;
+    StmtRef stmt2;
+
+    static constexpr auto keyword = "Affects";
+
+    Affects(StmtRef stmt1, StmtRef stmt2) : stmt1(std::move(stmt1)), stmt2(std::move(stmt2)) {
+    }
+
+    friend auto operator<<(std::ostream& os, const Affects& affects) -> std::ostream&;
+
+    auto operator==(const Affects& other) const -> bool {
         return stmt1 == other.stmt1 && stmt2 == other.stmt2;
     }
 };
@@ -350,9 +414,9 @@ struct ModifiesP {
     }
 };
 
-using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent>;
+using DefaultStmtStmtList = TypeList<FollowsT, Follows, ParentT, Parent, NextT, Next, Affects>;
 using DefaultStmtEntList = TypeList<UsesS, ModifiesS>;
-using DefaultEntEntList = TypeList<UsesP, ModifiesP, Calls, CallsT>;
+using DefaultEntEntList = TypeList<UsesP, ModifiesP, CallsT, Calls>;
 
 using RelationshipList = concat_t<concat_t<DefaultStmtStmtList, DefaultStmtEntList>, DefaultEntEntList>;
 using Relationship = type_list_to_variant_t<RelationshipList>;
