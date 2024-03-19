@@ -13,42 +13,42 @@
 TEST_CASE("Test Uses - All Statement Types") {
     std::string input = R"(
         procedure main {
-            flag = 0;1
-            call computeCentroid;2
-            call printResults;3
+            flag = 0;
+            call computeCentroid;
+            call printResults;
         }
 
         procedure readPoint {
-            read x;4
-            read y;5
+            read x;
+            read y;
         }
 
         procedure printResults {
-            print flag;6
-            print cenX;7
-            print cenY;8
-            print normSq;9
+            print flag;
+            print cenX;
+            print cenY;
+            print normSq;
         }
 
         procedure computeCentroid {
-            count = 0;0
-            cenX = 0;1
-            cenY = 0;2
-            call readPoint;3
-            while ((x != count) && (y != cenX)) {4
-                count = count + 1;5
-                cenX = cenX + x;6
-                cenY = cenY + y;7
-                call readPoint;8
+            count = 0;
+            cenX = 0;
+            cenY = 0;
+            call readPoint;
+            while ((x != count) && (y != cenX)) {
+                count = count + 1;
+                cenX = cenX + x;
+                cenY = cenY + y;
+                call readPoint;
             }
-            if (count == 0) then {9
-                flag = 1;0
+            if (count == 0) then {
+                flag = 1;
                 cenX = count / count;
             } else {
-                cenX = cenX / count;1
-                cenY = cenY / count;2
+                cenX = cenX / count;
+                cenY = cenY / count;
             }
-            call printResults;3
+            call printResults;
         })";
 
     auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
@@ -89,7 +89,7 @@ TEST_CASE("Test Uses - All Statement Types") {
         REQUIRE(read_facade->contains_statement_use_var("2", "flag"));   // indirect
         REQUIRE(read_facade->contains_statement_use_var("2", "normSq")); // indirect
         // Procedure
-        REQUIRE(read_facade->contains_statement_use_var("main", "flag"));              // indirect
+        REQUIRE(read_facade->contains_procedure_use_var("main", "flag"));              // indirect
         REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "normSq")); // indirect
         REQUIRE(read_facade->contains_procedure_use_var("computeCentroid", "count"));  // direct
     }
