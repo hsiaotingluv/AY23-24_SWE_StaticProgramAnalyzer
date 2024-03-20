@@ -248,6 +248,10 @@ class ReadFacade {
 
     std::unordered_set<std::string> get_previous_of(const std::string& after) const;
 
+    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_next() const;
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_next_reverse() const;
+
     // Calls-related Read Operations
     bool has_calls_relation() const;
 

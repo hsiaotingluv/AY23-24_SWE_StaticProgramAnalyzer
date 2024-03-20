@@ -562,6 +562,14 @@ std::unordered_set<std::string> PkbManager::get_previous_of(const std::string& a
     return next_store->get_keys_by_val(after);
 }
 
+std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_next() const {
+    return next_store->get_all();
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_next_reverse() const {
+    return next_store->get_all_reverse();
+}
+
 bool PkbManager::has_calls_relation() const {
     return direct_calls_store->has_relationship();
 }

@@ -54,6 +54,12 @@ std::unordered_map<KeyType, std::unordered_set<ValueType>> ManyToManyStore<KeyTy
 }
 
 template <class KeyType, class ValueType>
+std::unordered_map<ValueType, std::unordered_set<KeyType>>
+ManyToManyStore<KeyType, ValueType>::get_all_reverse() const {
+    return reverse_map;
+}
+
+template <class KeyType, class ValueType>
 std::unordered_set<std::tuple<KeyType, ValueType>> ManyToManyStore<KeyType, ValueType>::get_all_pairs() const {
     std::unordered_set<std::tuple<KeyType, ValueType>> allPairs;
 
