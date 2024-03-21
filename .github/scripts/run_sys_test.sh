@@ -1,6 +1,8 @@
 #!/bin/bash
 
 accumulated_result=""
+total_tc=0
+total_passing_tc=0
 
 for source_file in $(find "Team11/Tests11" -type f -name "*_source.txt"); do
   input_file="${source_file/_source.txt/_queries.txt}"
@@ -15,10 +17,20 @@ for source_file in $(find "Team11/Tests11" -type f -name "*_source.txt"); do
   # Extract the last line of the output
   result=$(echo "$output" | tail -n 1)
 
+  #!/bin/bash
+
+  # Extract the first and second integers from the text using grep and awk
+  passing_tc_file=$(echo "$result" | grep -oP '\(\K\d+(?=/)')
+  total_tc_file=$(echo "$result" | grep -oP '\d+(?=\))')
+
+  total_passing_tc=$((total_passing_tc + passing_tc_file))
+  total_tc=$((total_tc + total_tc_file))
+
   # Accumulate the result
   accumulated_result="${accumulated_result}\n${result}"
 done
 
+accumulated_result="${accumulated_result}\nTotal passing test cases: ${total_passing_tc}/${total_tc}"
 echo -e $accumulated_result
 
 # Check if accumulated_result contains "Failed"
