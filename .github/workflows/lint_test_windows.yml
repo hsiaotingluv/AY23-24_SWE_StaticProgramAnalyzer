@@ -6,20 +6,18 @@ jobs:
   run-testing:
     name: Run Testing
     runs-on: windows-latest
+    strategy:
+      fail-fast: true
 
     steps:
       - name: Checkout Git repo
         uses: actions/checkout@v3
 
-      - name: Setup CMake
-        run: choco install -y cmake
-
-      - name: Setup Clang
-        run: choco install -y llvm
-
+      - uses: lukka/get-cmake@latest
       - name: Build with CMake
+        shell: bash
         run: |
-          cd Team11\Code11
+          cd Team11/Code11
           mkdir build
           cd build
           cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang

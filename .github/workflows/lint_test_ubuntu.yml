@@ -6,6 +6,8 @@ jobs:
   run-testing:
     name: Run Testing
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
 
     steps:
       - name: Check out Git repo
