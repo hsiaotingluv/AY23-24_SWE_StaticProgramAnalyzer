@@ -54,5 +54,5 @@ jobs:
         shell: bash
         run: |
           chmod +x $GITHUB_WORKSPACE/.github/scripts/run_sys_test.sh
-          cd $GITHUB_WORKSPACE/.github/scripts
-          ./run_sys_test.sh
+          cd $GITHUB_WORKSPACE
+          ./.github/scripts/run_sys_test.sh
