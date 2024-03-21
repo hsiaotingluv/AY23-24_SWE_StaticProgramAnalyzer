@@ -1,6 +1,7 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/entities/select.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
@@ -18,16 +19,20 @@
 #include <vector>
 
 namespace qps::detail {
+auto to_synonym(const Elem& elem) -> std::shared_ptr<Synonym> {
+    return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
+                                     return synonym;
+                                 },
+                                 [](const AttrRef& attr_ref) -> std::shared_ptr<Synonym> {
+                                     return attr_ref.synonym;
+                                 }},
+                      elem);
+}
+
 auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
     auto synonyms = Synonyms{};
     synonyms.reserve(elems.size());
-    std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms),
-                   [](const auto& elem) -> std::shared_ptr<Synonym> {
-                       return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
-                                             return synonym;
-                                         }},
-                                         elem);
-                   });
+    std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms), to_synonym);
     return synonyms;
 }
 
@@ -311,7 +316,7 @@ void nested_loop_join_records(const Table& table1, const Table& table2, Table& n
 
 template <typename ColumnMergeStrategy, typename JoinRecordsStrategy>
 auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strategy,
-          JoinRecordsStrategy join_records_strategy) -> OutputTable {
+          JoinRecordsStrategy join_records_strategy) -> Table {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -537,12 +542,67 @@ auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTa
     return join(std::move(table1), std::move(table2), double_pointer_merge, nested_loop_join_records);
 }
 
-auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> OutputTable {
+auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
     auto table = Table{};
     for (const auto& synonym : synonyms) {
         auto curr_table = Table{{synonym}};
         for (const auto& result : synonym->scan(read_facade)) {
             curr_table.add_row({result});
+        }
+        table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
+    }
+    return table;
+}
+
+auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
+    return overloaded{[&](const std::shared_ptr<Synonym>& synonym) -> std::function<std::string(const std::string&)> {
+                          return [&read_facade](const std::string& x) -> std::string {
+                              return x;
+                          };
+                      },
+                      [&](const AttrRef& attr_ref) -> std::function<std::string(const std::string&)> {
+                          const auto synonym = attr_ref.synonym;
+                          if (const auto print_synonym = std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
+                                                         std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                              return [&read_facade](const std::string& x) -> std::string {
+                                  return *read_facade->get_vars_used_by_statement(x).begin();
+                              };
+                          } else if (const auto read_synonym = std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
+                                                               std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                              return [&read_facade](const std::string& x) -> std::string {
+                                  return *read_facade->get_vars_modified_by_statement(x).begin();
+                              };
+                          } else if (const auto call_synonym = std::dynamic_pointer_cast<CallSynonym>(synonym) &&
+                                                               std::holds_alternative<ProcName>(attr_ref.attr_name)) {
+                              return [&read_facade](const std::string& x) -> std::string {
+                                  return read_facade->get_procedure_name_called_by(x);
+                              };
+                          } else {
+                              return [&read_facade](const std::string& x) -> std::string {
+                                  return x;
+                              };
+                          }
+                      }};
+}
+
+/**
+ * @brief Build full synonym table from the given elements
+ *
+ * @param elements
+ * @param read_facade
+ * @return Table
+ */
+auto build_full_table(const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
+    auto table = Table{};
+
+    // Build mappers
+    const auto attribute_extractor = make_attribute_extractor(read_facade);
+    for (const auto& element : elements) {
+        const auto extract = std::visit(attribute_extractor, element);
+        const auto synonym = to_synonym(element);
+        auto curr_table = Table{{synonym}};
+        for (const auto& result : synonym->scan(read_facade)) {
+            curr_table.add_row({extract(result)});
         }
         table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
     }
@@ -608,110 +668,100 @@ auto to_string(const Table& table, const std::vector<int>& column_indices) -> st
 }
 
 /**
- * @brief Build a table from the given synonyms by selecting columns from the input table
+ * @brief Build a table from the given elements by selecting columns from the input table
  *
  * @param table
  * @param synonyms
  * @return Table
  */
-auto project(const Table& table, const Synonyms& synonyms) -> Table {
+auto project(Table& table, const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade)
+    -> void {
     // Contract: synonyms <= table.get_column()
+    const auto& synonyms = detail::to_synonyms(elements);
     const auto& new_idx_to_old_idx = detail::get_mapping_from_synonyms_to_table_names(table.get_column(), synonyms);
 
-    auto new_table = Table{synonyms};
-    for (const auto& row : table.get_records()) {
-        auto new_row = std::vector<std::string>{};
-        new_row.reserve(new_idx_to_old_idx.size());
-        for (const auto& old_idx : new_idx_to_old_idx) {
-            new_row.push_back(row.at(old_idx));
-        }
-        new_table.add_row(new_row);
+    // Scan out the desired synonyms
+    reorder(table.get_column(), new_idx_to_old_idx);
+    for (auto& row : table.get_records()) {
+        reorder(row, new_idx_to_old_idx);
     }
 
-    return new_table;
-}
+    // Convert to requested representation
+    auto extractors = std::vector<std::function<std::string(const std::string&)>>{};
+    extractors.reserve(elements.size());
 
-/**
- * @brief Build a table from the given synonyms by reading from the PKB
- *
- * @param read_facade
- * @param synonyms
- * @return Table
- */
-auto build_table(const std::shared_ptr<pkb::ReadFacade>& read_facade, const Synonyms& synonyms) -> Table {
-    auto table = Table{};
-    for (const auto& synonym : synonyms) {
-        auto curr_table = Table{{synonym}};
-        for (const auto& result : synonym->scan(read_facade)) {
-            curr_table.add_row({result});
-        }
-        table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
+    const auto attribute_extractor = detail::make_attribute_extractor(read_facade);
+    for (const auto& element : elements) {
+        extractors.push_back(std::visit(attribute_extractor, element));
     }
-    return table;
+
+    // Apply the extractors
+    for (auto& row : table.get_records()) {
+        for (int i = 0; i < static_cast<int>(row.size()); i++) {
+            row[i] = extractors[i](row[i]);
+        }
+    }
 }
 
-auto build_and_project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const Table& table, Synonyms synonyms)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, std::vector<Elem> elems)
     -> std::vector<std::string> {
     if (table.empty()) {
         // Table is empty --> contradiction
         return {};
     }
 
-    // Find synonyms in synonyms that are not in table
+    // Split the requested elements into available and missing elements
     auto column_names = table.get_column();
-    std::sort(column_names.begin(), column_names.end());
-    std::sort(synonyms.begin(), synonyms.end());
+    const auto& table_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{column_names.begin(), column_names.end()};
 
-    // Synonyms that are in table
-    const auto& available_synonyms = [&]() {
-        auto available_synonyms = std::vector<std::shared_ptr<Synonym>>{};
-        std::set_intersection(column_names.begin(), column_names.end(), synonyms.begin(), synonyms.end(),
-                              std::back_inserter(available_synonyms));
-        const auto reference_set = std::unordered_set<std::shared_ptr<Synonym>>{synonyms.begin(), synonyms.end()};
-        return available_synonyms;
-    }();
+    auto mid_iter = std::partition(elems.begin(), elems.end(), [&table_synonyms](const auto& element) {
+        const auto& synonym = detail::to_synonym(element);
+        return table_synonyms.find(synonym) != table_synonyms.end();
+    });
+    const auto& available_elements = std::vector<Elem>(elems.begin(), mid_iter);
+    const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
-    // Synonyms that are not in table
-    const auto& missing_synonyms = [&]() {
-        auto missing_synonyms = std::vector<std::shared_ptr<Synonym>>{};
-        std::set_difference(synonyms.begin(), synonyms.end(), available_synonyms.begin(), available_synonyms.end(),
-                            std::back_inserter(missing_synonyms));
-        return missing_synonyms;
-    }();
+    // Fill table using information from the available synonyms
+    project(table, available_elements, read_facade);
 
-    const auto final_table =
-        missing_synonyms.empty()
-            ? project(table, available_synonyms)
-            : std::get<Table>(detail::cross_join(project(table, available_synonyms),
-                                                 std::get<Table>(detail::build_table(missing_synonyms, read_facade))));
+    // Combine the table with the missing synonyms
+    const auto& final_table = missing_elements.empty()
+                                  ? table
+                                  : std::get<Table>(detail::cross_join(
+                                        std::move(table), detail::build_full_table(missing_elements, read_facade)));
 
     // Reorder the columns to match the requested order
     const auto& new_idx_to_old_idx =
-        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), synonyms);
+        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), detail::to_synonyms(elems));
     return to_string(final_table, new_idx_to_old_idx);
 }
 
-auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
     static constexpr auto TRUE_STRING = "TRUE";
     static constexpr auto FALSE_STRING = "FALSE";
 
-    return std::visit(
-        overloaded{
-            [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
-                return table.empty() ? std::vector<std::string>{FALSE_STRING} : std::vector<std::string>{TRUE_STRING};
-            },
-            [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
-                return {TRUE_STRING};
-            },
-            [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                return to_string(std::get<Table>(detail::build_table(detail::to_synonyms(elems), read_facade)));
-            },
-            [&read_facade](const Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                return build_and_project(read_facade, table, detail::to_synonyms(elems));
-            },
-        },
-        table, reference);
+    static const auto TRUE_VALUE = std::vector<std::string>{TRUE_STRING};
+    static const auto FALSE_VALUE = std::vector<std::string>{FALSE_STRING};
+
+    return std::visit(overloaded{
+                          [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
+                              return table.empty() ? FALSE_VALUE : TRUE_VALUE;
+                          },
+                          [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
+                              return TRUE_VALUE;
+                          },
+                          [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              // Evaluator produces "True", so we only need to build a full table based on the elements
+                              return to_string(detail::build_full_table(elems, read_facade));
+                          },
+                          [&read_facade](Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
+                              // Evaluator produces table, so we need to project the table based on the
+                              // elements
+                              return project(read_facade, table, elems);
+                          },
+                      },
+                      table, reference);
 }
 
 void print(const Table& table) {
