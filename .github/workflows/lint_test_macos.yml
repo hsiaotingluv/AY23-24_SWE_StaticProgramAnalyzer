@@ -1,21 +1,23 @@
-name: "Ubuntu: Lint cpp/h files and test"
+name: "MacOS: Test"
 
 on: [ push, pull_request ]
 
 jobs:
   run-testing:
     name: Run Testing
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - name: Check out Git repo
         uses: actions/checkout@v3
 
       - name: Setup CMake
-        run: sudo apt update && sudo apt install -y cmake
+        run: |
+          brew update
+          brew install cmake
 
       - name: Setup Clang
-        run: sudo apt install -y llvm
+        run: brew install llvm
 
       - name: Build cmake
         run: |
@@ -44,23 +46,22 @@ jobs:
         if: steps.linter.outputs.clang-format-checks-failed > 0
         run: echo "Some files failed the linting checks!" && exit 1
 
-      - name: Run Unit Test
+      - name: Run Unit Tests
         run: |
-          chmod +x Team11/Code11/build/src/unit_testing/unit_testing
-          ./Team11/Code11/build/src/unit_testing/unit_testing
+          cd Team11/Code11/build/src/unit_testing
+          ./unit_testing
 
-      - name: Run Integration Test
+      - name: Run Integration Tests
         run: |
-          chmod +x Team11/Code11/build/src/integration_testing/integration_testing
-          ./Team11/Code11/build/src/integration_testing/integration_testing
+          cd Team11/Code11/build/src/integration_testing
+          ./integration_testing
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run System Testing
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Run System Testing on Push
         run: |
           chmod +x ./.github/scripts/run_sys_test.sh
           ./.github/scripts/run_sys_test.sh
