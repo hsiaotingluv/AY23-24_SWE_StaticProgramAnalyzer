@@ -26,7 +26,7 @@ jobs:
 
             - name: Build cmake
               run: |
-                cd $GITHUB_WORKSPACE/Team11/Code11/build
+                cd $GITHUB_WORKSPACE/Team11/Code11
                 mkdir build
                 cd build
                 cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
