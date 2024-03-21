@@ -4,6 +4,7 @@
 
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 namespace pkb {
 PkbManager::PkbManager()
