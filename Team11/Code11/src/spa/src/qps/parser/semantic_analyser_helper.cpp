@@ -45,13 +45,13 @@ auto get_stmt_synonym(const Synonyms& declarations,
 
 auto validate_attr_ref(const Synonyms& declarations,
                        const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                       const untyped::UntypedAttrRef& attr_ref) -> std::optional<TypedRef> {
+                       const untyped::UntypedAttrRef& attr_ref) -> std::optional<AttrRef> {
     const auto& maybe_synonym = is_synonym_declared(declarations, mapping, attr_ref.synonym);
     if (!maybe_synonym.has_value()) {
         return std::nullopt;
     }
     const auto& synonym = maybe_synonym.value();
-    return std::visit(overloaded{[&synonym](const ProcName& attr_name) -> std::optional<TypedRef> {
+    return std::visit(overloaded{[&synonym](const ProcName& attr_name) -> std::optional<AttrRef> {
                                      const auto proc_synonym = std::dynamic_pointer_cast<ProcSynonym>(synonym);
                                      const auto call_synonym = std::dynamic_pointer_cast<CallSynonym>(synonym);
                                      if (!proc_synonym && !call_synonym) {
@@ -59,7 +59,7 @@ auto validate_attr_ref(const Synonyms& declarations,
                                      }
                                      return AttrRef{synonym, attr_name, AttrRef::Type::Name};
                                  },
-                                 [&synonym](const VarName& attr_name) -> std::optional<TypedRef> {
+                                 [&synonym](const VarName& attr_name) -> std::optional<AttrRef> {
                                      const auto var_synonym = std::dynamic_pointer_cast<VarSynonym>(synonym);
                                      const auto read_synonym = std::dynamic_pointer_cast<ReadSynonym>(synonym);
                                      const auto print_synonym = std::dynamic_pointer_cast<PrintSynonym>(synonym);
@@ -69,13 +69,13 @@ auto validate_attr_ref(const Synonyms& declarations,
 
                                      return AttrRef{synonym, attr_name, AttrRef::Type::Name};
                                  },
-                                 [&synonym](const StmtNum& attr_name) -> std::optional<TypedRef> {
+                                 [&synonym](const StmtNum& attr_name) -> std::optional<AttrRef> {
                                      if (!is_stmt_synonym(synonym)) {
                                          return std::nullopt;
                                      }
                                      return AttrRef{synonym, attr_name, AttrRef::Type::Integer};
                                  },
-                                 [&synonym](const Value& attr_name) -> std::optional<TypedRef> {
+                                 [&synonym](const Value& attr_name) -> std::optional<AttrRef> {
                                      const auto const_synonym = std::dynamic_pointer_cast<ConstSynonym>(synonym);
                                      if (!const_synonym) {
                                          return std::nullopt;
@@ -90,7 +90,9 @@ auto validate_ref(const Synonyms& declarations,
                   const untyped::UntypedRef& ref) -> std::optional<TypedRef> {
     return std::visit(
         overloaded{[&declarations, &mapping](const untyped::UntypedAttrRef& attr_ref) -> std::optional<TypedRef> {
-                       return validate_attr_ref(declarations, mapping, attr_ref);
+                       auto maybe_attr_ref = validate_attr_ref(declarations, mapping, attr_ref);
+                       return maybe_attr_ref.has_value() ? std::make_optional(TypedRef{maybe_attr_ref.value()})
+                                                         : std::nullopt;
                    },
                    [](const auto& x) -> std::optional<TypedRef> {
                        return x;
