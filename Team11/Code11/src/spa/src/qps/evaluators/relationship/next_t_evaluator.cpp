@@ -32,7 +32,7 @@ get_all_transitive_from_node(const std::string& node,
         stack.pop();
 
         // If already visited or is the starting node, skip
-        if (result.find(current) != result.end() || current == node) {
+        if (result.find(current) != result.end()) {
             continue;
         }
 
