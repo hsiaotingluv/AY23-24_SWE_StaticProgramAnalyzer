@@ -72,7 +72,8 @@ TEST_CASE("Test Evaluator UsesP") {
             },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")}, false),
+                std::make_shared<SuchThatClause>(UsesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")},
+                                                 false),
             },
         };
 
