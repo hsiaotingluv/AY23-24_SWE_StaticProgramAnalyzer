@@ -1,0 +1,60 @@
+1 - generated TC 1
+procedure p; Select p such that Modifies(p, _)
+
+FizzBuzz, InnerProcedure, AnotherProcedure
+5000
+2 - generated TC 2
+procedure p; Select BOOLEAN such that Modifies(p, _)
+
+TRUE
+5000
+3 - generated TC 3
+procedure p; variable v; Select p such that Modifies(p, v)
+
+InnerProcedure, AnotherProcedure, FizzBuzz
+5000
+4 - generated TC 4
+procedure p; variable v; Select v such that Modifies(p, v)
+
+buzz, fizzStr, fizz, g4r8aGe, n, i, fizzBuzzStr, buzzStr, x, y, z, a, b
+5000
+5 - generated TC 5
+procedure p; procedure q; Select p such that Modifies(p, q)
+
+SemanticError
+5000
+6 - generated TC 6
+procedure p; procedure q; Select q such that Modifies(p, q)
+
+SemanticError
+5000
+7 - generated TC 7
+procedure p; procedure q; Select BOOLEAN such that Modifies(p, q)
+
+SemanticError
+5000
+8 - generated TC 8
+procedure p; procedure q; Select BOOLEAN such that Modifies(q, p)
+
+SemanticError
+5000
+9 - generated TC 9
+procedure p; variable v; Select v such that Modifies(p, v)
+
+buzz, fizzStr, fizz, g4r8aGe, n, i, fizzBuzzStr, buzzStr, x, y, z, a, b
+5000
+10 - generated TC 10
+procedure q; variable v; Select q such that Modifies(q, v)
+
+InnerProcedure, AnotherProcedure, FizzBuzz
+5000
+11 - generated TC 11
+procedure p; variable v; Select BOOLEAN such that Modifies(p, v)
+
+TRUE
+5000
+12 - generated TC 12
+procedure q; variable v; Select BOOLEAN such that Modifies(q, v)
+
+TRUE
+5000
