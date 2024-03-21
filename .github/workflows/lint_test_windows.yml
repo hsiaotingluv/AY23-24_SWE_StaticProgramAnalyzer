@@ -13,15 +13,20 @@ jobs:
       - name: Checkout Git repo
         uses: actions/checkout@v3
 
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          create-symlink: true
+
       - uses: lukka/get-cmake@latest
-      - name: Build with CMake
-        shell: bash
-        run: |
-          cd Team11/Code11
-          mkdir build
-          cd build
-          cmake .. -A x64 -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Release
-          cmake --build . --config Release -j 4
+      - name: Build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/Team11/Code11/CMakeLists.txt'
+          cmakeAppendedArgs: '-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/Team11/Code11/build'
 
       - name: Run linters
         uses: cpp-linter/cpp-linter-action@v2
@@ -46,13 +51,13 @@ jobs:
       - name: Run Unit Test
         shell: bash
         run: |
-          cd $GITHUB_WORKSPACE/Team11/Code11/build/src/unit_testing/Release
+          cd $GITHUB_WORKSPACE/Team11/Code11/build/src/unit_testing/Debug
           ./unit_testing.exe
 
       - name: Run Integration Test
         shell: bash
         run: |
-          cd $GITHUB_WORKSPACE/Team11/Code11/build/src/integration_testing/Release
+          cd $GITHUB_WORKSPACE/Team11/Code11/build/src/integration_testing/Debug
           ./integration_testing.exe
 
       - name: Setup Python
