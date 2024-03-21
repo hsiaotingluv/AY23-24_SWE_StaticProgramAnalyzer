@@ -1,44 +1,48 @@
 name: Code Coverage
 
-on: [pull_request]
+on:
+  pull_request:
+    types:
+      - closed
 
 jobs:
-    coverage_report:
-        name: Generate coverage report
-        runs-on: ubuntu-latest
+  coverage_report:
+    if: github.event.pull_request.merged == true
+    name: Generate coverage report
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Check out Git repo
-              uses: actions/checkout@v3
+    steps:
+      - name: Check out Git repo
+        uses: actions/checkout@v3
 
-            - name: ccache
-              uses: hendrikmuhs/ccache-action@v1.2.11
-              with:
-                create-symlink: true
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          create-symlink: true
 
-            - uses: lukka/get-cmake@latest
+      - uses: lukka/get-cmake@latest
 
-            - name: Setup LCOV
-              uses: hrishikesh-kadam/setup-lcov@v1
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
 
-            - name: Build cmake
-              run: |
-                cd $GITHUB_WORKSPACE/Team11/Code11
-                mkdir build
-                cd build
-                cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-                make -j4
-                make SPA_coverage
+      - name: Build cmake
+        run: |
+          cd $GITHUB_WORKSPACE/Team11/Code11
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          make -j4
+          make SPA_coverage
 
-            - name: Run cwd
-              run: | 
-                pwd
+      - name: Run cwd
+        run: |
+          pwd
 
-            - name: Report code coverage
-              uses: zgosalvez/github-actions-report-lcov@v3
-              with:
-                coverage-files: Team11/Code11/build/SPA_coverage.info
-                minimum-coverage: 50
-                artifact-name: code-coverage-report
-                github-token: ${{ secrets.GITHUB_TOKEN }}
-                update-comment: true
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v3
+        with:
+          coverage-files: Team11/Code11/build/SPA_coverage.info
+          minimum-coverage: 50
+          artifact-name: code-coverage-report
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          update-comment: true
