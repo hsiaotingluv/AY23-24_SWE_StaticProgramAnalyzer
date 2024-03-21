@@ -17,13 +17,13 @@ jobs:
       - name: Setup Clang
         run: choco install -y llvm
 
-#      - name: Build with CMake
-#        run: |
-#          cd Team11\Code11
-#          mkdir build
-#          cd build
-#          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
-#          cmake --build . --config Debug -- -maxcpucount
+      - name: Build with CMake
+        run: |
+          cd Team11\Code11
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+          cmake --build . --config Debug -- -maxcpucount
 #
 #      - name: Run linters
 #        uses: cpp-linter/cpp-linter-action@v2
