@@ -1,6 +1,6 @@
 name: "Windows: Lint cpp/h files and test"
 
-on: [push]
+on: [ push ]
 
 jobs:
   run-testing:
@@ -45,11 +45,15 @@ jobs:
 
       - name: Run Unit Test
         shell: bash
-        run: ./Team11/Code11/build/src/unit_testing/unit_testing.exe
+        run: |
+          cd $GITHUB_WORKSPACE/Team02/Code02/build/src/unit_testing/Release
+          ./unit_testing.exe
 
       - name: Run Integration Test
         shell: bash
-        run: ./Team11/Code11/build/src/integration_testing/integration_testing.exe
+        run: |
+          cd $GITHUB_WORKSPACE/Team02/Code02/build/src/integration_testing/Release
+          ./integration_testing.exe
 
 #      - name: Setup Python
 #        uses: actions/setup-python@v2
