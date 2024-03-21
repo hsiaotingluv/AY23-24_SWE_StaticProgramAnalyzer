@@ -1,13 +1,9 @@
 name: Code Coverage
 
-on:
-  pull_request:
-    types:
-      - closed
+on: [ pull_request ]
 
 jobs:
   coverage_report:
-    if: github.event.pull_request.merged == true
     name: Generate coverage report
     runs-on: ubuntu-latest
 
@@ -25,13 +21,18 @@ jobs:
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
 
-      - name: Build cmake
+      - name: Build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/Team11/Code11/CMakeLists.txt'
+          cmakeAppendedArgs: '-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/Team11/Code11/build'
+
+      - name: Build spa coverage
         run: |
           cd $GITHUB_WORKSPACE/Team11/Code11
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-          make -j4
           make SPA_coverage
 
       - name: Run cwd
