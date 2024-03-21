@@ -15,7 +15,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     endif()
 endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     append_coverage_compiler_flags()
 
     message(STATUS " Building SPA with coverage ")
