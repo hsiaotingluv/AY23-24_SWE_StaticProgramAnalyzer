@@ -48,6 +48,7 @@ jobs:
         run: ./Team11/Code11/build/src/unit_testing/unit_testing.exe
 
       - name: Run Integration Test
+        shell: bash
         run: ./Team11/Code11/build/src/integration_testing/integration_testing.exe
 
 #      - name: Setup Python
