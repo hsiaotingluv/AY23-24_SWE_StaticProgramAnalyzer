@@ -21,7 +21,7 @@ jobs:
           mkdir build
           cd build
           cmake .. -A x64 -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug
-          cmake --build . --config Debug
+          cmake --build . --config Debug -j 4
 
 #
 #      - name: Run linters
