@@ -1,0 +1,58 @@
+name: "Windows: Lint cpp/h files and test"
+
+on: [push]
+
+jobs:
+  run-testing:
+    name: Run Testing
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Git repo
+        uses: actions/checkout@v3
+
+      - name: Setup CMake
+        run: choco install -y cmake
+
+      - name: Setup Clang
+        run: choco install -y llvm
+
+#      - name: Build with CMake
+#        run: |
+#          cd Team11\Code11
+#          mkdir build
+#          cd build
+#          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+#          cmake --build . --config Debug -- -maxcpucount
+#
+#      - name: Run linters
+#        uses: cpp-linter/cpp-linter-action@v2
+#        id: linter
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          style: file
+#          version: 16
+#          repo-root: "Team11\Code11"
+#          database: "build\compile_commands.json"
+#          ignore: "build | lib | cmake | src\autotester_gui | src\unit_testing | src\integration_testing"
+#          files-changed-only: false
+#          tidy-checks: "-*"
+#          step-summary: true
+#
+#      - name: Check linter status
+#        if: steps.linter.outputs.clang-format-checks-failed > 0
+#        run: echo "Some files failed the linting checks!" && exit 1
+#
+#      - name: Run Unit Test
+#        run: |
+#          .\Team11\Code11\build\src\unit_testing\unit_testing.exe
+#
+#      - name: Run Integration Test
+#        run: |
+#          .\Team11\Code11\build\src\integration_testing\integration_testing.exe
+#
+#      - name: Setup Python
+#        uses: actions/setup-python@v2
+#        with:
+#          python-version: '3.11'

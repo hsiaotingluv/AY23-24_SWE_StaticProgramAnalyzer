@@ -1,6 +1,6 @@
 name: "Ubuntu: Lint cpp/h files and test"
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   run-testing:
