@@ -55,7 +55,14 @@ jobs:
           cd $GITHUB_WORKSPACE/Team02/Code02/build/src/integration_testing/Release
           ./integration_testing.exe
 
-#      - name: Setup Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: '3.11'
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Run System Testing
+        shell: bash
+        run: |
+          chmod +x $GITHUB_WORKSPACE/.github/scripts/run_sys_test.sh
+          cd $GITHUB_WORKSPACE/.github/scripts
+          ./run_sys_test.sh
