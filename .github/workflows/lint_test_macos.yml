@@ -13,11 +13,7 @@ jobs:
       - name: Check out Git repo
         uses: actions/checkout@v3
 
-      - name: Setup CMake
-        run: |
-          brew update
-          brew install cmake
-
+      - uses: lukka/get-cmake@latest
       - name: Setup Clang
         run: brew install llvm
 
