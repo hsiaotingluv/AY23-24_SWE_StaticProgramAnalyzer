@@ -59,9 +59,9 @@ procedure p; Select p.procName such that Calls(p,_)
 Fifth, First, Fourth, Second, Third
 5000
 13 - generated TC 13
-procedure p; variable v; Select p.procName such that Calls(p,_) with p.procName=v.varName
+procedure p; variable v; Select p.procName such that Calls(p,_)
 
-
+Fourth, Third, Second, Fifth, First
 5000
 14 - generated TC 14
 procedure p; Select p.procName such that Calls(p,"Third")

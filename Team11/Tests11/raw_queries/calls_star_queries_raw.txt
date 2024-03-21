@@ -12,7 +12,7 @@ procedure p; Select p such that Calls*(_,p) and Calls*(_,"First")
 procedure p; Select p.procName such that Calls*("Fifth",p)
 procedure p; Select p.procName such that Calls*("Fourth",p)
 procedure p; Select p.procName such that Calls*(p,_)
-procedure p; variable v; Select p.procName such that Calls*(p,_) with p.procName=v.varName
+procedure p; Select p.procName such that Calls*(p,_)
 procedure p; Select p.procName such that Calls*(p,"Third")
 procedure p; Select p.procName such that Calls*(p, "First")
 procedure p,q; Select <p,q> such that Calls*(p, q)
