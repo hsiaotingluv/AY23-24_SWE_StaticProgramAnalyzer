@@ -18,11 +18,12 @@ jobs:
         run: sudo apt install -y llvm
 
       - name: Build cmake
+        uses: hendrikmuhs/ccache-action@v1.2
         run: |
           cd Team11/Code11
           mkdir build
           cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           make -j4
 
       - name: Run linters
