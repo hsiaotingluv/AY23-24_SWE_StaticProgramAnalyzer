@@ -2,9 +2,9 @@
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
+#include <algorithm>
 #include <tuple>
 #include <vector>
-#include <algorithm>
 
 namespace pkb {
 PkbManager::PkbManager()
