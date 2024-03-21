@@ -2,12 +2,12 @@ name: Code Coverage
 
 on: [pull_request]
 
-jobs: 
-    coverage_report: 
+jobs:
+    coverage_report:
         name: Generate coverage report
         runs-on: ubuntu-latest
 
-        steps: 
+        steps:
             - name: Check out Git repo
               uses: actions/checkout@v3
 
@@ -17,6 +17,9 @@ jobs:
                 create-symlink: true
 
             - uses: lukka/get-cmake@latest
+
+            - name: Setup Clang
+              run: sudo apt install -y llvm
 
             - name: Setup LCOV
               uses: hrishikesh-kadam/setup-lcov@v1
@@ -38,7 +41,7 @@ jobs:
             - name: Run cwd
               run: | 
                 pwd
-            
+
             - name: Report code coverage
               uses: zgosalvez/github-actions-report-lcov@v3
               with:
