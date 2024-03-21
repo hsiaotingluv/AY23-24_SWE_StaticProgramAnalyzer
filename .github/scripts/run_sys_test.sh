@@ -17,13 +17,12 @@ for source_file in $(find "Team11/Tests11" -type f -name "*_source.txt"); do
   # Extract the last line of the output
   result=$(echo "$output" | tail -n 1)
 
-  #!/bin/bash
-
   # Extract the first and second integers from the text using grep and awk
-  passing_tc_file=$(echo "$result" | grep -oP '\(\K\d+(?=/)')
-  total_tc_file=$(echo "$result" | grep -oP '\d+(?=\))')
+  tcs=$(echo "$result" | grep -o '(\([0-9]\+\/[0-9]\+\))')
+  total_passing_tc_file=$(echo "$tcs" | awk -F'[^0-9]+' '{print $2}')
+  total_tc_file=$(echo "$tcs" | awk -F'[^0-9]+' '{print $3}')
 
-  total_passing_tc=$((total_passing_tc + passing_tc_file))
+  total_passing_tc=$((total_passing_tc + total_passing_tc_file))
   total_tc=$((total_tc + total_tc_file))
 
   # Accumulate the result
