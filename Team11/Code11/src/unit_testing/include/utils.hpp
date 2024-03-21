@@ -2,6 +2,7 @@
 
 #include "catch.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/parser/entities/attribute.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
 #include <memory>
@@ -82,6 +83,46 @@ void require_boolean(const Variant& reference) {
                                           REQUIRE(true);
                                       },
                                       [](const auto& reference) {
+                                          REQUIRE(false);
+                                      }},
+                      reference);
+}
+
+template <typename T>
+auto require_value_bool(const qps::Elem& reference, T value) -> bool {
+    return std::visit(qps::overloaded{[&value](const std::shared_ptr<qps::Synonym>& synonym) -> bool {
+                                          if constexpr (std::is_base_of_v<qps::Synonym, T>) {
+                                              return require_value_bool<T>(synonym, value);
+                                          } else {
+                                              return false;
+                                          }
+                                      },
+                                      [&value](const qps::AttrRef& attr_ref) -> bool {
+                                          if constexpr (std::is_same_v<T, qps::AttrRef>) {
+                                              return attr_ref == value;
+                                          } else {
+                                              return false;
+                                          }
+                                      }},
+                      reference);
+}
+
+template <typename T>
+auto require_value(const qps::Reference& reference, T value) {
+    return std::visit(qps::overloaded{[&value](const qps::BooleanReference& reference) {
+                                          if constexpr (std::is_same_v<T, qps::BooleanReference>) {
+                                              require_boolean(reference);
+                                          } else {
+                                              REQUIRE(false);
+                                          }
+                                      },
+                                      [&value](const auto& references) {
+                                          for (const auto& reference : references) {
+                                              if (require_value_bool<T>(reference, value)) {
+                                                  REQUIRE(true);
+                                                  return;
+                                              }
+                                          }
                                           REQUIRE(false);
                                       }},
                       reference);
