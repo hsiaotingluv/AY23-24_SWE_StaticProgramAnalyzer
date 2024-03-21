@@ -10,15 +10,17 @@ jobs:
       fail-fast: true
 
     steps:
+      - uses: hendrikmuhs/ccache-action@v1.2
+
       - name: Check out Git repo
         uses: actions/checkout@v3
 
       - uses: lukka/get-cmake@latest
+
       - name: Setup Clang
         run: sudo apt install -y llvm
 
       - name: Build cmake
-        uses: hendrikmuhs/ccache-action@v1.2
         run: |
           cd Team11/Code11
           mkdir build
