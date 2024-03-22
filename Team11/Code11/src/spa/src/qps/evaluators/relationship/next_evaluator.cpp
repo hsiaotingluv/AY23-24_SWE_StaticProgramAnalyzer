@@ -46,7 +46,7 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, co
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto stmt_candidates = read_facade->get_previous_of(stmt_num_2.value);
-    for (const auto& candidate: stmt_candidates) {
+    for (const auto& candidate : stmt_candidates) {
         if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
             table.add_row({candidate});
         }
@@ -74,7 +74,7 @@ auto NextEvaluator::eval_next(const Integer& stmt_num_1, const std::shared_ptr<S
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table{{stmt_syn_2}};
     const auto stmt_candidates = read_facade->get_next_of(stmt_num_1.value);
-    for (const auto& candidate: stmt_candidates) {
+    for (const auto& candidate : stmt_candidates) {
         if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
             table.add_row({candidate});
         }
