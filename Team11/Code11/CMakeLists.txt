@@ -37,7 +37,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 set(AUTOTESTER_ROOT "${CMAKE_CURRENT_LIST_DIR}/lib/autotester/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_SYSTEM_NAME}/${CMAKE_BUILD_TYPE}")
-include(${CMAKE_MODULE_PATH}/CodeCoverage.cmake)
+if (NOT WIN32)
+    # many of the packages used in codecov such as gcov, lcov, etc are not available on windows
+    include(${CMAKE_MODULE_PATH}/CodeCoverage.cmake)
+endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${AUTOTESTER_ROOT}")
 find_package(autotester REQUIRED)

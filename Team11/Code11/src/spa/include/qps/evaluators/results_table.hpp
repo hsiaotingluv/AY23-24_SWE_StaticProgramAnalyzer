@@ -53,7 +53,7 @@ auto is_unit(const OutputTable& table) -> bool;
 
 template <class T>
 void reorder(std::vector<T>& v, std::vector<int> const& order) {
-    std::vector<T> v_copy(v.size());
+    std::vector<T> v_copy(order.size());
     for (size_t s = 0; s < order.size(); ++s) {
         v_copy[s] = v[order[s]];
     }
@@ -62,7 +62,7 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
 }
 
 auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable;
-auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, const OutputTable& table, const Reference& reference)
+auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
 void print(const Table& table);
 

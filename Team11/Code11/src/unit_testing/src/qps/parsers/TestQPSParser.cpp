@@ -92,8 +92,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
-        const auto reference_clause = std::make_shared<SuchThatClause>(
-            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
     }
 
     SECTION("Query with stmt-stmt relationship - Follows*") {
@@ -1065,7 +1063,8 @@ TEST_CASE("Test QPS - Select attrRef") {
         const auto result = output.value();
         REQUIRE(result.declared.size() == 1);
         require_value<AnyStmtSynonym>(result.declared[0], "s");
-        require_value<AnyStmtSynonym>(result.reference, "s");
+        require_value(result.reference,
+                      AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer});
     }
 
     SECTION("Query - Select attrRef two") {
@@ -1079,7 +1078,8 @@ TEST_CASE("Test QPS - Select attrRef") {
         require_value<AssignSynonym>(result.declared[0], "a1");
         require_value<VarSynonym>(result.declared[1], "a2");
 
-        require_value<AssignSynonym>(result.reference, "a1");
+        require_value(result.reference,
+                      AttrRef{std::make_shared<AssignSynonym>(IDENT{"a1"}), StmtNum{}, AttrRef::Type::Integer});
         require_value<VarSynonym>(result.reference, "a2");
     }
 
