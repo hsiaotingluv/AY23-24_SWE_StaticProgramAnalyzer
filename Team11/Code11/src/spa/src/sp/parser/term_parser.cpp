@@ -2,6 +2,8 @@
 #include "common/ast/binary_node_ast.hpp"
 #include "common/ast/null_ast.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 auto TermParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end) -> std::shared_ptr<AstNode> {
     auto factor_tree = factor_parser.parse(token_start, token_end);

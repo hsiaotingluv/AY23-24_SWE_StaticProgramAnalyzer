@@ -9,6 +9,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     target_compile_options(spa PRIVATE
         -Wall
         -Wextra-semi
+        -Wheader-hygiene
         -Wextra
         -Wpedantic
     )

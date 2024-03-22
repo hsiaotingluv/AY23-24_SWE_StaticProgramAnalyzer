@@ -7,8 +7,6 @@
 #include <memory>
 #include <vector>
 
-using namespace tokenizer;
-
 namespace sp {
 
 /**
@@ -17,7 +15,7 @@ namespace sp {
  */
 class Parser {
   public:
-    using Iterator = std::vector<Token>::const_iterator;
+    using Iterator = std::vector<tokenizer::Token>::const_iterator;
 
   protected:
     /**
@@ -37,7 +35,7 @@ class Parser {
      * @param token_start The iterator pointing to the current token.
      * @return The next token to be parsed.
      */
-    static auto get_next_token(Iterator& token_start) -> Token {
+    static auto get_next_token(Iterator& token_start) -> tokenizer::Token {
         auto token = *token_start;
         std::advance(token_start, 1);
         return token;
@@ -48,7 +46,7 @@ class Parser {
      * @param token_start The iterator pointing to the current token.
      * @return The next token to be parsed.
      */
-    static auto peek_next_token(Iterator& token_start) -> Token {
+    static auto peek_next_token(Iterator& token_start) -> tokenizer::Token {
         auto token = *token_start;
         return token;
     }

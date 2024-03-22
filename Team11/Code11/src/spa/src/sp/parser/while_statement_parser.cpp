@@ -2,6 +2,8 @@
 #include "sp/parser/statement_list_parser.hpp"
 #include "sp/parser/statement_parser.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 
 // while: 'while' '(' cond_expr ')' '{' stmtLst '}'

@@ -4,8 +4,6 @@
 #include "sp/parser/parser.hpp"
 #include "sp/parser/rel_expr_parser.hpp"
 
-using namespace tokenizer;
-
 namespace sp {
 /**
  * @class CondExprParser

@@ -3,6 +3,8 @@
 #include "common/ast/null_ast.hpp"
 #include "sp/parser/term_parser.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 auto ExprParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end) -> std::shared_ptr<AstNode> {
     TermParser term_parser; // circumvent forward declaration due to circular header dependency
