@@ -45,7 +45,7 @@ struct Token {
             os << "Token(" << token.content << ") - " << enum_counter;
         }
         return os;
-    };
+    }
 };
 
 /**

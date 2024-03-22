@@ -30,7 +30,7 @@ class Parser {
         if (token_start == token_end) {
             throw ParsingError("Unable to parse token");
         };
-    };
+    }
 
     /**
      * @brief Retrieves the next token for parsing and advances the iterator.

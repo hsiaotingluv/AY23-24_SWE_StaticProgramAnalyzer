@@ -10,4 +10,4 @@ class Variable : public Entity {
 namespace std {
 template <>
 struct hash<Variable> : Entity::HashFunction {};
-}; // namespace std
+} // namespace std

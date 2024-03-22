@@ -10,4 +10,4 @@ class Procedure : public Entity {
 namespace std {
 template <>
 struct hash<Procedure> : Entity::HashFunction {};
-}; // namespace std
+} // namespace std

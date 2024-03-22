@@ -227,11 +227,11 @@ bool ReadFacade::contains_procedure_use_var_value(const std::string& variable) c
 
 std::unordered_set<std::string> ReadFacade::get_all_statements_that_use() const {
     return pkb->get_all_statements_that_use();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::get_all_statements_that_use(const StatementType& statement_type) const {
     return pkb->get_all_statements_that_use(statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_statements_and_var_use_pairs() const {
     return pkb->get_all_statements_and_var_use_pairs();

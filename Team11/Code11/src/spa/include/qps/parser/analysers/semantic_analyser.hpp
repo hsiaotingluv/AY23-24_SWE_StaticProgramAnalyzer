@@ -61,7 +61,7 @@ struct Query {
             os << "\t\t" << clause << "\n";
         }
         return os;
-    };
+    }
 };
 } // namespace qps
 
@@ -104,7 +104,7 @@ auto analyse(const Synonyms& declarations, const std::unordered_map<std::string,
     }
     return std::optional<Reference>{constructed_elements};
 }
-}; // namespace qps::detail
+} // namespace qps::detail
 
 namespace qps {
 
@@ -144,7 +144,7 @@ class SemanticAnalyser {
         }
 
         return Query{declarations, reference, validated_clauses};
-    };
+    }
 };
 
 struct ReferenceAnalyser {

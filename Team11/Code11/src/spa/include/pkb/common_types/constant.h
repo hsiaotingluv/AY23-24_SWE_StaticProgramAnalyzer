@@ -10,4 +10,4 @@ class Constant : public Entity {
 namespace std {
 template <>
 struct hash<Constant> : Entity::HashFunction {};
-}; // namespace std
+} // namespace std
