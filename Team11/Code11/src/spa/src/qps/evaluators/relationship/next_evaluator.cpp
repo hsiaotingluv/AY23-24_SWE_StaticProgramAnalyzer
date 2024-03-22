@@ -15,6 +15,10 @@ auto NextEvaluator::evaluate() const -> OutputTable {
 auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                               const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
 
+    if (stmt_syn_1 == stmt_syn_2) {
+        return Table{};
+    }
+
     const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
     const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
 
