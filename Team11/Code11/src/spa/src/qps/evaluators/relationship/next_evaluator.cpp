@@ -41,12 +41,12 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
     return table;
 }
 
-auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                              const qps::Integer& stmt_num_2) const -> OutputTable {
+auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) const
+    -> OutputTable {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto stmt_candidates = read_facade->get_previous_of(stmt_num_2.value);
-    for (const auto &candidate: stmt_candidates) {
+    for (const auto& candidate: stmt_candidates) {
         if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
             table.add_row({candidate});
         }
@@ -55,8 +55,7 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
     return table;
 }
 
-auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
-                              const WildCard&) const -> OutputTable {
+auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const -> OutputTable {
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto all_next_keys = read_facade->get_all_next_keys();
@@ -70,12 +69,12 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
     return table;
 }
 
-auto NextEvaluator::eval_next(const Integer& stmt_num_1,
-                              const std::shared_ptr<StmtSynonym>& stmt_syn_2) const-> OutputTable {
+auto NextEvaluator::eval_next(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
+    -> OutputTable {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table{{stmt_syn_2}};
     const auto stmt_candidates = read_facade->get_next_of(stmt_num_1.value);
-    for (const auto &candidate: stmt_candidates) {
+    for (const auto& candidate: stmt_candidates) {
         if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
             table.add_row({candidate});
         }
@@ -84,24 +83,21 @@ auto NextEvaluator::eval_next(const Integer& stmt_num_1,
     return table;
 }
 
-auto NextEvaluator::eval_next(const Integer& stmt_num_1,
-                              const Integer& stmt_num_2) const -> OutputTable {
+auto NextEvaluator::eval_next(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
     if (!read_facade->has_next_relation(stmt_num_1.value, stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};
 }
 
-auto NextEvaluator::eval_next(const Integer& stmt_num_1,
-                              const WildCard&) const -> OutputTable {
+auto NextEvaluator::eval_next(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
     if (!read_facade->contains_next_key(stmt_num_1.value)) {
         return Table{};
     }
     return UnitTable{};
 }
 
-auto NextEvaluator::eval_next(const WildCard&,
-                              const std::shared_ptr<StmtSynonym>& stmt_syn_2) const-> OutputTable {
+auto NextEvaluator::eval_next(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
     const auto relevant_stmts = stmt_syn_2->scan(read_facade);
     auto table = Table{{stmt_syn_2}};
     const auto all_next_values = read_facade->get_all_next_values();
@@ -115,16 +111,14 @@ auto NextEvaluator::eval_next(const WildCard&,
     return table;
 }
 
-auto NextEvaluator::eval_next(const WildCard&,
-                              const Integer& stmt_num_2) const -> OutputTable {
+auto NextEvaluator::eval_next(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
     if (!read_facade->contains_next_value(stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};
 }
 
-auto NextEvaluator::eval_next(const WildCard&,
-                              const WildCard&) const -> OutputTable {
+auto NextEvaluator::eval_next(const WildCard&, const WildCard&) const -> OutputTable {
     if (!read_facade->has_next_relation()) {
         return Table{};
     }
