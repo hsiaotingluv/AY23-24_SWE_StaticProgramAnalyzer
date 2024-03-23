@@ -49,7 +49,7 @@ class NextEvaluator : public ClauseEvaluator {
     // e.g. Next(_, _)
     [[nodiscard]] auto eval_next(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
-public:
+  public:
     NextEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Next next)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), next(std::move(next)) {
     }
