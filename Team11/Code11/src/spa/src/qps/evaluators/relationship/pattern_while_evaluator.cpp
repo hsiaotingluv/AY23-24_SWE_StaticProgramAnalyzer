@@ -2,7 +2,7 @@
 
 namespace qps {
 auto PatternWhileEvaluator::select_eval_method() const {
-    return overloaded{[this](auto &&arg) -> OutputTable {
+    return overloaded{[this](auto&& arg) -> OutputTable {
         return eval_pattern_while(std::forward<decltype(arg)>(arg));
     }};
 }

@@ -12,7 +12,7 @@ auto PatternAssignEvaluator::evaluate() const -> OutputTable {
 }
 
 auto PatternAssignEvaluator::eval_pattern_assign(const std::shared_ptr<Synonym>& synonym,
-                                                 const qps::PartialMatch &partial_match) const -> OutputTable {
+                                                 const qps::PartialMatch& partial_match) const -> OutputTable {
     auto table = Table{{pattern.get_synonym(), synonym}};
     const auto all_partial_matches = read_facade->get_all_assignments_rhs_partial(partial_match.expr.value);
     for (const auto& assign_stmt : all_partial_matches) {
@@ -24,7 +24,7 @@ auto PatternAssignEvaluator::eval_pattern_assign(const std::shared_ptr<Synonym>&
     return table;
 }
 
-auto PatternAssignEvaluator::eval_pattern_assign(const std::shared_ptr<Synonym>& synonym, const qps::WildCard &) const
+auto PatternAssignEvaluator::eval_pattern_assign(const std::shared_ptr<Synonym>& synonym, const qps::WildCard&) const
     -> OutputTable {
     auto table = Table{{pattern.get_synonym(), synonym}};
     for (const auto& assign_stmt : read_facade->get_assign_statements()) {
@@ -36,8 +36,8 @@ auto PatternAssignEvaluator::eval_pattern_assign(const std::shared_ptr<Synonym>&
     return table;
 }
 
-auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent &quoted_ident, const qps::PartialMatch &partial_match) const
-    -> OutputTable {
+auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent& quoted_ident,
+                                                 const qps::PartialMatch& partial_match) const -> OutputTable {
     auto table = Table{{pattern.get_synonym()}};
     const auto all_partial_matches =
         read_facade->get_all_assignments_lhs_rhs_partial(quoted_ident.get_value(), partial_match.expr.value);
@@ -48,7 +48,8 @@ auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent &quoted_
     return table;
 }
 
-auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent &quoted_ident, const qps::WildCard &) const -> OutputTable {
+auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent& quoted_ident, const qps::WildCard&) const
+    -> OutputTable {
     auto table = Table{{pattern.get_synonym()}};
     const auto stmts_that_modify =
         read_facade->get_statements_that_modify_var(quoted_ident.get_value(), StatementType::Assign);
@@ -59,7 +60,8 @@ auto PatternAssignEvaluator::eval_pattern_assign(const qps::QuotedIdent &quoted_
     return table;
 }
 
-auto PatternAssignEvaluator::eval_pattern_assign(const qps::WildCard &, const qps::PartialMatch &partial_match) const -> OutputTable {
+auto PatternAssignEvaluator::eval_pattern_assign(const qps::WildCard&, const qps::PartialMatch& partial_match) const
+    -> OutputTable {
     auto table = Table{{pattern.get_synonym()}};
     const auto all_partial_matches = read_facade->get_all_assignments_rhs_partial(partial_match.expr.value);
     for (const auto& stmt : all_partial_matches) {
@@ -69,7 +71,7 @@ auto PatternAssignEvaluator::eval_pattern_assign(const qps::WildCard &, const qp
     return table;
 }
 
-auto PatternAssignEvaluator::eval_pattern_assign(const qps::WildCard &, const qps::WildCard &) const -> OutputTable {
+auto PatternAssignEvaluator::eval_pattern_assign(const qps::WildCard&, const qps::WildCard&) const -> OutputTable {
     auto table = Table{{pattern.get_synonym()}};
     const auto all_assign_stmts = read_facade->get_assign_statements();
     for (const auto& stmt : all_assign_stmts) {

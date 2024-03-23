@@ -82,7 +82,7 @@ auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_faca
 
         // TODO: add other clause evaluator cases here
         [](const auto&) -> std::shared_ptr<ClauseEvaluator> {
-                return nullptr;
+            return nullptr;
         }};
 };
 } // namespace qps
