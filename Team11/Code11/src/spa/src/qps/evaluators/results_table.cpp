@@ -555,8 +555,8 @@ auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade
 }
 
 auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
-    return overloaded{[&](const std::shared_ptr<Synonym>& synonym) -> std::function<std::string(const std::string&)> {
-                          return [&read_facade](const std::string& x) -> std::string {
+    return overloaded{[&](const std::shared_ptr<Synonym>&) -> std::function<std::string(const std::string&)> {
+                          return [](const std::string& x) -> std::string {
                               return x;
                           };
                       },
@@ -578,7 +578,7 @@ auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facad
                                   return read_facade->get_procedure_name_called_by(x);
                               };
                           } else {
-                              return [&read_facade](const std::string& x) -> std::string {
+                              return [](const std::string& x) -> std::string {
                                   return x;
                               };
                           }
