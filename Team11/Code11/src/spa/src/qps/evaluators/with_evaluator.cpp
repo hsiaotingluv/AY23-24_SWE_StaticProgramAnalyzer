@@ -70,7 +70,7 @@ auto WithEvaluator::eval_with(const QuotedIdent& quoted_ident_1, const QuotedIde
     return Table{};
 }
 
-auto WithEvaluator::eval_with(const QuotedIdent& quoted_ident, const Integer& integer) const -> OutputTable {
+auto WithEvaluator::eval_with(const QuotedIdent&, const Integer&) const -> OutputTable {
     return Table{};
 }
 
