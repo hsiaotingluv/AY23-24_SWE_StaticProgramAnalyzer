@@ -78,7 +78,7 @@ class PatternWhileAnalyser {
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
-        const auto maybe_ent_ref = detail::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
+        const auto maybe_ent_ref = detail::require_if_syn<VarSynonym>(pattern.ent_ref, declarations, mapping);
         if (!maybe_ent_ref.has_value()) {
             return std::nullopt;
         }
@@ -106,7 +106,7 @@ class PatternIfAnalyser {
         if (!maybe_synonym.has_value()) {
             return std::nullopt;
         }
-        const auto maybe_ent_ref = detail::require_if_syn<Synonym>(pattern.ent_ref, declarations, mapping);
+        const auto maybe_ent_ref = detail::require_if_syn<VarSynonym>(pattern.ent_ref, declarations, mapping);
         if (!maybe_ent_ref.has_value()) {
             return std::nullopt;
         }
