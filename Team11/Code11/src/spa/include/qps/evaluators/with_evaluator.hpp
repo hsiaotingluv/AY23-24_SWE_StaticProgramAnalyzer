@@ -43,37 +43,6 @@ class WithEvaluator : public ClauseEvaluator {
     // e.g. with 1 = 1
     [[nodiscard]] auto eval_with(const qps::Integer& integer_1, const qps::Integer& integer_2) const -> OutputTable;
 
-    [[nodiscard]] auto make_attribute_extractor() const {
-        return overloaded{[](const std::shared_ptr<Synonym>&) -> std::function<std::string(const std::string&)> {
-                              return [](const std::string& x) -> std::string {
-                                  return x;
-                              };
-                          },
-                          [&](const AttrRef& attr_ref) -> std::function<std::string(const std::string&)> {
-                              const auto synonym = attr_ref.synonym;
-                              if (std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
-                                  std::holds_alternative<VarName>(attr_ref.attr_name)) {
-                                  return [&](const std::string& x) -> std::string {
-                                      return *read_facade->get_vars_used_by_statement(x).begin();
-                                  };
-                              } else if (std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
-                                         std::holds_alternative<VarName>(attr_ref.attr_name)) {
-                                  return [&](const std::string& x) -> std::string {
-                                      return *read_facade->get_vars_modified_by_statement(x).begin();
-                                  };
-                              } else if (std::dynamic_pointer_cast<CallSynonym>(synonym) &&
-                                         std::holds_alternative<ProcName>(attr_ref.attr_name)) {
-                                  return [&](const std::string& x) -> std::string {
-                                      return read_facade->get_procedure_name_called_by(x);
-                                  };
-                              } else {
-                                  return [](const std::string& x) -> std::string {
-                                      return x;
-                                  };
-                              }
-                          }};
-    }
-
   public:
     WithEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, TypedRef ref_1, TypedRef ref_2)
         : ClauseEvaluator(), read_facade(std::move(read_facade)), ref_1(std::move(ref_1)), ref_2(std::move(ref_2)) {

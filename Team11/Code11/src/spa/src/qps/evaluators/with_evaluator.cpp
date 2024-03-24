@@ -18,7 +18,7 @@ auto WithEvaluator::eval_with(const AttrRef& attr_1, const AttrRef& attr_2) cons
     }
 
     auto table = Table{{attr_1.synonym, attr_2.synonym}};
-    const auto attribute_extractor = make_attribute_extractor();
+    const auto attribute_extractor = AttributeExtractor(read_facade)();
 
     const auto extractor_1 = attribute_extractor(attr_1);
     const auto extractor_2 = attribute_extractor(attr_2);
@@ -40,7 +40,7 @@ auto WithEvaluator::eval_with(const AttrRef& attr_1, const AttrRef& attr_2) cons
 auto WithEvaluator::eval_with(const AttrRef& attr, const QuotedIdent& quoted_ident) const -> OutputTable {
     auto table = Table{{attr.synonym}};
 
-    const auto attribute_extractor = make_attribute_extractor();
+    const auto attribute_extractor = AttributeExtractor(read_facade)();
     const auto extractor = attribute_extractor(attr);
     const auto values_set = attr.synonym->scan(read_facade);
 

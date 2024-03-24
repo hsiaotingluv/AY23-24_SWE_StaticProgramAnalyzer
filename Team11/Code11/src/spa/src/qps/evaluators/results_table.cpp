@@ -1,7 +1,6 @@
 #include "qps/evaluators/results_table.hpp"
 #include "pkb/facades/read_facade.h"
 #include "qps/parser/analysers/semantic_analyser.hpp"
-#include "qps/parser/entities/attribute_name.hpp"
 #include "qps/parser/entities/select.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
@@ -555,37 +554,6 @@ auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade
     return table;
 }
 
-static auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
-    return overloaded{[&](const std::shared_ptr<Synonym>&) -> std::function<std::string(const std::string&)> {
-                          return [](const std::string& x) -> std::string {
-                              return x;
-                          };
-                      },
-                      [&](const AttrRef& attr_ref) -> std::function<std::string(const std::string&)> {
-                          const auto synonym = attr_ref.synonym;
-                          if (std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
-                              std::holds_alternative<VarName>(attr_ref.attr_name)) {
-                              return [&read_facade](const std::string& x) -> std::string {
-                                  return *read_facade->get_vars_used_by_statement(x).begin();
-                              };
-                          } else if (std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
-                                     std::holds_alternative<VarName>(attr_ref.attr_name)) {
-                              return [&read_facade](const std::string& x) -> std::string {
-                                  return *read_facade->get_vars_modified_by_statement(x).begin();
-                              };
-                          } else if (std::dynamic_pointer_cast<CallSynonym>(synonym) &&
-                                     std::holds_alternative<ProcName>(attr_ref.attr_name)) {
-                              return [&read_facade](const std::string& x) -> std::string {
-                                  return read_facade->get_procedure_name_called_by(x);
-                              };
-                          } else {
-                              return [](const std::string& x) -> std::string {
-                                  return x;
-                              };
-                          }
-                      }};
-}
-
 /**
  * @brief Build full synonym table from the given elements
  *
@@ -675,7 +643,7 @@ static auto project_and_transform_table(Table& table, const std::vector<Elem>& e
     auto extractors = std::vector<std::function<std::string(const std::string&)>>{};
     extractors.reserve(elements.size());
 
-    const auto attribute_extractor = detail::make_attribute_extractor(read_facade);
+    const auto attribute_extractor = AttributeExtractor(read_facade)();
     for (const auto& element : elements) {
         extractors.push_back(std::visit(attribute_extractor, element));
     }
