@@ -19,7 +19,7 @@ struct AttrRef {
         : synonym(std::move(synonym)), attr_name(attr_name), type(type) {
     }
 
-    auto type_equals(const AttrRef& other) const -> bool {
+    [[nodiscard]] auto type_equals(const AttrRef& other) const -> bool {
         return type == other.type;
     }
 

@@ -1,8 +1,8 @@
 #include "qps/evaluators/query_evaluator.hpp"
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/results_table.hpp"
-#include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/evaluators/with_evaluator.hpp"
+#include "qps/parser/analysers/semantic_analyser.hpp"
 
 #include <memory>
 #include <variant>
