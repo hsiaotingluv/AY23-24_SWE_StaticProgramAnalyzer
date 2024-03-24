@@ -666,8 +666,8 @@ static auto to_string(const Table& table) -> std::vector<std::string> {
  * @param synonyms
  * @return Table
  */
-static auto project(Table& table, const std::vector<Elem>& elements,
-                    const std::shared_ptr<pkb::ReadFacade>& read_facade) -> void {
+static auto project_and_transform_table(Table& table, const std::vector<Elem>& elements,
+                                        const std::shared_ptr<pkb::ReadFacade>& read_facade) -> void {
     // Contract: synonyms <= table.get_column()
     detail::reorder_table(table, detail::to_synonyms(elements));
 
@@ -688,8 +688,8 @@ static auto project(Table& table, const std::vector<Elem>& elements,
     }
 }
 
-static auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, std::vector<Elem> elems)
-    -> std::vector<std::string> {
+static auto process_missing_synonym(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table,
+                                    std::vector<Elem> elems) -> Table {
     if (table.empty()) {
         // Table is empty --> contradiction
         return {};
@@ -710,19 +710,13 @@ static auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& 
     const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
     // Fill table using information from the available synonyms
-    auto final_table = [&]() {
-        if (missing_elements.empty()) {
-            return table;
-        }
+    if (missing_elements.empty()) {
+        return table;
+    }
 
-        // Combine the table with the missing synonyms
-        auto missing_table = detail::build_full_table(detail::to_synonyms(missing_elements), read_facade);
-        return std::get<Table>(detail::cross_join(std::move(table), std::move(missing_table)));
-    }();
-
-    // Convert to requested representation
-    project(final_table, requested_elements, read_facade);
-    return to_string(final_table);
+    // Combine the table with the missing synonyms
+    auto missing_table = detail::build_full_table(detail::to_synonyms(missing_elements), read_facade);
+    return std::get<Table>(detail::cross_join(std::move(table), std::move(missing_table)));
 }
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
@@ -743,13 +737,16 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
                           [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               // Evaluator produces "True", so we first need to build the full table before doing the
                               // projection
-                              auto table = detail::build_full_table(detail::to_synonyms(elems), read_facade);
-                              return project(read_facade, table, elems);
+                              auto final_table = detail::build_full_table(detail::to_synonyms(elems), read_facade);
+                              project_and_transform_table(final_table, elems, read_facade);
+                              return to_string(final_table);
                           },
                           [&read_facade](Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               // Evaluator produces table, so we need to project the table based on the
                               // elements
-                              return project(read_facade, table, elems);
+                              auto final_table = process_missing_synonym(read_facade, table, elems);
+                              project_and_transform_table(final_table, elems, read_facade);
+                              return to_string(final_table);
                           },
                       },
                       table, reference);
