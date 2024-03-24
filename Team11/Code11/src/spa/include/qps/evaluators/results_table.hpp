@@ -66,6 +66,47 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
     -> std::vector<std::string>;
 void print(const Table& table);
 
+class AttributeExtractor {
+    std::shared_ptr<pkb::ReadFacade> read_facade;
+
+  public:
+    AttributeExtractor(std::shared_ptr<pkb::ReadFacade> read_facade) : read_facade(std::move(read_facade)) {
+    }
+
+    [[nodiscard]] auto operator()() const {
+        auto read_facade = this->read_facade; // Prevent stack-use-after-scope
+        return overloaded{
+            [read_facade](const std::shared_ptr<Synonym>&) -> std::function<std::string(const std::string&)> {
+                return [](const std::string& x) -> std::string {
+                    return x;
+                };
+            },
+            [read_facade](const AttrRef& attr_ref) -> std::function<std::string(const std::string&)> {
+                const auto synonym = attr_ref.synonym;
+                if (std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
+                    std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                    return [read_facade](const std::string& x) -> std::string {
+                        return *read_facade->get_vars_used_by_statement(x).begin();
+                    };
+                } else if (std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
+                           std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                    return [read_facade](const std::string& x) -> std::string {
+                        return *read_facade->get_vars_modified_by_statement(x).begin();
+                    };
+                } else if (std::dynamic_pointer_cast<CallSynonym>(synonym) &&
+                           std::holds_alternative<ProcName>(attr_ref.attr_name)) {
+                    return [read_facade](const std::string& x) -> std::string {
+                        return read_facade->get_procedure_name_called_by(x);
+                    };
+                } else {
+                    return [](const std::string& x) -> std::string {
+                        return x;
+                    };
+                }
+            }};
+    }
+};
+
 namespace detail {
 // Helper functions for join
 auto sort_and_get_order(std::vector<std::shared_ptr<Synonym>>& column_names) -> std::vector<int>;
