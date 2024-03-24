@@ -758,14 +758,8 @@ void print(const Table& table) {
     for (const auto& col : table.get_column()) {
         std::cout << col->get_name() << "\t";
     }
+    std::cout << std::endl;
 
-    std::cout << std::endl;
-    for (const auto& row : table.get_records()) {
-        for (const auto& col : row) {
-            std::cout << col << "\t";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    detail::print(table.get_records());
 }
 } // namespace qps
