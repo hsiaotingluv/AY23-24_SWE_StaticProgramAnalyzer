@@ -6,7 +6,7 @@
 using namespace pkb;
 
 TEST_CASE("Simple Entity Test") {
-    SECTION("Procedure Test") {
+    SECTION("Get Entity Test") {
         auto [read_facade, write_facade] = PkbManager::create_facades();
 
         write_facade->add_procedure("procedure1");
@@ -14,6 +14,21 @@ TEST_CASE("Simple Entity Test") {
         REQUIRE(read_facade->get_procedures().size() == 1);
         REQUIRE(read_facade->get_variables().empty());
         REQUIRE(read_facade->get_entities().size() == 1);
+    }
+
+    SECTION("Entity Exists Test") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_procedure("main");
+        write_facade->add_variable("Main");
+        write_facade->add_constant("1");
+
+        REQUIRE(read_facade->has_entity("main"));
+        REQUIRE(read_facade->has_entity("Main"));
+        REQUIRE(read_facade->has_entity("1"));
+
+        REQUIRE_FALSE(read_facade->has_entity("2"));
+        REQUIRE_FALSE(read_facade->has_entity("does_not_exists"));
     }
 }
 
@@ -35,6 +50,31 @@ TEST_CASE("Simple Statement Test") {
         REQUIRE(read_facade->get_if_statements().size() == 1);
         REQUIRE(read_facade->get_while_statements().size() == 1);
         REQUIRE(read_facade->get_call_statements().size() == 1);
+    }
+
+    SECTION("Statement Exists Tests") {
+        auto [read_facade, write_facade] = PkbManager::create_facades();
+
+        write_facade->add_statement("1", StatementType::Read);
+        write_facade->add_statement("2", StatementType::Print);
+        write_facade->add_statement("3", StatementType::Assign);
+        write_facade->add_statement("4", StatementType::If);
+        write_facade->add_statement("5", StatementType::While);
+        write_facade->add_statement("6", StatementType::Call);
+
+        REQUIRE(read_facade->has_read_statement("1"));
+        REQUIRE(read_facade->has_print_statement("2"));
+        REQUIRE(read_facade->has_assign_statement("3"));
+        REQUIRE(read_facade->has_if_statement("4"));
+        REQUIRE(read_facade->has_while_statement("5"));
+        REQUIRE(read_facade->has_call_statement("6"));
+
+        REQUIRE_FALSE(read_facade->has_read_statement("2"));
+        REQUIRE_FALSE(read_facade->has_print_statement("3"));
+        REQUIRE_FALSE(read_facade->has_assign_statement("4"));
+        REQUIRE_FALSE(read_facade->has_if_statement("5"));
+        REQUIRE_FALSE(read_facade->has_while_statement("6"));
+        REQUIRE_FALSE(read_facade->has_call_statement("1"));
     }
 }
 

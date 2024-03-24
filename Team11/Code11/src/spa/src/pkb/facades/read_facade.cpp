@@ -22,6 +22,22 @@ std::unordered_set<std::string> ReadFacade::get_constants() const {
     return pkb->get_constants();
 }
 
+bool ReadFacade::has_entity(const std::string& entity) const {
+    return pkb->has_entity(entity);
+}
+
+bool ReadFacade::has_procedure(const std::string& procedure) const {
+    return pkb->has_procedure(procedure);
+}
+
+bool ReadFacade::has_variable(const std::string& variable) const {
+    return pkb->has_variable(variable);
+}
+
+bool ReadFacade::has_constant(const std::string& constant) const {
+    return pkb->has_constant(constant);
+}
+
 std::unordered_set<std::string> ReadFacade::get_all_statements() const {
     return pkb->get_all_statements();
 }
@@ -48,6 +64,34 @@ std::unordered_set<std::string> ReadFacade::get_print_statements() const {
 
 std::unordered_set<std::string> ReadFacade::get_call_statements() const {
     return pkb->get_call_statements();
+}
+
+bool ReadFacade::has_statement(const std::string& s) const {
+    return pkb->has_statement(s);
+}
+
+bool ReadFacade::has_assign_statement(const std::string& s) const {
+    return pkb->has_assign_statement(s);
+}
+
+bool ReadFacade::has_if_statement(const std::string& s) const {
+    return pkb->has_if_statement(s);
+}
+
+bool ReadFacade::has_while_statement(const std::string& s) const {
+    return pkb->has_while_statement(s);
+}
+
+bool ReadFacade::has_read_statement(const std::string& s) const {
+    return pkb->has_read_statement(s);
+}
+
+bool ReadFacade::has_print_statement(const std::string& s) const {
+    return pkb->has_print_statement(s);
+}
+
+bool ReadFacade::has_call_statement(const std::string& s) const {
+    return pkb->has_call_statement(s);
 }
 
 std::unordered_set<std::string> ReadFacade::get_vars_modified_by_statement(const std::string& s) const {

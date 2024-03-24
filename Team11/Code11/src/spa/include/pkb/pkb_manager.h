@@ -111,6 +111,14 @@ class PkbManager {
 
     std::unordered_set<std::string> get_constants() const;
 
+    bool has_entity(const std::string& entity) const;
+
+    bool has_procedure(const std::string& procedure) const;
+
+    bool has_variable(const std::string& variable) const;
+
+    bool has_constant(const std::string& constant) const;
+
     // Statement-related Read Operations
     std::unordered_set<std::string> get_all_statements() const;
 
@@ -125,6 +133,20 @@ class PkbManager {
     std::unordered_set<std::string> get_print_statements() const;
 
     std::unordered_set<std::string> get_call_statements() const;
+
+    bool has_statement(const std::string& s) const;
+
+    bool has_assign_statement(const std::string& s) const;
+
+    bool has_if_statement(const std::string& s) const;
+
+    bool has_while_statement(const std::string& s) const;
+
+    bool has_read_statement(const std::string& s) const;
+
+    bool has_print_statement(const std::string& s) const;
+
+    bool has_call_statement(const std::string& s) const;
 
     // Modifies-related Read Operations
     std::unordered_set<std::string> get_vars_modified_by_statement(const std::string& s) const;
