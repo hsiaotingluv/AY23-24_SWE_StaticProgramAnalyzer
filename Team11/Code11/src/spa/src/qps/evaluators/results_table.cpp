@@ -588,27 +588,32 @@ auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facad
 /**
  * @brief Build full synonym table from the given elements
  *
- * @param elements
+ * @param synonyms
  * @param read_facade
  * @return Table
  */
-auto build_full_table(const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
+auto build_full_table(const Synonyms synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
     auto table = Table{};
+    auto unique_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{synonyms.begin(), synonyms.end()};
 
     // Build mappers
-    const auto attribute_extractor = make_attribute_extractor(read_facade);
-    for (const auto& element : elements) {
-        const auto extract = std::visit(attribute_extractor, element);
-        const auto synonym = to_synonym(element);
+    for (const auto& synonym : unique_synonyms) {
         auto curr_table = Table{{synonym}};
         for (const auto& result : synonym->scan(read_facade)) {
-            curr_table.add_row({extract(result)});
+            curr_table.add_row({result});
         }
         table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
     }
     return table;
 }
 
+auto reorder_table(Table& table, const Synonyms& requested_synonyms) -> void {
+    const auto& new_idx_to_old_idx = get_mapping_from_synonyms_to_table_names(table.get_column(), requested_synonyms);
+    reorder(table.get_column(), new_idx_to_old_idx);
+    for (auto& row : table.get_records()) {
+        reorder(row, new_idx_to_old_idx);
+    }
+}
 } // namespace qps::detail
 
 namespace qps {
@@ -653,20 +658,6 @@ auto to_string(const Table& table) -> std::vector<std::string> {
     return {results.begin(), results.end()};
 }
 
-auto to_string(const Table& table, const std::vector<int>& column_indices) -> std::vector<std::string> {
-    auto results = std::unordered_set<std::string>{};
-    for (const auto& row : table.get_records()) {
-        auto ss = std::stringstream{};
-        ss << row.at(column_indices.front());
-        for (auto it = std::next(column_indices.begin()); it != column_indices.end(); it++) {
-            ss << " " << row.at(*it);
-        }
-        results.insert(ss.str());
-    }
-
-    return {results.begin(), results.end()};
-}
-
 /**
  * @brief Build a table from the given elements by selecting columns from the input table
  *
@@ -677,14 +668,7 @@ auto to_string(const Table& table, const std::vector<int>& column_indices) -> st
 auto project(Table& table, const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade)
     -> void {
     // Contract: synonyms <= table.get_column()
-    const auto& synonyms = detail::to_synonyms(elements);
-    const auto& new_idx_to_old_idx = detail::get_mapping_from_synonyms_to_table_names(table.get_column(), synonyms);
-
-    // Scan out the desired synonyms
-    reorder(table.get_column(), new_idx_to_old_idx);
-    for (auto& row : table.get_records()) {
-        reorder(row, new_idx_to_old_idx);
-    }
+    detail::reorder_table(table, detail::to_synonyms(elements));
 
     // Convert to requested representation
     auto extractors = std::vector<std::function<std::string(const std::string&)>>{};
@@ -710,6 +694,7 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, 
         return {};
     }
 
+    const auto requested_elements = std::vector<Elem>{elems.begin(), elems.end()};
     const auto requested_synonyms = detail::to_synonyms(elems);
 
     // Split the requested elements into available and missing elements
@@ -724,18 +709,19 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, 
     const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
     // Fill table using information from the available synonyms
-    project(table, available_elements, read_facade);
+    auto final_table = [&]() {
+        if (missing_elements.empty()) {
+            return table;
+        }
 
-    // Combine the table with the missing synonyms
-    const auto& final_table = missing_elements.empty()
-                                  ? table
-                                  : std::get<Table>(detail::cross_join(
-                                        std::move(table), detail::build_full_table(missing_elements, read_facade)));
+        // Combine the table with the missing synonyms
+        auto missing_table = detail::build_full_table(detail::to_synonyms(missing_elements), read_facade);
+        return std::get<Table>(detail::cross_join(std::move(table), std::move(missing_table)));
+    }();
 
-    // Reorder the columns to match the requested order
-    const auto& new_idx_to_old_idx =
-        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), requested_synonyms);
-    return to_string(final_table, new_idx_to_old_idx);
+    // Convert to requested representation
+    project(final_table, requested_elements, read_facade);
+    return to_string(final_table);
 }
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
@@ -754,8 +740,10 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
                               return TRUE_VALUE;
                           },
                           [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                              // Evaluator produces "True", so we only need to build a full table based on the elements
-                              return to_string(detail::build_full_table(elems, read_facade));
+                              // Evaluator produces "True", so we first need to build the full table before doing the
+                              // projection
+                              auto table = detail::build_full_table(detail::to_synonyms(elems), read_facade);
+                              return project(read_facade, table, elems);
                           },
                           [&read_facade](Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               // Evaluator produces table, so we need to project the table based on the
