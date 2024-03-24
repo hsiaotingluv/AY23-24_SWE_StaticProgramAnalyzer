@@ -10,6 +10,7 @@
 #include "qps/evaluators/relationship/modifies_p_evaluator.hpp"
 #include "qps/evaluators/relationship/modifies_s_evaluator.hpp"
 #include "qps/evaluators/relationship/next_evaluator.hpp"
+#include "qps/evaluators/relationship/next_t_evaluator.hpp"
 #include "qps/evaluators/relationship/parent_evaluator.hpp"
 #include "qps/evaluators/relationship/parent_t_evaluator.hpp"
 #include "qps/evaluators/relationship/pattern_assign_evaluator.hpp"
@@ -65,6 +66,10 @@ auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_faca
 
         [read_facade](const qps::Next& next) -> std::shared_ptr<ClauseEvaluator> {
             return std::make_shared<NextEvaluator>(read_facade, next);
+        },
+
+        [read_facade](const qps::NextT& calls) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<NextTEvaluator>(read_facade, calls);
         },
 
         // TODO: move this to a separate file

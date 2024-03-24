@@ -386,6 +386,33 @@ TEST_CASE("Test CFG Builder") {
         REQUIRE(test_traverse(proc_map, "nesting"));
         REQUIRE(verify_stmt_num_map(proc_map, stmt_num_map, stmt_names));
     }
+
+    SECTION("Test While with If - success") {
+        std::string input = R"(
+            procedure whileIf {
+                while (x != 0) {
+                    if (x > 0) then {
+                        read x;
+                    } else {
+                        print x;
+                    }
+                }
+            }
+        )";
+
+        auto ast = sp.process(input);
+        auto proc_map = cfg_builder->get_proc_map();
+        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto stmt_names = std::unordered_set<std::string>{"whileIf"};
+
+        REQUIRE(get_proc_names(proc_map) == stmt_names);
+        REQUIRE(get_stmt_nums_in_proc(proc_map, "whileIf") == std::unordered_set<int>{1, 2, 3, 4});
+        REQUIRE(get_dummy_nodes(proc_map) == 2);
+        REQUIRE(verify_start_node(proc_map, "whileIf"));
+        REQUIRE(verify_outneighbour_stmt_nums(proc_map, "whileIf"));
+        REQUIRE(test_traverse(proc_map, "whileIf"));
+        REQUIRE(verify_stmt_num_map(proc_map, stmt_num_map, stmt_names));
+    }
 }
 
 #pragma clang diagnostic pop

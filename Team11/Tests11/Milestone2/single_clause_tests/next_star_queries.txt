@@ -1,0 +1,160 @@
+1 - generated TC 1
+stmt s; read r; Select s such that Next*(r, s)
+
+45, 44, 5, 15, 13, 17, 7, 4, 2, 18, 11, 43, 23, 22, 9, 12, 10, 42, 14, 20, 21, 8, 3, 16, 6, 19
+5000
+2 - generated TC 2
+procedure FizzBuzz; print p; Select s such that Next*(p, s)
+
+SemanticError
+5000
+3 - generated TC 3
+procedure InnerProcedure; if ifs; Select s such that Next*(ifs, s)
+
+SemanticError
+5000
+4 - generated TC 4
+procedure AnotherProcedure; call c; Select s such that Next*(c, s)
+
+SemanticError
+5000
+5 - generated TC 5
+stmt s; while w; assign a; Select s such that Next*(a, s) and Parent(w, s)
+
+23, 39, 18, 28, 17, 7, 41, 19, 21, 20, 16, 8, 40, 29, 9, 22
+5000
+6 - generated TC 6
+stmt s; while w; assign a; Select s such that Next*(a, s) and Parent(w, s)
+
+23, 39, 18, 28, 17, 7, 41, 19, 21, 20, 16, 8, 40, 29, 9, 22
+5000
+7 - generated TC 7
+assign a; call c; Select a, s such that Next*(c, a) and Next*(c, s)
+
+SyntaxError
+5000
+8 - generated TC 8
+while w; if ifs; Select ifs, s such that Next*(w, ifs) and Next*(ifs, s)
+
+SyntaxError
+5000
+9 - generated TC 9
+if ifs; while w; Select ifs, s such that Next*(ifs, w) and Next*(w, s)
+
+SyntaxError
+5000
+10 - generated TC 10
+if ifs; Select ifs such that Next*(ifs, 5)
+
+
+5000
+11 - generated TC 11
+stmt s; Select s such that Next*(_, 10)
+
+25, 2, 24, 23, 21, 20, 26, 32, 14, 34, 16, 3, 6, 30, 45, 5, 18, 11, 39, 35, 27, 42, 31, 33, 37, 38, 8, 44, 12, 43, 9, 36, 1, 22, 13, 15, 29, 10, 7, 40, 17, 41, 28, 19, 4
+5000
+12 - generated TC 12
+if ifs; Select s such that Next*(ifs, s)
+
+SemanticError
+5000
+13 - generated TC 13
+while w; Select w such that Next*(w, 8)
+
+17, 20, 6, 18
+5000
+14 - generated TC 14
+while w; Select w such that Next*(w, 1)
+
+
+5000
+15 - generated TC 15
+if ifs; while w; Select ifs, w.stmt# such that Next*(ifs, 11)
+
+SyntaxError
+5000
+16 - generated TC 16
+if ifs; while w; Select ifs, w such that Next*(3, w)
+
+SyntaxError
+5000
+17 - generated TC 17
+while w; Select w such that Next*(w, 7)
+
+20, 17, 6, 18
+5000
+18 - generated TC 18
+procedure p; Select p such that Next*(p, 2)
+
+SemanticError
+5000
+19 - generated TC 19
+procedure p; Select p.procName such that Next*(p, 7)
+
+SemanticError
+5000
+20 - generated TC 20
+while w; Select w such that Next*(w, 6)
+
+17, 18, 20, 6
+5000
+21 - generated TC 21
+assign a; while w; Select a, w such that Next*(a, w)
+
+SyntaxError
+5000
+22 - generated TC 22
+assign a; while w; Select a, w such that Next*(a, w) and Next*(9, w)
+
+SyntaxError
+5000
+23 - generated TC 23
+if ifs1; if ifs2; Select <ifs1, ifs2> such that Next*(ifs1, ifs2)
+
+11 11, 9 9, 11 9, 43 43, 26 33, 31 33, 26 31, 13 11, 11 13, 13 9, 9 11, 9 13, 13 13
+5000
+24 - generated TC 24
+while w; assign a; Select <w, a> such that Next*(w, a)
+
+17 8, 20 8, 18 16, 6 16, 17 7, 38 40, 6 19, 27 29, 18 19, 6 8, 17 19, 18 7, 20 7, 17 16, 6 7, 18 8, 20 16, 20 19
+5000
+25 - generated TC 25
+while w; call c; Select <w, c> such that Next*(w, c)
+
+6 23, 20 22, 18 22, 20 23, 6 22, 18 23, 17 22, 38 41, 17 23
+5000
+26 - generated TC 26
+procedure p; if ifs; Select <p, ifs> such that Next*(p, ifs)
+
+SemanticError
+5000
+27 - generated TC 27
+assign a1; assign a2; Select <a1, a2> such that Next*(a1, a2)
+
+4 16, 5 8, 3 16, 24 29, 4 8, 5 7, 7 19, 36 40, 3 19, 3 4, 16 8, 3 8, 36 37, 16 7, 8 19, 16 19, 16 16, 19 8, 7 16, 24 25, 25 30, 3 7, 24 30, 8 16, 5 19, 37 40, 19 16, 8 8, 40 40, 3 5, 7 7, 4 5, 4 7, 4 19, 25 29, 8 7, 19 19, 19 7, 7 8, 29 29, 5 16
+5000
+28 - generated TC 28
+read r; print p; Select <r, p> such that Next*(r, p)
+
+2 10, 1 12, 2 15, 2 21, 2 14, 1 15, 1 14, 1 21, 2 12, 1 10
+5000
+29 - generated TC 29
+while w; return r; Select <w, r> such that Next*(w, r)
+
+SyntaxError
+5000
+30 - generated TC 30
+if ifs; return r; Select <ifs, r> such that Next*(ifs, r)
+
+SyntaxError
+5000
+31 - generated TC 31
+call c; if ifs; Select <c, ifs> such that Next*(c, ifs)
+
+22 11, 23 13, 23 11, 23 9, 22 9, 22 13
+5000
+32 - additional query
+stmt s; Select s such that Next*(s, s)
+
+29, 43, 17, 21, 45, 42, 38, 10, 15, 27, 19, 11, 12, 23, 8, 39, 18, 14, 44, 22, 9, 28, 6, 40, 20, 16, 41, 7, 13
+5000

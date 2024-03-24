@@ -20,6 +20,7 @@ class ManyToManyStore {
     std::unordered_set<ValueType> get_vals_by_key(const KeyType& key) const;
     std::unordered_set<KeyType> get_keys_by_val(const ValueType& value) const;
     std::unordered_map<KeyType, std::unordered_set<ValueType>> get_all() const;
+    std::unordered_map<ValueType, std::unordered_set<KeyType>> get_all_reverse() const;
     std::unordered_set<std::tuple<KeyType, ValueType>> get_all_pairs() const;
     std::unordered_set<KeyType> get_all_keys() const;
     std::unordered_set<ValueType> get_all_vals() const;

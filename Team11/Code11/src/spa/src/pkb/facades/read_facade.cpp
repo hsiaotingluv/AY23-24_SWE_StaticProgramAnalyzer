@@ -495,6 +495,14 @@ std::unordered_set<std::string> ReadFacade::get_previous_of(const std::string& a
     return pkb->get_previous_of(after);
 }
 
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::get_all_next() const {
+    return pkb->get_all_next();
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::get_all_next_reverse() const {
+    return pkb->get_all_next_reverse();
+}
+
 bool ReadFacade::has_calls_relation() const {
     return pkb->has_calls_relation();
 }

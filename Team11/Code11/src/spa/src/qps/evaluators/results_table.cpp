@@ -19,7 +19,7 @@
 #include <vector>
 
 namespace qps::detail {
-auto to_synonym(const Elem& elem) -> std::shared_ptr<Synonym> {
+static auto to_synonym(const Elem& elem) -> std::shared_ptr<Synonym> {
     return std::visit(overloaded{[](const std::shared_ptr<Synonym>& synonym) {
                                      return synonym;
                                  },
@@ -29,14 +29,14 @@ auto to_synonym(const Elem& elem) -> std::shared_ptr<Synonym> {
                       elem);
 }
 
-auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
+static auto to_synonyms(const std::vector<Elem>& elems) -> Synonyms {
     auto synonyms = Synonyms{};
     synonyms.reserve(elems.size());
     std::transform(elems.begin(), elems.end(), std::back_inserter(synonyms), to_synonym);
     return synonyms;
 }
 
-auto get_mapping_from_synonyms_to_table_names(const Synonyms& table_column_names, const Synonyms& synonyms)
+static auto get_mapping_from_synonyms_to_table_names(const Synonyms& table_column_names, const Synonyms& synonyms)
     -> std::vector<int> {
     auto new_idx_to_old_idx = std::vector<int>{};
     new_idx_to_old_idx.reserve(synonyms.size());
@@ -62,7 +62,7 @@ auto compare_rows(const std::vector<std::string>& row1, const std::vector<std::s
     return false; // If all first n columns are equal, don't change the order
 }
 
-void print(const std::vector<std::vector<std::string>>& records) {
+static void print(const std::vector<std::vector<std::string>>& records) {
     for (const auto& row : records) {
         for (const auto& col : row) {
             std::cout << col << "\t";
@@ -133,8 +133,8 @@ auto double_pointer_merge(std::vector<std::shared_ptr<Synonym>> column1, std::ve
  * @return std::tuple<std::vector<std::shared_ptr<Synonym>>, std::vector<int>, std::vector<int>, std::vector<int>,
  * std::vector<int>>
  */
-auto double_pointer_merge_with_ordering(std::vector<std::shared_ptr<Synonym>>& column1,
-                                        std::vector<std::shared_ptr<Synonym>>& column2)
+static auto double_pointer_merge_with_ordering(std::vector<std::shared_ptr<Synonym>>& column1,
+                                               std::vector<std::shared_ptr<Synonym>>& column2)
     -> std::tuple<std::vector<std::shared_ptr<Synonym>>, std::vector<int>, std::vector<int>,
                   std::vector<std::tuple<int, int>>> {
     // Sort + double pointer merge to remove duplicates
@@ -227,8 +227,8 @@ auto ordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
  * @param new_column Column names from the new table
  * @return std::unordered_map<int, int> Index mapping from old_column to new_column
  */
-auto build_mapping(const std::vector<std::shared_ptr<Synonym>>& old_column,
-                   const std::vector<std::shared_ptr<Synonym>>& new_column) -> std::unordered_map<int, int> {
+static auto build_mapping(const std::vector<std::shared_ptr<Synonym>>& old_column,
+                          const std::vector<std::shared_ptr<Synonym>>& new_column) -> std::unordered_map<int, int> {
     auto mapping = std::unordered_map<int, int>{};
     mapping.reserve(old_column.size());
     for (int i = 0; i < static_cast<int>(old_column.size()); i++) {
@@ -249,8 +249,9 @@ auto build_mapping(const std::vector<std::shared_ptr<Synonym>>& old_column,
  * @param new_column Column names from the new table
  * @return std::unordered_map<int, int> Index mapping from old_column to new_column
  */
-auto build_mapping_sorted(const std::vector<std::shared_ptr<Synonym>>& old_column,
-                          const std::vector<std::shared_ptr<Synonym>>& new_column) -> std::unordered_map<int, int> {
+static auto build_mapping_sorted(const std::vector<std::shared_ptr<Synonym>>& old_column,
+                                 const std::vector<std::shared_ptr<Synonym>>& new_column)
+    -> std::unordered_map<int, int> {
     auto mapping = std::unordered_map<int, int>{};
     mapping.reserve(old_column.size());
 
@@ -271,7 +272,7 @@ auto build_mapping_sorted(const std::vector<std::shared_ptr<Synonym>>& old_colum
     return mapping;
 }
 
-void nested_loop_join_records(const Table& table1, const Table& table2, Table& new_table) {
+static void nested_loop_join_records(const Table& table1, const Table& table2, Table& new_table) {
     const auto column1 = table1.get_column();
     const auto column2 = table2.get_column();
     const auto new_column = new_table.get_column();
@@ -315,8 +316,8 @@ void nested_loop_join_records(const Table& table1, const Table& table2, Table& n
 }
 
 template <typename ColumnMergeStrategy, typename JoinRecordsStrategy>
-auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strategy,
-          JoinRecordsStrategy join_records_strategy) -> Table {
+static auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strategy,
+                 JoinRecordsStrategy join_records_strategy) -> Table {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
         return table2;
@@ -334,9 +335,9 @@ auto join(Table&& table1, Table&& table2, ColumnMergeStrategy column_merge_strat
     return new_table;
 }
 
-auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
-                    std::vector<std::vector<std::string>>& table2_contents,
-                    const std::vector<std::tuple<int, int>>& common_column_idxs) -> void {
+static auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
+                           std::vector<std::vector<std::string>>& table2_contents,
+                           const std::vector<std::tuple<int, int>>& common_column_idxs) -> void {
     auto first_idxs = std::vector<int>{};
     first_idxs.reserve(common_column_idxs.size());
     auto second_idxs = std::vector<int>{};
@@ -358,7 +359,7 @@ auto sort_on_column(std::vector<std::vector<std::string>>& table1_contents,
               });
 }
 
-void reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
+static void reorder_contents(std::vector<std::vector<std::string>>& table_contents, const std::vector<int>& order) {
     std::for_each(table_contents.begin(), table_contents.end(), [&order](auto& row) {
         reorder(row, order);
     });
@@ -554,7 +555,7 @@ auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade
     return table;
 }
 
-auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
+static auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
     return overloaded{[&](const std::shared_ptr<Synonym>&) -> std::function<std::string(const std::string&)> {
                           return [](const std::string& x) -> std::string {
                               return x;
@@ -588,27 +589,32 @@ auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& read_facad
 /**
  * @brief Build full synonym table from the given elements
  *
- * @param elements
+ * @param synonyms
  * @param read_facade
  * @return Table
  */
-auto build_full_table(const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
+static auto build_full_table(const Synonyms synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
     auto table = Table{};
+    auto unique_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{synonyms.begin(), synonyms.end()};
 
     // Build mappers
-    const auto attribute_extractor = make_attribute_extractor(read_facade);
-    for (const auto& element : elements) {
-        const auto extract = std::visit(attribute_extractor, element);
-        const auto synonym = to_synonym(element);
+    for (const auto& synonym : unique_synonyms) {
         auto curr_table = Table{{synonym}};
         for (const auto& result : synonym->scan(read_facade)) {
-            curr_table.add_row({extract(result)});
+            curr_table.add_row({result});
         }
         table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
     }
     return table;
 }
 
+static auto reorder_table(Table& table, const Synonyms& requested_synonyms) -> void {
+    const auto& new_idx_to_old_idx = get_mapping_from_synonyms_to_table_names(table.get_column(), requested_synonyms);
+    reorder(table.get_column(), new_idx_to_old_idx);
+    for (auto& row : table.get_records()) {
+        reorder(row, new_idx_to_old_idx);
+    }
+}
 } // namespace qps::detail
 
 namespace qps {
@@ -639,27 +645,13 @@ auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable {
                       std::move(table1), std::move(table2));
 }
 
-auto to_string(const Table& table) -> std::vector<std::string> {
+static auto to_string(const Table& table) -> std::vector<std::string> {
     auto results = std::unordered_set<std::string>{};
     for (const auto& row : table.get_records()) {
         auto ss = std::stringstream{};
         ss << row.front();
         for (auto it = std::next(row.begin()); it != row.end(); it++) {
             ss << " " << *it;
-        }
-        results.insert(ss.str());
-    }
-
-    return {results.begin(), results.end()};
-}
-
-auto to_string(const Table& table, const std::vector<int>& column_indices) -> std::vector<std::string> {
-    auto results = std::unordered_set<std::string>{};
-    for (const auto& row : table.get_records()) {
-        auto ss = std::stringstream{};
-        ss << row.at(column_indices.front());
-        for (auto it = std::next(column_indices.begin()); it != column_indices.end(); it++) {
-            ss << " " << row.at(*it);
         }
         results.insert(ss.str());
     }
@@ -674,17 +666,10 @@ auto to_string(const Table& table, const std::vector<int>& column_indices) -> st
  * @param synonyms
  * @return Table
  */
-auto project(Table& table, const std::vector<Elem>& elements, const std::shared_ptr<pkb::ReadFacade>& read_facade)
-    -> void {
+static auto project_and_transform_table(Table& table, const std::vector<Elem>& elements,
+                                        const std::shared_ptr<pkb::ReadFacade>& read_facade) -> void {
     // Contract: synonyms <= table.get_column()
-    const auto& synonyms = detail::to_synonyms(elements);
-    const auto& new_idx_to_old_idx = detail::get_mapping_from_synonyms_to_table_names(table.get_column(), synonyms);
-
-    // Scan out the desired synonyms
-    reorder(table.get_column(), new_idx_to_old_idx);
-    for (auto& row : table.get_records()) {
-        reorder(row, new_idx_to_old_idx);
-    }
+    detail::reorder_table(table, detail::to_synonyms(elements));
 
     // Convert to requested representation
     auto extractors = std::vector<std::function<std::string(const std::string&)>>{};
@@ -703,13 +688,14 @@ auto project(Table& table, const std::vector<Elem>& elements, const std::shared_
     }
 }
 
-auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, std::vector<Elem> elems)
-    -> std::vector<std::string> {
+static auto process_missing_synonym(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table,
+                                    std::vector<Elem> elems) -> Table {
     if (table.empty()) {
         // Table is empty --> contradiction
         return {};
     }
 
+    const auto requested_elements = std::vector<Elem>{elems.begin(), elems.end()};
     const auto requested_synonyms = detail::to_synonyms(elems);
 
     // Split the requested elements into available and missing elements
@@ -724,18 +710,13 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, 
     const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
     // Fill table using information from the available synonyms
-    project(table, available_elements, read_facade);
+    if (missing_elements.empty()) {
+        return table;
+    }
 
     // Combine the table with the missing synonyms
-    const auto& final_table = missing_elements.empty()
-                                  ? table
-                                  : std::get<Table>(detail::cross_join(
-                                        std::move(table), detail::build_full_table(missing_elements, read_facade)));
-
-    // Reorder the columns to match the requested order
-    const auto& new_idx_to_old_idx =
-        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), requested_synonyms);
-    return to_string(final_table, new_idx_to_old_idx);
+    auto missing_table = detail::build_full_table(detail::to_synonyms(missing_elements), read_facade);
+    return std::get<Table>(detail::cross_join(std::move(table), std::move(missing_table)));
 }
 
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
@@ -754,13 +735,18 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
                               return TRUE_VALUE;
                           },
                           [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                              // Evaluator produces "True", so we only need to build a full table based on the elements
-                              return to_string(detail::build_full_table(elems, read_facade));
+                              // Evaluator produces "True", so we first need to build the full table before doing the
+                              // projection
+                              auto final_table = detail::build_full_table(detail::to_synonyms(elems), read_facade);
+                              project_and_transform_table(final_table, elems, read_facade);
+                              return to_string(final_table);
                           },
                           [&read_facade](Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
                               // Evaluator produces table, so we need to project the table based on the
                               // elements
-                              return project(read_facade, table, elems);
+                              auto final_table = process_missing_synonym(read_facade, table, elems);
+                              project_and_transform_table(final_table, elems, read_facade);
+                              return to_string(final_table);
                           },
                       },
                       table, reference);
@@ -770,14 +756,8 @@ void print(const Table& table) {
     for (const auto& col : table.get_column()) {
         std::cout << col->get_name() << "\t";
     }
+    std::cout << std::endl;
 
-    std::cout << std::endl;
-    for (const auto& row : table.get_records()) {
-        for (const auto& col : row) {
-            std::cout << col << "\t";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
+    detail::print(table.get_records());
 }
 } // namespace qps
