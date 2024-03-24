@@ -710,6 +710,8 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, 
         return {};
     }
 
+    const auto requested_synonyms = detail::to_synonyms(elems);
+
     // Split the requested elements into available and missing elements
     auto column_names = table.get_column();
     const auto& table_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{column_names.begin(), column_names.end()};
@@ -732,7 +734,7 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, Table& table, 
 
     // Reorder the columns to match the requested order
     const auto& new_idx_to_old_idx =
-        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), detail::to_synonyms(elems));
+        detail::get_mapping_from_synonyms_to_table_names(final_table.get_column(), requested_synonyms);
     return to_string(final_table, new_idx_to_old_idx);
 }
 
