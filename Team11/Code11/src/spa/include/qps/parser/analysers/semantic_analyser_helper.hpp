@@ -25,4 +25,8 @@ auto validate_ref(const Synonyms& declarations,
 
 auto validate_ref_combination(const TypedRef&, const TypedRef&) -> std::optional<std::pair<TypedRef, TypedRef>>;
 
+auto validate_attr_ref(const Synonyms& declarations,
+                       const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                       const untyped::UntypedAttrRef& attr_ref) -> std::optional<AttrRef>;
+
 } // namespace qps::detail

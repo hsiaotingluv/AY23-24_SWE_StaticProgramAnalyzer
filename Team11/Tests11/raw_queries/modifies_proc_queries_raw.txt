@@ -1,0 +1,15 @@
+// ai-gen start(copilot, 1, e)
+// prompt: used copilot - Additional comments: generate far far more test cases similar to the ones given
+procedure p; Select p such that Modifies(p, _)
+procedure p; Select BOOLEAN such that Modifies(p, _)
+procedure p; variable v; Select p such that Modifies(p, v)
+procedure p; variable v; Select v such that Modifies(p, v)
+procedure p; procedure q; Select p such that Modifies(p, q)
+procedure p; procedure q; Select q such that Modifies(p, q)
+procedure p; procedure q; Select BOOLEAN such that Modifies(p, q)
+procedure p; procedure q; Select BOOLEAN such that Modifies(q, p)
+procedure p; variable v; Select v such that Modifies(p, v)
+procedure q; variable v; Select q such that Modifies(q, v)
+procedure p; variable v; Select BOOLEAN such that Modifies(p, v)
+procedure q; variable v; Select BOOLEAN such that Modifies(q, v)
+// ai-gen end

@@ -100,11 +100,11 @@ if __name__ == "__main__":
 
         prefix = os.path.abspath(source).split(".")[0]
         found_exception = None
+        errors = []
         try:
             tree = ET.parse(f"{output_path}")
             root = tree.getroot()
 
-            errors = []
 
             def traverse(node):
                 global total_tc_file
