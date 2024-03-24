@@ -37,6 +37,12 @@ class EntityStore {
      */
     void add_constant(const Constant& constant);
 
+    bool has_procedure(const std::string& procedure) const;
+
+    bool has_variable(const std::string& variable) const;
+
+    bool has_constant(const std::string& constant) const;
+
     /**
      * Retrieves all procedure entities from the store.
      *

@@ -67,6 +67,44 @@ std::unordered_set<std::string> PkbManager::get_constants() const {
     return get_name_list(consts);
 }
 
+bool PkbManager::has_entity(const std::string& entity) const {
+    std::unordered_set<std::string> entities;
+
+    auto procedures = entity_store->get_procedures();
+    auto vars = entity_store->get_variables();
+    auto consts = entity_store->get_constants();
+
+    for (const Procedure& p : procedures) {
+        if (p.get_name() == entity) {
+            return true;
+        }
+    }
+    for (const Variable& v : vars) {
+        if (v.get_name() == entity) {
+            return true;
+        }
+    }
+    for (const Constant& c : consts) {
+        if (c.get_name() == entity) {
+            return true;
+        }
+    }
+
+    return false; // Entity not found in any category
+}
+
+bool PkbManager::has_procedure(const std::string& procedure) const {
+    return entity_store->has_procedure(procedure);
+}
+
+bool PkbManager::has_variable(const std::string& variable) const {
+    return entity_store->has_variable(variable);
+}
+
+bool PkbManager::has_constant(const std::string& constant) const {
+    return entity_store->has_constant(constant);
+}
+
 std::unordered_set<std::string> PkbManager::get_all_statements() const {
     return statement_store->get_all_keys();
 }
@@ -93,6 +131,41 @@ std::unordered_set<std::string> PkbManager::get_print_statements() const {
 
 std::unordered_set<std::string> PkbManager::get_call_statements() const {
     return statement_store->get_keys_by_val(StatementType::Call);
+}
+
+bool PkbManager::has_statement(const std::string& s) const {
+    auto stmts = statement_store->get_all_keys();
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_assign_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::Assign);
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_if_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::If);
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_while_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::While);
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_read_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::Read);
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_print_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::Print);
+    return stmts.find(s) != stmts.end();
+}
+
+bool PkbManager::has_call_statement(const std::string& s) const {
+    auto stmts = statement_store->get_keys_by_val(StatementType::Call);
+    return stmts.find(s) != stmts.end();
 }
 
 std::unordered_set<std::string> PkbManager::get_vars_modified_by_statement(const std::string& s) const {
