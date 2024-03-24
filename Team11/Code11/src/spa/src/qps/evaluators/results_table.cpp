@@ -563,18 +563,18 @@ static auto make_attribute_extractor(const std::shared_ptr<pkb::ReadFacade>& rea
                       },
                       [&](const AttrRef& attr_ref) -> std::function<std::string(const std::string&)> {
                           const auto synonym = attr_ref.synonym;
-                          if (const auto print_synonym = std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
-                                                         std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                          if (std::dynamic_pointer_cast<PrintSynonym>(synonym) &&
+                              std::holds_alternative<VarName>(attr_ref.attr_name)) {
                               return [&read_facade](const std::string& x) -> std::string {
                                   return *read_facade->get_vars_used_by_statement(x).begin();
                               };
-                          } else if (const auto read_synonym = std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
-                                                               std::holds_alternative<VarName>(attr_ref.attr_name)) {
+                          } else if (std::dynamic_pointer_cast<ReadSynonym>(synonym) &&
+                                     std::holds_alternative<VarName>(attr_ref.attr_name)) {
                               return [&read_facade](const std::string& x) -> std::string {
                                   return *read_facade->get_vars_modified_by_statement(x).begin();
                               };
-                          } else if (const auto call_synonym = std::dynamic_pointer_cast<CallSynonym>(synonym) &&
-                                                               std::holds_alternative<ProcName>(attr_ref.attr_name)) {
+                          } else if (std::dynamic_pointer_cast<CallSynonym>(synonym) &&
+                                     std::holds_alternative<ProcName>(attr_ref.attr_name)) {
                               return [&read_facade](const std::string& x) -> std::string {
                                   return read_facade->get_procedure_name_called_by(x);
                               };
