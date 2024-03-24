@@ -144,10 +144,23 @@ bool has_transitive_rs(const std::string& node1, const std::string& node2,
 
 auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                                  const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
-    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
     const auto next_map = read_facade->get_all_next();
 
+    if (stmt_syn_1 == stmt_syn_2) {
+        Table table{{stmt_syn_1}};
+
+        const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+
+        for (const auto& stmt : relevant_stmts) {
+            if (has_transitive_rs(stmt, stmt, next_map)) {
+                table.add_row({stmt});
+            }
+        }
+        return table;
+    }
+
+    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
     Table table{{stmt_syn_1, stmt_syn_2}};
 
     for (const auto& stmt1 : relevant_stmts_1) {
