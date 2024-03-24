@@ -133,3 +133,8 @@ if ifs; while w;variable v; Select <w, v.varName> pattern w(v,"fizz")
 
 SemanticError
 5000
+28 - additional query
+if ifs; while w;variable v; Select v pattern w(ifs,"fizz")
+
+SemanticError
+5000
