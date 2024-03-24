@@ -75,13 +75,19 @@ bool PkbManager::has_entity(const std::string& entity) const {
     auto consts = entity_store->get_constants();
 
     for (const Procedure& p : procedures) {
-        if (p.get_name() == entity) return true;
+        if (p.get_name() == entity) {
+            return true;
+        }
     }
     for (const Variable& v : vars) {
-        if (v.get_name() == entity) return true;
+        if (v.get_name() == entity) {
+            return true;
+        }
     }
     for (const Constant& c : consts) {
-        if (c.get_name() == entity) return true;
+        if (c.get_name() == entity) {
+            return true;
+        }
     }
 
     return false; // Entity not found in any category
