@@ -27,8 +27,8 @@ auto NextTraverser::traverse_edge(const std::shared_ptr<CfgNode>& node, const st
     auto prev_node_stmt_nums = node->get();
     auto prev_node_final_stmt_num = std::to_string(prev_node_stmt_nums.back());
 
-    auto is_dummy_neighbour = outneighbour->empty();
-    if (is_dummy_neighbour) {
+    auto is_neighbour_dummy = outneighbour->empty();
+    if (is_neighbour_dummy) {
         auto dummy_node_next = proc_cfg_graph.find(outneighbour);
         if (dummy_node_next != proc_cfg_graph.end()) {
             auto dummy_node_outneighbours = dummy_node_next->second;
