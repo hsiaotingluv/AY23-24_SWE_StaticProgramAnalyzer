@@ -18,31 +18,41 @@ auto NextTraverser::traverse_node(const std::shared_ptr<CfgNode>& node) -> void 
  * @brief Extract the Next Relationships between the last statement of a node and the first statement of its
  * outneighbour.
  */
-auto NextTraverser::traverse_edge(const std::shared_ptr<CfgNode>& node, const std::shared_ptr<CfgNode>& outneighbour)
-    -> void {
+auto NextTraverser::traverse_edge(const std::shared_ptr<CfgNode>& node, const std::shared_ptr<CfgNode>& outneighbour,
+                                  const Graph& proc_cfg_graph) -> void {
+    if (outneighbour == nullptr) {
+        return;
+    }
+
     auto prev_node_stmt_nums = node->get();
     auto prev_node_final_stmt_num = std::to_string(prev_node_stmt_nums.back());
 
-    auto outneigh_stmt_nums = outneighbour->get();
-    auto outneigh_first_stmt_num = std::to_string(outneigh_stmt_nums.front());
+    auto is_dummy_neighbour = outneighbour->empty();
+    if (is_dummy_neighbour) {
+        auto dummy_node_next = proc_cfg_graph.find(outneighbour);
+        if (dummy_node_next != proc_cfg_graph.end()) {
+            auto dummy_node_outneighbours = dummy_node_next->second;
 
-    write_facade->add_next(prev_node_final_stmt_num, outneigh_first_stmt_num);
+            // Dummy neighbour will only have 1 outneighbour
+            auto dummy_neighbour = dummy_node_outneighbours.first;
+            traverse_edge(node, dummy_neighbour, proc_cfg_graph);
+        }
+    } else {
+        auto outneighbour_stmt_nums = outneighbour->get();
+        auto outneighbour_first_stmt_num = std::to_string(outneighbour_stmt_nums.front());
+
+        write_facade->add_next(prev_node_final_stmt_num, outneighbour_first_stmt_num);
+    }
 }
 
 /**
  * @brief Extract the Next Relationships between the last statement of a node and the first statements of its
  * outneighbours.
  */
-auto NextTraverser::traverse_edges(const std::shared_ptr<CfgNode>& node, const OutNeighbours& outneighbours) -> void {
-    auto is_first_outneighbour_non_empty = outneighbours.first && !(outneighbours.first->empty());
-    auto is_second_outneighbour_non_empty = outneighbours.second && !(outneighbours.second->empty());
-
-    if (is_first_outneighbour_non_empty) {
-        traverse_edge(node, outneighbours.first);
-    }
-    if (is_second_outneighbour_non_empty) {
-        traverse_edge(node, outneighbours.second);
-    }
+auto NextTraverser::traverse_edges(const std::shared_ptr<CfgNode>& node, const OutNeighbours& outneighbours,
+                                   const Graph& proc_cfg_graph) -> void {
+    traverse_edge(node, outneighbours.first, proc_cfg_graph);
+    traverse_edge(node, outneighbours.second, proc_cfg_graph);
 }
 
 /**
@@ -54,12 +64,9 @@ auto NextTraverser::traverse_procedure(const std::shared_ptr<ProcedureCfg>& cfg)
         traverse_node(node);
 
         auto is_node_non_empty = !(node->empty());
-        auto is_first_neighb_non_empty = outneighbours.first && !(outneighbours.first->empty());
-        auto is_second_neighb_non_empty = outneighbours.second && !(outneighbours.second->empty());
-
-        if (is_node_non_empty && (is_first_neighb_non_empty || is_second_neighb_non_empty)) {
-            traverse_edges(node, outneighbours);
-        } // Else, there is no edge to link.
+        if (is_node_non_empty) {
+            traverse_edges(node, outneighbours, graph);
+        }
     }
 }
 
