@@ -2,6 +2,7 @@
 #include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
+#include "qps/evaluators/with_evaluator.hpp"
 
 #include <memory>
 #include <variant>
@@ -27,6 +28,8 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
         } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
             const auto syntactic_pattern = pattern_clause->syntactic_pattern;
             evaluator = std::visit(clause_evaluator_selector(read_facade), syntactic_pattern);
+        } else if (const auto with_clause = std::dynamic_pointer_cast<qps::WithClause>(clause)) {
+            evaluator = std::make_shared<WithEvaluator>(read_facade, with_clause->ref1, with_clause->ref2);
         }
 
         if (evaluator == nullptr) {
