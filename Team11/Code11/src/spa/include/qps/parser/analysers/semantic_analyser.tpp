@@ -48,48 +48,66 @@ auto validate_relationship(const Synonyms& declarations,
     return validate_relationship(declarations, mapping, pattern, TypeList<Tails...>{});
 }
 
+template <typename RelationshipAnalysersList>
+static auto visit_such_that_clause(const Synonyms& declarations,
+                                   const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                                   const untyped::UntypedSuchThatClause& such_that)
+    -> std::optional<std::shared_ptr<Clause>> {
+    auto maybe_rel_ref = validate_relationship(declarations, mapping, such_that.rel_ref, RelationshipAnalysersList{});
+
+    if (!maybe_rel_ref.has_value()) {
+        return std::nullopt;
+    }
+
+    return std::make_shared<SuchThatClause>(maybe_rel_ref.value());
+}
+
+template <typename PatternAnalysersList>
+static auto visit_pattern_clause(const Synonyms& declarations,
+                                 const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                                 const untyped::UntypedPatternClause& pattern)
+    -> std::optional<std::shared_ptr<Clause>> {
+    auto maybe_syntactic_pattern = validate_pattern(declarations, mapping, pattern, PatternAnalysersList{});
+    if (!maybe_syntactic_pattern.has_value()) {
+        return std::nullopt;
+    }
+    return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
+}
+
+static auto visit_with_clause(const Synonyms& declarations,
+                              const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                              const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
+    const auto& maybe_ref1 = validate_ref(declarations, mapping, with.ref1);
+    if (!maybe_ref1.has_value()) {
+        return std::nullopt;
+    }
+
+    const auto& maybe_ref2 = validate_ref(declarations, mapping, with.ref2);
+    if (!maybe_ref2.has_value()) {
+        return std::nullopt;
+    }
+
+    const auto maybe_valid_combi = validate_ref_combination(maybe_ref1.value(), maybe_ref2.value());
+    if (!maybe_valid_combi.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ref1, ref2] = maybe_valid_combi.value();
+
+    return std::make_shared<WithClause>(ref1, ref2);
+}
+
 template <typename RelationshipAnalysersList, typename PatternAnalysersList>
 auto untyped_clause_visitor(const Synonyms& declarations,
-                            const std::unordered_map<std::string, std::shared_ptr<Synonym>> mapping) {
-    return overloaded{
-        [&declarations,
-         &mapping](const untyped::UntypedSuchThatClause& such_that) -> std::optional<std::shared_ptr<Clause>> {
-            const auto& maybe_rel_ref =
-                validate_relationship(declarations, mapping, such_that.rel_ref, RelationshipAnalysersList{});
-
-            if (!maybe_rel_ref.has_value()) {
-                return std::nullopt;
-            }
-
-            return std::make_shared<SuchThatClause>(maybe_rel_ref.value());
-        },
-        [&declarations,
-         &mapping](const untyped::UntypedPatternClause& pattern) -> std::optional<std::shared_ptr<Clause>> {
-            auto maybe_syntactic_pattern = validate_pattern(declarations, mapping, pattern, PatternAnalysersList{});
-            if (!maybe_syntactic_pattern.has_value()) {
-                return std::nullopt;
-            }
-            return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
-        },
-        [&declarations, &mapping](const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
-            const auto& maybe_ref1 = validate_ref(declarations, mapping, with.ref1);
-            if (!maybe_ref1.has_value()) {
-                return std::nullopt;
-            }
-
-            const auto& maybe_ref2 = validate_ref(declarations, mapping, with.ref2);
-            if (!maybe_ref2.has_value()) {
-                return std::nullopt;
-            }
-
-            const auto maybe_valid_combi = validate_ref_combination(maybe_ref1.value(), maybe_ref2.value());
-            if (!maybe_valid_combi.has_value()) {
-                return std::nullopt;
-            }
-            const auto& [ref1, ref2] = maybe_valid_combi.value();
-
-            return std::make_shared<WithClause>(ref1, ref2);
-        }};
+                            const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping) {
+    return overloaded{[&declarations, &mapping](const untyped::UntypedSuchThatClause& such_that) {
+                          return visit_such_that_clause<RelationshipAnalysersList>(declarations, mapping, such_that);
+                      },
+                      [&declarations, &mapping](const untyped::UntypedPatternClause& pattern) {
+                          return visit_pattern_clause<PatternAnalysersList>(declarations, mapping, pattern);
+                      },
+                      [&declarations, &mapping](const untyped::UntypedWithClause& with) {
+                          return visit_with_clause(declarations, mapping, with);
+                      }};
 };
 
 } // namespace qps::detail
