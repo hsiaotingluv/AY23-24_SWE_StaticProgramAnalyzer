@@ -114,13 +114,8 @@ auto sort_and_get_order(std::vector<std::shared_ptr<Synonym>>& column_names) -> 
 // Column merge strategies
 auto double_pointer_merge(std::vector<std::shared_ptr<Synonym>> column1, std::vector<std::shared_ptr<Synonym>> column2)
     -> std::vector<std::shared_ptr<Synonym>>;
-auto unordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
-                         const std::vector<std::shared_ptr<Synonym>>& column2) -> std::vector<std::shared_ptr<Synonym>>;
-auto ordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
-                       const std::vector<std::shared_ptr<Synonym>>& column2) -> std::vector<std::shared_ptr<Synonym>>;
 
 // Join strategies
-auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTable;
 auto cross_join(Table&& table1, Table&& table2) -> OutputTable;
 auto merge_join(Table&& table1, Table&& table2) -> OutputTable;
 auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable;

@@ -186,37 +186,6 @@ static auto double_pointer_merge_with_ordering(std::vector<std::shared_ptr<Synon
     return std::make_tuple(new_column, ordering1, ordering2, common_column_idxs);
 }
 
-auto unordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
-                         const std::vector<std::shared_ptr<Synonym>>& column2)
-    -> std::vector<std::shared_ptr<Synonym>> {
-    // Set merge to remove duplicates
-    // Time complexity: O(nlogn) with n = max(column1.size(), column2.size())
-    const auto& columnBig = column1.size() > column2.size() ? column1 : column2;
-    const auto& columnSmall = column1.size() > column2.size() ? column2 : column1;
-
-    auto new_column_set = std::unordered_set<std::shared_ptr<Synonym>>{columnBig.begin(), columnBig.end()};
-    for (const auto& synonym : columnSmall) {
-        new_column_set.insert(synonym);
-    }
-
-    auto new_column = std::vector<std::shared_ptr<Synonym>>{new_column_set.begin(), new_column_set.end()};
-    std::sort(new_column.begin(), new_column.end());
-    return new_column;
-}
-
-auto ordered_set_merge(const std::vector<std::shared_ptr<Synonym>>& column1,
-                       const std::vector<std::shared_ptr<Synonym>>& column2) -> std::vector<std::shared_ptr<Synonym>> {
-    // Set merge to remove duplicates
-    // Time complexity: O(nlogn) with n = max(column1.size(), column2.size())
-    auto new_column_set = std::set<std::shared_ptr<Synonym>>{column1.begin(), column1.end()};
-    for (const auto& synonym : column2) {
-        new_column_set.insert(synonym);
-    }
-
-    auto new_column = std::vector<std::shared_ptr<Synonym>>{new_column_set.begin(), new_column_set.end()};
-    return new_column;
-}
-
 /**
  * @brief Build an index mapping from old_column to new_column.
  *
