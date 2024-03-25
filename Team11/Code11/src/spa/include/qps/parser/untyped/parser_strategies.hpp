@@ -6,7 +6,7 @@
 
 namespace qps::untyped {
 
-template <typename SupportedStmtStmtStrategies, typename SupportedRefEntStrategies>
+template <typename SupportedStmtStmtStrategies, typename SupportedStmtEntStrategies, typename SupportedEntEntStrategies>
 struct SuchThatParserStrategy; // Forward declaration - defined in parser_strategies.tpp
 
 struct PatternParserStrategy {
