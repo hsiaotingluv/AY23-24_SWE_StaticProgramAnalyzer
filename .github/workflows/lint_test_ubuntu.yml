@@ -1,32 +1,38 @@
 name: "Ubuntu: Lint cpp/h files and test"
 
-on: [ push, pull_request ]
+on: [ push ]
 
 jobs:
   run-testing:
     name: Run Testing
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
 
     steps:
       - name: Check out Git repo
         uses: actions/checkout@v3
 
-      - name: Setup CMake
-        run: sudo apt update && sudo apt install -y cmake
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          create-symlink: true
+
+      - uses: lukka/get-cmake@latest
 
       - name: Setup Clang
         run: sudo apt install -y llvm
 
-      - name: Build cmake
-        run: |
-          cd Team11/Code11
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
-          make -j4
+      - name: Build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/Team11/Code11/CMakeLists.txt'
+          cmakeAppendedArgs: '-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/Team11/Code11/build'
 
       - name: Run linters
-        if: ${{ github.event_name == 'push' }}
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -61,23 +67,6 @@ jobs:
           python-version: '3.11'
 
       - name: Run System Testing
-        if: ${{ github.event_name == 'pull_request' }}
         run: |
           chmod +x ./.github/scripts/run_sys_test.sh
           ./.github/scripts/run_sys_test.sh
-
-      - name: Run linters and analyser
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: cpp-linter/cpp-linter-action@v2
-        id: linter_and_analyser
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          style: file
-          version: 16
-          repo-root: "Team11/Code11"
-          database: "build/compile_commands.json"
-          ignore: "build | lib | cmake | src/autotester_gui | src/unit_testing | src/integration_testing"
-          files-changed-only: false
-          tidy-checks: "-*,bugprone-*,clang-analyzer-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-length,-readability-else-after-return,-bugprone-easily-swappable-parameters,-readability-named-parameter,-cppcoreguidelines-special-member-functions"
-          step-summary: true

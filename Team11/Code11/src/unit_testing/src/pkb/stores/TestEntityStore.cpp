@@ -62,6 +62,20 @@ TEST_CASE("EntityStore Tests") {
         REQUIRE(constants.find(Constant("1")) != constants.end());
     }
 
+    SECTION("Entity exists") {
+        entity_store.add_variable(Variable("Main"));
+        entity_store.add_procedure(Procedure("Main"));
+        entity_store.add_constant(Constant("1"));
+
+        REQUIRE(entity_store.has_variable("Main"));
+        REQUIRE(entity_store.has_procedure("Main"));
+        REQUIRE(entity_store.has_constant("1"));
+
+        REQUIRE_FALSE(entity_store.has_variable("main"));
+        REQUIRE_FALSE(entity_store.has_procedure("main"));
+        REQUIRE_FALSE(entity_store.has_constant("main"));
+    }
+
     SECTION("Initial Store state") {
         REQUIRE(entity_store.get_variables().empty());
         REQUIRE(entity_store.get_procedures().empty());

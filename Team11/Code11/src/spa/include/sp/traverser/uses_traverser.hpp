@@ -1,9 +1,6 @@
 #pragma once
 
-#include "common/ast/factor_ast.hpp"
 #include "common/ast/procedure_ast.hpp"
-#include "common/ast/statement_ast.hpp"
-#include "common/ast/statement_list_ast.hpp"
 #include "pkb/facades/write_facade.h"
 #include "sp/traverser/traverser.hpp"
 
@@ -22,10 +19,10 @@ class UsesTraverser : public Traverser {
     UsesMap uses_map{};
     ProcMap proc_map{};
 
-    std::shared_ptr<WriteFacade> write_facade;
+    std::shared_ptr<pkb::WriteFacade> write_facade;
 
   public:
-    explicit UsesTraverser(std::shared_ptr<WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
+    explicit UsesTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
     auto traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>& proc_topo_sort)
         -> std::shared_ptr<AstNode> override;
 };

@@ -12,6 +12,11 @@ void ManyToManyStore<KeyType, ValueType>::add(const KeyType& key, const ValueTyp
 }
 
 template <class KeyType, class ValueType>
+bool ManyToManyStore<KeyType, ValueType>::has_relationship() const {
+    return !forward_map.empty();
+}
+
+template <class KeyType, class ValueType>
 bool ManyToManyStore<KeyType, ValueType>::contains_key_val_pair(const KeyType& key, const ValueType& value) const {
     auto it = forward_map.find(key);
     return it != forward_map.end() && it->second.find(value) != it->second.end();
@@ -46,6 +51,12 @@ std::unordered_set<KeyType> ManyToManyStore<KeyType, ValueType>::get_keys_by_val
 template <class KeyType, class ValueType>
 std::unordered_map<KeyType, std::unordered_set<ValueType>> ManyToManyStore<KeyType, ValueType>::get_all() const {
     return forward_map;
+}
+
+template <class KeyType, class ValueType>
+std::unordered_map<ValueType, std::unordered_set<KeyType>>
+ManyToManyStore<KeyType, ValueType>::get_all_reverse() const {
+    return reverse_map;
 }
 
 template <class KeyType, class ValueType>

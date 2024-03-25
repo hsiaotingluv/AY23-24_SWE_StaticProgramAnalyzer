@@ -1,0 +1,280 @@
+1 - Missing open bracket
+stmt s; variable v;
+Select s,v> such that Modifies(s,v)
+SyntaxError
+5000
+2 - Missing close bracket
+stmt s; variable v;
+Select <s,v such that Modifies(s,v)
+SyntaxError
+5000
+3 - Missing both brackets
+stmt s; variable v;
+Select s,v such that Modifies(s,v)
+SyntaxError
+5000
+4 - Missing comma
+stmt s; variable v;
+Select <s v> such that Modifies(s,v)
+SyntaxError
+5000
+5 - Undeclared synonym
+stmt s; variable v;
+Select <sv> such that Modifies(s,v)
+SemanticError
+5000
+6 - Extra open bracket
+stmt s; variable v;
+Select <<s,<v> such that Modifies(s,v)
+SyntaxError
+5000
+7 - Extra close bracket
+stmt s; variable v;
+Select <s,>v>> such that Modifies(s,v)
+SyntaxError
+5000
+8 - Extra both brackets
+stmt s; variable v;
+Select <<s,v>>> such that Modifies(s,v)
+SyntaxError
+5000
+9 - Extra comma
+stmt s; variable v;
+Select <s,, v,> such that Modifies(s,v)
+SyntaxError
+5000
+10 - Extra synonym
+stmt s; variable v;
+Select <sv,vs,ss> such that Modifies(s,v)
+SemanticError
+5000
+11 - Extra open bracket with big spacing
+stmt s; variable v;
+Select <   <  s<,         v > such that Modifies(s,v)
+SyntaxError
+5000
+12 - Missing close bracket with big spacing
+stmt s; variable v;
+         Select    <    s,v         such that Modifies(s,v)
+SyntaxError
+5000
+13 - Extra both brackets with big spacing
+stmt s; variable v;
+Select <          <  <s>, v >             >  > such   that Modifies(s,v)
+SyntaxError
+5000
+14 - Missing comma with big spacing
+stmt s; variable v;
+Select <s           v> such that Modifies(s,v)
+SyntaxError
+5000
+15 - Spelling error in attrref for statement
+stmt s; variable v;
+Select <s.stmt,v> such that Modifies(s,v)
+SyntaxError
+5000
+16 - Non-existing attrref for statement
+stmt s; variable v;
+Select <s.stmt##,v> such that Modifies(s,v)
+SyntaxError
+5000
+17 - Mismatch attrref for statement
+stmt s; variable v;
+Select <s.procName,v> such that Modifies(s,v)
+SemanticError
+5000
+18 - Spelling error in attrref for read
+read r; variable v;
+Select <r.stmt,v> such that Modifies(r,v)
+SyntaxError
+5000
+19 - Non-existing attrref for read
+read r; variable v;
+Select <r.stmt##,v> such that Modifies(r,v)
+SyntaxError
+5000
+20 - Mismatch attrref for read
+read r; variable v;
+Select <r.procName,v> such that Modifies(r,v)
+SemanticError
+5000
+21 - Spelling error in attrref for print
+print p; variable v;
+Select <p.stmt,v> such that Modifies(p,v)
+SyntaxError
+5000
+22 - Non-existing attrref for print
+print p; variable v;
+Select <p.stmt##,v> such that Modifies(p,v)
+SyntaxError
+5000
+23 - Mismatch attrref for print
+print p; variable v;
+Select <p.procName,v> such that Modifies(p,v)
+SemanticError
+5000
+24 - Spelling error in attrref for call
+stmt s; call c; variable v;
+Select <c.stmt,v> such that Modifies(s,_)
+SyntaxError
+5000
+25 - Non-existing attrref for call
+stmt s; call c; variable v;
+Select <c.stmt##,v> such that Modifies(s,_)
+SyntaxError
+5000
+26 - Mismatch attrref for call
+stmt s; call c; variable v;
+Select <c.varName,v> such that Modifies(s,_)
+SemanticError
+5000
+27 - Spelling error in attrref for while
+stmt s; while w; variable v;
+Select <w.stmt,v> such that Modifies(s,_)
+SyntaxError
+5000
+28 - Non-existing attrref for while
+stmt s; while w; variable v;
+Select <w.stmt##,v> such that Modifies(s,_)
+SyntaxError
+5000
+29 - Mismatch attrref for while
+stmt s; while w; variable v;
+Select <w.varName,v> such that Modifies(s,_)
+SemanticError
+5000
+30 - Spelling error in attrref for if
+stmt s; if i; variable v;
+Select <i.stmt,v> such that Modifies(s,_)
+SyntaxError
+5000
+31 - Non-existing attrref for if
+stmt s; if i; variable v;
+Select <i.stmt##,v> such that Modifies(s,_)
+SyntaxError
+5000
+32 - Mismatch attrref for if
+stmt s; if i; variable v;
+Select <i.varName,v> such that Modifies(s,_)
+SemanticError
+5000
+33 - Spelling error in attrref for assign
+stmt s; assign a; variable v;
+Select <a.stmt,v> such that Modifies(s,_)
+SyntaxError
+5000
+34 - Non-existing attrref for assign
+stmt s; assign a; variable v;
+Select <a.stmt##,v> such that Modifies(s,_)
+SyntaxError
+5000
+35 - Mismatch attrref for assign
+stmt s; assign a; variable v;
+Select <a.procName,v> such that Modifies(s,_)
+SemanticError
+5000
+36 - Spelling error in attrref for constant
+stmt s; constant c; variable v;
+Select <c.val,v> such that Modifies(s,_)
+SyntaxError
+5000
+37 - Non-existing attrref for constant
+stmt s; constant c; variable v;
+Select <c.values,v> such that Modifies(s,_)
+SyntaxError
+5000
+38 - Mismatch attrref for constant
+stmt s; constant c; variable v;
+Select <c.procName,v> such that Modifies(s,_)
+SemanticError
+5000
+39 - Spelling error in attrref for procedure
+stmt s; procedure p; variable v;
+Select <p.procname,v> such that Modifies(s,_)
+SyntaxError
+5000
+40 - Non-existing attrref for procedure
+stmt s; procedure p; variable v;
+Select <p.procedureName,v> such that Modifies(s,_)
+SyntaxError
+5000
+41 - Mismatch attrref for procedure
+stmt s; procedure p; variable v;
+Select <p.varName,v> such that Modifies(s,_)
+SemanticError
+5000
+42 - Spelling error in attrref for call
+stmt s; call c; variable v;
+Select <p.procname,v> such that Modifies(s,_)
+SyntaxError
+5000
+43 - Non-existing attrref for call
+stmt s; call c; variable v;
+Select <c.procedureName,v> such that Modifies(s,_)
+SyntaxError
+5000
+44 - Mismatch attrref for call
+stmt s; call c; variable v;
+Select <c.varName,v> such that Modifies(s,_)
+SemanticError
+5000
+45 - Spelling error in attrref for variable
+stmt s; variable v;
+Select <v.varname,s> such that Modifies(s,_)
+SyntaxError
+5000
+46 - Non-existing attrref for variable
+stmt s; variable v;
+Select <v.variableName,s> such that Modifies(s,_)
+SyntaxError
+5000
+47 - Mismatch attrref for variable
+stmt s; variable v;
+Select <v.procName,s> such that Modifies(s,_)
+SemanticError
+5000
+48 - Spelling error in attrref for read
+stmt s; variable v; read r;
+Select <r.varname,v> such that Modifies(s,_)
+SyntaxError
+5000
+49 - Non-existing attrref for read
+stmt s; variable v; read r;
+Select <r.variableName,v> such that Modifies(s,_)
+SyntaxError
+5000
+50 - Mismatch attrref for read
+stmt s; variable v; read r;
+Select <r.procName,v> such that Modifies(s,_)
+SemanticError
+5000
+51 - Spelling error in attrref for print
+stmt s; variable v; print p;
+Select <p.varname,v> such that Modifies(s,_)
+SyntaxError
+5000
+52 - Non-existing attrref for print
+stmt s; variable v; print p;
+Select <p.variableName,v> such that Modifies(s,_)
+SyntaxError
+5000
+53 - Mismatch attrref for print
+stmt s; variable v; print p;
+Select <p.procName,v> such that Modifies(s,_)
+SemanticError
+5000
+54 - Missing dot in attrref
+stmt s; variable v; print p;
+Select <p varName,v> such that Modifies(s,_)
+SyntaxError
+5000
+55 - Missing dot and space in attrref
+stmt s; variable v; print p;
+Select <pvarName,v> such that Modifies(s,_)
+SemanticError
+5000
+56 - Extra dot in attrref
+stmt s; variable v; print p;
+Select <p..varName,v> such that Modifies(s,_)
+SyntaxError
+5000

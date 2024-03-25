@@ -1,13 +1,10 @@
 #pragma once
 
 #include "entity.h"
-#include <string>
-#include <utility>
 
 class Variable : public Entity {
   public:
-    explicit Variable(std::string name) : Entity(std::move(name)) {
-    }
+    using Entity::Entity;
 };
 
 namespace std {

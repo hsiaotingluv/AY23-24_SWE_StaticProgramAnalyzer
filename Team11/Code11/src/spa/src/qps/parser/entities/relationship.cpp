@@ -3,6 +3,7 @@
 #include "qps/template_utils.hpp"
 
 #include <memory>
+#include <optional>
 #include <ostream>
 #include <variant>
 
@@ -60,6 +61,18 @@ auto to_proc_ref(const EntRefNoWildcard& ent_ref) -> std::optional<ProcedureRefN
                       ent_ref);
 }
 
+auto to_proc_ref(const EntRef& ent_ref) -> std::optional<ProcedureRef> {
+    return std::visit(overloaded{[](const std::shared_ptr<Synonym>& x) -> std::optional<ProcedureRef> {
+                                     const auto try_ptr = std::dynamic_pointer_cast<ProcSynonym>(x);
+                                     return try_ptr == nullptr ? std::nullopt
+                                                               : std::make_optional(ProcedureRef{try_ptr});
+                                 },
+                                 [](const auto& x) -> std::optional<ProcedureRef> {
+                                     return x;
+                                 }},
+                      ent_ref);
+}
+
 auto operator<<(std::ostream& os, const Follows& follows) -> std::ostream& {
     os << "Follows(" << follows.stmt1 << ", " << follows.stmt2 << ")";
     return os;
@@ -100,4 +113,28 @@ auto operator<<(std::ostream& os, const ModifiesP& modifies) -> std::ostream& {
     return os;
 }
 
+auto operator<<(std::ostream& os, const Calls& calls) -> std::ostream& {
+    os << "Calls(" << calls.procedure1 << ", " << calls.procedure2 << ")";
+    return os;
+}
+
+auto operator<<(std::ostream& os, const CallsT& callsT) -> std::ostream& {
+    os << "Calls*(" << callsT.procedure1 << ", " << callsT.procedure2 << ")";
+    return os;
+}
+
+auto operator<<(std::ostream& os, const Next& next) -> std::ostream& {
+    os << "Next(" << next.stmt1 << ", " << next.stmt1 << ")";
+    return os;
+}
+
+auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream& {
+    os << "Next*(" << nextT.stmt1 << ", " << nextT.stmt1 << ")";
+    return os;
+}
+
+auto operator<<(std::ostream& os, const Affects& affects) -> std::ostream& {
+    os << "Affects(" << affects.stmt1 << ", " << affects.stmt1 << ")";
+    return os;
+}
 } // namespace qps

@@ -16,12 +16,21 @@ auto SuchThatClause::operator==(const SuchThatClause& other) const -> bool {
 
 auto PatternClause::representation() const -> std::string {
     std::stringstream ss;
-    ss << "Pattern(" << assign_synonym << ", " << ent_ref << ", " << expression_spec << ")";
+    ss << "Pattern(" << syntactic_pattern << ")";
     return ss.str();
 }
 
 auto PatternClause::operator==(const PatternClause& other) const -> bool {
-    return assign_synonym == other.assign_synonym && ent_ref == other.ent_ref &&
-           expression_spec == other.expression_spec;
+    return syntactic_pattern == other.syntactic_pattern;
+}
+
+auto WithClause::representation() const -> std::string {
+    std::stringstream ss;
+    ss << "With(" << ref1 << ", " << ref2 << ")";
+    return ss.str();
+}
+
+auto WithClause::operator==(const WithClause& other) const -> bool {
+    return ref1 == other.ref1 && ref2 == other.ref2;
 }
 } // namespace qps

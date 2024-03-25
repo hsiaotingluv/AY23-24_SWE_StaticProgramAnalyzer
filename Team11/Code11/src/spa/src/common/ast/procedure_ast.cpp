@@ -1,7 +1,7 @@
 #include "common/ast/procedure_ast.hpp"
 
 namespace sp {
-auto ProcedureNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto ProcedureNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     write_facade->add_procedure(proc_name);
 }
 
@@ -26,7 +26,7 @@ auto ProcedureNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return xml;
 }
 
-auto ProcedureNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+auto ProcedureNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                           const std::shared_ptr<ModifyMap>& modify_map)
     -> std::unordered_set<std::string> {
     // Modifies(p, v)
@@ -44,14 +44,14 @@ auto ProcedureNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& wr
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_procedure_modifies_var(proc_name, var);
+        write_facade->add_procedure_modify_var(proc_name, var);
     }
 
     modify_map->insert(std::make_pair(proc_name, combined_set));
     return combined_set;
 }
 
-auto ProcedureNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+auto ProcedureNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                             const std::shared_ptr<UsesMap>& uses_map,
                                             const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
@@ -70,13 +70,13 @@ auto ProcedureNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& 
     return combined_set;
 }
 
-auto ProcedureNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+auto ProcedureNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                       const std::shared_ptr<UsesMap>& uses_map) const
     -> std::unordered_set<std::string> {
     // Uses(p, v) holds if there is a statement s in p
     auto var_names_stmt_list = get_vars_from_stmt_list(write_facade, uses_map, stmt_list);
     for (const auto& var_name : var_names_stmt_list) {
-        write_facade->add_procedure_uses_var(proc_name, var_name);
+        write_facade->add_procedure_use_var(proc_name, var_name);
     }
     uses_map->insert(std::make_pair(proc_name, var_names_stmt_list));
     return var_names_stmt_list;

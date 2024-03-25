@@ -10,7 +10,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
-#include "pkb/pkb.h"
+#include "pkb/pkb_manager.h"
 
 #include "qps/parser.hpp"
 
@@ -18,8 +18,8 @@ class TestWrapper : public AbstractWrapper {
   private:
     std::shared_ptr<sp::SourceProcessor> source_processor;
 
-    std::shared_ptr<ReadFacade> read_facade;
-    std::shared_ptr<WriteFacade> write_facade;
+    std::shared_ptr<pkb::ReadFacade> read_facade;
+    std::shared_ptr<pkb::WriteFacade> write_facade;
 
     std::shared_ptr<qps::DefaultParser> qps_parser;
     std::shared_ptr<qps::QueryEvaluator> qps_evaluator;

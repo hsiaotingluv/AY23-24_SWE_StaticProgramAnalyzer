@@ -1,0 +1,26 @@
+// ai-gen start(copilot, 1, e)
+// prompt: used copilot - Additional comments: generate far far more test cases similar to the ones given
+constant c; Select c with c.value=1
+constant c; Select c with 0=c.value
+constant c; Select c with c.value=0 and c.value=1
+variable v; Select v with "x"=v.varName
+variable v; Select v with v.varName="x"
+stmt s; Select s with s.stmt#=5
+procedure p; Select p with p.procName="FizzBuzz"
+read r; Select r with r.varName="i"
+call c; Select c with c.procName="InnerProcedure"
+assign a; Select a with a.varName="fizz"
+if i; Select i with i.condition="fizz == 0"
+print p; Select p with p.stmt#=8
+call c; Select c with c.stmt#=12
+while w; Select w with w.stmt#=15
+if i; Select i with i.stmt#=20
+assign a; Select a with a.stmt#=25
+variable v; Select v with v.varName="x" and v.stmt#=30
+print p; Select p with p.varName="a" and p.stmt#=39
+constant c; Select c with c.value=10 and c.stmt#=40
+read r; Select r with r.varName="z" and r.stmt#=45
+call c; Select c with c.procName="AnotherProcedure" and c.stmt#=50
+while w; Select w with w.procName="FizzBuzz"
+if i; Select i with i.procName="Dummy"
+// ai-gen end

@@ -28,4 +28,11 @@ auto StatementListNode::get_children() -> std::vector<std::shared_ptr<AstNode>> 
     xml += "</" + get_node_name() + ">";
     return xml;
 }
+
+auto StatementListNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
+    for (const auto& node : statements) {
+        auto stmt_node = std::dynamic_pointer_cast<CfgMixin>(node);
+        stmt_node->build_cfg(cfg);
+    }
+}
 } // namespace sp

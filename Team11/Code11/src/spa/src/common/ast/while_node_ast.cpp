@@ -27,11 +27,18 @@ auto WhileNode::get_children() -> std::vector<std::shared_ptr<AstNode>> {
     return opening_xml + cond_expr_xml + body_xml + ending_xml;
 }
 
-auto WhileNode::populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
-    write_facade->add_statement(std::to_string(get_statement_number()), StatementType::While);
+auto WhileNode::populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
+    auto stmt_number = std::to_string(get_statement_number());
+    write_facade->add_statement(stmt_number, StatementType::While);
+
+    // populate patterns for while
+    auto var_names_cond_expr = get_vars_from_expr(cond_expr);
+    for (const auto& var_name : var_names_cond_expr) {
+        write_facade->add_while_var(stmt_number, var_name);
+    }
 }
 
-auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                       const std::shared_ptr<ModifyMap>& modify_map) -> std::unordered_set<std::string> {
     // Modifies(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
@@ -52,7 +59,7 @@ auto WhileNode::populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_
     }
 
     for (const auto& var : combined_set) {
-        write_facade->add_statement_modifies_var(stmt_number, var);
+        write_facade->add_statement_modify_var(stmt_number, var);
     }
 
     return combined_set;
@@ -77,7 +84,7 @@ auto WhileNode::get_vars_from_expr(const std::shared_ptr<AstNode>& node) const -
     return combined_set;
 }
 
-auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                         const std::shared_ptr<UsesMap>& uses_map,
                                         const std::shared_ptr<StatementListNode>& node)
     -> std::unordered_set<std::string> {
@@ -96,7 +103,7 @@ auto WhileNode::get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& writ
     return combined_set;
 }
 
-auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+auto WhileNode::populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                   const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> {
     // Uses(s, v) for s = While
     auto stmt_number = std::to_string(get_statement_number());
@@ -114,9 +121,9 @@ auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_faca
         combined_set.insert(var_name);
     }
 
-    // Add all variables to the PKB.
+    // Add all variables to the PkbManager.
     for (const auto& var_name : combined_set) {
-        write_facade->add_statement_uses_var(stmt_number, var_name);
+        write_facade->add_statement_use_var(stmt_number, var_name);
     }
 
     return combined_set;
@@ -124,7 +131,7 @@ auto WhileNode::populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_faca
 
 auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) -> std::unordered_set<std::string> {
     // Consider only directly nested statements (i.e. only Parent relationship). Indirectly nested statements (i.e.
-    // Parent* relationship) are handled by PKB.
+    // Parent* relationship) are handled by PkbManager.
     auto statement_nums = std::unordered_set<std::string>{};
     auto statements = node->statements;
     for (const auto& statement : statements) {
@@ -135,11 +142,33 @@ auto WhileNode::get_stmt_nums(const std::shared_ptr<StatementListNode>& node) ->
     return statement_nums;
 }
 
-auto WhileNode::populate_pkb_parent(const std::shared_ptr<WriteFacade>& write_facade) const -> void {
+auto WhileNode::populate_pkb_parent(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void {
     auto parent_statement_num = std::to_string(get_statement_number());
     auto children_statement_nums = get_stmt_nums(stmt_list);
     for (const auto& child_statement_num : children_statement_nums) {
         write_facade->add_parent(parent_statement_num, child_statement_num);
     }
 }
+
+auto WhileNode::build_cfg(std::shared_ptr<ProcedureCfg> cfg) -> void {
+    auto while_node = std::make_shared<CfgNode>();
+    auto loop_node = std::make_shared<CfgNode>();
+    auto end_node = std::make_shared<CfgNode>();
+
+    if (cfg->is_current_node_empty()) {       // If no statement in current node
+        while_node = cfg->get_current_node(); // Reuse Node
+    } else {
+        cfg->link_and_move_to(while_node); // Move to new While node.
+    }
+
+    auto stmt_num = get_statement_number();
+    cfg->add_stmt_to_node(stmt_num); // Add statement to While node.
+
+    // Build CFG for 'loop' branch.
+    cfg->link_and_move_to(loop_node);
+    stmt_list->build_cfg(cfg);
+    cfg->link_and_move_to(while_node); // Back to While node
+    cfg->link_and_move_to(end_node);   // Finally go to End node.
+}
+
 } // namespace sp

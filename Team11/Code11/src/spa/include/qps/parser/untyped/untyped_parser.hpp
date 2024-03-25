@@ -2,7 +2,8 @@
 
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
-#include "qps/parser/untyped/clause_parser.hpp"
+#include "qps/parser/untyped/clauses_parser.tpp"
+#include "qps/parser/untyped/parser_strategies.hpp"
 #include "qps/parser/untyped/result_cl_parser.hpp"
 #include "qps/parser/untyped/untyped_parser.tpp"
 #include "qps/template_utils.hpp"
@@ -11,12 +12,13 @@ namespace qps::untyped {
 using DefaultSupportedSynonyms = TypeList<AnyStmtSynonym, ReadSynonym, PrintSynonym, WhileSynonym, IfSynonym,
                                           AssignSynonym, CallSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
 
-using DefaultSupportedStmtStmtRelationships = TypeList<Follows, FollowsT, Parent, ParentT>;
-using DefaultSupportedRefEntRelationships = TypeList<ModifiesS, UsesS>;
 using DefaultSuchThatClausesParser =
-    SuchThatClausesParser<DefaultSupportedStmtStmtRelationships, DefaultSupportedRefEntRelationships>;
+    ClausesParser<SuchThatParserStrategy<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>>;
+using DefaultPatternClausesParser = ClausesParser<PatternParserStrategy>;
+using DefaultWithClausesParser = ClausesParser<WithParserStrategy>;
 
-using DefaultSupportedClauseParsers = TypeList<DefaultSuchThatClausesParser, PatternClausesParser>;
+using DefaultSupportedClauseParsers =
+    TypeList<DefaultSuchThatClausesParser, DefaultPatternClausesParser, DefaultWithClausesParser>;
 
 using DefaultUntypedParser =
     UntypedParser<DefaultSupportedSynonyms, DefaultSupportedSelectParsers, DefaultSupportedClauseParsers>;

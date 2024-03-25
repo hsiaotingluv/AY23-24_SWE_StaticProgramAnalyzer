@@ -3,12 +3,15 @@
 #include "catch.hpp"
 
 #include "common/ast/statement_ast.hpp"
+#include "sp/cfg/cfg_builder.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
 #include "sp/traverser/stmt_num_traverser.hpp"
 #include "sp/traverser/traverser.hpp"
 #include <vector>
+
+using namespace pkb;
 
 auto is_stmt_node(const std::shared_ptr<sp::AstNode>& node) -> bool {
     return (dynamic_cast<sp::StatementNode*>(node.get()) != nullptr);
@@ -65,14 +68,6 @@ auto print_stmt_num(const std::shared_ptr<sp::AstNode>& node) -> void {
 }
 
 TEST_CASE("Test Statement Number Traverser") {
-    auto tokenizer_runner =
-        std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
-    auto parser = std::make_shared<sp::ProgramParser>();
-
-    auto [read_facade, write_facade] = PKB::create_facades();
-
-    std::vector<std::shared_ptr<sp::Traverser>> traversers = {std::make_shared<sp::StmtNumTraverser>(write_facade)};
-    auto sp = sp::SourceProcessor{tokenizer_runner, parser, traversers};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -113,7 +108,10 @@ TEST_CASE("Test Statement Number Traverser") {
             normSq = cenX * cenX + cenY * cenY;
         })";
 
-        auto ast = sp.process(input);
+        auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
+        auto sp = sp::SourceProcessor::get_complete_sp(write_facade);
+        auto ast = sp->process(input);
+
         REQUIRE(require_stmt_num_populated(ast));
 
         const auto expected_output = std::vector<std::string>{

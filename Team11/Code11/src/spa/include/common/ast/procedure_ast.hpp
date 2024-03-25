@@ -9,11 +9,14 @@
 
 namespace sp {
 
+/**
+ * @brief ProcedureNode represents an AST Node that is a Procedure.
+ */
 class ProcedureNode : public AstNode, public DesignEntitiesMixin, public ModifiesMixin, public UsesMixin {
-    static auto get_vars_from_stmt_list(const std::shared_ptr<WriteFacade>& write_facade,
+    static auto get_vars_from_stmt_list(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                         const std::shared_ptr<UsesMap>& uses_map,
                                         const std::shared_ptr<StatementListNode>& node)
-        -> std::unordered_set<std::string>;
+        -> std::unordered_set<std::string>; // TODO: Move this function to a proper location, either public or private!
 
   public:
     std::string proc_name;
@@ -23,16 +26,22 @@ class ProcedureNode : public AstNode, public DesignEntitiesMixin, public Modifie
         : AstNode(sp::NodeType::Procedure), proc_name(std::move(proc_name)), stmt_list(stmt_list) {
     }
 
-    auto populate_pkb_entities(const std::shared_ptr<WriteFacade>& write_facade) const -> void override;
+    // ASTNode Methods
     auto get_children() -> std::vector<std::shared_ptr<AstNode>> override;
     [[nodiscard]] auto get_node_name() const -> std::string override;
     [[nodiscard]] auto identifier() const -> std::stringstream override;
     [[nodiscard]] auto to_xml() const -> std::string override;
-    auto populate_pkb_modifies(const std::shared_ptr<WriteFacade>& write_facade,
+
+    // DesignEntitiesMixin methods.
+    auto populate_pkb_entities(const std::shared_ptr<pkb::WriteFacade>& write_facade) const -> void override;
+
+    // ModifiesMixin methods.
+    auto populate_pkb_modifies(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                                const std::shared_ptr<ModifyMap>& modify_map)
         -> std::unordered_set<std::string> override;
 
-    auto populate_pkb_uses(const std::shared_ptr<WriteFacade>& write_facade,
+    // UsesMixin methods.
+    auto populate_pkb_uses(const std::shared_ptr<pkb::WriteFacade>& write_facade,
                            const std::shared_ptr<UsesMap>& uses_map) const -> std::unordered_set<std::string> override;
 };
 } // namespace sp
