@@ -11,10 +11,11 @@
 namespace qps::untyped {
 using DefaultSupportedSynonyms = TypeList<AnyStmtSynonym, ReadSynonym, PrintSynonym, WhileSynonym, IfSynonym,
                                           AssignSynonym, CallSynonym, VarSynonym, ConstSynonym, ProcSynonym>;
+using DefaultSupportedSyntacticPatternStrategies = TypeList<PatternParserAssignStrategy, PatternParserWhileStrategy, PatternParserIfStrategy>;
 
 using DefaultSuchThatClausesParser =
     ClausesParser<SuchThatParserStrategy<DefaultStmtStmtList, DefaultStmtEntList, DefaultEntEntList>>;
-using DefaultPatternClausesParser = ClausesParser<PatternParserStrategy>;
+using DefaultPatternClausesParser = ClausesParser<PatternParserStrategy<DefaultSupportedSyntacticPatternStrategies>>;
 using DefaultWithClausesParser = ClausesParser<WithParserStrategy>;
 
 using DefaultSupportedClauseParsers =
