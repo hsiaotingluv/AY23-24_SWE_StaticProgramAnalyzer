@@ -16,14 +16,10 @@
 #include "qps/evaluators/clause_evaluators/relationship/uses_p_evaluator.hpp"
 #include "qps/evaluators/clause_evaluators/relationship/uses_s_evaluator.hpp"
 
-#include "qps/evaluators/clause_evaluators/pattern/pattern_assign_evaluator.hpp"
-#include "qps/evaluators/clause_evaluators/pattern/pattern_if_evaluator.hpp"
-#include "qps/evaluators/clause_evaluators/pattern/pattern_while_evaluator.hpp"
-
 #include "qps/parser/entities/relationship.hpp"
 
 namespace qps {
-auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
+auto such_that_clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_facade) {
     return overloaded{
 
         [read_facade](const qps::Follows& follows) -> std::shared_ptr<ClauseEvaluator> {
@@ -74,21 +70,8 @@ auto clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& read_faca
             return std::make_shared<NextTEvaluator>(read_facade, calls);
         },
 
-        // TODO: move this to a separate file
-        [read_facade](const qps::PatternAssign& pattern) -> std::shared_ptr<ClauseEvaluator> {
-            return std::make_shared<PatternAssignEvaluator>(read_facade, pattern);
-        },
-
-        [read_facade](const qps::PatternIf& pattern) -> std::shared_ptr<ClauseEvaluator> {
-            return std::make_shared<PatternIfEvaluator>(read_facade, pattern);
-        },
-
-        [read_facade](const qps::PatternWhile& pattern) -> std::shared_ptr<ClauseEvaluator> {
-            return std::make_shared<PatternWhileEvaluator>(read_facade, pattern);
-        },
-
-        // TODO: add other clause evaluator cases here
-        [](const auto&) -> std::shared_ptr<ClauseEvaluator> {
+        [read_facade](const qps::Affects&) -> std::shared_ptr<ClauseEvaluator> {
+            // TODO: Implement Affects here
             return nullptr;
         }};
 };
