@@ -84,42 +84,14 @@ auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const std::sha
 }
 
 auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO: improve pkv API, has_follows_star
-    const auto follows_star_map = read_facade->get_all_follows_star();
-    bool stmt_1_is_followed = false;
-    bool stmt_2_is_following = false;
-    const auto stmt_1_string = stmt_num_1.value;
-    const auto stmt_2_string = stmt_num_2.value;
-    for (const auto& stmt_and_followers : follows_star_map) {
-        if (stmt_and_followers.first != stmt_1_string) {
-            continue;
-        }
-        stmt_1_is_followed = true;
-        for (const auto& follower : stmt_and_followers.second) {
-            if (follower == stmt_2_string) {
-                stmt_2_is_following = true;
-                break;
-            }
-        }
-    }
-    if (!stmt_1_is_followed || !stmt_2_is_following) {
+    if (!read_facade->has_follows_star_relation(stmt_num_1.value, stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};
 }
 
 auto FollowsTEvaluator::eval_follows_t(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
-    // TODO: Improve pkb API: bool is_followed_by_something
-    const auto all_followed_stmts = read_facade->get_all_follows_star_keys();
-    bool is_followed = false;
-    const auto stmt_num = stmt_num_1.value;
-    for (const auto& stmt : all_followed_stmts) {
-        if (stmt_num == stmt) {
-            is_followed = true;
-            break;
-        }
-    }
-    if (!is_followed) {
+    if (!read_facade->contains_follows_star_key(stmt_num_1.value)) {
         return Table{};
     }
     return UnitTable{};
@@ -141,17 +113,7 @@ auto FollowsTEvaluator::eval_follows_t(const WildCard&, const std::shared_ptr<St
 }
 
 auto FollowsTEvaluator::eval_follows_t(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO: Improve pkb API: bool is_following_star_something
-    const auto all_following_stmts = read_facade->get_all_follows_star_values();
-    bool is_following = false;
-    const auto stmt_num = stmt_num_2.value;
-    for (const auto& stmt : all_following_stmts) {
-        if (stmt_num == stmt) {
-            is_following = true;
-            break;
-        }
-    }
-    if (!is_following) {
+    if (!read_facade->contains_follows_star_value(stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};

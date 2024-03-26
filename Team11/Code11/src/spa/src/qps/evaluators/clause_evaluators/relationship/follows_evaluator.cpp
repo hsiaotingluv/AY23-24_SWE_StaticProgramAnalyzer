@@ -82,17 +82,7 @@ auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const Integer& st
 }
 
 auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
-    // TODO: Improve pkb API: bool is_followed_by_something
-    const auto all_followed_stmts = read_facade->get_all_follows_keys();
-    bool is_followed = false;
-    const auto stmt_num = stmt_num_1.value;
-    for (const auto& stmt : all_followed_stmts) {
-        if (stmt_num == stmt) {
-            is_followed = true;
-            break;
-        }
-    }
-    if (!is_followed) {
+    if (!read_facade->contains_follows_key(stmt_num_1.value)) {
         return Table{};
     }
     return UnitTable{};
@@ -113,17 +103,7 @@ auto FollowsEvaluator::eval_follows(const WildCard&, const std::shared_ptr<StmtS
 }
 
 auto FollowsEvaluator::eval_follows(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO: Improve pkb API: bool is_following_something
-    const auto all_following_stmts = read_facade->get_all_follows_values();
-    bool is_following = false;
-    const auto stmt_num = stmt_num_2.value;
-    for (const auto& stmt : all_following_stmts) {
-        if (stmt_num == stmt) {
-            is_following = true;
-            break;
-        }
-    }
-    if (!is_following) {
+    if (!read_facade->contains_follows_value(stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};

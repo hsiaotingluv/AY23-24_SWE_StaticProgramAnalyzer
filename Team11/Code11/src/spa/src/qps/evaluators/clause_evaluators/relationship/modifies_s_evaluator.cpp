@@ -19,7 +19,6 @@ auto ModifiesSEvaluator::evaluate() const -> OutputTable {
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
                                          const std::shared_ptr<qps::VarSynonym>& var_syn) const -> OutputTable {
-    // TODO: Improve pkb API: Get all statement that modifies and all variables that are modified
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
     const auto relevant_variables = var_syn->scan(read_facade);
 
@@ -28,9 +27,10 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 
     auto table = Table{{stmt_synonym, var_syn}};
 
+    const auto all_pairs = read_facade->get_all_statements_and_var_modify_pairs();
     for (const auto& stmt : stmt_vec) {
         for (const auto& v : var_vec) {
-            if (read_facade->contains_statement_modify_var(stmt, v)) {
+            if (all_pairs.find({stmt, v}) != all_pairs.end()) {
                 table.add_row({stmt, v});
             }
         }
@@ -58,21 +58,15 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const WildCard&) const
     -> OutputTable {
-    // TODO: Improve pkb API: Get all statement that modifies
     const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
+
+    const auto statements = read_facade->get_all_statements_that_modify();
+
     auto table = Table{{stmt_synonym}};
-
-    const auto variables = read_facade->get_variables();
-    const auto var_vec = std::vector<std::string>{variables.begin(), variables.end()};
-
-    for (const auto& var : var_vec) {
-        const auto statements = read_facade->get_statements_that_modify_var(var);
-        const auto stmt_vec = std::vector<std::string>{statements.begin(), statements.end()};
-
-        for (const auto& stmt : stmt_vec) {
-            if (relevant_stmts.find(stmt) != relevant_stmts.end()) {
-                table.add_row({stmt});
-            }
+    for (const auto& stmt : stmt_vec) {
+        if (statements.find(stmt) != statements.end()) {
+            table.add_row({stmt});
         }
     }
 

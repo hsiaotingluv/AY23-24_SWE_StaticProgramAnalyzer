@@ -89,17 +89,7 @@ auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const Integer& stmt
 }
 
 auto ParentEvaluator::eval_parent(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
-    // TODO: Improve pkb API: bool is_a_parent
-    const auto all_parents = read_facade->get_all_parent_keys();
-    bool is_parent = false;
-    const auto stmt_num = stmt_num_1.value;
-    for (const auto& parent_name : all_parents) {
-        if (stmt_num == parent_name) {
-            is_parent = true;
-            break;
-        }
-    }
-    if (!is_parent) {
+    if (!read_facade->contains_parent_key(stmt_num_1.value)) {
         return Table{};
     }
     return UnitTable{};
@@ -121,17 +111,7 @@ auto ParentEvaluator::eval_parent(const WildCard&, const std::shared_ptr<StmtSyn
 }
 
 auto ParentEvaluator::eval_parent(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO: Improve pkb API: bool has_a_parent
-    const auto all_children = read_facade->get_all_parent_values();
-    bool has_a_parent = false;
-    const auto stmt_num = stmt_num_2.value;
-    for (const auto& child_name : all_children) {
-        if (stmt_num == child_name) {
-            has_a_parent = true;
-            break;
-        }
-    }
-    if (!has_a_parent) {
+    if (!read_facade->contains_parent_value(stmt_num_2.value)) {
         return Table{};
     }
     return UnitTable{};
