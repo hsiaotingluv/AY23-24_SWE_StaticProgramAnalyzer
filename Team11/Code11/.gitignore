@@ -6,5 +6,5 @@ build/
 src/spa/docs/html
 src/spa/docs/latex
 
-# Benchmark script
-benchmark.sh
+# Benchmark scripts
+benchmark*
