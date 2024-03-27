@@ -1,6 +1,6 @@
 name: Code Coverage
 
-on: [ push ]
+on: [push]
 
 jobs:
   coverage_report:
@@ -21,12 +21,15 @@ jobs:
       - name: Setup LCOV
         uses: hrishikesh-kadam/setup-lcov@v1
 
+      - name: Install GCC
+        run: sudo apt update && sudo apt install -y gcc-12 g++-12
+
       - name: Build cmake
         run: |
           cd $GITHUB_WORKSPACE/Team11/Code11
           mkdir build
           cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_CXX_COMPILER=g++-12 -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           make -j4
           make SPA_coverage
 
@@ -38,7 +41,7 @@ jobs:
         uses: zgosalvez/github-actions-report-lcov@v3
         with:
           coverage-files: Team11/Code11/build/SPA_coverage.info
-          minimum-coverage: 50
+          minimum-coverage: 70
           artifact-name: code-coverage-report
           github-token: ${{ secrets.GITHUB_TOKEN }}
           update-comment: true
