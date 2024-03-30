@@ -48,18 +48,25 @@ struct Query {
         : declared(std::move(declared)), reference(std::vector<Elem>{std::move(synonym)}), clauses(std::move(clauses)) {
     }
 
-    auto operator<<(std::ostream& os) -> std::ostream& {
+    friend auto operator<<(std::ostream& os, const Query& query) -> std::ostream& {
         os << "Query:\n";
         os << "\tDeclared:\n";
-        for (const auto& declared : declared) {
+        for (const auto& declared : query.declared) {
             os << "\t\t" << declared << "\n";
         }
         os << "\tReference:\n";
-        os << "\t\t" << reference << "\n";
+        os << "\t\t" << query.reference << "\n";
         os << "\tClauses:\n";
-        for (const auto& clause : clauses) {
-            os << "\t\t" << clause << "\n";
+        for (const auto& clause : query.clauses) {
+            os << "\t\t";
+            if (clause == nullptr) {
+                os << "nullptr";
+            } else {
+                os << *clause;
+            }
+            os << "\n";
         }
+
         return os;
     }
 };
