@@ -6,7 +6,6 @@
 namespace qps {
 
 auto RedundancyOptimiser::optimise(const Query& query) const -> std::vector<Query> {
-    const auto& declared = query.declared;
     const auto& select = query.reference;
 
     const auto& clauses = query.clauses;
@@ -26,6 +25,6 @@ auto RedundancyOptimiser::optimise(const Query& query) const -> std::vector<Quer
         }
     }
 
-    return {Query{declared, select, redundant_removed}};
+    return {Query{select, redundant_removed}};
 }
 } // namespace qps

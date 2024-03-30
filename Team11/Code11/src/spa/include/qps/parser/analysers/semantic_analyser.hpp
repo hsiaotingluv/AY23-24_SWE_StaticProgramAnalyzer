@@ -36,24 +36,19 @@ inline auto operator<<(std::ostream& os, const Synonyms& reference) -> std::ostr
 }
 
 struct Query {
-    Synonyms declared;
     Reference reference;
     std::vector<std::shared_ptr<Clause>> clauses;
 
-    Query(Synonyms declared, Reference reference, std::vector<std::shared_ptr<Clause>> clauses)
-        : declared(std::move(declared)), reference(std::move(reference)), clauses(std::move(clauses)) {
+    Query(Reference reference, std::vector<std::shared_ptr<Clause>> clauses)
+        : reference(std::move(reference)), clauses(std::move(clauses)) {
     }
 
-    Query(Synonyms declared, std::shared_ptr<Synonym> synonym, std::vector<std::shared_ptr<Clause>> clauses)
-        : declared(std::move(declared)), reference(std::vector<Elem>{std::move(synonym)}), clauses(std::move(clauses)) {
+    Query(std::shared_ptr<Synonym> synonym, std::vector<std::shared_ptr<Clause>> clauses)
+        : reference(std::vector<Elem>{std::move(synonym)}), clauses(std::move(clauses)) {
     }
 
     friend auto operator<<(std::ostream& os, const Query& query) -> std::ostream& {
         os << "Query:\n";
-        os << "\tDeclared:\n";
-        for (const auto& declared : query.declared) {
-            os << "\t\t" << declared << "\n";
-        }
         os << "\tReference:\n";
         os << "\t\t" << query.reference << "\n";
         os << "\tClauses:\n";
@@ -150,7 +145,7 @@ class SemanticAnalyser {
             validated_clauses.push_back(maybe_validated_clause.value());
         }
 
-        return Query{declarations, reference, validated_clauses};
+        return Query{reference, validated_clauses};
     }
 };
 

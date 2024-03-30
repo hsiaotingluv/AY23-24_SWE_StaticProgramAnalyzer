@@ -35,10 +35,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(p, v)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-                std::make_shared<VarSynonym>("v"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
@@ -51,10 +47,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select v such that Modifies(p, v)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-                std::make_shared<VarSynonym>("v"),
-            },
             std::make_shared<VarSynonym>("v"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
@@ -67,9 +59,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(p, \"a\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{std::make_shared<ProcSynonym>("p"), qps::QuotedIdent("a")},
@@ -82,9 +71,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(p, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
@@ -97,9 +83,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select v such that Modifies(\"p\", v)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<VarSynonym>("v"),
-            },
             std::make_shared<VarSynonym>("v"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{QuotedIdent("proc1"), std::make_shared<VarSynonym>("v")},
@@ -112,9 +95,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(\"p\", \"v\") returns all procedures if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{QuotedIdent("proc1"), QuotedIdent("a")}, false),
@@ -126,9 +106,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(\"p\", \"v\") returns no procedures if false") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{QuotedIdent("proc3"), QuotedIdent("b")}, false),
@@ -140,9 +117,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(\"p\", _) returns all procedures if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{QuotedIdent("proc1"), WildCard()}, false),
@@ -154,9 +128,6 @@ TEST_CASE("Test Evaluator ModifiesP") {
 
     SECTION("Evaluate - Select p such that Modifies(\"p\", _) returns no procedures if false") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(ModifiesP{QuotedIdent("proc3"), WildCard()}, false),

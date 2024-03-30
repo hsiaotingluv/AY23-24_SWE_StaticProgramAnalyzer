@@ -15,9 +15,6 @@ TEST_CASE("Test RedundancyOptimiser - Remove redundant clause") {
 
     SECTION("Redundancy - No redundant clause") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}, false),
@@ -28,7 +25,6 @@ TEST_CASE("Test RedundancyOptimiser - Remove redundant clause") {
         REQUIRE(results.size() == 1);
 
         const auto result = results[0];
-        REQUIRE(result.declared == query.declared);
         REQUIRE(std::holds_alternative<std::vector<Elem>>(query.reference));
         REQUIRE(std::holds_alternative<std::vector<Elem>>(result.reference));
         REQUIRE(std::get<std::vector<Elem>>(query.reference) == std::get<std::vector<Elem>>(result.reference));
@@ -37,9 +33,6 @@ TEST_CASE("Test RedundancyOptimiser - Remove redundant clause") {
 
     SECTION("Redundancy - Remove 1 redundant clause") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}, false),
@@ -51,7 +44,6 @@ TEST_CASE("Test RedundancyOptimiser - Remove redundant clause") {
         REQUIRE(results.size() == 1);
 
         const auto result = results[0];
-        REQUIRE(result.declared == query.declared);
         REQUIRE(std::holds_alternative<std::vector<Elem>>(query.reference));
         REQUIRE(std::holds_alternative<std::vector<Elem>>(result.reference));
         REQUIRE(std::get<std::vector<Elem>>(query.reference) == std::get<std::vector<Elem>>(result.reference));
