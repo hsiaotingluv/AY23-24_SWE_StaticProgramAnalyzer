@@ -10,15 +10,19 @@
 #include <vector>
 
 namespace qps {
+auto QueryEvaluator::optimise(const Query& query_obj) const -> std::vector<Query> {
+    const auto queries = std::vector<Query>{query_obj};
+    return optimiser->optimise(queries);
+}
 
-auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
+auto QueryEvaluator::evaluate_query(const Query& query_obj) -> OutputTable {
     const auto reference = query_obj.reference;
 
     auto curr_table = OutputTable{UnitTable{}};
 
     if (query_obj.clauses.empty()) {
         // Short-circuit if there are no clauses
-        return project(read_facade, curr_table, query_obj.reference);
+        return project_to_table(read_facade, curr_table, reference);
     }
 
     // Step 1: populate all synonyms
@@ -38,7 +42,7 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
             std::cerr << "Failed to create evaluator for clause: " << *clause << std::endl;
 #endif
             auto empty_table = OutputTable{Table{}};
-            return project(read_facade, empty_table, query_obj.reference);
+            return project_to_table(read_facade, empty_table, reference);
         }
 
         auto next_table = evaluator->evaluate();
@@ -46,7 +50,7 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 #ifdef DEBUG
             std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
 #endif
-            return project(read_facade, next_table, query_obj.reference);
+            return project_to_table(read_facade, next_table, reference);
         }
 
         curr_table = join(std::move(curr_table), std::move(next_table));
@@ -54,6 +58,27 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
 #ifdef DEBUG
             std::cerr << "Conflict detected for clause: " << *clause << std::endl;
 #endif
+            return project_to_table(read_facade, curr_table, reference);
+        }
+    }
+
+    return project_to_table(read_facade, curr_table, reference);
+}
+
+auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
+    // Step 1: optimise query
+    const auto optimised_queries = optimise(query_obj);
+
+    // Step 2: evaluate optimised queries
+    auto curr_table = OutputTable{UnitTable{}};
+    for (const auto& query : optimised_queries) {
+        auto next_table = evaluate_query(query);
+        if (is_empty(next_table)) {
+            return project(read_facade, next_table, query_obj.reference);
+        }
+
+        curr_table = join(std::move(curr_table), std::move(next_table));
+        if (is_empty(curr_table)) {
             return project(read_facade, curr_table, query_obj.reference);
         }
     }

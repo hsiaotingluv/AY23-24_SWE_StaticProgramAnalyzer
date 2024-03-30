@@ -192,7 +192,7 @@ auto parse_stmt_ent(std::vector<Token>::const_iterator it, const std::vector<Tok
     }
     it = std::next(it, 1);
     return std::make_tuple(UntypedRefEntRel{keyword, stmt_ref, ent_ref}, it);
-};
+}
 
 template <typename T>
 auto parse_ent_ent(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)

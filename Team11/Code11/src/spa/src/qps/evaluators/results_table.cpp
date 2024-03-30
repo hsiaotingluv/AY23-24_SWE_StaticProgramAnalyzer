@@ -656,6 +656,48 @@ static auto process_missing_synonym(const std::shared_ptr<pkb::ReadFacade>& read
     return std::get<Table>(detail::cross_join(std::move(table), std::move(missing_table)));
 }
 
+auto project_to_table(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table,
+                      const Reference& reference, bool should_transform) -> OutputTable {
+    return std::visit(
+        overloaded{
+            [](const Table& table, const BooleanReference&) -> OutputTable {
+                return table.empty() ? OutputTable{Table{}} : UnitTable{};
+            },
+            [](const UnitTable&, const BooleanReference&) -> OutputTable {
+                return UnitTable{};
+            },
+            [&read_facade, should_transform](const UnitTable&, const std::vector<Elem>& elems) -> OutputTable {
+                // Evaluator produces "True", so we first need to build the full table before doing the
+                // projection
+                const auto synonyms = detail::to_synonyms(elems);
+                const auto used_elements = should_transform ? elems
+                                                            : std::vector<Elem>{
+                                                                  synonyms.begin(),
+                                                                  synonyms.end(),
+                                                              };
+
+                auto final_table = detail::build_full_table(synonyms, read_facade);
+                project_and_transform_table(final_table, used_elements, read_facade);
+                return final_table;
+            },
+            [&read_facade, should_transform](Table& table, const std::vector<Elem>& elems) -> OutputTable {
+                // Evaluator produces table, so we need to project the table based on the
+                // elements
+                const auto synonyms = detail::to_synonyms(elems);
+                const auto used_elements = should_transform ? elems
+                                                            : std::vector<Elem>{
+                                                                  synonyms.begin(),
+                                                                  synonyms.end(),
+                                                              };
+
+                auto final_table = process_missing_synonym(read_facade, table, used_elements);
+                project_and_transform_table(final_table, used_elements, read_facade);
+                return final_table;
+            },
+        },
+        table, reference);
+}
+
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string> {
     static constexpr auto TRUE_STRING = "TRUE";
@@ -664,29 +706,24 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
     static const auto TRUE_VALUE = std::vector<std::string>{TRUE_STRING};
     static const auto FALSE_VALUE = std::vector<std::string>{FALSE_STRING};
 
+    const auto final_table = project_to_table(read_facade, table, reference, true);
     return std::visit(overloaded{
-                          [](const Table& table, const BooleanReference&) -> std::vector<std::string> {
-                              return table.empty() ? FALSE_VALUE : TRUE_VALUE;
+                          [&final_table](const BooleanReference&) -> std::vector<std::string> {
+                              if (std::holds_alternative<UnitTable>(final_table)) {
+                                  return TRUE_VALUE;
+                              } else {
+                                  return std::get<Table>(final_table).empty() ? FALSE_VALUE : TRUE_VALUE;
+                              }
                           },
-                          [](const UnitTable&, const BooleanReference&) -> std::vector<std::string> {
-                              return TRUE_VALUE;
-                          },
-                          [&read_facade](const UnitTable&, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                              // Evaluator produces "True", so we first need to build the full table before doing the
-                              // projection
-                              auto final_table = detail::build_full_table(detail::to_synonyms(elems), read_facade);
-                              project_and_transform_table(final_table, elems, read_facade);
-                              return to_string(final_table);
-                          },
-                          [&read_facade](Table& table, const std::vector<Elem>& elems) -> std::vector<std::string> {
-                              // Evaluator produces table, so we need to project the table based on the
-                              // elements
-                              auto final_table = process_missing_synonym(read_facade, table, elems);
-                              project_and_transform_table(final_table, elems, read_facade);
-                              return to_string(final_table);
+                          [&final_table](const std::vector<Elem>&) -> std::vector<std::string> {
+                              if (is_empty(final_table)) {
+                                  return {};
+                              } else {
+                                  return to_string(std::get<Table>(final_table)); // Safe: this cannot be a UnitTable
+                              }
                           },
                       },
-                      table, reference);
+                      reference);
 }
 
 void print(const Table& table) {
