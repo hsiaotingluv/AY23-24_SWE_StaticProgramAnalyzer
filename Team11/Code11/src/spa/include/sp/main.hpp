@@ -56,8 +56,8 @@ class SourceProcessor {
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
                     std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> program_cfgs,
                     const std::vector<std::shared_ptr<Traverser>>&& traversers,
-                    std::shared_ptr<NextTraverser> next_traverser,
-                    const std::shared_ptr<pkb::WriteFacade>& write_facade, std::shared_ptr<AffectsTraverser> affects_traverser)
+                    std::shared_ptr<NextTraverser> next_traverser, std::shared_ptr<AffectsTraverser> affects_traverser,
+                    const std::shared_ptr<pkb::WriteFacade>& write_facade)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
           program_cfgs(std::move(program_cfgs)), design_abstr_traversers(traversers),
           next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)), write_facade(write_facade), call_graph_traverser(write_facade) {}

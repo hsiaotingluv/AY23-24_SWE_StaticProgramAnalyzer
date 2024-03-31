@@ -8,13 +8,14 @@ namespace sp {
  */
 auto AffectsTraverser::get_statement_numbers(const std::shared_ptr<ProcedureCfg>& cfg) -> StatementNumbers {
     auto graph = cfg->get_graph();
-    std::vector<std::string> stmt_nos;
+    StatementNumbers stmt_nos;
     for (const auto& [node, _] : graph) { // Traverse all nodes (key) of the graph will suffice.
         auto stmts = node->get();
         for (const auto& stmt : stmts) {
-            stmt_nos.push_back(std::to_string(stmt));
+            stmt_nos.push_back(stmt);
         }
     }
+    return stmt_nos;
 }
 
 /**
