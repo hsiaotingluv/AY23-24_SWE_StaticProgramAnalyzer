@@ -1,0 +1,11 @@
+// ai-gen start(copilot, 1, e)
+// prompt: used copilot - Additional comments: generate far far more test cases similar to the ones given
+stmt Uses; Select Uses such that Uses(Uses, _)
+stmt Follows; Select Follows such that Follows(Follows, _)
+stmt Parent; Select Parent such that Parent(Parent, _)
+stmt Modifies; Select Modifies such that Modifies(Modifies, _)
+stmt Calls; Select Calls such that Calls(Calls, _)
+stmt Next; Select Next such that Next(Next, _)
+assign pattern; Select pattern pattern pattern ("pattern", _)
+stmt with; Select with with with.stmt# = with.stmt#
+// ai-gen end

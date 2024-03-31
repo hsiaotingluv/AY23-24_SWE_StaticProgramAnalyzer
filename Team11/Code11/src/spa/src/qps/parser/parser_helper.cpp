@@ -43,7 +43,7 @@ auto is_keyword(const Token& token, const std::string& keyword) -> bool {
 }
 
 auto is_relationship_keyword(const Token& token, const std::string& keyword) -> bool {
-    return token.T == TokenType::Relationship && token.content == keyword;
+    return token.T == TokenType::String && token.content == keyword;
 }
 
 auto is(const Token& token, const std::string& content) -> bool {

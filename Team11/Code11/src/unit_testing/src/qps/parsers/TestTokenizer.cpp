@@ -66,7 +66,7 @@ TEST_CASE("Test QPS Tokenizer") {
         REQUIRE(result[8].T == TokenType::String);
 
         REQUIRE(result[9].content == "Modifies");
-        REQUIRE(result[9].T == TokenType::Relationship);
+        REQUIRE(result[9].T == TokenType::String);
 
         REQUIRE(result[10].content == "(");
         REQUIRE(result[10].T == TokenType::LParen);
@@ -102,7 +102,7 @@ TEST_CASE("Test QPS Tokenizer") {
 
         REQUIRE(result.size() == 10);
         REQUIRE(result[0].content == "Follows*");
-        REQUIRE(result[0].T == TokenType::Relationship);
+        REQUIRE(result[0].T == TokenType::String);
 
         REQUIRE(result[1].content == "(");
         REQUIRE(result[1].T == TokenType::LParen);

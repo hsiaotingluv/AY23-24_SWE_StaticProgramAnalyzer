@@ -1089,3 +1089,44 @@ TEST_CASE("Test QPS - Select attrRef") {
         REQUIRE(is_syntax_error(output));
     }
 }
+
+TEST_CASE("Test QPS - Weird synonym names") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query - Select Uses") {
+        const auto query = "stmt Uses; Select Uses such that Uses(Uses, \"v\")";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 1);
+        require_value<AnyStmtSynonym>(result.declared[0], "Uses");
+        require_value<AnyStmtSynonym>(result.reference, "Uses");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause =
+            std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"Uses"}), QuotedIdent{"v"}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query - Select Pattern") {
+        const auto query = "stmt Parent; stmt Follows; Select Parent such that Follows (Parent, Follows)";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        REQUIRE(result.declared.size() == 2);
+        require_value<AnyStmtSynonym>(result.declared[0], "Parent");
+        require_value<AnyStmtSynonym>(result.declared[1], "Follows");
+
+        require_value<AnyStmtSynonym>(result.reference, "Parent");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause =
+            std::make_shared<SuchThatClause>(Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"Parent"})},
+                                                     StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"Follows"})}});
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+}
