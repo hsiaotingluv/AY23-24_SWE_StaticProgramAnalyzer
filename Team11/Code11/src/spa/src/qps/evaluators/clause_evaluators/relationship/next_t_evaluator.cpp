@@ -1,5 +1,5 @@
-#include "qps/utils/algo.h"
 #include "qps/evaluators/clause_evaluators/relationship/next_t_evaluator.hpp"
+#include "qps/utils/algo.h"
 #include <stack>
 
 namespace qps {
