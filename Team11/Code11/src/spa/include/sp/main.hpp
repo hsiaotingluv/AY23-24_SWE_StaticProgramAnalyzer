@@ -3,10 +3,11 @@
 #include "common/tokeniser/runner.hpp"
 
 #include "common/ast/ast.hpp"
-#include "sp/cfg/cfg_builder.hpp"
+#include "sp/cfg/program_cfgs.hpp"
 #include "sp/parser/parser.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
+#include "sp/traverser/affects_traverser.hpp"
 #include "sp/traverser/design_entites_populator_traverser.hpp"
 #include "sp/traverser/follows_traverser.hpp"
 #include "sp/traverser/modifies_traverser.hpp"
@@ -35,32 +36,31 @@ class SourceProcessor {
     std::shared_ptr<TokenizerRunner> tokenizer_runner;
     std::shared_ptr<Parser> parser;
     std::shared_ptr<StmtNumTraverser> stmt_num_traverser;
-    std::shared_ptr<ProgramCfgs> cfg_builder;
+    std::shared_ptr<ProgramCfgs> program_cfgs;
     std::vector<std::shared_ptr<Traverser>> design_abstr_traversers;
     std::shared_ptr<NextTraverser> next_traverser;
+    std::shared_ptr<AffectsTraverser> affects_traverser;
     std::shared_ptr<pkb::WriteFacade> write_facade;
     SemanticValidator semantic_validator{};
     CallGraphTraverser call_graph_traverser;
 
   public:
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
-                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> cfg_builder,
+                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> program_cfgs,
                     const std::vector<std::shared_ptr<Traverser>>& traversers,
-                    std::shared_ptr<NextTraverser> next_traverser)
+                    std::shared_ptr<NextTraverser> next_traverser, std::shared_ptr<AffectsTraverser> affects_traverser)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
-          cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers),
-          next_traverser(std::move(next_traverser)) {
-    }
+          program_cfgs(std::move(program_cfgs)), design_abstr_traversers(traversers),
+          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)) {}   
 
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
-                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> cfg_builder,
+                    std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> program_cfgs,
                     const std::vector<std::shared_ptr<Traverser>>&& traversers,
                     std::shared_ptr<NextTraverser> next_traverser,
-                    const std::shared_ptr<pkb::WriteFacade>& write_facade)
+                    const std::shared_ptr<pkb::WriteFacade>& write_facade, std::shared_ptr<AffectsTraverser> affects_traverser)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
-          cfg_builder(std::move(cfg_builder)), design_abstr_traversers(traversers),
-          next_traverser(std::move(next_traverser)), write_facade(write_facade), call_graph_traverser(write_facade) {
-    }
+          program_cfgs(std::move(program_cfgs)), design_abstr_traversers(traversers),
+          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)), write_facade(write_facade), call_graph_traverser(write_facade) {}
 
     static auto get_complete_sp(const std::shared_ptr<pkb::WriteFacade>& write_facade)
         -> std::shared_ptr<SourceProcessor> {
@@ -72,7 +72,7 @@ class SourceProcessor {
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
                 std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
-            std::make_shared<NextTraverser>(write_facade), write_facade);
+            std::make_shared<NextTraverser>(write_facade), std::make_shared<AffectsTraverser>(write_facade), write_facade);
     }
 
     static auto output_xml(const std::shared_ptr<AstNode>& ast_node) -> std::string {
@@ -113,7 +113,7 @@ class SourceProcessor {
         // Step 3.2 Execute Statement Number Traverser （Update AST)
         ast = stmt_num_traverser->traverse(ast, procedure_topology_orders);
         // Step 3.3 Build CFG
-        auto cfgs = cfg_builder->build(ast);
+        auto cfgs = program_cfgs->build(ast);
         // Step 3.4 Extract Call Graph
         call_graph_traverser.traverse(semantic_validator.get_call_graph());
 
@@ -122,8 +122,9 @@ class SourceProcessor {
             ast = traverser->traverse(ast, procedure_topology_orders);
         }
 
-        // Step 5. Execute Next Traverser
+        // Step 5. Execute Next & Affects Traverser
         next_traverser->traverse(cfgs);
+        affects_traverser->traverse(cfgs);
 
         // Step 6. If writing to pkb, finalise pkb.
         if (write_facade != nullptr) {
