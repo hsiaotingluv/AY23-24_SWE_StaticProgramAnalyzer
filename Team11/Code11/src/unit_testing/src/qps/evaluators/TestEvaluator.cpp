@@ -280,7 +280,7 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
             },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}, false),
             },
         };
 
@@ -360,7 +360,7 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
             },
             std::vector<Elem>{AttrRef{std::make_shared<PrintSynonym>("pn"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<PrintSynonym>("pn"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<PrintSynonym>("pn"), WildCard{}}, false),
             },
         };
 
@@ -441,7 +441,7 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
             },
             std::vector<Elem>{AttrRef{std::make_shared<CallSynonym>("c"), ProcName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<CallSynonym>("c"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<CallSynonym>("c"), WildCard{}}, false),
             },
         };
 

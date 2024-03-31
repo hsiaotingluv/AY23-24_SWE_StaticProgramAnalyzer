@@ -5,7 +5,13 @@
 
 namespace qps {
 
-struct Clause {
+class Clause {
+    bool is_negated;
+
+  public:
+    Clause(bool is_negated) : is_negated(is_negated) {
+    }
+
     virtual ~Clause() = default;
 
     friend auto operator<<(std::ostream& os, const Clause& clause) -> std::ostream& {
@@ -22,12 +28,16 @@ struct Clause {
     }
 
     [[nodiscard]] virtual auto is_equal(const Clause& other) const -> bool = 0;
+
+    [[nodiscard]] auto is_negated_clause() const -> bool {
+        return is_negated;
+    }
 };
 
-struct SuchThatClause : public Clause {
+struct SuchThatClause final : public Clause {
     Relationship rel_ref;
 
-    explicit SuchThatClause(Relationship rel_ref) : rel_ref(std::move(rel_ref)) {
+    explicit SuchThatClause(Relationship rel_ref, bool is_negated) : Clause(is_negated), rel_ref(std::move(rel_ref)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
@@ -42,10 +52,11 @@ struct SuchThatClause : public Clause {
     }
 };
 
-struct PatternClause : public Clause {
+struct PatternClause final : public Clause {
     SyntacticPattern syntactic_pattern;
 
-    explicit PatternClause(SyntacticPattern syntactic_pattern) : syntactic_pattern(std::move(syntactic_pattern)) {
+    explicit PatternClause(SyntacticPattern syntactic_pattern, bool is_negated)
+        : Clause(is_negated), syntactic_pattern(std::move(syntactic_pattern)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
@@ -60,11 +71,12 @@ struct PatternClause : public Clause {
     }
 };
 
-struct WithClause : public Clause {
+struct WithClause final : public Clause {
     TypedRef ref1;
     TypedRef ref2;
 
-    WithClause(TypedRef ref1, TypedRef ref2) : ref1(std::move(ref1)), ref2(std::move(ref2)) {
+    WithClause(TypedRef ref1, TypedRef ref2, bool is_negated)
+        : Clause(is_negated), ref1(std::move(ref1)), ref2(std::move(ref2)) {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
