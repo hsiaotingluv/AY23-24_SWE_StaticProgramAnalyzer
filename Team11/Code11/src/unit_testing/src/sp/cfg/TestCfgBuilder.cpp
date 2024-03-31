@@ -3,7 +3,7 @@
 #include "catch.hpp"
 
 #include "common/cfg/cfg.hpp"
-#include "sp/cfg/cfg_builder.hpp"
+#include "sp/cfg/program_cfgs.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"
@@ -200,12 +200,13 @@ TEST_CASE("Test CFG Builder") {
         std::make_shared<tokenizer::TokenizerRunner>(std::make_unique<sp::SourceProcessorTokenizer>(), true);
     auto parser = std::make_shared<sp::ProgramParser>();
     auto [read_facade, write_facade] = PkbManager::create_facades();
-    auto cfg_builder = std::make_shared<sp::ProgramCfgs>();
+    auto program_cfgs = std::make_shared<sp::ProgramCfgs>();
     auto stmt_num_traverser = std::make_shared<sp::StmtNumTraverser>(write_facade);
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
     auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
-    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, cfg_builder,
-                                  design_abstr_traversers, next_traverser};
+    auto affects_traverser = std::make_shared<sp::AffectsTraverser>(write_facade);
+    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, program_cfgs,
+                                  design_abstr_traversers, next_traverser, affects_traverser};
 
     SECTION("complex program Code 4 - success") {
         std::string input = R"(procedure main {
@@ -247,7 +248,7 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         /**
-         * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
+         * FYI : std::cout << *program_cfgs << std::endl; returns the below string representation of the Control Flow
          * Graph.
          *
          * computeCentroid:
@@ -267,8 +268,8 @@ TEST_CASE("Test CFG Builder") {
          */
 
         auto ast = sp.process(input);
-        auto proc_map = cfg_builder->get_proc_map();
-        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto proc_map = program_cfgs->get_proc_map();
+        auto stmt_num_map = program_cfgs->get_stmt_num_map();
         auto stmt_names = std::unordered_set<std::string>{"main", "readPoint", "printResults", "computeCentroid"};
 
         REQUIRE(get_proc_names(proc_map) == stmt_names);
@@ -315,7 +316,7 @@ TEST_CASE("Test CFG Builder") {
         })";
 
         /**
-         * FYI : std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow
+         * FYI : std::cout << *program_cfgs << std::endl; returns the below string representation of the Control Flow
          * Graph.
          *
          * computeCentroid:
@@ -327,8 +328,8 @@ TEST_CASE("Test CFG Builder") {
          * Node(1) -> OutNeighbours(Node(2, 3, 4), Node(5))
          */
         auto ast = sp.process(input);
-        auto proc_map = cfg_builder->get_proc_map();
-        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto proc_map = program_cfgs->get_proc_map();
+        auto stmt_num_map = program_cfgs->get_stmt_num_map();
         auto stmt_names = std::unordered_set<std::string>{"computeCentroid"};
 
         REQUIRE(get_proc_names(proc_map) == stmt_names);
@@ -358,7 +359,7 @@ TEST_CASE("Test CFG Builder") {
         )";
 
         /**
-         * std::cout << *cfg_builder << std::endl; returns the below string representation of the Control Flow Graph.
+         * std::cout << *program_cfgs << std::endl; returns the below string representation of the Control Flow Graph.
          *
          * computeCentroid:
          * Node(7) -> OutNeighbours(Node()) // read j
@@ -374,8 +375,8 @@ TEST_CASE("Test CFG Builder") {
          */
 
         auto ast = sp.process(input);
-        auto proc_map = cfg_builder->get_proc_map();
-        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto proc_map = program_cfgs->get_proc_map();
+        auto stmt_num_map = program_cfgs->get_stmt_num_map();
         auto stmt_names = std::unordered_set<std::string>{"nesting"};
 
         REQUIRE(get_proc_names(proc_map) == stmt_names);
@@ -401,8 +402,8 @@ TEST_CASE("Test CFG Builder") {
         )";
 
         auto ast = sp.process(input);
-        auto proc_map = cfg_builder->get_proc_map();
-        auto stmt_num_map = cfg_builder->get_stmt_num_map();
+        auto proc_map = program_cfgs->get_proc_map();
+        auto stmt_num_map = program_cfgs->get_stmt_num_map();
         auto stmt_names = std::unordered_set<std::string>{"whileIf"};
 
         REQUIRE(get_proc_names(proc_map) == stmt_names);
