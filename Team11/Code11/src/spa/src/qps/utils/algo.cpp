@@ -221,3 +221,90 @@ get_next_star_pairs(const std::unordered_map<std::string, std::unordered_set<std
 
     return next_star_result;
 }
+
+// Check whether there's a transitive rs
+bool has_transitive_rs(const std::string& node1, const std::string& node2,
+                       const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
+                       std::function<bool(const std::string&)> start_node_cond,
+                       std::function<bool(const std::string&)> end_node_cond,
+                       std::function<bool(const std::string&)> intermediate_node_cond) {
+    if (!start_node_cond(node1) || !end_node_cond(node2)) {
+        return false;
+    }
+
+    std::unordered_set<std::string> visited;
+    std::stack<std::string> stack;
+
+    auto it = map.find(node1);
+    if (it != map.end()) {
+        for (const auto& child_node : it->second) {
+            stack.push(child_node);
+        }
+    }
+
+    while (!stack.empty()) {
+        // Get top of stack
+        const auto current = stack.top();
+        stack.pop();
+
+        if (current == node2) {
+            return true;
+        }
+
+        // If already visited or does not pass the intermediate node condition, skip
+        if (visited.find(current) != visited.end() || !intermediate_node_cond(current)) {
+            continue;
+        }
+
+        // Else, add to visited
+        visited.insert(current);
+
+        // Add all next nodes to stack
+        auto it_current = map.find(current);
+        if (it_current != map.end()) {
+            for (const auto& next_node : it_current->second) {
+                stack.push(next_node);
+            }
+        }
+    }
+
+    return false;
+}
+
+std::unordered_set<std::string>
+get_all_transitive_from_node(const std::string& node,
+                             const std::unordered_map<std::string, std::unordered_set<std::string>>& map) {
+    std::unordered_set<std::string> result;
+    std::stack<std::string> stack;
+
+    auto it = map.find(node);
+    if (it != map.end()) {
+        for (const auto& next_node : it->second) {
+            stack.push(next_node);
+        }
+    }
+
+    while (!stack.empty()) {
+        // Get top of stack
+        const auto current = stack.top();
+        stack.pop();
+
+        // If already visited or is the starting node, skip
+        if (result.find(current) != result.end()) {
+            continue;
+        }
+
+        // Else, add to result
+        result.insert(current);
+
+        // Add all next nodes to stack
+        auto it_current = map.find(current);
+        if (it_current != map.end()) {
+            for (const auto& next_node : it_current->second) {
+                stack.push(next_node);
+            }
+        }
+    }
+
+    return result;
+}

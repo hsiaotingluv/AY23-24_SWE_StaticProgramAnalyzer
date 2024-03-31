@@ -1,4 +1,7 @@
 #include "qps/evaluators/clause_evaluators/relationship/affects_evaluator.hpp"
+#include "qps/utils/affects_conditions.h"
+#include "qps/utils/algo.h"
+
 #include <stack>
 
 namespace qps {
@@ -9,13 +12,6 @@ auto AffectsEvaluator::select_eval_method() const {
     }};
 }
 
-/*
- * Affects(s1, s2) holds IF
- * a1 and a2 are in the same procedure
- * a1 modifies a variable v which is used in a2
- * There is a path from a1 to a2 and v is not modified in any assignment, read, or procedure call stmt
- * (not container stmt (if/while) or procedure declaration) in that path
- */
 auto AffectsEvaluator::evaluate() const -> OutputTable {
     return std::visit(select_eval_method(), affects.stmt1, affects.stmt2);
 }
@@ -41,7 +37,19 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
 }
 
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO:
+    const auto next_map = read_facade->get_all_next();
+
+    auto affect_conds = AffectsConditions(stmt_num_1.value, stmt_num_2.value, read_facade);
+
+    auto has_transitive =
+        has_transitive_rs(stmt_num_1.value, stmt_num_2.value, next_map, affect_conds.get_start_node_cond(),
+                          affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+    if (has_transitive) {
+        return UnitTable{};
+    }
+
+    return Table{};
 }
 
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
