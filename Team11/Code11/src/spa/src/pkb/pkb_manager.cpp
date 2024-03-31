@@ -1,4 +1,5 @@
 #include "pkb/pkb_manager.h"
+#include "common/utils/algo.h"
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
@@ -915,30 +916,13 @@ void PkbManager::populate_star_from_direct(std::shared_ptr<DirectStore> direct_s
     }
 }
 
-struct OrderingBySecondElement {
-    template <class T>
-    auto operator()(const T& a, const T& b) const -> bool {
-        return stoi(std::get<1>(a)) < stoi(std::get<1>(b));
-    }
-};
+void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_string_order) {
+    std::vector<Procedure> procedure_order;
+    std::transform(procedure_string_order.begin(), procedure_string_order.end(), std::back_inserter(procedure_order),
+                   [](const std::string& s) {
+                       return Procedure(s);
+                   });
 
-class OrderingByIndexMap {
-    std::unordered_map<std::string, unsigned long> order_map;
-
-  public:
-    explicit OrderingByIndexMap(const std::vector<std::string>& order) {
-        for (unsigned long i = 0; i < order.size(); i++) {
-            order_map.insert({order[i], i});
-        }
-    };
-
-    template <class T>
-    auto operator()(const T& a, const T& b) const -> bool {
-        return order_map.at(std::get<1>(a).get_name()) > order_map.at(std::get<1>(b).get_name());
-    }
-};
-
-void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_order) {
     populate_star_from_direct(direct_follows_store, follows_star_store, OrderingBySecondElement{});
     populate_star_from_direct(direct_parent_store, parent_star_store, OrderingBySecondElement{});
     populate_star_from_direct(direct_calls_store, calls_star_store, OrderingByIndexMap{procedure_order});

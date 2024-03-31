@@ -1,4 +1,5 @@
 #include "qps/evaluators/relationship/next_t_evaluator.hpp"
+#include "qps/utils/algo.h"
 #include <stack>
 
 namespace qps {
@@ -146,13 +147,15 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                                  const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
     const auto next_map = read_facade->get_all_next();
 
+    auto next_star_pairs = get_next_star_pairs(next_map);
+
     if (stmt_syn_1 == stmt_syn_2) {
         Table table{{stmt_syn_1}};
 
         const auto relevant_stmts = stmt_syn_1->scan(read_facade);
 
         for (const auto& stmt : relevant_stmts) {
-            if (has_transitive_rs(stmt, stmt, next_map)) {
+            if (next_star_pairs.find({stmt, stmt}) != next_star_pairs.end()) {
                 table.add_row({stmt});
             }
         }
@@ -165,7 +168,7 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 
     for (const auto& stmt1 : relevant_stmts_1) {
         for (const auto& stmt2 : relevant_stmts_2) {
-            if (has_transitive_rs(stmt1, stmt2, next_map)) {
+            if (next_star_pairs.find({stmt1, stmt2}) != next_star_pairs.end()) {
                 table.add_row({stmt1, stmt2});
             }
         }
