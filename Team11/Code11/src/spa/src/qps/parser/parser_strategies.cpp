@@ -12,12 +12,13 @@
 namespace qps::untyped::detail {
 auto parse_ref(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<UntypedRef, std::vector<Token>::const_iterator>>;
-}
+} // namespace qps::untyped::detail
 
 namespace qps::untyped {
-auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
-                                         const std::vector<Token>::const_iterator& end)
+auto PatternParserAssignStrategy::parse_syntactic_pattern(std::vector<Token>::const_iterator it,
+                                                          const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    // syn-assign '(' entRef ',' expression-spec ')'
     static constexpr auto EXPECTED_LENGTH = 6;
     static constexpr auto EARLY_EXIT_NUM_ARG = 2;
     static constexpr auto LATE_EXIT_NUM_ARG = 3;
@@ -32,16 +33,14 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     }
 
     // Expects string
-    const auto maybe_syn_assign = *it;
-    if (!is_string(maybe_syn_assign)) {
+    if (it == end || !is_string(*it)) {
         return std::nullopt;
     }
+    const auto syn_assign = UntypedSynonym{IDENT{it->content}};
     it = std::next(it);
-    const auto syn_assign = UntypedSynonym{IDENT{maybe_syn_assign.content}};
 
     // Expects open bracket
-    const auto maybe_open_bracket = *it;
-    if (!is_open_bracket(maybe_open_bracket)) {
+    if (it == end || !is_open_bracket(*it)) {
         return std::nullopt;
     }
     it = std::next(it);
@@ -55,11 +54,8 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     it = rest;
 
     // Expects comma
-    if (std::distance(it, end) < 1) {
-        return std::nullopt;
-    }
-    const auto maybe_comma = *it;
-    if (!is_comma(maybe_comma)) {
+
+    if (it == end || !is_comma(*it)) {
         return std::nullopt;
     }
     it = std::next(it, 1);
@@ -72,47 +68,128 @@ auto PatternParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     const auto& [expr_spec, rest2] = maybe_expr_spec.value();
     it = rest2;
 
-    // Expects closing bracket, or comma
-    if (std::distance(it, end) < 1) {
+    // Expects closing bracket
+    if (it == end || !is_close_bracket(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value()}, it);
+}
+
+auto PatternParserWhileStrategy::parse_syntactic_pattern(std::vector<Token>::const_iterator it,
+                                                         const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    // syn-while '(' entRef ',' _ ')'
+    static constexpr auto EXPECTED_LENGTH = 6;
+    if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }
 
-    const auto maybe_close_bracket = *it;
-    if (is_close_bracket(maybe_close_bracket)) {
-        it = std::next(it, 1);
-        return std::make_tuple(
-            UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value(), EARLY_EXIT_NUM_ARG}, it);
-    } else {
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
+    }
+
+    // Expects string
+    const auto maybe_syn_while = *it;
+    if (!is_string(maybe_syn_while)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+    const auto syn_while = UntypedSynonym{IDENT{maybe_syn_while.content}};
+
+    // Expects open bracket
+    if (it == end || !is_open_bracket(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    // Expects entity reference
+    const auto maybe_ent_ref = detail::parse_ent_ref(it, end);
+    if (!maybe_ent_ref.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ent_ref, rest] = maybe_ent_ref.value();
+    it = rest;
+
+    // Expects comma
+    if (it == end || !is_comma(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it, 1);
+
+    // Expects wildcard
+    if (it == end || !is_wildcard(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it, 1);
+
+    // Expects closing bracket
+    if (it == end || !is_close_bracket(*it)) {
+        return std::nullopt;
+    }
+    return std::make_tuple(UntypedPatternClause{syn_while, ent_ref, WildCard{}, maybe_not.has_value()}, std::next(it));
+}
+
+auto PatternParserIfStrategy::parse_syntactic_pattern(std::vector<Token>::const_iterator it,
+                                                      const std::vector<Token>::const_iterator& end)
+    -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+    // syn-if '(' entRef ',' _ ',' _ ')'
+    static constexpr auto EXPECTED_LENGTH = 8;
+    static constexpr auto EXPECTED_NUM_ARG = 3;
+
+    if (std::distance(it, end) < EXPECTED_LENGTH) {
+        return std::nullopt;
+    }
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
+    }
+
+    // Expects string
+    const auto maybe_syn_if = *it;
+    if (!is_string(maybe_syn_if)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+    const auto syn_if = UntypedSynonym{IDENT{maybe_syn_if.content}};
+
+    // Expects open bracket
+    if (it == end || !is_open_bracket(*it)) {
+        return std::nullopt;
+    }
+    it = std::next(it);
+
+    // Expects entity reference
+    const auto maybe_ent_ref = detail::parse_ent_ref(it, end);
+    if (!maybe_ent_ref.has_value()) {
+        return std::nullopt;
+    }
+    const auto& [ent_ref, rest] = maybe_ent_ref.value();
+    it = rest;
+
+    // Expects the following twice
+    for (int i = 0; i < 2; i++) {
         // Expects comma
-        const auto maybe_comma = *it;
-        if (!is_comma(maybe_comma)) {
+        if (it == end || !is_comma(*it)) {
             return std::nullopt;
         }
         it = std::next(it, 1);
 
         // Expects wildcard
-        const auto maybe_wildcard = *it;
-        if (!is_wildcard(maybe_wildcard)) {
+        if (it == end || !is_wildcard(*it)) {
             return std::nullopt;
         }
         it = std::next(it, 1);
-
-        // Expects closing bracket
-        const auto maybe_close_bracket = *it;
-        if (!is_close_bracket(maybe_close_bracket)) {
-            return std::nullopt;
-        }
-        it = std::next(it, 1);
-
-        // Require expression spec to be wildcard
-        const auto is_wildcard = std::holds_alternative<WildCard>(expr_spec);
-        if (!is_wildcard) {
-            return std::nullopt;
-        }
-
-        return std::make_tuple(
-            UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value(), LATE_EXIT_NUM_ARG}, it);
     }
+
+    // Expects closing bracket
+    if (it == end || !is_close_bracket(*it)) {
+        return std::nullopt;
+    }
+    return std::make_tuple(UntypedPatternClause{syn_if, ent_ref, WildCard{}, maybe_not.has_value(), EXPECTED_NUM_ARG},
+                           std::next(it));
 }
 
 auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,

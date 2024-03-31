@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pkb/facades/read_facade.h"
-#include "qps/evaluators/relationship/clause_evaluator.hpp"
+#include "qps/evaluators/clause_evaluators/clause_evaluator.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
 
 #include <memory>

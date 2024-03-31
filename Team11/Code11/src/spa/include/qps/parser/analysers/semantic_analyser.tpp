@@ -74,9 +74,9 @@ static auto visit_pattern_clause(const Synonyms& declarations,
     return std::make_shared<PatternClause>(maybe_syntactic_pattern.value(), pattern.is_negated);
 }
 
-static auto visit_with_clause(const Synonyms& declarations,
-                              const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                              const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
+static inline auto visit_with_clause(const Synonyms& declarations,
+                                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                                     const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
     const auto& maybe_ref1 = validate_ref(declarations, mapping, with.ref1);
     if (!maybe_ref1.has_value()) {
         return std::nullopt;

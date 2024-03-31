@@ -52,6 +52,11 @@ struct UntypedPatternClause {
         return synonym == rhs.synonym && ent_ref == rhs.ent_ref && expression_spec == rhs.expression_spec &&
                is_negated == rhs.is_negated;
     }
+
+    friend auto operator<<(std::ostream& os, const UntypedPatternClause& clause) -> std::ostream& {
+        os << clause.synonym << "(" << clause.ent_ref << ", " << clause.expression_spec << ") " << clause.num_arg;
+        return os;
+    }
 };
 
 struct UntypedWithClause {

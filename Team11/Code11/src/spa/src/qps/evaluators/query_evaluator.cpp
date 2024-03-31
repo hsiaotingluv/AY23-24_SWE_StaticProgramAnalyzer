@@ -1,7 +1,8 @@
 #include "qps/evaluators/query_evaluator.hpp"
-#include "qps/evaluators/relationship/clause_evaluator_selector.hpp"
+#include "qps/evaluators/clause_evaluators/pattern_clause_evaluator_selector.hpp"
+#include "qps/evaluators/clause_evaluators/such_that_clause_evaluator_selector.hpp"
+#include "qps/evaluators/clause_evaluators/with_evaluator.hpp"
 #include "qps/evaluators/results_table.hpp"
-#include "qps/evaluators/with_evaluator.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
 
 #include <memory>
@@ -24,10 +25,10 @@ auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::s
     for (const auto& clause : query_obj.clauses) {
         if (const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
             const auto relationship = such_that_clause->rel_ref;
-            evaluator = std::visit(clause_evaluator_selector(read_facade), relationship);
+            evaluator = std::visit(such_that_clause_evaluator_selector(read_facade), relationship);
         } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
             const auto syntactic_pattern = pattern_clause->syntactic_pattern;
-            evaluator = std::visit(clause_evaluator_selector(read_facade), syntactic_pattern);
+            evaluator = std::visit(pattern_clause_evaluator_selector(read_facade), syntactic_pattern);
         } else if (const auto with_clause = std::dynamic_pointer_cast<qps::WithClause>(clause)) {
             evaluator = std::make_shared<WithEvaluator>(read_facade, with_clause->ref1, with_clause->ref2);
         }

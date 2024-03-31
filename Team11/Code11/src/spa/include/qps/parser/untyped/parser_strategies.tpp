@@ -30,6 +30,10 @@ auto parse_ent_ent_rel(std::vector<Token>::const_iterator it, const std::vector<
                        TypeList<Head, Tails...>)
     -> std::optional<std::tuple<UntypedRelationship, std::vector<Token>::const_iterator>>;
 
+template <typename Head, typename... Tails>
+auto parse_pattern(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
+                   TypeList<Head, Tails...>)
+    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>>;
 } // namespace qps::untyped::detail
 
 namespace qps::untyped {
@@ -68,6 +72,23 @@ struct SuchThatParserStrategy {
             return std::make_tuple(UntypedSuchThatClause{rel_ref, maybe_not.has_value()}, rest);
         }
         return std::nullopt;
+    }
+};
+
+template <typename SupportedPatternStrategies>
+struct PatternParserStrategy {
+    static constexpr auto keywords = std::array<std::string_view, 1>{"pattern"};
+
+    using ClauseType = UntypedPatternClause;
+
+    static auto parse_clause(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
+        -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
+        if (it == end) {
+            return std::nullopt;
+        }
+        const auto results = detail::parse_pattern(it, end, SupportedPatternStrategies{});
+
+        return results;
     }
 };
 
@@ -289,6 +310,23 @@ auto parse_ent_ent_rel(std::vector<Token>::const_iterator it, const std::vector<
     }
 
     return parse_ent_ent_rel(it, end, TypeList<Tails...>{});
+}
+
+inline auto parse_pattern(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&, TypeList<>)
+    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
+    return std::nullopt;
+}
+
+template <typename Head, typename... Tails>
+auto parse_pattern(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
+                   TypeList<Head, Tails...>)
+    -> std::optional<std::tuple<UntypedPatternClause, std::vector<Token>::const_iterator>> {
+    const auto maybe_pattern = Head::parse_syntactic_pattern(it, end);
+    if (maybe_pattern.has_value()) {
+        return maybe_pattern.value();
+    }
+
+    return parse_pattern(it, end, TypeList<Tails...>{});
 }
 
 } // namespace qps::untyped::detail
