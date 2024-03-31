@@ -1,4 +1,5 @@
 #include <stack>
+#include <stdexcept>
 
 #include "common/utils/algo.h"
 #include "qps/utils/algo.h"
