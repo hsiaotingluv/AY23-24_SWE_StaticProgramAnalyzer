@@ -530,7 +530,7 @@ auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade
  * @param read_facade
  * @return Table
  */
-static auto build_full_table(const Synonyms synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
+static auto build_full_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
     auto table = Table{};
     auto unique_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{synonyms.begin(), synonyms.end()};
 

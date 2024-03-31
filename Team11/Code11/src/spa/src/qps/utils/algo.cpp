@@ -97,7 +97,7 @@ generate_maps(const std::vector<std::unordered_set<std::string>>& scc) {
     std::unordered_map<std::string, int> reverse_result;
 
     for (std::size_t i = 0; i < scc.size(); i++) {
-        result[i] = scc[i];
+        result[static_cast<int>(i)] = scc[i];
         for (const auto& elem : scc[i]) {
             reverse_result[elem] = static_cast<int>(i);
         }

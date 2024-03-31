@@ -10,20 +10,20 @@ class CallsTEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto select_eval_method() const;
 
     // e.g. Calls*(p, q)
-    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_1,
-                                    const std::shared_ptr<ProcSynonym>& proc_2) const -> OutputTable;
+    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_syn_1,
+                                    const std::shared_ptr<ProcSynonym>& proc_syn_2) const -> OutputTable;
 
     // e.g. Calls*(p, "q")
-    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_1,
+    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_syn_1,
                                     const qps::QuotedIdent& quoted_proc_2) const -> OutputTable;
 
     // e.g. Calls*(p, _)
-    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_1, const qps::WildCard&) const
+    [[nodiscard]] auto eval_calls_t(const std::shared_ptr<ProcSynonym>& proc_syn_1, const qps::WildCard&) const
         -> OutputTable;
 
     // e.g. Calls*("p", q)
     [[nodiscard]] auto eval_calls_t(const qps::QuotedIdent& quoted_proc_1,
-                                    const std::shared_ptr<ProcSynonym>& proc_2) const -> OutputTable;
+                                    const std::shared_ptr<ProcSynonym>& proc_syn_2) const -> OutputTable;
 
     // e.g. Calls*("p", "q")
     [[nodiscard]] auto eval_calls_t(const qps::QuotedIdent& quoted_proc_1, const qps::QuotedIdent& quoted_proc_2) const
@@ -33,7 +33,7 @@ class CallsTEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_calls_t(const qps::QuotedIdent& quoted_proc_1, const qps::WildCard&) const -> OutputTable;
 
     // e.g. Calls*(_, q)
-    [[nodiscard]] auto eval_calls_t(const qps::WildCard&, const std::shared_ptr<ProcSynonym>& proc_2) const
+    [[nodiscard]] auto eval_calls_t(const qps::WildCard&, const std::shared_ptr<ProcSynonym>& proc_syn_2) const
         -> OutputTable;
 
     // e.g. Calls*(_, "q")
