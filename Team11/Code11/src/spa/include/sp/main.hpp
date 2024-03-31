@@ -51,7 +51,8 @@ class SourceProcessor {
                     std::shared_ptr<NextTraverser> next_traverser, std::shared_ptr<AffectsTraverser> affects_traverser)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
           program_cfgs(std::move(program_cfgs)), design_abstr_traversers(traversers),
-          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)) {}   
+          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)) {
+    }
 
     SourceProcessor(std::shared_ptr<TokenizerRunner> tr, std::shared_ptr<Parser> parser,
                     std::shared_ptr<StmtNumTraverser> stmt_num_traverser, std::shared_ptr<ProgramCfgs> program_cfgs,
@@ -60,7 +61,9 @@ class SourceProcessor {
                     const std::shared_ptr<pkb::WriteFacade>& write_facade)
         : tokenizer_runner(std::move(tr)), parser(std::move(parser)), stmt_num_traverser(std::move(stmt_num_traverser)),
           program_cfgs(std::move(program_cfgs)), design_abstr_traversers(traversers),
-          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)), write_facade(write_facade), call_graph_traverser(write_facade) {}
+          next_traverser(std::move(next_traverser)), affects_traverser(std::move(affects_traverser)),
+          write_facade(write_facade), call_graph_traverser(write_facade) {
+    }
 
     static auto get_complete_sp(const std::shared_ptr<pkb::WriteFacade>& write_facade)
         -> std::shared_ptr<SourceProcessor> {
@@ -72,7 +75,8 @@ class SourceProcessor {
                 std::make_shared<DesignEntitiesPopulatorTraverser>(write_facade),
                 std::make_shared<ModifiesTraverser>(write_facade), std::make_shared<ParentTraverser>(write_facade),
                 std::make_shared<UsesTraverser>(write_facade), std::make_shared<FollowsTraverser>(write_facade)},
-            std::make_shared<NextTraverser>(write_facade), std::make_shared<AffectsTraverser>(write_facade), write_facade);
+            std::make_shared<NextTraverser>(write_facade), std::make_shared<AffectsTraverser>(write_facade),
+            write_facade);
     }
 
     static auto output_xml(const std::shared_ptr<AstNode>& ast_node) -> std::string {

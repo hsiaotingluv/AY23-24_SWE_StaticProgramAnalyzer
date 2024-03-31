@@ -205,7 +205,7 @@ TEST_CASE("Test CFG Builder") {
     std::vector<std::shared_ptr<sp::Traverser>> design_abstr_traversers = {};
     auto next_traverser = std::make_shared<sp::NextTraverser>(write_facade);
     auto affects_traverser = std::make_shared<sp::AffectsTraverser>(write_facade);
-    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,        stmt_num_traverser, program_cfgs,
+    auto sp = sp::SourceProcessor{tokenizer_runner,        parser,         stmt_num_traverser, program_cfgs,
                                   design_abstr_traversers, next_traverser, affects_traverser};
 
     SECTION("complex program Code 4 - success") {
