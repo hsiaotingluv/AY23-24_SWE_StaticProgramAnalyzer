@@ -3,6 +3,7 @@
 #include "pkb/facades/read_facade.h"
 #include "qps/template_utils.hpp"
 
+#include "qps/evaluators/clause_evaluators/relationship/affects_evaluator.hpp"
 #include "qps/evaluators/clause_evaluators/relationship/calls_evaluator.hpp"
 #include "qps/evaluators/clause_evaluators/relationship/calls_t_evaluator.hpp"
 #include "qps/evaluators/clause_evaluators/relationship/follows_evaluator.hpp"
@@ -66,13 +67,12 @@ auto such_that_clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>&
             return std::make_shared<NextEvaluator>(read_facade, next);
         },
 
-        [read_facade](const qps::NextT& calls) -> std::shared_ptr<ClauseEvaluator> {
-            return std::make_shared<NextTEvaluator>(read_facade, calls);
+        [read_facade](const qps::NextT& next_t) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<NextTEvaluator>(read_facade, next_t);
         },
 
-        [read_facade](const qps::Affects&) -> std::shared_ptr<ClauseEvaluator> {
-            // TODO: Implement Affects here
-            return nullptr;
+        [read_facade](const qps::Affects& affects) -> std::shared_ptr<ClauseEvaluator> {
+            return std::make_shared<AffectsEvaluator>(read_facade, affects);
         }};
 };
 } // namespace qps
