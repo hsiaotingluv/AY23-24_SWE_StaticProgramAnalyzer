@@ -223,12 +223,24 @@ get_next_star_pairs(const std::unordered_map<std::string, std::unordered_set<std
 }
 
 // Check whether there's a transitive rs
-bool has_transitive_rs(const std::string& node1, const std::string& node2,
+bool has_transitive_rs(const std::string& node1, const std::unordered_set<std::string>& end_nodes,
                        const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
-                       std::function<bool(const std::string&)> start_node_cond,
-                       std::function<bool(const std::string&)> end_node_cond,
-                       std::function<bool(const std::string&)> intermediate_node_cond) {
-    if (!start_node_cond(node1) || !end_node_cond(node2)) {
+                       const std::function<bool(const std::string&)>& start_node_cond,
+                       const std::function<bool(const std::string&)>& end_node_cond,
+                       const std::function<bool(const std::string&)>& intermediate_node_cond) {
+    if (!start_node_cond(node1)) {
+        return false;
+    }
+
+    // remove end_node that do not adhere to end_node_cond
+    std::unordered_set<std::string> valid_end_nodes;
+    for (const auto& end_node : end_nodes) {
+        if (end_node_cond(end_node)) {
+            valid_end_nodes.insert(end_node);
+        }
+    }
+
+    if (valid_end_nodes.empty()) {
         return false;
     }
 
@@ -247,7 +259,7 @@ bool has_transitive_rs(const std::string& node1, const std::string& node2,
         const auto current = stack.top();
         stack.pop();
 
-        if (current == node2) {
+        if (valid_end_nodes.find(current) != valid_end_nodes.end()) {
             return true;
         }
 
@@ -273,8 +285,16 @@ bool has_transitive_rs(const std::string& node1, const std::string& node2,
 
 std::unordered_set<std::string>
 get_all_transitive_from_node(const std::string& node,
-                             const std::unordered_map<std::string, std::unordered_set<std::string>>& map) {
+                             const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
+                             const std::function<bool(const std::string&)>& start_node_cond,
+                             const std::function<bool(const std::string&)>& end_node_cond,
+                             const std::function<bool(const std::string&)>& intermediate_node_cond) {
+    if (!start_node_cond(node)) {
+        return {};
+    }
+
     std::unordered_set<std::string> result;
+    std::unordered_set<std::string> visited;
     std::stack<std::string> stack;
 
     auto it = map.find(node);
@@ -289,13 +309,18 @@ get_all_transitive_from_node(const std::string& node,
         const auto current = stack.top();
         stack.pop();
 
-        // If already visited or is the starting node, skip
-        if (result.find(current) != result.end()) {
+        // If already visited or does not pass intermediate_node_cond, skip
+        if (visited.find(current) != visited.end() || !intermediate_node_cond(current)) {
             continue;
         }
 
-        // Else, add to result
-        result.insert(current);
+        // Else, add to visited
+        visited.insert(current);
+
+        // If passes end_node_cond, add to result
+        if (end_node_cond(current)) {
+            result.insert(current);
+        }
 
         // Add all next nodes to stack
         auto it_current = map.find(current);

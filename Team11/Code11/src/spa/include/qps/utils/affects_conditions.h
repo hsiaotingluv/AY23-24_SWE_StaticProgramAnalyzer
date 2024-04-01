@@ -6,7 +6,6 @@
 
 class AffectsConditions {
     std::string start_node;
-    std::string end_node;
     std::shared_ptr<pkb::ReadFacade> read_facade;
 
     std::string modified_var;
@@ -16,10 +15,8 @@ class AffectsConditions {
     std::function<bool(const std::string&)> intermediate_node_cond;
 
   public:
-    explicit AffectsConditions(const std::string& start_node, const std::string& end_node,
-                               const std::shared_ptr<pkb::ReadFacade>& read_facade) {
+    explicit AffectsConditions(const std::string& start_node, const std::shared_ptr<pkb::ReadFacade>& read_facade) {
         this->start_node = start_node;
-        this->end_node = end_node;
         this->read_facade = read_facade;
 
         this->start_node_cond = [this](const std::string& start_node) {
@@ -37,7 +34,9 @@ class AffectsConditions {
 
             if (is_assign) {
                 auto used_vars = this->read_facade->get_vars_used_by_statement(end_node);
-                return used_vars.find(this->modified_var) != used_vars.end();
+                auto is_same_var_used = used_vars.find(this->modified_var) != used_vars.end();
+                auto is_in_same_proc = this->read_facade->are_stmt_nos_in_same_proc(this->start_node, end_node);
+                return is_same_var_used && is_in_same_proc;
             }
 
             return false;

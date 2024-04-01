@@ -101,7 +101,7 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 auto NextTEvaluator::eval_next_t(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
     const auto next_map = read_facade->get_all_next();
 
-    bool has_transitive = has_transitive_rs(stmt_num_1.value, stmt_num_2.value, next_map);
+    bool has_transitive = has_transitive_rs(stmt_num_1.value, {stmt_num_2.value}, next_map);
 
     if (has_transitive) {
         return UnitTable{};

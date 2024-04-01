@@ -28,7 +28,21 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
 
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    // TODO:
+    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    auto table = Table{{stmt_syn_2}};
+    const auto next_map = read_facade->get_all_next();
+
+    auto affect_conds = AffectsConditions(stmt_num_1.value, read_facade);
+
+    auto new_rows =
+        get_all_transitive_from_node(stmt_num_1.value, next_map, affect_conds.get_start_node_cond(),
+                                     affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+    for (const auto& row : new_rows) {
+        if (relevant_stmts.find(row) != relevant_stmts.end()) {
+            table.add_row({row});
+        }
+    }
 }
 
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
@@ -39,10 +53,10 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
     const auto next_map = read_facade->get_all_next();
 
-    auto affect_conds = AffectsConditions(stmt_num_1.value, stmt_num_2.value, read_facade);
+    auto affect_conds = AffectsConditions(stmt_num_1.value, read_facade);
 
     auto has_transitive =
-        has_transitive_rs(stmt_num_1.value, stmt_num_2.value, next_map, affect_conds.get_start_node_cond(),
+        has_transitive_rs(stmt_num_1.value, {stmt_num_2.value}, next_map, affect_conds.get_start_node_cond(),
                           affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
 
     if (has_transitive) {
