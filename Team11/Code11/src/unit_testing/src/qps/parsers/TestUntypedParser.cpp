@@ -56,7 +56,8 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{Integer{"13"}},
-                                        untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}}}};
+                                        untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     }
 
@@ -82,7 +83,8 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     };
 
@@ -108,7 +110,8 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     };
 
@@ -132,7 +135,8 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Uses", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     }
 
@@ -157,7 +161,8 @@ TEST_CASE("Test QPSParser") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Uses", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{QuotedIdent{"s"}}}};
+                                      untyped::UntypedEntRef{QuotedIdent{"s"}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     }
 
@@ -181,7 +186,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}}, WildCard{},
-                                                                    ExpressionSpec{PartialMatch{"count 1 + "}}};
+                                                                    ExpressionSpec{PartialMatch{"count 1 + "}}, false};
         REQUIRE(pattern_clause == reference_clause);
     }
 
@@ -205,7 +210,7 @@ Select a pattern a ( _ , _"count + 1"_))";
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause =
             untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
-                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}, false};
         REQUIRE(pattern_clause == reference_clause);
     }
 
@@ -265,7 +270,8 @@ TEST_CASE("Test Parser - Advanced Relationship") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{untyped::UntypedSynonym{IDENT{"q"}}}}};
+                                      untyped::UntypedEntRef{untyped::UntypedSynonym{IDENT{"q"}}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     }
 
@@ -289,7 +295,8 @@ TEST_CASE("Test Parser - Advanced Relationship") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{QuotedIdent{"q"}}}};
+                                      untyped::UntypedEntRef{QuotedIdent{"q"}}},
+            false};
     }
 
     SECTION("Calls - proc_syn and wildcard") {
@@ -313,7 +320,8 @@ TEST_CASE("Test Parser - Advanced Relationship") {
         const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Calls", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{WildCard{}}}};
+                                      untyped::UntypedEntRef{WildCard{}}},
+            false};
         REQUIRE(such_that_clause == reference_clause);
     }
 
@@ -392,14 +400,16 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto such_that_clause1 = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause1 = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}},
+            false};
         REQUIRE(such_that_clause1 == reference_clause1);
 
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
         const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
         const auto reference_clause2 = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Modifies", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}},
+            false};
         REQUIRE(such_that_clause2 == reference_clause2);
     }
 
@@ -425,14 +435,16 @@ TEST_CASE("Test Parser - 'and' connectives for such that clauses") {
         const auto such_that_clause1 = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
         const auto reference_clause1 = untyped::UntypedSuchThatClause{
             untyped::UntypedStmtStmtRel{"Follows*", untyped::UntypedStmtRef{untyped::UntypedSynonym{IDENT{"s"}}},
-                                        untyped::UntypedStmtRef{Integer{"13"}}}};
+                                        untyped::UntypedStmtRef{Integer{"13"}}},
+            false};
         REQUIRE(such_that_clause1 == reference_clause1);
 
         REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
         const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
         const auto reference_clause2 = untyped::UntypedSuchThatClause{
             untyped::UntypedRefEntRel{"Modifies", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"p"}}},
-                                      untyped::UntypedEntRef{QuotedIdent{"v"}}}};
+                                      untyped::UntypedEntRef{QuotedIdent{"v"}}},
+            false};
         REQUIRE(such_that_clause2 == reference_clause2);
     }
 
@@ -473,13 +485,14 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause =
             untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
-                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}, false};
         REQUIRE(pattern_clause == reference_clause);
 
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[1]));
         const auto pattern_clause2 = std::get<untyped::UntypedPatternClause>(clauses[1]);
-        const auto reference_clause2 = untyped::UntypedPatternClause{
-            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX "}}};
+        const auto reference_clause2 =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX "}}, false};
         REQUIRE(pattern_clause2 == reference_clause2);
     }
 
@@ -504,13 +517,14 @@ TEST_CASE("Test Parser - 'and' connectives for pattern clauses") {
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
         const auto reference_clause =
             untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
-                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}};
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}, false};
         REQUIRE(pattern_clause == reference_clause);
 
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[1]));
         const auto pattern_clause2 = std::get<untyped::UntypedPatternClause>(clauses[1]);
-        const auto reference_clause2 = untyped::UntypedPatternClause{
-            untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX "}}};
+        const auto reference_clause2 =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"newa"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX "}}, false};
         REQUIRE(pattern_clause2 == reference_clause2);
     }
 
@@ -549,8 +563,8 @@ TEST_CASE("Test Parser - pattern clause with 3 arg") {
         REQUIRE(clauses.size() == 1);
         REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
         const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
-        const auto reference_clause = untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}},
-                                                                    untyped::UntypedSynonym{IDENT{"v"}}, WildCard{}};
+        const auto reference_clause = untyped::UntypedPatternClause{
+            untyped::UntypedSynonym{IDENT{"a"}}, untyped::UntypedSynonym{IDENT{"v"}}, WildCard{}, false};
         REQUIRE(pattern_clause == reference_clause);
     }
 
@@ -586,7 +600,7 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
         const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedWithClause{
-            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, StmtNum{}}, Integer{"1"}};
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, StmtNum{}}, Integer{"1"}, false};
         REQUIRE(with_clause == reference_clause);
     }
 
@@ -608,7 +622,7 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
         const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedWithClause{
-            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, Value{}}, QuotedIdent{"x"}};
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, Value{}}, QuotedIdent{"x"}, false};
         REQUIRE(with_clause == reference_clause);
     }
 
@@ -630,7 +644,7 @@ TEST_CASE("Test Parser - Basic With clause") {
         REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
         const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
         const auto reference_clause = untyped::UntypedWithClause{
-            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"p"}}, ProcName{}}, QuotedIdent{"x"}};
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"p"}}, ProcName{}}, QuotedIdent{"x"}, false};
         REQUIRE(with_clause == reference_clause);
 
         SECTION("Transitive relationships") {
@@ -642,5 +656,99 @@ TEST_CASE("Test Parser - Basic With clause") {
             const auto output2 = parser.parse(query);
             REQUIRE(std::holds_alternative<SyntaxError>(output2)); // Follows* instead of Follows *
         }
+    }
+}
+
+TEST_CASE("Test Parser - Negated Clause") {
+    const auto parser = untyped::DefaultUntypedParser{};
+
+    SECTION("Test Parser - Negated Such That Clause") {
+        const auto query = R"(variable v; Select v such that Modifies(v, "x") and not Uses(v, "y"))";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<VarSynonym>(declarations[0], "v");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "v");
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[0]));
+        const auto such_that_clause = std::get<untyped::UntypedSuchThatClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Modifies", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"v"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"x"}}},
+            false};
+        REQUIRE(such_that_clause == reference_clause);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedSuchThatClause>(clauses[1]));
+        const auto such_that_clause2 = std::get<untyped::UntypedSuchThatClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedSuchThatClause{
+            untyped::UntypedRefEntRel{"Uses", untyped::UntypedStmtEntRef{untyped::UntypedSynonym{IDENT{"v"}}},
+                                      untyped::UntypedEntRef{QuotedIdent{"y"}}},
+            true};
+        REQUIRE(such_that_clause2 == reference_clause2);
+    }
+
+    SECTION("Test Parser - Negated Pattern Clause") {
+        const auto query =
+            R"(assign a; Select a pattern a ( "normSq" , _"cenX * cenX"_) and not a ( "normSq" , _"cenX"_))";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<AssignSynonym>(declarations[0], "a");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "a");
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[0]));
+        const auto pattern_clause = std::get<untyped::UntypedPatternClause>(clauses[0]);
+        const auto reference_clause =
+            untyped::UntypedPatternClause{untyped::UntypedSynonym{IDENT{"a"}}, QuotedIdent{"normSq"},
+                                          ExpressionSpec{PartialMatch{"cenX cenX * "}}, false};
+        REQUIRE(pattern_clause == reference_clause);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedPatternClause>(clauses[1]));
+        const auto pattern_clause2 = std::get<untyped::UntypedPatternClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedPatternClause{
+            untyped::UntypedSynonym{IDENT{"a"}}, QuotedIdent{"normSq"}, ExpressionSpec{PartialMatch{"cenX "}}, true};
+        REQUIRE(pattern_clause2 == reference_clause2);
+    }
+
+    SECTION("Test Parser - Negated With Clause") {
+        const auto query = R"(variable v; Select v with v.stmt# = 1 and not v.value = "x")";
+        const auto output = parser.parse(query);
+        REQUIRE(std::holds_alternative<std::tuple<Synonyms, UntypedQuery>>(output));
+        const auto& [declarations, untyped] = std::get<std::tuple<Synonyms, UntypedQuery>>(output);
+
+        REQUIRE(declarations.size() == 1);
+        require_value<VarSynonym>(declarations[0], "v");
+
+        const auto& [references, clauses] = untyped;
+        REQUIRE(std::holds_alternative<UntypedVector>(references));
+        const auto& reference = std::get<UntypedVector>(references);
+        require_value<untyped::UntypedSynonym>(reference, "v");
+
+        REQUIRE(clauses.size() == 2);
+        REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[0]));
+        const auto with_clause = std::get<untyped::UntypedWithClause>(clauses[0]);
+        const auto reference_clause = untyped::UntypedWithClause{
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, StmtNum{}}, Integer{"1"}, false};
+        REQUIRE(with_clause == reference_clause);
+
+        REQUIRE(std::holds_alternative<untyped::UntypedWithClause>(clauses[1]));
+        const auto with_clause2 = std::get<untyped::UntypedWithClause>(clauses[1]);
+        const auto reference_clause2 = untyped::UntypedWithClause{
+            untyped::UntypedAttrRef{untyped::UntypedSynonym{IDENT{"v"}}, Value{}}, QuotedIdent{"x"}, true};
+        REQUIRE(with_clause2 == reference_clause2);
     }
 }

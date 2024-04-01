@@ -20,7 +20,7 @@ auto PatternWhile::operator==(const PatternWhile& other) const -> bool {
 }
 
 auto operator<<(std::ostream& os, const PatternIf& pattern_if) -> std::ostream& {
-    return os << "While(" << pattern_if.if_synonym << ", " << pattern_if.ent_ref << ")";
+    return os << "If(" << pattern_if.if_synonym << ", " << pattern_if.ent_ref << ")";
 }
 
 auto PatternIf::operator==(const PatternIf& other) const -> bool {

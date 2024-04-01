@@ -20,8 +20,16 @@ auto PatternParserAssignStrategy::parse_syntactic_pattern(std::vector<Token>::co
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     // syn-assign '(' entRef ',' expression-spec ')'
     static constexpr auto EXPECTED_LENGTH = 6;
+    static constexpr auto EARLY_EXIT_NUM_ARG = 2;
+    static constexpr auto LATE_EXIT_NUM_ARG = 3;
+
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
+    }
+
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects string
@@ -66,7 +74,7 @@ auto PatternParserAssignStrategy::parse_syntactic_pattern(std::vector<Token>::co
     }
     it = std::next(it);
 
-    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec}, it);
+    return std::make_tuple(UntypedPatternClause{syn_assign, ent_ref, expr_spec, maybe_not.has_value()}, it);
 }
 
 auto PatternParserWhileStrategy::parse_syntactic_pattern(std::vector<Token>::const_iterator it,
@@ -76,6 +84,11 @@ auto PatternParserWhileStrategy::parse_syntactic_pattern(std::vector<Token>::con
     static constexpr auto EXPECTED_LENGTH = 6;
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
+    }
+
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects string
@@ -116,7 +129,7 @@ auto PatternParserWhileStrategy::parse_syntactic_pattern(std::vector<Token>::con
     if (it == end || !is_close_bracket(*it)) {
         return std::nullopt;
     }
-    return std::make_tuple(UntypedPatternClause{syn_while, ent_ref, WildCard{}}, std::next(it));
+    return std::make_tuple(UntypedPatternClause{syn_while, ent_ref, WildCard{}, maybe_not.has_value()}, std::next(it));
 }
 
 auto PatternParserIfStrategy::parse_syntactic_pattern(std::vector<Token>::const_iterator it,
@@ -124,8 +137,14 @@ auto PatternParserIfStrategy::parse_syntactic_pattern(std::vector<Token>::const_
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     // syn-if '(' entRef ',' _ ',' _ ')'
     static constexpr auto EXPECTED_LENGTH = 8;
+    static constexpr auto EXPECTED_NUM_ARG = 3;
+
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
+    }
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects string
@@ -169,7 +188,8 @@ auto PatternParserIfStrategy::parse_syntactic_pattern(std::vector<Token>::const_
     if (it == end || !is_close_bracket(*it)) {
         return std::nullopt;
     }
-    return std::make_tuple(UntypedPatternClause{syn_if, ent_ref, WildCard{}, 3}, std::next(it));
+    return std::make_tuple(UntypedPatternClause{syn_if, ent_ref, WildCard{}, maybe_not.has_value(), EXPECTED_NUM_ARG},
+                           std::next(it));
 }
 
 auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
@@ -177,6 +197,11 @@ auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     if (it == end) {
         return std::nullopt;
+    }
+
+    const auto maybe_not = detail::consume_not(it, end);
+    if (maybe_not.has_value()) {
+        it = maybe_not.value();
     }
 
     // Expects Ref
@@ -201,7 +226,7 @@ auto WithParserStrategy::parse_clause(std::vector<Token>::const_iterator it,
     const auto& [ref2, rest2] = maybe_ref2.value();
     it = rest2;
 
-    return std::make_tuple(UntypedWithClause{ref1, ref2}, it);
+    return std::make_tuple(UntypedWithClause{ref1, ref2, maybe_not.has_value()}, it);
 }
 } // namespace qps::untyped
 

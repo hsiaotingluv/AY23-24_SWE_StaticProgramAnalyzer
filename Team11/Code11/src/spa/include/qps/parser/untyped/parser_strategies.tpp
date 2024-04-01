@@ -49,22 +49,27 @@ struct SuchThatParserStrategy {
             return std::nullopt;
         }
 
+        const auto maybe_not = detail::consume_not(it, end);
+        if (maybe_not.has_value()) {
+            it = maybe_not.value();
+        }
+
         const auto maybe_stmt_stmt_rel = detail::parse_stmt_stmt_rel(it, end, SupportedStmtStmtStrategies{});
         if (maybe_stmt_stmt_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_stmt_stmt_rel.value();
-            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+            return std::make_tuple(UntypedSuchThatClause{rel_ref, maybe_not.has_value()}, rest);
         }
 
         const auto maybe_stmt_ent_rel = detail::parse_stmt_ent_rel(it, end, SupportedStmtEntStrategies{});
         if (maybe_stmt_ent_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_stmt_ent_rel.value();
-            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+            return std::make_tuple(UntypedSuchThatClause{rel_ref, maybe_not.has_value()}, rest);
         }
 
         const auto maybe_ent_ent_rel = detail::parse_ent_ent_rel(it, end, SupportedEntEntStrategies{});
         if (maybe_ent_ent_rel.has_value()) {
             const auto& [rel_ref, rest] = maybe_ent_ent_rel.value();
-            return std::make_tuple(UntypedSuchThatClause{rel_ref}, rest);
+            return std::make_tuple(UntypedSuchThatClause{rel_ref, maybe_not.has_value()}, rest);
         }
         return std::nullopt;
     }

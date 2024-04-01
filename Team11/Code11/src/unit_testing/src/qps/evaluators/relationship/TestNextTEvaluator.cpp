@@ -38,7 +38,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    NextT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    NextT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -52,7 +52,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
+                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}, false),
             },
         };
 
@@ -66,7 +66,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, false),
             },
         };
 
@@ -80,7 +80,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}, false),
             },
         };
 
@@ -94,7 +94,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, Integer{"3"}}, false),
             },
         };
 
@@ -108,7 +108,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, Integer{"5"}}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, Integer{"5"}}, false),
             },
         };
 
@@ -122,7 +122,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, WildCard{}}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"1"}, WildCard{}}, false),
             },
         };
 
@@ -136,7 +136,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"5"}, WildCard{}}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"5"}, WildCard{}}, false),
             },
         };
 
@@ -150,7 +150,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{Integer{"10"}, WildCard{}}),
+                std::make_shared<SuchThatClause>(NextT{Integer{"10"}, WildCard{}}, false),
             },
         };
 
@@ -164,7 +164,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{WildCard{}, std::make_shared<AnyStmtSynonym>("s1")}),
+                std::make_shared<SuchThatClause>(NextT{WildCard{}, std::make_shared<AnyStmtSynonym>("s1")}, false),
             },
         };
 
@@ -178,7 +178,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{WildCard{}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(NextT{WildCard{}, Integer{"3"}}, false),
             },
         };
 
@@ -192,7 +192,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{WildCard{}, Integer{"1"}}),
+                std::make_shared<SuchThatClause>(NextT{WildCard{}, Integer{"1"}}, false),
             },
         };
 
@@ -206,7 +206,7 @@ TEST_CASE("Test Evaluator Next* with Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{WildCard{}, WildCard{}}),
+                std::make_shared<SuchThatClause>(NextT{WildCard{}, WildCard{}}, false),
             },
         };
 
@@ -234,7 +234,7 @@ TEST_CASE("Test Evaluator Next* without Cycle") {
             },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}),
+                std::make_shared<SuchThatClause>(NextT{std::make_shared<AnyStmtSynonym>("s1"), Integer{"3"}}, false),
             },
         };
 

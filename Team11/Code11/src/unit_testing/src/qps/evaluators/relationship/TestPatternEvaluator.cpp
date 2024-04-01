@@ -47,7 +47,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, WildCard{}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, WildCard{}}, false),
             },
         };
 
@@ -63,7 +63,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"y"}, WildCard{}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"y"}, WildCard{}}, false),
             },
         };
 
@@ -78,7 +78,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"y z 2 * +"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"y z 2 * +"}},
+                    false),
             },
         };
 
@@ -94,7 +95,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"z 2 *"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"z 2 *"}}, false),
             },
         };
 
@@ -109,7 +110,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"y z 2 * +"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"y z 2 * +"}},
+                    false),
             },
         };
 
@@ -125,7 +127,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"z 2 *"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, ExactMatch{"z 2 *"}}, false),
             },
         };
 
@@ -138,7 +140,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>("a"),
-                                                              std::make_shared<VarSynonym>("x"), ExactMatch{"z 2 *"}}),
+                                                              std::make_shared<VarSynonym>("x"), ExactMatch{"z 2 *"}},
+                                                false),
             },
         };
 
@@ -153,7 +156,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"y z 2 * +"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"y z 2 * +"}},
+                    false),
             },
         };
 
@@ -169,7 +173,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"z 2 *"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"z 2 *"}},
+                    false),
             },
         };
 
@@ -185,7 +190,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"y z +"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), QuotedIdent{"x"}, PartialMatch{"y z +"}},
+                    false),
             },
         };
 
@@ -199,7 +205,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>("a"),
                                                               std::make_shared<VarSynonym>("v"),
-                                                              PartialMatch{"y z 2 * +"}}),
+                                                              PartialMatch{"y z 2 * +"}},
+                                                false),
             },
         };
 
@@ -212,7 +219,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v"), WildCard{}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v"), WildCard{}},
+                    false),
             },
         };
 
@@ -226,7 +234,8 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v"), WildCard{}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v"), WildCard{}},
+                    false),
             },
         };
 
@@ -240,7 +249,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, WildCard{}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, WildCard{}}, false),
             },
         };
 
@@ -254,7 +263,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, ExactMatch{"y z 2 * +"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, ExactMatch{"y z 2 * +"}}, false),
             },
         };
 
@@ -268,7 +277,7 @@ TEST_CASE("Test Evaluator Pattern") {
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
-                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, PartialMatch{"z 2 *"}}),
+                    PatternAssign{std::make_shared<AssignSynonym>("a"), WildCard{}, PartialMatch{"z 2 *"}}, false),
             },
         };
 
