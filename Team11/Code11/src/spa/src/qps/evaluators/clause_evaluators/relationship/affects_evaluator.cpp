@@ -67,7 +67,32 @@ auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const Integer& st
 }
 
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const WildCard&) const -> OutputTable {
-    // TODO:
+    const auto next_map = read_facade->get_all_next();
+
+    auto affect_conds = AffectsConditions(stmt_num_1.value, read_facade);
+
+    // Get the vars modified by stmt_num_1
+    auto mod_vars = read_facade->get_vars_modified_by_statement(stmt_num_1.value);
+
+    // If mod_vars size is not 1, return empty table
+    if (mod_vars.size() != 1) {
+        return Table{};
+    }
+
+    auto mod_var = *mod_vars.begin();
+
+    // Get all stmts that use the mod_var
+    auto used_stmts = read_facade->get_statements_that_use_var(mod_var);
+
+    auto has_transitive =
+        has_transitive_rs(stmt_num_1.value, used_stmts, next_map, affect_conds.get_start_node_cond(),
+                          affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+    if (has_transitive) {
+        return UnitTable{};
+    }
+
+    return Table{};
 }
 
 auto AffectsEvaluator::eval_affects(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const

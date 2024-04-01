@@ -46,8 +46,9 @@ class AffectsConditions {
             auto is_modified = this->read_facade->contains_procedure_modify_var(intermediate_node, this->modified_var);
             auto is_not_if = !this->read_facade->has_if_statement(intermediate_node);
             auto is_not_while = !this->read_facade->has_while_statement(intermediate_node);
+            auto is_same_proc = this->read_facade->are_stmt_nos_in_same_proc(this->start_node, intermediate_node);
 
-            return !(is_modified && is_not_if && is_not_while);
+            return !(is_modified && is_not_if && is_not_while) && is_same_proc;
         };
     }
 
