@@ -18,7 +18,41 @@ auto AffectsEvaluator::evaluate() const -> OutputTable {
 
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2) const
     -> OutputTable {
-    // TODO:
+    // TODO: We should optimise this (current implementation is quite naive)
+    auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    auto table = Table{{stmt_syn_1}};
+
+    // Get all variables used by stmt_num_2
+    auto used_vars = read_facade->get_vars_used_by_statement(stmt_num_2.value);
+
+    // From the relevant statements, filter such that they are only assign statements and
+    // the stmts modify any of the used vars (assignment statements only modify one var)
+    for (const auto& stmt : relevant_stmts) {
+        if (!read_facade->has_assign_statement(stmt)) {
+            relevant_stmts.erase(stmt);
+        } else {
+            auto modified_var = *read_facade->get_vars_modified_by_statement(stmt).begin();
+            if (used_vars.find(modified_var) == used_vars.end()) {
+                relevant_stmts.erase(stmt);
+            }
+        }
+    }
+
+    // For all remaining relevant statements
+    for (const auto& stmt : relevant_stmts) {
+        // Get all transitive stmts from stmt_num_2
+        auto next_map = read_facade->get_all_next();
+        auto affect_conds = AffectsConditions(stmt, read_facade);
+        auto has_transitive =
+            has_transitive_rs(stmt, {stmt_num_2.value}, next_map, affect_conds.get_start_node_cond(),
+                              affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+        if (has_transitive) {
+            table.add_row({stmt});
+        }
+    }
+
+    return table;
 }
 
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
@@ -101,7 +135,35 @@ auto AffectsEvaluator::eval_affects(const WildCard&, const std::shared_ptr<StmtS
 }
 
 auto AffectsEvaluator::eval_affects(const WildCard&, const Integer& stmt_num_2) const -> OutputTable {
-    // TODO:
+    // TODO: We should optimise this (current implementation is quite naive)
+    // Get all variables used by stmt_num_2
+    auto used_vars = read_facade->get_vars_used_by_statement(stmt_num_2.value);
+
+    // Get all assign statements that modify any of the used vars
+    auto assign_stmts = read_facade->get_assign_statements();
+
+    for (const auto& stmt : assign_stmts) {
+        auto modified_var = *read_facade->get_vars_modified_by_statement(stmt).begin();
+        if (used_vars.find(modified_var) == used_vars.end()) {
+            assign_stmts.erase(stmt);
+        }
+    }
+
+    // For the remaining assign_stmts
+    for (const auto& stmt : assign_stmts) {
+        // Get all transitive stmts from stmt_num_2
+        auto next_map = read_facade->get_all_next();
+        auto affect_conds = AffectsConditions(stmt, read_facade);
+        auto has_transitive =
+            has_transitive_rs(stmt, {stmt_num_2.value}, next_map, affect_conds.get_start_node_cond(),
+                              affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+        if (has_transitive) {
+            return UnitTable{};
+        }
+    }
+
+    return Table{};
 }
 
 auto AffectsEvaluator::eval_affects(const WildCard&, const WildCard&) const -> OutputTable {
