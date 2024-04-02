@@ -6,8 +6,6 @@
 
 #include <memory>
 
-using namespace tokenizer;
-
 namespace sp {
 
 /**

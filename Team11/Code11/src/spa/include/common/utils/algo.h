@@ -19,7 +19,7 @@ class OrderingByIndexMap {
         for (unsigned long i = 0; i < order.size(); i++) {
             order_map.insert({order[i], i});
         }
-    };
+    }
 
     template <class T>
     auto operator()(const T& a, const T& b) const -> bool {

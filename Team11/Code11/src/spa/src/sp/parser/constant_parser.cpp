@@ -1,6 +1,8 @@
 #include "sp/parser/constant_parser.hpp"
 #include "common/ast/factor_ast.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 
 auto ConstantParser::parse(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode> {

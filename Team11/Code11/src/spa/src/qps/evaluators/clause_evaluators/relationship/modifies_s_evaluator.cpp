@@ -109,6 +109,6 @@ auto ModifiesSEvaluator::eval_modifies_s(const Integer& stmt_num, const WildCard
         return Table{};
     }
     return UnitTable{};
-};
+}
 
 } // namespace qps

@@ -20,9 +20,6 @@ auto PatternParserAssignStrategy::parse_syntactic_pattern(std::vector<Token>::co
     -> std::optional<std::tuple<ClauseType, std::vector<Token>::const_iterator>> {
     // syn-assign '(' entRef ',' expression-spec ')'
     static constexpr auto EXPECTED_LENGTH = 6;
-    static constexpr auto EARLY_EXIT_NUM_ARG = 2;
-    static constexpr auto LATE_EXIT_NUM_ARG = 3;
-
     if (std::distance(it, end) < EXPECTED_LENGTH) {
         return std::nullopt;
     }

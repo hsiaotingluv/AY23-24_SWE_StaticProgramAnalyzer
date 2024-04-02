@@ -51,7 +51,7 @@ class AstNode {
      */
     friend auto operator<<(std::ostream& os, const AstNode& node) -> std::ostream& {
         return os << node.identifier().str();
-    };
+    }
 };
 
 } // namespace sp

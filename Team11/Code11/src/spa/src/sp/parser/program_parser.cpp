@@ -1,6 +1,8 @@
 #include "sp/parser/program_parser.hpp"
 #include "common/ast/program_ast.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 auto ProgramParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end)
     -> std::shared_ptr<AstNode> {

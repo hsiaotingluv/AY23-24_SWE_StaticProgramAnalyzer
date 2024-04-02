@@ -5,6 +5,8 @@
 #include <functional>
 #include <unordered_map>
 
+using namespace tokenizer;
+
 namespace sp {
 auto RelExprParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end)
     -> std::shared_ptr<AstNode> {

@@ -8,7 +8,7 @@ auto ProgramCfgs::create_empty_cfg(const std::string& proc_name) -> std::shared_
     auto cfg = std::make_shared<ProcedureCfg>();
     proc_map.insert(std::make_pair(proc_name, cfg)); // Add the Cfg to the ProcMap.
     return cfg;
-};
+}
 
 auto ProgramCfgs::populate_stmt_num_map_by_node(const StatementNumbers& stmt_nums, const std::string& proc_name,
                                                 const std::shared_ptr<CfgNode>& node) -> StatementNumbers {
@@ -34,15 +34,15 @@ auto ProgramCfgs::populate_stmt_num_map() -> StmtNumMap {
         populate_stmt_num_map_by_procedure(proc_name, graph);
     }
     return stmt_num_map;
-};
+}
 
 auto ProgramCfgs::get_proc_map() const -> ProcMap {
     return proc_map;
-};
+}
 
 auto ProgramCfgs::get_stmt_num_map() const -> StmtNumMap {
     return stmt_num_map;
-};
+}
 
 auto ProgramCfgs::build(const std::shared_ptr<AstNode>& ast) -> ProcMap {
     auto prog_node = std::dynamic_pointer_cast<ProgramNode>(ast);

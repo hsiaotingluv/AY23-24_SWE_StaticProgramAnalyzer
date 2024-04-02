@@ -5,16 +5,16 @@
 namespace sp {
 auto CfgNode::get() const -> StatementNumbers {
     return stmt_nums;
-};
+}
 
 auto CfgNode::add(int stmt_num) -> int {
     stmt_nums.push_back(stmt_num);
     return stmt_num;
-};
+}
 
 auto CfgNode::empty() const -> bool {
     return stmt_nums.empty();
-};
+}
 
 auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream& {
     os << "Node(";
@@ -30,11 +30,11 @@ auto operator<<(std::ostream& os, const CfgNode& cfg_node) -> std::ostream& {
 
 auto ProcedureCfg::get_start_node() const -> std::shared_ptr<CfgNode> {
     return start_node;
-};
+}
 
 auto ProcedureCfg::get_current_node() const -> std::shared_ptr<CfgNode> {
     return current_node;
-};
+}
 
 auto ProcedureCfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const -> OutNeighbours {
     if (graph.find(node) == graph.end()) {
@@ -42,11 +42,11 @@ auto ProcedureCfg::get_outneighbours(const std::shared_ptr<CfgNode>& node) const
     } else {
         return graph.at(node);
     }
-};
+}
 
 auto ProcedureCfg::get_graph() const -> Graph {
     return graph;
-};
+}
 
 auto ProcedureCfg::is_current_node_empty() const -> bool {
     return current_node->empty();
@@ -55,7 +55,7 @@ auto ProcedureCfg::is_current_node_empty() const -> bool {
 auto ProcedureCfg::add_stmt_to_node(int stmt_num) -> int {
     current_node->add(stmt_num);
     return stmt_num;
-};
+}
 
 auto ProcedureCfg::add_node_to_graph() -> std::shared_ptr<CfgNode> {
     auto edge = std::make_pair(current_node, EMPTY_OUTNEIGHBOURS);
@@ -76,14 +76,14 @@ auto ProcedureCfg::add_outneighbour_to_graph(const std::shared_ptr<CfgNode>& out
 auto ProcedureCfg::move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
     current_node = node;
     return node;
-};
+}
 
 auto ProcedureCfg::link_and_move_to(const std::shared_ptr<CfgNode>& node) -> std::shared_ptr<CfgNode> {
     add_outneighbour_to_graph(node);
     move_to(node);
     add_node_to_graph();
     return node;
-};
+}
 
 auto operator<<(std::ostream& os, const ProcedureCfg& cfg) -> std::ostream& {
     auto graph = cfg.graph;

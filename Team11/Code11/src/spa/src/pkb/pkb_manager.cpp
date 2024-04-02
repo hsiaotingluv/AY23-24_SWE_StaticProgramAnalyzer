@@ -30,7 +30,7 @@ auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std
     auto write_facade = std::make_shared<WriteFacade>(pkb);
 
     return {std::move(read_facade), std::move(write_facade)};
-};
+}
 
 // ReadFacade APIs
 std::unordered_set<std::string> PkbManager::get_entities() const {
@@ -205,12 +205,12 @@ bool PkbManager::contains_statement_modify_var_value(const std::string& variable
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_modify() const {
     return statement_modifies_store->get_all_keys();
-};
+}
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_modify(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_modify();
     return filter_by_statement_type(stmts_pool, statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_modify_pairs() const {
     auto pairs = statement_modifies_store->get_all_pairs();
@@ -333,12 +333,12 @@ bool PkbManager::contains_procedure_use_var_value(const std::string& variable) c
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_use() const {
     return statement_uses_store->get_all_keys();
-};
+}
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_use(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_use();
     return filter_by_statement_type(stmts_pool, statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_use_pairs() const {
     auto pairs = statement_uses_store->get_all_pairs();

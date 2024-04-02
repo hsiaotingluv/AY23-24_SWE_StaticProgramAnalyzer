@@ -5,8 +5,6 @@
 
 #include <memory>
 
-using namespace tokenizer;
-
 namespace sp {
 /**
  * @class ExpressionParser

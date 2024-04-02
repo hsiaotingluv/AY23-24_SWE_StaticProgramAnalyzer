@@ -108,6 +108,6 @@ auto untyped_clause_visitor(const Synonyms& declarations,
                       [&declarations, &mapping](const untyped::UntypedWithClause& with) {
                           return visit_with_clause(declarations, mapping, with);
                       }};
-};
+}
 
 } // namespace qps::detail

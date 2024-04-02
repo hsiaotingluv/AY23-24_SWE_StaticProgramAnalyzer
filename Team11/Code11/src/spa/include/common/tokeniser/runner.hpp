@@ -15,7 +15,8 @@ class TokenizerRunner {
 
   public:
     explicit TokenizerRunner(std::unique_ptr<Tokenizer> tokeniser, bool include_done = false)
-        : tokenizer(std::move(tokeniser)), include_done(include_done){};
+        : tokenizer(std::move(tokeniser)), include_done(include_done) {
+    }
 
     [[nodiscard]] auto apply_tokeniser(std::string input, bool debug = false) const -> std::vector<Token>;
 };

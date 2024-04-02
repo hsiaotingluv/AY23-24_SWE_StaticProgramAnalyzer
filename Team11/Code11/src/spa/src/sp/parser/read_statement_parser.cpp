@@ -1,6 +1,8 @@
 #include "common/ast/statement_ast.hpp"
 #include "sp/parser/statement_parser.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 // read: 'read' var_name';'
 auto StatementParser::parseReadStmt(Parser::Iterator& token_start, const Token& next_token)

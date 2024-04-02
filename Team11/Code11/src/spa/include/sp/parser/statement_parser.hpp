@@ -5,8 +5,6 @@
 #include "sp/parser/cond_expr_parser.hpp"
 #include "sp/parser/expr_parser.hpp"
 
-using namespace tokenizer;
-
 namespace sp {
 
 /**
@@ -39,29 +37,29 @@ class StatementParser : public Parser {
     /**
      * Parses a Read statement.
      * @param token_start Start of the Read statement.
-     * @param token_end End of the Read statement.
+     * @param next_token End of the Read statement.
      * @return Parsed Read statement.
      * @note read: 'read' var_name';'
      */
-    static auto parseReadStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
+    static auto parseReadStmt(Iterator& token_start, const tokenizer::Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a Print statement.
      * @param token_start Start of the Print statement.
-     * @param token_end End of the Print statement.
+     * @param next_token End of the Print statement.
      * @return Parsed Print statement.
      * @note print: 'print' var_name';'
      */
-    static auto parsePrintStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
+    static auto parsePrintStmt(Iterator& token_start, const tokenizer::Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a Call statement.
      * @param token_start Start of the Call statement.
-     * @param token_end End of the Call statement.
+     * @param next_token End of the Call statement.
      * @return Parsed Call statement.
      * @note call: 'call' proc_name';'
      */
-    static auto parseCallStmt(Iterator& token_start, const Token& next_token) -> std::shared_ptr<AstNode>;
+    static auto parseCallStmt(Iterator& token_start, const tokenizer::Token& next_token) -> std::shared_ptr<AstNode>;
 
     /**
      * Parses a If statement.
@@ -70,7 +68,7 @@ class StatementParser : public Parser {
      * @return Parsed If statement.
      * @note if: 'if' '(' cond_expr ')' 'then' '{' stmtLst '}' 'else' '{' stmtLst '}'
      */
-    auto parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end, const Token& next_token)
+    auto parseIfStmt(Iterator& token_start, const Parser::Iterator& token_end, const tokenizer::Token& next_token)
         -> std::shared_ptr<AstNode>;
 
     /**
@@ -80,7 +78,7 @@ class StatementParser : public Parser {
      * @return Parsed While statement.
      * @note while: 'while' '(' cond_expr ')' '{' stmtLst '}'
      */
-    auto parseWhileStmt(Iterator& token_start, const Parser::Iterator& token_end, const Token& next_token)
+    auto parseWhileStmt(Iterator& token_start, const Parser::Iterator& token_end, const tokenizer::Token& next_token)
         -> std::shared_ptr<AstNode>;
 
   public:

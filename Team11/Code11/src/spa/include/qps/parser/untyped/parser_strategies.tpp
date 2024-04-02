@@ -132,7 +132,7 @@ auto parse_stmt_stmt(std::vector<Token>::const_iterator it, const std::vector<To
     return std::make_tuple(
         UntypedStmtStmtRel{keyword, parse_stmt_ref(maybe_first_arg), parse_stmt_ref(maybe_second_arg)},
         std::next(it, EXPECTED_LENGTH));
-};
+}
 
 template <typename T>
 auto parse_stmt_ent(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
@@ -254,7 +254,7 @@ auto parse_ent_ent(std::vector<Token>::const_iterator it, const std::vector<Toke
     }
     it = std::next(it, 1);
     return std::make_tuple(UntypedRefEntRel{keyword, ent_ref1, ent_ref}, it);
-};
+}
 
 inline auto parse_stmt_stmt_rel(std::vector<Token>::const_iterator, const std::vector<Token>::const_iterator&,
                                 TypeList<>)
