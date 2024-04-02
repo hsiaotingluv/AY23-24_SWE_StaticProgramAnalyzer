@@ -11,10 +11,10 @@ class AffectsTraverser {
 
   private:
     auto get_statement_numbers(const std::shared_ptr<ProcedureCfg>& cfg) -> StatementNumbers;
-    auto send_to_pkb(const std::string proc_name, const StatementNumbers& stmt_nos) -> void;
+    auto send_to_pkb(const std::string proc_name, const StatementNumbers& stmt_nos) -> StatementNumbers;
 
   public:
     explicit AffectsTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
-    auto traverse(const ProcMap& cfgs) -> void;
+    auto traverse(const ProcMap& cfgs) -> std::unordered_map<std::string, StatementNumbers>;
 };
 } // namespace sp
