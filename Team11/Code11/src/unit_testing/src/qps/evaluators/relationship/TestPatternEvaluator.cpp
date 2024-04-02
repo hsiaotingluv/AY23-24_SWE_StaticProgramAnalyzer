@@ -41,9 +41,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate - Select a such that Pattern a (\"x\", _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -57,9 +54,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate - Select a such that Pattern a (\"y\", _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -72,9 +66,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (\"x\", \"y + z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -89,9 +80,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (\"x\", \"z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -104,9 +92,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (_, \"y + z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -121,9 +106,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (_, \"z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -136,7 +118,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (x, \"z * 2\")") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("x")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>("a"),
@@ -150,9 +131,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Partial Match - Select a such that Pattern a (\"x\", \"y + z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -167,9 +145,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Partial Match - Select a such that Pattern a (\"x\", \"z * 2\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -184,9 +159,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Partial Match - Select a such that Pattern a (\"x\", \"y + z\")") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -200,7 +172,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Partial Match - Select a such that Pattern a (\"x\", \"z * 2 + y\")") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>("a"),
@@ -215,7 +186,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate - Select a such that Pattern a (v, _)") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -230,7 +200,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate - Select a such that Pattern a (v, _)") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a"), std::make_shared<VarSynonym>("v")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -245,7 +214,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate - Select a such that Pattern a (_, _)") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -259,7 +227,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Exact Match - Select a such that Pattern a (_, \"y + z * 2\")") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(
@@ -273,7 +240,6 @@ TEST_CASE("Test Evaluator Pattern") {
 
     SECTION("Evaluate Partial Match - Select a such that Pattern a (_, \"z * 2\")") {
         const auto query = Query{
-            Synonyms{std::make_shared<AssignSynonym>("a")},
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<PatternClause>(

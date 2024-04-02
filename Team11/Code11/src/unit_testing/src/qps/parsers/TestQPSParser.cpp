@@ -86,9 +86,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -103,10 +100,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -120,10 +113,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -137,8 +126,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto result = to_query(qps.parse(query));
 
         REQUIRE(result.has_value());
-        REQUIRE(result->declared.size() == 1);
-        require_value<AnyStmtSynonym>(result->declared[0], "s");
         require_value<AnyStmtSynonym>(result->reference, "s");
 
         REQUIRE(result->clauses.size() == 1);
@@ -152,10 +139,6 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<VarSynonym>(result.declared[1], "v");
         require_value<VarSynonym>(result.reference, "v");
 
         REQUIRE(result.clauses.size() == 1);
@@ -171,9 +154,6 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AssignSynonym>(result.declared[0], "a");
         require_value<AssignSynonym>(result.reference, "a");
 
         REQUIRE(result.clauses.size() == 1);
@@ -188,10 +168,6 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-
-        require_value<AssignSynonym>(result.declared[0], "newa");
         require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
@@ -208,10 +184,6 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-
-        require_value<WhileSynonym>(result.declared[0], "newa");
         require_value<WhileSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
@@ -332,9 +304,6 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<ProcSynonym>(result.declared[0], "p");
-
         require_value<ProcSynonym>(result.reference, "p");
 
         REQUIRE(result.clauses.size() == 1);
@@ -350,9 +319,6 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<ProcSynonym>(result.declared[0], "p");
-
         require_value<ProcSynonym>(result.reference, "p");
 
         REQUIRE(result.clauses.size() == 1);
@@ -368,9 +334,6 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -386,9 +349,6 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -404,9 +364,6 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -443,11 +400,6 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -462,11 +414,6 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
         require_value<ProcSynonym>(result.reference, "p");
 
@@ -486,11 +433,6 @@ TEST_CASE("Test QPS - 'and' connectives") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 2);
@@ -510,10 +452,6 @@ TEST_CASE("Test QPS - 'and' connectives") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AssignSynonym>(result.declared[0], "newa");
-
         require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 2);
@@ -538,9 +476,6 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_boolean(result.reference);
 
         REQUIRE(result.clauses.size() == 1);
@@ -555,8 +490,6 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 0);
         require_boolean(result.reference);
 
         REQUIRE(result.clauses.size() == 1);
@@ -570,9 +503,6 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value<AnyStmtSynonym>(result.reference, "BOOLEAN");
 
         REQUIRE(result.clauses.size() == 2);
@@ -609,9 +539,6 @@ TEST_CASE("Test QPS - Pattern If") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<IfSynonym>(result.declared[0], "ifs");
         require_value<IfSynonym>(result.reference, "ifs");
 
         REQUIRE(result.clauses.size() == 1);
@@ -631,9 +558,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ProcSynonym>(result.declared[0], "p");
             require_value<ProcSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
@@ -649,9 +573,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<CallSynonym>(result.declared[0], "c");
             require_value<CallSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
@@ -725,9 +646,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<VarSynonym>(result.declared[0], "v");
             require_value<VarSynonym>(result.reference, "v");
 
             REQUIRE(result.clauses.size() == 1);
@@ -743,9 +661,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ReadSynonym>(result.declared[0], "r");
             require_value<ReadSynonym>(result.reference, "r");
 
             REQUIRE(result.clauses.size() == 1);
@@ -761,9 +676,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<PrintSynonym>(result.declared[0], "p");
             require_value<PrintSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
@@ -830,9 +742,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ConstSynonym>(result.declared[0], "c");
             require_value<ConstSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
@@ -913,9 +822,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<AnyStmtSynonym>(result.declared[0], "s");
             require_value<AnyStmtSynonym>(result.reference, "s");
 
             REQUIRE(result.clauses.size() == 1);
@@ -932,10 +838,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<ReadSynonym>(result.declared[0], "r");
             require_value<ReadSynonym>(result.reference, "r");
 
             REQUIRE(result.clauses.size() == 1);
@@ -952,10 +854,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<PrintSynonym>(result.declared[0], "p");
             require_value<PrintSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
@@ -972,10 +870,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<CallSynonym>(result.declared[0], "c");
             require_value<CallSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
@@ -992,10 +886,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<WhileSynonym>(result.declared[0], "w");
             require_value<WhileSynonym>(result.reference, "w");
 
             REQUIRE(result.clauses.size() == 1);
@@ -1012,10 +902,6 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<IfSynonym>(result.declared[0], "i");
             require_value<IfSynonym>(result.reference, "i");
 
             REQUIRE(result.clauses.size() == 1);
@@ -1033,9 +919,6 @@ TEST_CASE("Test QPS - With") {
             REQUIRE(output.has_value());
             const auto result = output.value();
 
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<AssignSynonym>(result.declared[0], "a");
             require_value<AssignSynonym>(result.reference, "a");
 
             REQUIRE(result.clauses.size() == 1);
@@ -1079,8 +962,6 @@ TEST_CASE("Test QPS - Select attrRef") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value(result.reference,
                       AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer});
     }
@@ -1092,10 +973,6 @@ TEST_CASE("Test QPS - Select attrRef") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 2);
-        require_value<AssignSynonym>(result.declared[0], "a1");
-        require_value<VarSynonym>(result.declared[1], "a2");
-
         require_value(result.reference,
                       AttrRef{std::make_shared<AssignSynonym>(IDENT{"a1"}), StmtNum{}, AttrRef::Type::Integer});
         require_value<VarSynonym>(result.reference, "a2");
@@ -1118,8 +995,6 @@ TEST_CASE("Test QPS - Weird synonym names") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "Uses");
         require_value<AnyStmtSynonym>(result.reference, "Uses");
 
         REQUIRE(result.clauses.size() == 1);
@@ -1135,10 +1010,6 @@ TEST_CASE("Test QPS - Weird synonym names") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 2);
-        require_value<AnyStmtSynonym>(result.declared[0], "Parent");
-        require_value<AnyStmtSynonym>(result.declared[1], "Follows");
-
         require_value<AnyStmtSynonym>(result.reference, "Parent");
 
         REQUIRE(result.clauses.size() == 1);
@@ -1159,8 +1030,6 @@ TEST_CASE("Query - Select negated clause") {
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -1176,8 +1045,6 @@ TEST_CASE("Query - Select negated clause") {
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
@@ -1194,8 +1061,6 @@ TEST_CASE("Query - Select negated clause") {
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 1);
-        require_value<AssignSynonym>(result.declared[0], "a");
         require_value<AssignSynonym>(result.reference, "a");
 
         REQUIRE(result.clauses.size() == 1);

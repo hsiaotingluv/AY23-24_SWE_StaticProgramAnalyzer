@@ -36,30 +36,32 @@ inline auto operator<<(std::ostream& os, const Synonyms& reference) -> std::ostr
 }
 
 struct Query {
-    Synonyms declared;
     Reference reference;
     std::vector<std::shared_ptr<Clause>> clauses;
 
-    Query(Synonyms declared, Reference reference, std::vector<std::shared_ptr<Clause>> clauses)
-        : declared(std::move(declared)), reference(std::move(reference)), clauses(std::move(clauses)) {
+    Query(Reference reference, std::vector<std::shared_ptr<Clause>> clauses)
+        : reference(std::move(reference)), clauses(std::move(clauses)) {
     }
 
-    Query(Synonyms declared, std::shared_ptr<Synonym> synonym, std::vector<std::shared_ptr<Clause>> clauses)
-        : declared(std::move(declared)), reference(std::vector<Elem>{std::move(synonym)}), clauses(std::move(clauses)) {
+    Query(std::shared_ptr<Synonym> synonym, std::vector<std::shared_ptr<Clause>> clauses)
+        : reference(std::vector<Elem>{std::move(synonym)}), clauses(std::move(clauses)) {
     }
 
-    auto operator<<(std::ostream& os) -> std::ostream& {
+    friend auto operator<<(std::ostream& os, const Query& query) -> std::ostream& {
         os << "Query:\n";
-        os << "\tDeclared:\n";
-        for (const auto& declared : declared) {
-            os << "\t\t" << declared << "\n";
-        }
         os << "\tReference:\n";
-        os << "\t\t" << reference << "\n";
+        os << "\t\t" << query.reference << "\n";
         os << "\tClauses:\n";
-        for (const auto& clause : clauses) {
-            os << "\t\t" << clause << "\n";
+        for (const auto& clause : query.clauses) {
+            os << "\t\t";
+            if (clause == nullptr) {
+                os << "nullptr";
+            } else {
+                os << *clause;
+            }
+            os << "\n";
         }
+
         return os;
     }
 };
@@ -143,7 +145,7 @@ class SemanticAnalyser {
             validated_clauses.push_back(maybe_validated_clause.value());
         }
 
-        return Query{declarations, reference, validated_clauses};
+        return Query{reference, validated_clauses};
     }
 };
 

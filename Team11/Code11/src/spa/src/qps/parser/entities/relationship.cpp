@@ -124,17 +124,17 @@ auto operator<<(std::ostream& os, const CallsT& callsT) -> std::ostream& {
 }
 
 auto operator<<(std::ostream& os, const Next& next) -> std::ostream& {
-    os << "Next(" << next.stmt1 << ", " << next.stmt1 << ")";
+    os << "Next(" << next.stmt1 << ", " << next.stmt2 << ")";
     return os;
 }
 
 auto operator<<(std::ostream& os, const NextT& nextT) -> std::ostream& {
-    os << "Next*(" << nextT.stmt1 << ", " << nextT.stmt1 << ")";
+    os << "Next*(" << nextT.stmt1 << ", " << nextT.stmt2 << ")";
     return os;
 }
 
 auto operator<<(std::ostream& os, const Affects& affects) -> std::ostream& {
-    os << "Affects(" << affects.stmt1 << ", " << affects.stmt1 << ")";
+    os << "Affects(" << affects.stmt1 << ", " << affects.stmt2 << ")";
     return os;
 }
 } // namespace qps
