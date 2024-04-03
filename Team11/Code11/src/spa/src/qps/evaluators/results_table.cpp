@@ -643,7 +643,6 @@ static auto process_missing_synonym(const std::shared_ptr<pkb::ReadFacade>& read
         const auto& synonym = detail::to_synonym(element);
         return table_synonyms.find(synonym) != table_synonyms.end();
     });
-    const auto& available_elements = std::vector<Elem>(elems.begin(), mid_iter);
     const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
     // Fill table using information from the available synonyms
