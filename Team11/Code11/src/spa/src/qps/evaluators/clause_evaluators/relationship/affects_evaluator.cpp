@@ -2,8 +2,6 @@
 #include "qps/utils/affects_conditions.h"
 #include "qps/utils/algo.h"
 
-#include <stack>
-
 namespace qps {
 
 auto AffectsEvaluator::select_eval_method() const {
@@ -101,6 +99,7 @@ auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const std::shared
             table.add_row({row});
         }
     }
+    return table;
 }
 
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
