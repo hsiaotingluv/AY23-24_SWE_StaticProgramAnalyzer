@@ -74,5 +74,5 @@ auto such_that_clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>&
             // TODO: Implement Affects here
             return nullptr;
         }};
-};
+}
 } // namespace qps

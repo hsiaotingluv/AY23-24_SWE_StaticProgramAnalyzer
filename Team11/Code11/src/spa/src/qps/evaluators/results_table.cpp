@@ -333,40 +333,17 @@ static void reorder_contents(std::vector<std::vector<std::string>>& table_conten
     });
 }
 
-auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
-    // Step 0: Short-circuit if either table is empty
-    if (table1.empty()) {
-        return table2;
-    } else if (table2.empty()) {
-        return table1;
-    }
+static auto merge_join_impl(std::vector<std::vector<std::string>>&& table1_contents,
+                            std::vector<std::vector<std::string>>&& table2_contents,
+                            const std::unordered_map<int, int>& table1_mask,
+                            const std::unordered_map<int, int>& table2_mask,
+                            const std::vector<std::tuple<int, int>>& common_column_idxs,
+                            const std::vector<std::shared_ptr<Synonym>>& new_column_names) -> OutputTable {
+    // Preconditions: table1_contents and table2_contents are sorted based on the common columns
+    auto new_table = Table{new_column_names};
 
-    // Step 1: Reorder columns and rows
-    const auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
-    const auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
-
-    auto table1_contents = tableA.get_records();
-    auto table2_contents = tableB.get_records();
-    auto table1_column_names = tableA.get_column();
-    auto table2_column_names = tableB.get_column();
-
-    const auto& [new_column, ordering1, ordering2, common_column_idxs] =
-        double_pointer_merge_with_ordering(table1_column_names, table2_column_names);
-    auto new_table = Table{new_column};
-
-    const auto table1_mask = build_mapping_sorted(table1_column_names, new_column);
-    const auto table2_mask = build_mapping_sorted(table2_column_names, new_column);
-
-    reorder_contents(table1_contents, ordering1);
-    reorder_contents(table2_contents, ordering2);
-
-    // Sort based on values in the common column
-    sort_on_column(table1_contents, table2_contents, common_column_idxs);
-
-    // Step 2: join records
     auto curr_row1 = table1_contents.begin();
     auto curr_row2 = table2_contents.begin();
-
     while (curr_row1 != table1_contents.end() && curr_row2 != table2_contents.end()) {
         // Shift row pointers to the first row with the same value in the common column
         auto all_same = true;
@@ -390,7 +367,7 @@ auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
 
         while (true) {
             // All common columns are equal -> safe to join the records
-            auto new_record = std::vector<std::string>(new_column.size(), "");
+            auto new_record = std::vector<std::string>(new_column_names.size(), "");
             // Populate new_record with values from records
             for (int i = 0; i < static_cast<int>(curr_row1->size()); i++) {
                 new_record[table1_mask.at(i)] = (*curr_row1)[i];
@@ -433,6 +410,39 @@ auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
     return new_table;
 }
 
+static auto reorder_table_data(std::vector<std::vector<std::string>>& table1_contents,
+                               std::vector<std::vector<std::string>>& table2_contents,
+                               const std::vector<int>& ordering1, const std::vector<int>& ordering2,
+                               const std::vector<std::tuple<int, int>>& common_column_idxs) -> void {
+    // Reorder data
+    reorder_contents(table1_contents, ordering1);
+    reorder_contents(table2_contents, ordering2);
+
+    // Sort based on values in the common column
+    sort_on_column(table1_contents, table2_contents, common_column_idxs);
+}
+
+auto merge_join(Table&& table1, Table&& table2) -> OutputTable {
+    // Step 0: Short-circuit if either table is empty
+    if (table1.empty()) {
+        return table2;
+    } else if (table2.empty()) {
+        return table1;
+    }
+
+    auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
+    auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
+
+    const auto& [new_column, ordering1, ordering2, common_column_idxs] =
+        double_pointer_merge_with_ordering(tableA.get_column(), tableB.get_column());
+    const auto table1_mask = build_mapping_sorted(tableA.get_column(), new_column);
+    const auto table2_mask = build_mapping_sorted(tableB.get_column(), new_column);
+
+    reorder_table_data(tableA.get_records(), tableB.get_records(), ordering1, ordering2, common_column_idxs);
+    return merge_join_impl(std::move(tableA.get_records()), std::move(tableB.get_records()), table1_mask, table2_mask,
+                           common_column_idxs, new_column);
+}
+
 auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     // Step 0: Short-circuit if either table is empty
     if (table1.empty()) {
@@ -445,8 +455,6 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     auto& tableA = table1.get_column().size() < table2.get_column().size() ? table1 : table2;
     auto& tableB = table1.get_column().size() < table2.get_column().size() ? table2 : table1;
 
-    auto table1_contents = tableA.get_records();
-    auto table2_contents = tableB.get_records();
     auto table1_column_names = tableA.get_column();
     auto table2_column_names = tableB.get_column();
 
@@ -456,7 +464,14 @@ auto cross_merge_join(Table&& table1, Table&& table2) -> OutputTable {
     if (common_column_idxs.empty()) {
         return cross_join(std::move(tableA), std::move(tableB));
     } else {
-        return merge_join(std::move(tableA), std::move(tableB));
+        tableA.get_column() = std::move(table1_column_names);
+        tableB.get_column() = std::move(table2_column_names);
+        const auto table1_mask = build_mapping_sorted(tableA.get_column(), new_column);
+        const auto table2_mask = build_mapping_sorted(tableB.get_column(), new_column);
+
+        reorder_table_data(tableA.get_records(), tableB.get_records(), ordering1, ordering2, common_column_idxs);
+        return merge_join_impl(std::move(tableA.get_records()), std::move(tableB.get_records()), table1_mask,
+                               table2_mask, common_column_idxs, new_column);
     }
 }
 
@@ -552,6 +567,97 @@ static auto reorder_table(Table& table, const Synonyms& requested_synonyms) -> v
         reorder(row, new_idx_to_old_idx);
     }
 }
+
+static auto subtract_impl(std::vector<std::vector<std::string>>&& table1_contents,
+                          std::vector<std::vector<std::string>>&& table2_contents,
+                          const std::vector<std::shared_ptr<Synonym>>& new_column_names,
+                          const std::vector<std::tuple<int, int>>& common_column_idxs) -> Table {
+    // Preconditions:
+    // table1_contents and table2_contents are sorted based on the common columns
+    // table1_contents is superset of table2_contents
+
+    auto new_table = Table{new_column_names};
+
+    auto curr_row1 = table1_contents.begin();
+    auto curr_row2 = table2_contents.begin();
+    while (curr_row1 != table1_contents.end() && curr_row2 != table2_contents.end()) {
+        // Shift row pointers to the first row with the same value in the common column
+        auto all_same = true;
+        for (auto [col_idx1, col_idx2] : common_column_idxs) {
+            if ((*curr_row1)[col_idx1] < (*curr_row2)[col_idx2]) {
+                new_table.add_row(*curr_row1);
+                curr_row1++;
+                all_same = false;
+                break;
+            } else if ((*curr_row1)[col_idx1] > (*curr_row2)[col_idx2]) {
+                curr_row2++;
+                all_same = false;
+                break;
+            }
+        }
+        if (!all_same) {
+            continue;
+        }
+        // All common columns are equal -> advance both pointers
+        curr_row1++;
+        curr_row2++;
+    }
+
+    // Add all remaining rows from table1
+    while (curr_row1 != table1_contents.end()) {
+        new_table.add_row(*curr_row1);
+        curr_row1++;
+    }
+
+    return new_table;
+}
+
+static auto subtract_tables(Table&& table1, Table&& table2, const std::shared_ptr<pkb::ReadFacade>& read_facade)
+    -> Table {
+    // Step 0: Short-circuit if either table is empty
+    if (table1.empty() || table2.empty()) {
+        return table1;
+    }
+
+    auto table1_column_names = table1.get_column();
+    auto table2_column_names = table2.get_column();
+    const auto& [new_column, ordering1, ordering2, common_column_idxs] =
+        double_pointer_merge_with_ordering(table1_column_names, table2_column_names);
+
+    if (common_column_idxs.empty()) {
+        // No common columns -> no subtraction possible
+        return table1;
+    }
+
+    if (common_column_idxs.size() != table2_column_names.size()) {
+        // Table1 does not have enough information -> Need to fetch more data
+        // new_column is union of table1_column_names and table2_column_names
+
+#ifdef DEBUG
+        std::cerr << "[PERF WARNING] >>> Table1 does not have enough information -> Need to fetch more data"
+                  << std::endl;
+#endif
+        auto missing_names = std::vector<std::shared_ptr<Synonym>>{};
+        for (const auto& name : table2_column_names) {
+            if (std::find(table1_column_names.begin(), table1_column_names.end(), name) == table1_column_names.end()) {
+                missing_names.push_back(name);
+            }
+        }
+        auto missing_table = detail::build_full_table(missing_names, read_facade);
+
+        // Safe: cross joining 2 concrete tables has to give a concrete table
+        table1 = std::get<Table>(detail::cross_join(std::move(table1), std::move(missing_table)));
+
+        // Retry with the fully built table
+        return subtract_tables(std::move(table1), std::move(table2), read_facade);
+    }
+
+    table1.get_column() = std::move(table1_column_names);
+    table2.get_column() = std::move(table2_column_names);
+    reorder_table_data(table1.get_records(), table2.get_records(), ordering1, ordering2, common_column_idxs);
+    return subtract_impl(std::move(table1.get_records()), std::move(table2.get_records()), new_column,
+                         common_column_idxs);
+}
 } // namespace qps::detail
 
 namespace qps {
@@ -562,6 +668,23 @@ auto is_unit(const OutputTable& table) -> bool {
 
 auto is_empty(const OutputTable& table) -> bool {
     return std::holds_alternative<Table>(table) && std::get<Table>(table).empty();
+}
+
+auto subtract(OutputTable&& table1, OutputTable&& table2, const std::shared_ptr<pkb::ReadFacade>& read_facade)
+    -> Table {
+    return std::visit(overloaded{[&read_facade](UnitTable&&, Table&& table2) -> Table {
+                                     const auto synonyms = table2.get_column();
+                                     return detail::subtract_tables(detail::build_full_table(synonyms, read_facade),
+                                                                    std::move(table2), read_facade);
+                                 },
+                                 [&read_facade](Table&& table1, Table&& table2) -> Table {
+                                     return detail::subtract_tables(std::move(table1), std::move(table2), read_facade);
+                                 },
+                                 [](auto&&, UnitTable&&) -> Table {
+                                     // Subtracting UnitTable from anything must result in an empty table
+                                     return Table{};
+                                 }},
+                      std::move(table1), std::move(table2));
 }
 
 auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable {
@@ -643,7 +766,6 @@ static auto process_missing_synonym(const std::shared_ptr<pkb::ReadFacade>& read
         const auto& synonym = detail::to_synonym(element);
         return table_synonyms.find(synonym) != table_synonyms.end();
     });
-    const auto& available_elements = std::vector<Elem>(elems.begin(), mid_iter);
     const auto& missing_elements = std::vector<Elem>(mid_iter, elems.end());
 
     // Fill table using information from the available synonyms
