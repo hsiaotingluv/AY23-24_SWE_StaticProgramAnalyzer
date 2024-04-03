@@ -8,7 +8,6 @@
 
 namespace qps {
 class PatternAssignEvaluator : public ClauseEvaluator {
-    std::shared_ptr<pkb::ReadFacade> read_facade;
     PatternAssign pattern;
 
     [[nodiscard]] auto select_eval_method() const;
@@ -48,11 +47,11 @@ class PatternAssignEvaluator : public ClauseEvaluator {
         -> OutputTable;
 
   public:
-    PatternAssignEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, PatternAssign pattern)
-        : ClauseEvaluator(), read_facade(std::move(read_facade)), pattern(std::move(pattern)) {
+    PatternAssignEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, PatternAssign pattern, bool is_negated)
+        : ClauseEvaluator(std::move(read_facade), is_negated), pattern(std::move(pattern)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> OutputTable override;
+    [[nodiscard]] auto evaluate_positive() const -> OutputTable override;
 };
 
 } // namespace qps

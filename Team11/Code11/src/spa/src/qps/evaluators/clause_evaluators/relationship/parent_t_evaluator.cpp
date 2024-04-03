@@ -9,7 +9,7 @@ auto ParentTEvaluator::select_eval_method() const {
     }};
 }
 
-auto ParentTEvaluator::evaluate() const -> OutputTable {
+auto ParentTEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), parent_t.stmt1, parent_t.stmt2);
 }
 
