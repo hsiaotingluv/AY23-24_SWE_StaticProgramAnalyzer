@@ -61,7 +61,10 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
     v = v_copy;
 }
 
+auto subtract(OutputTable&& table1, OutputTable&& table2, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table;
 auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable;
+auto project_to_table(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table,
+                      const Reference& reference, bool should_transform = false) -> OutputTable;
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
 void print(const Table& table);

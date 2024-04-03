@@ -1,11 +1,14 @@
 #include "catch.hpp"
 
+#include "common/statement_type.hpp"
+#include "pkb/facades/write_facade.h"
+#include "pkb/pkb_manager.h"
 #include "qps/evaluators/results_table.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include <cstdlib>
-#include <functional>
 #include <memory>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 using namespace qps;
@@ -111,6 +114,80 @@ TEST_CASE("Test Join") {
             REQUIRE(expected_set.find(std::make_tuple(record[0], record[1])) != expected_set.end());
         }
     }
+}
+
+TEST_CASE("Test Subtract Table") {
+    auto [read_facade, write_facade] = pkb::PkbManager::create_facades();
+    constexpr auto num_rows = 5;
+
+    SECTION("No common synonyms") {
+        auto table1 = Table{{std::make_shared<AnyStmtSynonym>("s")}};
+        auto table2 = Table{{std::make_shared<VarSynonym>("v")}};
+
+        for (auto i = 0; i < num_rows; i++) {
+            table1.add_row({std::to_string(i)});
+            table2.add_row({"v" + std::to_string(i)});
+        }
+
+        auto expected_columns = table1.get_column();
+        auto expected_answers = table1.get_records();
+
+        const auto table = subtract(std::move(table1), std::move(table2), read_facade);
+        REQUIRE(table.get_column() == expected_columns);
+        REQUIRE(table.get_records() == expected_answers);
+    }
+
+    SECTION("All common synonym - All common rows") {
+        auto table1 = Table{{std::make_shared<AnyStmtSynonym>("s")}};
+        auto table2 = Table{{std::make_shared<AnyStmtSynonym>("s")}};
+        for (auto i = 0; i < num_rows; i++) {
+            table1.add_row({std::to_string(i)});
+            table2.add_row({std::to_string(num_rows - i - 1)});
+        }
+
+        auto expected_columns = table1.get_column();
+        auto expected_answers = table1.get_records();
+
+        const auto table = subtract(std::move(table1), std::move(table2), read_facade);
+        REQUIRE(table.empty());
+    }
+
+    SECTION("All common synonym - no common rows") {
+        auto table1 = Table{{std::make_shared<AnyStmtSynonym>("s")}};
+        auto table2 = Table{{std::make_shared<AnyStmtSynonym>("s")}};
+        for (auto i = 0; i < num_rows; i++) {
+            table1.add_row({std::to_string(i)});
+            table2.add_row({std::to_string(num_rows + i)});
+        }
+
+        auto expected_columns = table1.get_column();
+        auto expected_answers = table1.get_records();
+
+        const auto table = subtract(std::move(table1), std::move(table2), read_facade);
+        REQUIRE(table.get_column() == expected_columns);
+        REQUIRE(table.get_records() == expected_answers);
+    }
+
+    SECTION("Some common synonym - Some common rows") {
+        auto table1 = Table{{std::make_shared<AnyStmtSynonym>("s"), std::make_shared<VarSynonym>("v")}};
+        auto table2 = Table{{std::make_shared<VarSynonym>("v2"), std::make_shared<AnyStmtSynonym>("s")}};
+
+        for (auto i = 0; i < num_rows; i++) {
+            table1.add_row({std::to_string(i), "v" + std::to_string(i)});
+            table2.add_row({"v" + std::to_string(i), std::to_string(i)});
+
+            write_facade->add_variable("v" + std::to_string(i));
+            write_facade->add_statement(std::to_string(i), StatementType::Assign);
+        }
+
+        const auto table = subtract(std::move(table1), std::move(table2), read_facade);
+        REQUIRE(table.get_records().size() == num_rows * num_rows - num_rows);
+
+        for (const auto& row : table.get_records()) {
+            REQUIRE("v" + row[0] !=
+                    row[2]); // Our subtraction disallows x _ "v"+x e.g. 1 _ v1 cannot appear in the table
+        }
+    };
 }
 
 #ifdef ENABLE_BENCHMARK

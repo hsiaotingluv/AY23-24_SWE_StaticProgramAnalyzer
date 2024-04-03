@@ -74,5 +74,5 @@ auto such_that_clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>&
         [read_facade](const qps::Affects& affects) -> std::shared_ptr<ClauseEvaluator> {
             return std::make_shared<AffectsEvaluator>(read_facade, affects);
         }};
-};
+}
 } // namespace qps

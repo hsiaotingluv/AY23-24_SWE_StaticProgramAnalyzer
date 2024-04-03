@@ -20,5 +20,5 @@ auto pattern_clause_evaluator_selector(const std::shared_ptr<pkb::ReadFacade>& r
                       [read_facade](const qps::PatternWhile& pattern) -> std::shared_ptr<ClauseEvaluator> {
                           return std::make_shared<PatternWhileEvaluator>(read_facade, pattern);
                       }};
-};
+}
 } // namespace qps
