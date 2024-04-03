@@ -19,8 +19,9 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
     const auto relevant_stmts = stmt_syn_1->scan(read_facade);
     auto table = Table{{stmt_syn_1}};
     const auto next_reverse_map = read_facade->get_all_next_reverse();
+    const auto next_map = read_facade->get_all_next();
 
-    auto new_rows = get_all_transitive_from_node(stmt_num_2.value, next_reverse_map);
+    auto new_rows = get_all_transitive_from_node(stmt_num_2.value, next_reverse_map, next_map);
 
     for (const auto& row : new_rows) {
         if (relevant_stmts.find(row) != relevant_stmts.end()) {
@@ -52,8 +53,9 @@ auto NextTEvaluator::eval_next_t(const Integer& stmt_num_1, const std::shared_pt
     auto table = Table{{stmt_syn_2}};
 
     const auto next_map = read_facade->get_all_next();
+    const auto rev_map = read_facade->get_all_next_reverse();
 
-    auto new_rows = get_all_transitive_from_node(stmt_num_1.value, next_map);
+    auto new_rows = get_all_transitive_from_node(stmt_num_1.value, next_map, rev_map);
 
     for (const auto& row : new_rows) {
         if (relevant_stmts.find(row) != relevant_stmts.end()) {
@@ -100,8 +102,9 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 
 auto NextTEvaluator::eval_next_t(const Integer& stmt_num_1, const Integer& stmt_num_2) const -> OutputTable {
     const auto next_map = read_facade->get_all_next();
+    const auto rev_map = read_facade->get_all_next_reverse();
 
-    bool has_transitive = has_transitive_rs(stmt_num_1.value, {stmt_num_2.value}, next_map);
+    bool has_transitive = has_transitive_rs(stmt_num_1.value, {stmt_num_2.value}, next_map, rev_map);
 
     if (has_transitive) {
         return UnitTable{};
