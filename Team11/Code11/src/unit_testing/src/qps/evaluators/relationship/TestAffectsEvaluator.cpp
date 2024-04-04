@@ -50,10 +50,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
@@ -66,9 +62,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, 5)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{std::make_shared<AnyStmtSynonym>("s1"), Integer{"5"}}, false),
@@ -80,9 +73,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, false),
@@ -95,9 +85,6 @@ TEST_CASE("Test Evaluator Affects") {
     // TODO: Fail - program failure
     SECTION("Evaluate - Select s1 such that Affects (1, s1)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}, false),
@@ -109,9 +96,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (2, 4)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"2"}, Integer{"4"}}, false),
@@ -123,9 +107,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"1"}, WildCard{}}, false),
@@ -137,9 +118,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, s1)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, std::make_shared<AnyStmtSynonym>("s1")}, false),
@@ -151,9 +129,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, 4)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, Integer{"4"}}, false),
@@ -165,9 +140,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, WildCard{}}, false),
@@ -179,9 +151,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (5, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"5"}, WildCard{}}, false),
@@ -193,9 +162,6 @@ TEST_CASE("Test Evaluator Affects") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, Integer{"3"}}, false),
@@ -243,10 +209,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
@@ -259,9 +221,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, 5)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{std::make_shared<AnyStmtSynonym>("s1"), Integer{"5"}}, false),
@@ -275,9 +234,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (s1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, false),
@@ -289,9 +245,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (1, s1)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s1")}, false),
@@ -303,9 +256,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (3, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"3"}, Integer{"3"}}, false),
@@ -317,9 +267,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"1"}, WildCard{}}, false),
@@ -331,9 +278,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, s1)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, std::make_shared<AnyStmtSynonym>("s1")}, false),
@@ -345,9 +289,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, 5)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, Integer{"5"}}, false),
@@ -359,9 +300,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, WildCard{}}, false),
@@ -373,9 +311,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (2, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{Integer{"2"}, WildCard{}}, false),
@@ -387,9 +322,6 @@ TEST_CASE("Test Evaluator Affects with Cycle") {
 
     SECTION("Evaluate - Select s1 such that Affects (_, 4)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(Affects{WildCard{}, Integer{"4"}}, false),
