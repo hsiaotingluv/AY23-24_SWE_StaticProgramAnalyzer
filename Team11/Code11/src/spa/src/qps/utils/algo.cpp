@@ -226,7 +226,6 @@ get_next_star_pairs(const std::unordered_map<std::string, std::unordered_set<std
 // Check whether there's a transitive rs
 bool has_transitive_rs(const std::string& node1, const std::unordered_set<std::string>& end_nodes,
                        const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
-                       const std::unordered_map<std::string, std::unordered_set<std::string>>& rev_map,
                        const std::function<bool(const std::string&)>& start_node_cond,
                        const std::function<bool(const std::string&)>& end_node_cond,
                        const std::function<bool(const std::string&)>& intermediate_node_cond) {
@@ -266,8 +265,7 @@ bool has_transitive_rs(const std::string& node1, const std::unordered_set<std::s
         }
 
         // If already visited or does not pass the intermediate node condition, skip
-        if ((rev_map.at(current).size() == 1 && visited.find(current) != visited.end()) ||
-            !intermediate_node_cond(current)) {
+        if (visited.find(current) != visited.end() || !intermediate_node_cond(current)) {
             continue;
         }
 
@@ -289,7 +287,6 @@ bool has_transitive_rs(const std::string& node1, const std::unordered_set<std::s
 std::unordered_set<std::string>
 get_all_transitive_from_node(const std::string& node,
                              const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
-                             const std::unordered_map<std::string, std::unordered_set<std::string>>& rev_map,
                              const std::function<bool(const std::string&)>& start_node_cond,
                              const std::function<bool(const std::string&)>& end_node_cond,
                              const std::function<bool(const std::string&)>& intermediate_node_cond) {
@@ -319,8 +316,7 @@ get_all_transitive_from_node(const std::string& node,
         }
 
         // If already visited or does not pass intermediate_node_cond, skip
-        if ((rev_map.at(current).size() == 1 && visited.find(current) != visited.end()) ||
-            !intermediate_node_cond(current)) {
+        if (visited.find(current) != visited.end() || !intermediate_node_cond(current)) {
             continue;
         }
 
