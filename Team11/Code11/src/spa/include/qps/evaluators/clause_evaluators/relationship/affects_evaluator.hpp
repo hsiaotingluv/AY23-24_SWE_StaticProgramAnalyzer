@@ -5,6 +5,7 @@
 #include "pkb/facades/read_facade.h"
 
 #include "qps/evaluators/clause_evaluators/clause_evaluator.hpp"
+#include "qps/evaluators/data_source.hpp"
 #include "qps/parser/entities/relationship.hpp"
 
 namespace qps {
@@ -47,8 +48,9 @@ class AffectsEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_affects(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    AffectsEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Affects affects, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), affects(std::move(affects)) {
+    AffectsEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, Affects affects,
+                     bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), affects(std::move(affects)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

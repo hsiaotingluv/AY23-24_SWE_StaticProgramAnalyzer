@@ -5,6 +5,7 @@
 #include "pkb/facades/read_facade.h"
 
 #include "qps/evaluators/clause_evaluators/clause_evaluator.hpp"
+#include "qps/evaluators/data_source.hpp"
 #include "qps/parser/entities/relationship.hpp"
 
 namespace qps {
@@ -46,8 +47,8 @@ class NextTEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_next_t(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    NextTEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, NextT next_t, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), next_t(std::move(next_t)) {
+    NextTEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, NextT next_t, bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), next_t(std::move(next_t)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

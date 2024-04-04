@@ -38,8 +38,10 @@ class ModifiesSEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_modifies_s(const qps::Integer& stmt_num, const qps::WildCard&) const -> OutputTable;
 
   public:
-    ModifiesSEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, ModifiesS modifies_s, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), modifies_s(std::move(modifies_s)) {
+    ModifiesSEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, ModifiesS modifies_s,
+                       bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated),
+          modifies_s(std::move(modifies_s)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

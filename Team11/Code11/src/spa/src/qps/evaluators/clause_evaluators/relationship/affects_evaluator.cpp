@@ -17,7 +17,7 @@ auto AffectsEvaluator::evaluate_positive() const -> OutputTable {
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2) const
     -> OutputTable {
     // TODO: We should optimise this (current implementation is quite naive)
-    auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
 
     // Get all variables used by stmt_num_2
@@ -58,7 +58,7 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
     -> OutputTable {
     // TODO: Possibly optimise?
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto next_map = read_facade->get_all_next();
 
     // get all statements
@@ -84,7 +84,7 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
 
 auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table{{stmt_syn_2}};
     const auto next_map = read_facade->get_all_next();
 
@@ -106,7 +106,7 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
                                     const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
     // TODO: Possibly optimise
     auto next_map = read_facade->get_all_next();
-    auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
+    auto relevant_stmts_1 = get_data(stmt_syn_1);
 
     if (stmt_syn_1 == stmt_syn_2) {
         Table table{{stmt_syn_1}};
@@ -124,7 +124,7 @@ auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn
         return table;
     }
 
-    auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
+    auto relevant_stmts_2 = get_data(stmt_syn_2);
 
     auto table = Table{{stmt_syn_1, stmt_syn_2}};
 
@@ -195,7 +195,7 @@ auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const WildCard&) 
 auto AffectsEvaluator::eval_affects(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
     // TODO: We should optimise this (current implementation is quite naive)
-    auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    auto relevant_stmts = get_data(stmt_syn_2);
     auto next_map = read_facade->get_all_next();
 
     auto table = Table({stmt_syn_2});

@@ -16,7 +16,7 @@ auto NextTEvaluator::evaluate_positive() const -> OutputTable {
 
 auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto next_reverse_map = read_facade->get_all_next_reverse();
 
@@ -32,7 +32,7 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 }
 
 auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
 
     auto table = Table{{stmt_syn_1}};
     auto all_stmts = read_facade->get_all_next_keys();
@@ -48,7 +48,7 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 
 auto NextTEvaluator::eval_next_t(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table{{stmt_syn_2}};
 
     const auto next_map = read_facade->get_all_next();
@@ -73,7 +73,7 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
     if (stmt_syn_1 == stmt_syn_2) {
         Table table{{stmt_syn_1}};
 
-        const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+        const auto relevant_stmts = get_data(stmt_syn_1);
 
         for (const auto& stmt : relevant_stmts) {
             if (next_star_pairs.find({stmt, stmt}) != next_star_pairs.end()) {
@@ -83,8 +83,8 @@ auto NextTEvaluator::eval_next_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
         return table;
     }
 
-    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts_1 = get_data(stmt_syn_1);
+    const auto relevant_stmts_2 = get_data(stmt_syn_2);
     Table table{{stmt_syn_1, stmt_syn_2}};
 
     for (const auto& stmt1 : relevant_stmts_1) {
@@ -121,7 +121,7 @@ auto NextTEvaluator::eval_next_t(const Integer& stmt_num_1, const WildCard&) con
 }
 
 auto NextTEvaluator::eval_next_t(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
 
     auto table = Table{{stmt_syn_2}};
     auto all_stmts = read_facade->get_all_next_values();

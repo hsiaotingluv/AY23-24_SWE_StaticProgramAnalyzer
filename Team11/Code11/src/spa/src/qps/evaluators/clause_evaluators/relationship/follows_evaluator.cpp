@@ -17,8 +17,8 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
     if (stmt_syn_1 == stmt_syn_2) {
         return Table{};
     }
-    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts_1 = get_data(stmt_syn_1);
+    const auto relevant_stmts_2 = get_data(stmt_syn_2);
 
     auto table = Table{{stmt_syn_1, stmt_syn_2}};
     const auto follows_map = read_facade->get_all_follows();
@@ -37,7 +37,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
 
 auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                                     const qps::Integer& stmt_num_2) const -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto candidate = read_facade->get_statement_followed_by(stmt_num_2.value);
     if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
@@ -49,7 +49,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
 
 auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto all_followed_stmts = read_facade->get_all_follows_keys();
     for (const auto& stmt : all_followed_stmts) {
@@ -64,7 +64,7 @@ auto FollowsEvaluator::eval_follows(const std::shared_ptr<StmtSynonym>& stmt_syn
 
 auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table{{stmt_syn_2}};
     const auto candidate = read_facade->get_statement_following(stmt_num_1.value);
     if (relevant_stmts.find(candidate) != relevant_stmts.end()) {
@@ -90,7 +90,7 @@ auto FollowsEvaluator::eval_follows(const Integer& stmt_num_1, const WildCard&) 
 
 auto FollowsEvaluator::eval_follows(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table({stmt_syn_2});
     const auto all_following = read_facade->get_all_follows_values();
     for (const auto& stmt : all_following) {

@@ -22,8 +22,9 @@ class PatternIfEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_pattern_if(const qps::WildCard&) const -> OutputTable;
 
   public:
-    PatternIfEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, PatternIf pattern, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), pattern(std::move(pattern)) {
+    PatternIfEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, PatternIf pattern,
+                       bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), pattern(std::move(pattern)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;
