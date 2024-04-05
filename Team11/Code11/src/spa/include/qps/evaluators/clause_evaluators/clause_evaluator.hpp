@@ -16,7 +16,8 @@ class ClauseEvaluator {
   public:
     virtual ~ClauseEvaluator() = default;
 
-    ClauseEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, bool is_negated) : is_negated(is_negated){};
+    ClauseEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, bool is_negated)
+        : read_facade(std::move(read_facade)), is_negated(is_negated){};
 
     [[nodiscard]] auto evaluate() const -> OutputTable;
 };
