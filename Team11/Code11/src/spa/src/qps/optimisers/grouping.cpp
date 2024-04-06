@@ -5,6 +5,7 @@
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include "qps/template_utils.hpp"
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -20,8 +21,11 @@ static auto to_clause_tuples(const std::vector<std::shared_ptr<Clause>>& clauses
 
 static auto build_adjacency_list(const std::vector<ClauseTuple>& clause_tuples) -> std::vector<std::vector<uint64_t>>;
 
-static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacency_list)
-    -> std::vector<std::vector<uint64_t>>;
+static auto order_clauses(const std::vector<std::shared_ptr<Clause>>& clauses, std::vector<ClauseTuple>& clause_tuples)
+    -> void;
+
+static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacency_list,
+                               const std::vector<ClauseTuple>& clause_tuples) -> std::vector<std::vector<uint64_t>>;
 
 static auto group_queries(const Query& query, const std::vector<std::vector<uint64_t>>& clause_id_forests,
                           const std::vector<ClauseTuple>& clause_tuples) -> std::vector<Query>;
@@ -29,9 +33,10 @@ static auto group_queries(const Query& query, const std::vector<std::vector<uint
 
 namespace qps {
 auto GroupingOptimiser::optimise(const Query& query) const -> std::vector<Query> {
-    const auto clause_tuples = details::to_clause_tuples(query.clauses);
+    auto clause_tuples = details::to_clause_tuples(query.clauses);
+    details::order_clauses(query.clauses, clause_tuples);
     const auto adjacency_list = details::build_adjacency_list(clause_tuples);
-    const auto clause_id_forests = details::depth_first_search(adjacency_list);
+    const auto clause_id_forests = details::depth_first_search(adjacency_list, clause_tuples);
 
     return details::group_queries(query, clause_id_forests, clause_tuples);
 }
@@ -155,10 +160,12 @@ static auto build_adjacency_list(const std::vector<ClauseTuple>& clause_tuples) 
     auto adjacency_list = std::vector<std::vector<uint64_t>>(clause_tuples.size());
     for (uint64_t i = 0; i < clause_tuples.size() - 1; ++i) {
         for (uint64_t j = i + 1; j < clause_tuples.size(); ++j) {
+            auto [from_index, _] = clause_tuples[i];
+            auto [to_index, __] = clause_tuples[j];
             if (is_reachable(clause_tuples[i], clause_tuples[j])) {
                 // Reachability is a symmetric relation
-                adjacency_list[i].push_back(j);
-                adjacency_list[j].push_back(i);
+                adjacency_list[from_index].push_back(to_index);
+                adjacency_list[to_index].push_back(from_index);
             }
         }
     }
@@ -166,14 +173,50 @@ static auto build_adjacency_list(const std::vector<ClauseTuple>& clause_tuples) 
     return adjacency_list;
 }
 
-static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacency_list)
-    -> std::vector<std::vector<uint64_t>> {
+static auto order_clauses(const std::vector<std::shared_ptr<Clause>>& clauses, std::vector<ClauseTuple>& clause_tuples)
+    -> void {
+    std::partition(std::begin(clause_tuples), std::end(clause_tuples), [&clauses](auto&& element) {
+        const auto& [i, synonyms] = element;
+        const auto clause = clauses[i];
+        // Heuristic: prioritise Pattern clauses and With clauses
+        if (!std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
+            return true;
+        }
+
+        // Heuristic: don't prioritise Affects and Next clauses
+        const auto relationship = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)->rel_ref;
+        return std::visit(overloaded{[](const Affects&) {
+                                         return false;
+                                     },
+                                     [](const NextT&) {
+                                         return false;
+                                     },
+                                     [](const auto&) {
+                                         return true;
+                                     }},
+                          relationship);
+    });
+
+    // Heuristic: sort by number of synonyms
+    std::stable_sort(std::begin(clause_tuples), std::end(clause_tuples), [&clause_tuples](auto lhs, auto rhs) {
+        return std::get<1>(lhs).size() < std::get<1>(rhs).size();
+    });
+}
+
+static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacency_list,
+                               const std::vector<ClauseTuple>& clause_tuples) -> std::vector<std::vector<uint64_t>> {
     auto visited = std::vector<bool>(adjacency_list.size(), false);
     auto forests = std::vector<std::vector<uint64_t>>{};
 
+    auto starting_points = std::vector<std::size_t>(adjacency_list.size());
+    std::transform(clause_tuples.begin(), clause_tuples.end(), std::begin(starting_points),
+                   [](const auto& clause_tuple) {
+                       return std::get<0>(clause_tuple);
+                   });
+
     auto stack = std::vector<uint64_t>{};
     stack.reserve(adjacency_list.size());
-    for (uint64_t i = 0; i < adjacency_list.size(); ++i) {
+    for (auto i : starting_points) {
         if (visited[i]) {
             continue;
         }
@@ -192,7 +235,10 @@ static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacen
             visited[current] = true;
             forest.push_back(current);
 
-            for (const auto& neighbour : adjacency_list[current]) {
+            // To preserve the order of the clauses within DFS forest, we iterate in reverse
+            for (auto neighbour_it = adjacency_list[current].rbegin(); neighbour_it != adjacency_list[current].rend();
+                 ++neighbour_it) {
+                const auto neighbour = *neighbour_it;
                 if (!visited[neighbour]) {
                     stack.push_back(neighbour);
                 }
@@ -225,7 +271,7 @@ static auto group_queries(const Query& query, const std::vector<std::vector<uint
 
         for (const auto& clause_id : clause_ids) {
             clauses.push_back(query.clauses[clause_id]);
-            const auto& [_, synonyms] = clause_tuples[clause_id];
+            const auto& [_, synonyms] = to_clause_tuple(clause_id, query.clauses[clause_id]);
             for (const auto& synonym : synonyms) {
                 auto is_included = false;
                 for (const auto& decl_prev : new_declared) {
