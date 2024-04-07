@@ -1,0 +1,115 @@
+1 - generated TC 1
+constant c; Select c with c.value=1
+
+1
+5000
+2 - generated TC 2
+constant c; Select c with 0=c.value
+
+0
+5000
+3 - generated TC 3
+constant c; Select c with c.value=0 and c.value=1
+
+
+5000
+4 - generated TC 4
+variable v; Select v with "x"=v.varName
+
+x
+5000
+5 - generated TC 5
+variable v; Select v with v.varName="x"
+
+x
+5000
+6 - generated TC 6
+stmt s; Select s with s.stmt#=5
+
+5
+5000
+7 - generated TC 7
+procedure p; Select p with p.procName="FizzBuzz"
+
+FizzBuzz
+5000
+8 - generated TC 8
+read r; Select r with r.varName="i"
+
+1
+5000
+9 - generated TC 9
+call c; Select c with c.procName="InnerProcedure"
+
+41, 22
+5000
+10 - generated TC 10
+assign a; Select a with a.varName="fizz"
+
+SemanticError
+5000
+11 - generated TC 11
+if i; Select i with i.condition="fizz == 0"
+
+SyntaxError
+5000
+12 - generated TC 12
+print p; Select p with p.stmt#=8
+
+
+5000
+13 - generated TC 13
+call c; Select c with c.stmt#=12
+
+
+5000
+14 - generated TC 14
+while w; Select w with w.stmt#=15
+
+
+5000
+15 - generated TC 15
+if i; Select i with i.stmt#=20
+
+
+5000
+16 - generated TC 16
+assign a; Select a with a.stmt#=25
+
+25
+5000
+17 - generated TC 17
+variable v; Select v with v.varName="x" and v.stmt#=30
+
+SemanticError
+5000
+18 - generated TC 18
+print p; Select p with p.varName="a" and p.stmt#=39
+
+39
+5000
+19 - generated TC 19
+constant c; Select c with c.value=10 and c.stmt#=40
+
+SemanticError
+5000
+20 - generated TC 20
+read r; Select r with r.varName="z" and r.stmt#=45
+
+
+5000
+21 - generated TC 21
+call c; Select c with c.procName="AnotherProcedure" and c.stmt#=50
+
+
+5000
+22 - generated TC 22
+while w; Select w with w.procName="FizzBuzz"
+
+SemanticError
+5000
+23 - generated TC 23
+if i; Select i with i.procName="Dummy"
+
+SemanticError
+5000

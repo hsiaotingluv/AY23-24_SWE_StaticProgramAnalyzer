@@ -1,0 +1,18 @@
+procedure Pattern {
+  read x;
+  print y;
+  while (x < 10) {
+    x = x + 1;
+    if (x % 2 == 0) then {
+      y = x;
+      while (y > 5) {
+        print y;
+        y = y -            1;
+      }
+    } else {
+      z = x + 3;
+    }
+  }
+
+  y = 1 + var * vir / vur % 50;
+}

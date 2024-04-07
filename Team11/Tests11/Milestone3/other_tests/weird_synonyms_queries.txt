@@ -1,0 +1,40 @@
+1 - generated TC 1
+stmt Uses; Select Uses such that Uses(Uses, _)
+
+34, 14, 18, 26, 32, 8, 38, 20, 31, 9, 22, 43, 13, 29, 15, 42, 35, 27, 41, 28, 40, 17, 10, 7, 12, 6, 16, 11, 39, 21, 23, 33
+5000
+2 - generated TC 2
+stmt Follows; Select Follows such that Follows(Follows, _)
+
+25, 30, 16, 3, 39, 40, 5, 4, 8, 2, 36, 24, 37, 7, 17, 28, 22, 9, 1, 18
+5000
+3 - generated TC 3
+stmt Parent; Select Parent such that Parent(Parent, _)
+
+38, 43, 6, 9, 17, 31, 27, 42, 13, 11, 18, 20, 26, 33
+5000
+4 - generated TC 4
+stmt Modifies; Select Modifies such that Modifies(Modifies, _)
+
+1, 22, 29, 40, 44, 17, 7, 2, 45, 23, 42, 41, 27, 38, 8, 5, 18, 24, 25, 30, 4, 36, 43, 3, 16, 37, 26, 6, 19
+5000
+5 - generated TC 5
+stmt Calls; Select Calls such that Calls(Calls, _)
+
+SemanticError
+5000
+6 - generated TC 6
+stmt Next; Select Next such that Next(Next, _)
+
+39, 11, 29, 40, 17, 43, 25, 2, 30, 3, 45, 6, 20, 23, 21, 19, 8, 38, 16, 33, 18, 5, 9, 22, 1, 36, 4, 13, 15, 14, 26, 37, 44, 12, 31, 42, 27, 41, 28, 10, 7, 24
+5000
+7 - generated TC 7
+assign pattern; Select pattern pattern pattern ("pattern", _)
+
+
+5000
+8 - generated TC 8
+stmt with; Select with with with.stmt# = with.stmt#
+
+25, 2, 24, 23, 21, 20, 26, 32, 14, 34, 16, 3, 6, 30, 45, 5, 18, 11, 39, 35, 27, 42, 31, 33, 37, 38, 8, 44, 12, 43, 9, 36, 1, 22, 13, 15, 29, 10, 7, 40, 17, 41, 28, 19, 4
+5000
