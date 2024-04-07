@@ -27,8 +27,8 @@ static auto order_clauses(const std::vector<std::shared_ptr<Clause>>& clauses, s
 static auto depth_first_search(const std::vector<std::vector<uint64_t>>& adjacency_list,
                                const std::vector<ClauseTuple>& clause_tuples) -> std::vector<std::vector<uint64_t>>;
 
-static auto group_queries(const Query& query, const std::vector<std::vector<uint64_t>>& clause_id_forests,
-                          const std::vector<ClauseTuple>& clause_tuples) -> std::vector<Query>;
+static auto group_queries(const Query& query, const std::vector<std::vector<uint64_t>>& clause_id_forests)
+    -> std::vector<Query>;
 } // namespace qps::details
 
 namespace qps {
@@ -38,7 +38,7 @@ auto GroupingOptimiser::optimise(const Query& query) const -> std::vector<Query>
     const auto adjacency_list = details::build_adjacency_list(clause_tuples);
     const auto clause_id_forests = details::depth_first_search(adjacency_list, clause_tuples);
 
-    return details::group_queries(query, clause_id_forests, clause_tuples);
+    return details::group_queries(query, clause_id_forests);
 }
 } // namespace qps
 
@@ -198,7 +198,7 @@ static auto order_clauses(const std::vector<std::shared_ptr<Clause>>& clauses, s
     });
 
     // Heuristic: sort by number of synonyms
-    std::stable_sort(std::begin(clause_tuples), std::end(clause_tuples), [&clause_tuples](auto lhs, auto rhs) {
+    std::stable_sort(std::begin(clause_tuples), std::end(clause_tuples), [](auto lhs, auto rhs) {
         return std::get<1>(lhs).size() < std::get<1>(rhs).size();
     });
 }
@@ -259,8 +259,8 @@ static auto get_reference_length(const std::variant<BooleanReference, std::vecto
     return std::get<std::vector<Elem>>(reference).size();
 }
 
-static auto group_queries(const Query& query, const std::vector<std::vector<uint64_t>>& clause_id_forests,
-                          const std::vector<ClauseTuple>& clause_tuples) -> std::vector<Query> {
+static auto group_queries(const Query& query, const std::vector<std::vector<uint64_t>>& clause_id_forests)
+    -> std::vector<Query> {
     auto grouped_queries = std::vector<Query>{};
     grouped_queries.reserve(clause_id_forests.size());
 
