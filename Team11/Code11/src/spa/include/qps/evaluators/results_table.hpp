@@ -19,6 +19,12 @@ class Table {
     Table() = default;
 
     Table(const std::vector<std::shared_ptr<Synonym>>& column_keys) : record_type(column_keys) {
+#ifdef DEBUG
+        auto name_set = std::unordered_set<std::shared_ptr<Synonym>>(column_keys.begin(), column_keys.end());
+        if (name_set.size() != column_keys.size()) {
+            throw std::invalid_argument("Duplicate column names are not allowed");
+        }
+#endif
     }
 
     auto add_row(const std::vector<std::string>& record) -> void {
