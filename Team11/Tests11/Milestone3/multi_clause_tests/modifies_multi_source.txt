@@ -1,4 +1,0 @@
-procedure Fizz {
-    x = z + y * 2;
-    z = 3; 
-}
