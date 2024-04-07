@@ -1,0 +1,130 @@
+1 - generated TC 1
+while w; variable v; Select <w, v> pattern not w(v, _)
+
+42 z, 18 z, 42 y, 27 z, 18 y, 6 x, 38 x, 17 x, 27 testing, 20 testing, 6 random, 42 x, 20 random, 18 random, 17 testing, 42 n, 17 n, 27 i, 20 i, 38 testing, 18 i, 17 i, 20 y, 20 n, 42 g4r8aGe, 20 g4r8aGe, 17 g4r8aGe, 6 fizzStr, 38 fizzStr, 20 fizzStr, 18 fizzStr, 17 fizzStr, 18 x, 6 fizzBuzzStr, 17 y, 42 fizzBuzzStr, 38 n, 27 fizzBuzzStr, 20 fizzBuzzStr, 18 fizzBuzzStr, 18 another, 17 another, 6 a, 18 a, 27 g4r8aGe, 6 FizzBuzz, 6 fizz, 38 i, 27 FizzBuzz, 6 y, 20 a, 6 testing, 18 FizzBuzz, 27 n, 38 FizzBuzz, 6 z, 27 a, 17 FizzBuzz, 18 b, 27 buzzStr, 20 z, 20 x, 6 Fizz, 17 Buzz, 17 a, 27 random, 42 a, 6 b, 27 another, 27 Buzz, 18 testing, 17 fizzBuzzStr, 27 b, 18 Buzz, 38 Fizz, 38 fizzBuzzStr, 6 Buzz, 38 random, 42 Fizz, 18 g4r8aGe, 17 Fizz, 38 Buzz, 20 fizz, 6 g4r8aGe, 18 Fizz, 20 Fizz, 17 buzz, 17 z, 20 another, 38 another, 17 random, 17 b, 20 b, 38 z, 20 FizzBuzz, 42 b, 18 buzz, 27 buzz, 42 Buzz, 38 buzz, 38 y, 42 buzz, 17 buzzStr, 18 n, 18 buzzStr, 42 random, 42 fizzStr, 20 buzzStr, 38 buzzStr, 27 fizzStr, 42 fizz, 38 g4r8aGe, 20 Buzz, 27 Fizz, 42 buzzStr, 6 another, 6 buzzStr, 17 fizz, 42 i, 38 fizz, 42 FizzBuzz, 6 buzz, 27 fizz
+5000
+2 - generated TC 2
+while w; variable v; Select w pattern not w(v, _)
+
+6, 42, 38, 20, 18, 27, 17
+5000
+3 - generated TC 3
+while w; variable v; Select v pattern not w(v, _)
+
+z, x, random, n, Buzz, y, FizzBuzz, testing, fizzBuzzStr, Fizz, buzzStr, a, another, b, buzz, fizzStr, fizz, g4r8aGe, i
+5000
+4 - generated TC 4
+while w; Select w pattern not w(_, _)
+
+17
+5000
+5 - generated TC 5
+while w; Select w pattern not w("0wahaha", _)
+
+SyntaxError
+5000
+6 - generated TC 6
+while w; Select w pattern not w("wahaha", _)
+
+6, 17, 27, 18, 20, 38, 42
+5000
+7 - generated TC 7
+if i; variable v; Select i pattern not i(v, _, _)
+
+43, 33, 9, 31, 26, 13, 11
+5000
+8 - generated TC 8
+if i; variable v; Select i pattern not i(v, _, "wahaha")
+
+SyntaxError
+5000
+9 - generated TC 9
+if i; variable v; Select v pattern not i(v, _, _)
+
+fizz, z, x, random, Buzz, y, FizzBuzz, testing, fizzBuzzStr, Fizz, buzzStr, a, another, b, buzz, fizzStr, g4r8aGe, i, n
+5000
+10 - generated TC 10
+if i; variable v; Select <i, v> pattern not i(v, _, _)
+
+9 random, 9 n, 9 fizzStr, 9 b, 9 another, 9 Fizz, 43 random, 43 i, 43 fizzStr, 43 fizz, 43 buzzStr, 43 b, 43 a, 43 Fizz, 43 Buzz, 33 x, 33 random, 33 g4r8aGe, 33 fizzBuzzStr, 33 buzz, 33 another, 33 a, 43 testing, 33 FizzBuzz, 43 g4r8aGe, 33 Fizz, 31 n, 31 fizzStr, 43 FizzBuzz, 31 fizz, 31 buzz, 13 fizzStr, 31 Fizz, 13 buzzStr, 13 fizz, 13 b, 13 another, 43 buzz, 13 Fizz, 31 random, 13 Buzz, 11 y, 11 x, 31 g4r8aGe, 13 g4r8aGe, 26 another, 11 buzzStr, 26 n, 11 random, 9 Buzz, 11 g4r8aGe, 13 fizzBuzzStr, 11 i, 9 fizzBuzzStr, 33 fizz, 31 fizzBuzzStr, 11 testing, 11 Fizz, 9 FizzBuzz, 11 fizzBuzzStr, 13 z, 9 x, 13 a, 43 z, 33 b, 31 y, 11 Buzz, 33 testing, 33 i, 11 n, 43 fizzBuzzStr, 26 Fizz, 11 a, 33 buzzStr, 26 fizz, 13 testing, 11 another, 11 fizzStr, 13 FizzBuzz, 9 g4r8aGe, 26 buzzStr, 43 another, 31 testing, 26 g4r8aGe, 26 testing, 9 testing, 31 Buzz, 9 buzzStr, 11 z, 26 Buzz, 9 z, 9 i, 13 i, 33 fizzStr, 13 n, 9 y, 31 FizzBuzz, 9 a, 43 n, 31 buzzStr, 13 random, 11 buzz, 13 y, 13 x, 31 b, 26 FizzBuzz, 26 a, 11 b, 26 b, 26 buzz, 31 another, 31 i, 26 fizzBuzzStr, 33 Buzz, 11 FizzBuzz, 26 fizzStr, 26 i, 33 n, 26 random, 26 z, 31 a
+5000
+11 - generated TC 11
+while not; Select not pattern not not(_, _)
+
+17
+5000
+12 - generated TC 12
+if not; Select not pattern not not(_, _, _)
+
+
+5000
+13 - generated TC 13
+if not; Select not pattern not not("wahaha", _, _)
+
+9, 31, 11, 13, 26, 33, 43
+5000
+14 - generated TC 14
+if not; Select not pattern not not("fizz", _, _)
+
+43, 33, 31, 26, 13
+5000
+15 - generated TC 15
+if not; Select not pattern not not("buzz", _, _)
+
+43, 33, 31, 26, 11
+5000
+16 - generated TC 16
+if not; variable v; Select not pattern not not(v, _, _)
+
+43, 33, 9, 31, 26, 13, 11
+5000
+17 - generated TC 17
+if not; Select <not, not> pattern not not(_, _, _)
+
+
+5000
+18 - generated TC 18
+if not; Select <not, not> pattern not not("wakaka", _, _)
+
+9 9, 11 11, 13 13, 26 26, 33 33, 31 31, 43 43
+5000
+19 - generated TC 19
+while not; Select <not, not> pattern not not(_, _)
+
+17 17
+5000
+20 - generated TC 20
+while not; Select <not, not> pattern not not("wakaka", _)
+
+6 6, 17 17, 27 27, 18 18, 38 38, 20 20, 42 42
+5000
+21 - generated TC 21
+while not; Select <not, not> pattern not not("fizz", _)
+
+38 38, 27 27, 42 42, 20 20, 6 6, 17 17
+5000
+22 - generated TC 22
+while not; Select <not, not> pattern not not("buzz", _)
+
+42 42, 38 38, 27 27, 18 18, 6 6, 17 17
+5000
+23 - generated TC 23
+if not; while not; Select not pattern not not(v, _, _)
+
+SemanticError
+5000
+24 - generated TC 24
+while w; Select BOOLEAN pattern not w(_, _)
+
+TRUE
+5000
+25 - generated TC 25
+if i; Select BOOLEAN pattern not i(_, _, _)
+
+FALSE
+5000
+26 - generated TC 26
+if i; Select BOOLEAN pattern not i(_, _, "wahaha")
+
+SyntaxError
+5000

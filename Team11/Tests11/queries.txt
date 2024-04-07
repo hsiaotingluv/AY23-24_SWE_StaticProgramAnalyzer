@@ -1,1 +1,0 @@
-Select BOOLEAN such that not Calls ("First", "Second")
