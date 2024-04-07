@@ -8,7 +8,7 @@ auto NextEvaluator::select_eval_method() const {
     }};
 }
 
-auto NextEvaluator::evaluate() const -> OutputTable {
+auto NextEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), next.stmt1, next.stmt2);
 }
 

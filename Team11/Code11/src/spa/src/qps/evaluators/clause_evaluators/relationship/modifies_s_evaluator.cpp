@@ -13,7 +13,7 @@ auto ModifiesSEvaluator::select_eval_method() const {
     }};
 }
 
-auto ModifiesSEvaluator::evaluate() const -> OutputTable {
+auto ModifiesSEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), modifies_s.stmt, modifies_s.ent);
 }
 

@@ -7,7 +7,7 @@ auto WithEvaluator::select_eval_method() const {
     }};
 }
 
-auto WithEvaluator::evaluate() const -> OutputTable {
+auto WithEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), ref_1, ref_2);
 }
 

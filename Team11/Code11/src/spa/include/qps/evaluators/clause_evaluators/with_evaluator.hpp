@@ -7,7 +7,6 @@
 
 namespace qps {
 class WithEvaluator : public ClauseEvaluator {
-    std::shared_ptr<pkb::ReadFacade> read_facade;
     TypedRef ref_1;
     TypedRef ref_2;
 
@@ -44,11 +43,11 @@ class WithEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_with(const qps::Integer& integer_1, const qps::Integer& integer_2) const -> OutputTable;
 
   public:
-    WithEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, TypedRef ref_1, TypedRef ref_2)
-        : ClauseEvaluator(), read_facade(std::move(read_facade)), ref_1(std::move(ref_1)), ref_2(std::move(ref_2)) {
+    WithEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, TypedRef ref_1, TypedRef ref_2, bool is_negated)
+        : ClauseEvaluator(std::move(read_facade), is_negated), ref_1(std::move(ref_1)), ref_2(std::move(ref_2)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> OutputTable override;
+    [[nodiscard]] auto evaluate_positive() const -> OutputTable override;
 };
 
 } // namespace qps
