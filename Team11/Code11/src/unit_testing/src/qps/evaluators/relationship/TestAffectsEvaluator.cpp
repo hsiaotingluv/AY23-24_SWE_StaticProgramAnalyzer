@@ -400,7 +400,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "4", "6", "7", "9", "11", "12", "13"});
+        require_equal(evaluator.evaluate(query),
+                      std::vector<std::string>{"1", "2", "4", "6", "7", "9", "11", "12", "13"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (s1, 9)") {
@@ -424,7 +425,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "4", "6", "7", "9", "11", "12", "13"});
+        require_equal(evaluator.evaluate(query),
+                      std::vector<std::string>{"1", "2", "4", "6", "7", "9", "11", "12", "13"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (1, s1)") {
@@ -446,7 +448,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"});
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9",
+                                                                          "10", "11", "12", "13", "14"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (1, _)") {
@@ -457,7 +460,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"});
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9",
+                                                                          "10", "11", "12", "13", "14"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (_, s1)") {
@@ -479,7 +483,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"});
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9",
+                                                                          "10", "11", "12", "13", "14"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (_, _)") {
@@ -490,7 +495,8 @@ TEST_CASE("Test Evaluator Affects with Nested Cycle") {
             },
         };
 
-        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"});
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5", "6", "7", "8", "9",
+                                                                          "10", "11", "12", "13", "14"});
     }
 
     SECTION("Evaluate - Select s1 such that Affects (3, _)") {
