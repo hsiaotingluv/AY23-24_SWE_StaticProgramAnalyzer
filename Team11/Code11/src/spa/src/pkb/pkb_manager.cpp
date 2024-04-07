@@ -21,7 +21,8 @@ PkbManager::PkbManager()
       assignment_store(std::make_shared<AssignmentStore>()), next_store(std::make_shared<NextStore>()),
       direct_calls_store(std::make_shared<DirectCallsStore>()), calls_star_store(std::make_shared<CallsStarStore>()),
       if_var_store(std::make_shared<IfVarStore>()), while_var_store(std::make_shared<WhileVarStore>()),
-      stmt_no_to_proc_called_store(std::make_shared<StmtNoToProcCalledStore>()) {
+      stmt_no_to_proc_called_store(std::make_shared<StmtNoToProcCalledStore>()),
+      proc_to_stmt_nos_store(std::make_shared<ProcToStmtNosStore>()) {
 }
 
 auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
@@ -795,6 +796,34 @@ std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_whi
     return get_tuple_list_from_entity_string_pairs(pairs);
 }
 
+std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_proc_to_stmts_nos_map() const {
+    auto temp = proc_to_stmt_nos_store->get_all();
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> result;
+
+    for (const auto& [p, stmt_nos] : temp) {
+        result[p.get_name()] = stmt_nos;
+    }
+
+    return result;
+}
+
+std::unordered_set<std::string> PkbManager::get_all_stmts_nos_by_proc(const std::string& proc_name) const {
+    auto p = Procedure(proc_name);
+    return proc_to_stmt_nos_store->get_vals_by_key(p);
+}
+
+std::string PkbManager::get_proc_name_by_stmt_no(const std::string& stmt_no) const {
+    auto p = stmt_no_to_proc_called_store->get_val_by_key(stmt_no);
+    return p.get_name();
+}
+
+bool PkbManager::are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const {
+    auto p1 = stmt_no_to_proc_called_store->get_val_by_key(stmt_no_1);
+    auto p2 = stmt_no_to_proc_called_store->get_val_by_key(stmt_no_2);
+    return p1 == p2;
+}
+
 // WriteFacade APIs
 void PkbManager::add_procedure(std::string procedure) {
     Procedure p = Procedure(std::move(procedure));
@@ -914,6 +943,11 @@ void PkbManager::populate_star_from_direct(std::shared_ptr<DirectStore> direct_s
             star_store->add(s1, s3);
         }
     }
+}
+
+void PkbManager::add_proc_to_stmt_no_mapping(const std::string& procedure, const std::string& stmt_no) {
+    auto p = Procedure(procedure);
+    proc_to_stmt_nos_store->add(p, stmt_no);
 }
 
 void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_string_order) {

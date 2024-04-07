@@ -36,3 +36,35 @@ std::vector<int> toposort(const std::unordered_map<int, std::unordered_set<int>>
 // Given an adjacency list, return the correct next* relationship pairs
 std::unordered_set<std::tuple<std::string, std::string>>
 get_next_star_pairs(const std::unordered_map<std::string, std::unordered_set<std::string>>& adj_list);
+
+// Check whether there's a transitive rs
+bool has_transitive_rs(
+    const std::string& node1, const std::unordered_set<std::string>& end_nodes,
+    const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
+    const std::function<bool(const std::string&)>& start_node_cond =
+        [](const std::string&) {
+            return true;
+        },
+    const std::function<bool(const std::string&)>& end_node_cond =
+        [](const std::string&) {
+            return true;
+        },
+    const std::function<bool(const std::string&)>& intermediate_node_cond =
+        [](const std::string&) {
+            return true;
+        });
+
+std::unordered_set<std::string> get_all_transitive_from_node(
+    const std::string& node, const std::unordered_map<std::string, std::unordered_set<std::string>>& map,
+    const std::function<bool(const std::string&)>& start_node_cond =
+        [](const std::string&) {
+            return true;
+        },
+    const std::function<bool(const std::string&)>& end_node_cond =
+        [](const std::string&) {
+            return true;
+        },
+    const std::function<bool(const std::string&)>& intermediate_node_cond =
+        [](const std::string&) {
+            return true;
+        });

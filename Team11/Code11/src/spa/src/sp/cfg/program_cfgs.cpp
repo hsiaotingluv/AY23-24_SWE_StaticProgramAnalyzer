@@ -1,4 +1,4 @@
-#include "sp/cfg/cfg_builder.hpp"
+#include "sp/cfg/program_cfgs.hpp"
 #include "common/ast/procedure_ast.hpp"
 #include "common/ast/program_ast.hpp"
 
@@ -60,8 +60,8 @@ auto ProgramCfgs::build(const std::shared_ptr<AstNode>& ast) -> ProcMap {
     return proc_map;
 }
 
-auto operator<<(std::ostream& os, const ProgramCfgs& cfg_builder) -> std::ostream& {
-    auto proc_map = cfg_builder.proc_map;
+auto operator<<(std::ostream& os, const ProgramCfgs& program_cfgs) -> std::ostream& {
+    auto proc_map = program_cfgs.proc_map;
     for (const auto& [proc_name, cfg] : proc_map) {
         os << proc_name << ":\n" << *cfg;
     }

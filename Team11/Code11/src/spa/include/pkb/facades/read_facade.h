@@ -343,6 +343,15 @@ class ReadFacade {
 
     std::unordered_set<std::tuple<std::string, std::string>> get_all_while_stmt_var_pairs() const;
 
+    // Read operations for procedure to statement number store
+    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_proc_to_stmts_nos_map() const;
+
+    std::unordered_set<std::string> get_all_stmts_nos_by_proc(const std::string& proc_name) const;
+
+    std::string get_proc_name_by_stmt_no(const std::string& stmt_no) const;
+
+    bool are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const;
+
   private:
     std::shared_ptr<PkbManager> pkb;
 };
