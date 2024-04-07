@@ -48,6 +48,18 @@ TEST_CASE("Test Evaluator UsesS") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
     }
 
+    SECTION("Evaluate - Select s1 such that not Uses(s1, v)") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(
+                    UsesS{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<VarSynonym>("v")}, true),
+            },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
     SECTION("Evaluate - Select a such that Uses(a, v)") {
         const auto query = Query{
             std::make_shared<AssignSynonym>("a"),
@@ -119,6 +131,17 @@ TEST_CASE("Test Evaluator UsesS") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4"});
     }
 
+    SECTION("Evaluate - Select s1 such that not Uses(s1, _)") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, true),
+            },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"5"});
+    }
+
     SECTION("Evaluate - Select v such that Uses(3, v)") {
         const auto query = Query{
             std::make_shared<VarSynonym>("v"),
@@ -140,6 +163,18 @@ TEST_CASE("Test Evaluator UsesS") {
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
     }
+
+    SECTION("Evaluate - Select s1 such that not Uses(3, \"a\")") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesS{Integer{"3"}, QuotedIdent{"a"}}, true),
+            },
+        };
+
+        REQUIRE(evaluator.evaluate(query).empty());
+    }
+
     SECTION("Evaluate - Select s1 such that Uses(3, \"b\")") {
         const auto query = Query{
             std::make_shared<AnyStmtSynonym>("s1"),
@@ -149,6 +184,17 @@ TEST_CASE("Test Evaluator UsesS") {
         };
 
         REQUIRE(evaluator.evaluate(query).empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that not Uses(3, \"b\")") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(UsesS{Integer{"3"}, QuotedIdent{"b"}}, true),
+            },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
     }
 
     SECTION("Evaluate - Select s1 such that Uses(3, _)") {

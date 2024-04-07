@@ -4,9 +4,22 @@
 
 namespace qps {
 class ClauseEvaluator {
+    bool is_negated;
+
+    [[nodiscard]] virtual auto evaluate_positive() const -> OutputTable = 0;
+
+    [[nodiscard]] virtual auto negate_result(OutputTable output) const -> OutputTable;
+
+  protected:
+    std::shared_ptr<pkb::ReadFacade> read_facade;
+
   public:
     virtual ~ClauseEvaluator() = default;
 
-    [[nodiscard]] virtual auto evaluate() const -> OutputTable = 0;
+    ClauseEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, bool is_negated)
+        : is_negated(is_negated), read_facade(std::move(read_facade)) {
+    }
+
+    [[nodiscard]] auto evaluate() const -> OutputTable;
 };
 } // namespace qps

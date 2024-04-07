@@ -4,7 +4,6 @@
 
 namespace qps {
 class CallsTEvaluator : public ClauseEvaluator {
-    std::shared_ptr<pkb::ReadFacade> read_facade;
     CallsT calls_t;
 
     [[nodiscard]] auto select_eval_method() const;
@@ -43,10 +42,10 @@ class CallsTEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_calls_t(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    CallsTEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, CallsT calls_t)
-        : ClauseEvaluator(), read_facade(std::move(read_facade)), calls_t(std::move(calls_t)) {
+    CallsTEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, CallsT calls_t, bool is_negated)
+        : ClauseEvaluator(std::move(read_facade), is_negated), calls_t(std::move(calls_t)) {
     }
 
-    [[nodiscard]] auto evaluate() const -> OutputTable override;
+    [[nodiscard]] auto evaluate_positive() const -> OutputTable override;
 };
 } // namespace qps

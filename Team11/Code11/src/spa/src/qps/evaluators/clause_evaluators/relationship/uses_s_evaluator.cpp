@@ -10,7 +10,7 @@ auto UsesSEvaluator::select_eval_method() const {
     }};
 }
 
-auto UsesSEvaluator::evaluate() const -> OutputTable {
+auto UsesSEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), uses_s.stmt, uses_s.ent);
 }
 
