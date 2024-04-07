@@ -21,7 +21,8 @@ auto qps::ClauseEvaluator::negate_result(qps::OutputTable output_table) const ->
                                          curr_table = join(std::move(curr_table), std::move(new_table));
                                      }
                                      // TODO: subtract original table from this new table and return that result
-                                     return subtract(std::move(curr_table), table, read_facade);
+                                     auto final_table =  subtract(std::move(curr_table), table, read_facade);
+                                     return final_table;
                                  }},
                       output_table);
 }
