@@ -804,6 +804,8 @@ std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get
     for (const auto& [p, stmt_nos] : temp) {
         result[p.get_name()] = stmt_nos;
     }
+
+    return result;
 }
 
 std::unordered_set<std::string> PkbManager::get_all_stmts_nos_by_proc(const std::string& proc_name) const {

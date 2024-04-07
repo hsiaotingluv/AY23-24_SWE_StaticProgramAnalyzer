@@ -14,7 +14,9 @@ class AffectsTraverser {
     auto send_to_pkb(const std::string proc_name, const StatementNumbers& stmt_nos) -> StatementNumbers;
 
   public:
-    explicit AffectsTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
+    explicit AffectsTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)) {
+    }
+
     auto traverse(const ProcMap& cfgs) -> std::unordered_map<std::string, StatementNumbers>;
 };
 } // namespace sp
