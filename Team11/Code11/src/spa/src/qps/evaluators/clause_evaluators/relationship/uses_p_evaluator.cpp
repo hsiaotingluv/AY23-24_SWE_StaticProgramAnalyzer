@@ -10,7 +10,7 @@ auto UsesPEvaluator::select_eval_method() const {
     }};
 }
 
-auto UsesPEvaluator::evaluate() const -> OutputTable {
+auto UsesPEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), uses_p.ent1, uses_p.ent2);
 }
 

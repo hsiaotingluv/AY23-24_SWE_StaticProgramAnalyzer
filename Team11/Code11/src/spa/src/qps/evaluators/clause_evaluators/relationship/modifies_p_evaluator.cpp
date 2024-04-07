@@ -10,7 +10,7 @@ auto ModifiesPEvaluator::select_eval_method() const {
     }};
 }
 
-auto ModifiesPEvaluator::evaluate() const -> OutputTable {
+auto ModifiesPEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), modifies_p.ent1, modifies_p.ent2);
 }
 

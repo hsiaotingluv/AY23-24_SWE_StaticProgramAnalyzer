@@ -8,7 +8,7 @@ auto FollowsTEvaluator::select_eval_method() const {
     }};
 }
 
-auto FollowsTEvaluator::evaluate() const -> OutputTable {
+auto FollowsTEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), follows_t.stmt1, follows_t.stmt2);
 }
 

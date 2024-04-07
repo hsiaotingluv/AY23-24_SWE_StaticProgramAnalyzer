@@ -8,7 +8,7 @@ auto CallsEvaluator::select_eval_method() const {
     }};
 }
 
-auto CallsEvaluator::evaluate() const -> OutputTable {
+auto CallsEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), calls.procedure1, calls.procedure2);
 }
 

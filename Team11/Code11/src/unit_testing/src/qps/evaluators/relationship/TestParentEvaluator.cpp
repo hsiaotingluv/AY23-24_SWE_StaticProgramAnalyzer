@@ -49,6 +49,23 @@ TEST_CASE("Test Evaluator Parent") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
     }
 
+    SECTION("Evaluate - Select s1 such that not Parent(s1, s2)") {
+        /*
+         * Parent(s1, s2) pairs: {1, 2}, {3, 4}
+         * not Parent(s1, s2) pairs: {1, 3}, {1, 4}, {2, 1}, {2, 3}, {2, 4}, {3, 1}, {3, 2}, {4, 1}, {4, 2}, {4, 3},
+         * everything w/ 5 expected result: 1, 2, 3, 4, 5
+         */
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(
+                    Parent{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, true),
+            },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
+    }
+
     SECTION("Evaluate - Select s1 such that Parent(if1, s2)") {
         const auto query = Query{
             std::make_shared<IfSynonym>("s1"),
@@ -133,6 +150,17 @@ TEST_CASE("Test Evaluator Parent") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "3"});
     }
 
+    SECTION("Evaluate - Select s1 such that not Parent(s1, _)") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Parent{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, true),
+            },
+        };
+
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"2", "4", "5"});
+    }
+
     SECTION("Evaluate - Select s2 such that Parent(3, s2)") {
         const auto query = Query{
             std::make_shared<AnyStmtSynonym>("s2"),
@@ -155,6 +183,18 @@ TEST_CASE("Test Evaluator Parent") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
     }
 
+    SECTION("Evaluate - Select s1 such that not Parent(3, 4)") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Parent{Integer{"3"}, Integer{"4"}}, true),
+            },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        REQUIRE(output.empty());
+    }
+
     SECTION("Evaluate - Select s1 such that Parent(3, 5)") {
         const auto query = Query{
             std::make_shared<AnyStmtSynonym>("s1"),
@@ -165,6 +205,18 @@ TEST_CASE("Test Evaluator Parent") {
 
         const auto output = evaluator.evaluate(query);
         REQUIRE(output.empty());
+    }
+
+    SECTION("Evaluate - Select s1 such that not Parent(3, 5)") {
+        const auto query = Query{
+            std::make_shared<AnyStmtSynonym>("s1"),
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Parent{Integer{"3"}, Integer{"5"}}, true),
+            },
+        };
+
+        const auto output = evaluator.evaluate(query);
+        require_equal(evaluator.evaluate(query), std::vector<std::string>{"1", "2", "3", "4", "5"});
     }
 
     SECTION("Evaluate - Select s1 such that Parent(3, _)") {

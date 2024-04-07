@@ -1,0 +1,45 @@
+1 - generated TC 1
+Select BOOLEAN such that not Calls ("First", "Second")
+
+FALSE
+5000
+2 - generated TC 2
+constant c; Select c with not 5 = 10
+
+2, 1, 5, 0
+5000
+3 - generated TC 3
+procedure p; Select p such that not Calls*(p, "Third")
+
+Third
+5000
+4 - generated TC 4
+procedure q; Select q such that not Calls*(_, q)
+
+First
+5000
+5 - generated TC 5
+while w; Select w pattern not w("y", _)
+
+6
+5000
+6 - generated TC 6
+assign a; Select a with not 10 = a.stmt#
+
+4, 5, 7, 13, 9, 17, 11, 12, 14, 15, 16
+5000
+7 - generated TC 7
+procedure p, q; Select p such that not Calls*(p, q)
+
+Third, Second, First
+5000
+8 - generated TC 8
+while w; variable v; Select <w, v> pattern not w(v, _)
+
+6 z, 6 y, 6 x, 6 v
+5000
+9 - generated TC 9
+while w; constant c; Select c with not c.value = w.stmt#
+
+2, 1, 5, 0
+5000

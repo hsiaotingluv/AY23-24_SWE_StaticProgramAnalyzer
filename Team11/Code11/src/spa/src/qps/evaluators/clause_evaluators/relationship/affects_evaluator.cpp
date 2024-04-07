@@ -10,7 +10,7 @@ auto AffectsEvaluator::select_eval_method() const {
     }};
 }
 
-auto AffectsEvaluator::evaluate() const -> OutputTable {
+auto AffectsEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), affects.stmt1, affects.stmt2);
 }
 

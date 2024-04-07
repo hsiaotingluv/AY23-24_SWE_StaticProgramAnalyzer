@@ -7,7 +7,7 @@ auto PatternIfEvaluator::select_eval_method() const {
     }};
 }
 
-auto PatternIfEvaluator::evaluate() const -> OutputTable {
+auto PatternIfEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), pattern.get_ent_ref());
 }
 

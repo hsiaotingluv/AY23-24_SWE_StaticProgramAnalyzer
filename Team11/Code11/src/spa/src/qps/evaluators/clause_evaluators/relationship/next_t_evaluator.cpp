@@ -10,7 +10,7 @@ auto NextTEvaluator::select_eval_method() const {
     }};
 }
 
-auto NextTEvaluator::evaluate() const -> OutputTable {
+auto NextTEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), next_t.stmt1, next_t.stmt2);
 }
 

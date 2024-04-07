@@ -44,7 +44,7 @@ auto CallsTEvaluator::select_eval_method() const {
     };
 }
 
-auto CallsTEvaluator::evaluate() const -> OutputTable {
+auto CallsTEvaluator::evaluate_positive() const -> OutputTable {
     return std::visit(select_eval_method(), calls_t.procedure1, calls_t.procedure2);
 }
 
