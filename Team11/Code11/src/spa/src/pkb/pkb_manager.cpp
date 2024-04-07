@@ -814,13 +814,13 @@ std::unordered_set<std::string> PkbManager::get_all_stmts_nos_by_proc(const std:
 }
 
 std::string PkbManager::get_proc_name_by_stmt_no(const std::string& stmt_no) const {
-    auto p = stmt_no_to_proc_called_store->get_val_by_key(stmt_no);
+    auto p = proc_to_stmt_nos_store->get_key_by_val(stmt_no);
     return p.get_name();
 }
 
 bool PkbManager::are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const {
-    auto p1 = stmt_no_to_proc_called_store->get_val_by_key(stmt_no_1);
-    auto p2 = stmt_no_to_proc_called_store->get_val_by_key(stmt_no_2);
+    auto p1 = proc_to_stmt_nos_store->get_key_by_val(stmt_no_1);
+    auto p2 = proc_to_stmt_nos_store->get_key_by_val(stmt_no_2);
     return p1 == p2;
 }
 

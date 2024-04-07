@@ -105,10 +105,26 @@ auto AffectsEvaluator::eval_affects(const Integer& stmt_num_1, const std::shared
 auto AffectsEvaluator::eval_affects(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
                                     const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
     // TODO: Possibly optimise
-    auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
-
     auto next_map = read_facade->get_all_next();
+    auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
+
+    if (stmt_syn_1 == stmt_syn_2) {
+        Table table{{stmt_syn_1}};
+
+        for (const auto& stmt : relevant_stmts_1) {
+            auto affect_conds = AffectsConditions(stmt, read_facade);
+            auto has_transitive =
+                has_transitive_rs(stmt, {stmt}, next_map, affect_conds.get_start_node_cond(),
+                                  affect_conds.get_end_node_cond(), affect_conds.get_intermediate_node_cond());
+
+            if (has_transitive) {
+                table.add_row({stmt});
+            }
+        }
+        return table;
+    }
+
+    auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
 
     auto table = Table{{stmt_syn_1, stmt_syn_2}};
 

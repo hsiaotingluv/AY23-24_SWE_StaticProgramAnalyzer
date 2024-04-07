@@ -1,4 +1,5 @@
 #include "qps/evaluators/clause_evaluators/with_evaluator.hpp"
+#include "qps/evaluators/results_table.hpp"
 
 namespace qps {
 auto WithEvaluator::select_eval_method() const {
@@ -15,6 +16,9 @@ auto WithEvaluator::eval_with(const AttrRef& attr_1, const AttrRef& attr_2) cons
     if (!attr_1.type_equals(attr_2)) {
         // Different types of attributes will never be equal!
         return Table{};
+    } else if (attr_1 == attr_2) {
+        // Same attributes will always be equal
+        return UnitTable{};
     }
 
     auto table = Table{{attr_1.synonym, attr_2.synonym}};
