@@ -84,6 +84,17 @@ TEST_CASE("Test Declaration Parser") {
         const auto& [result, rest] = output;
         REQUIRE(result.empty());
     }
+
+    SECTION("Declaration with extra semi-colon") {
+        const auto query = "procedure p;;";
+        auto tokens = runner.apply_tokeniser(query);
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
+        const auto& [result, rest] = output;
+
+        REQUIRE(result.size() == 1);
+        REQUIRE(std::distance(rest, tokens.cend()) == 1);
+    }
 }
 
 TEST_CASE("Test QPS - Basic Functionality") {
@@ -240,6 +251,13 @@ TEST_CASE("Test QPS - Syntax") {
         REQUIRE(is_syntax_error(output));
     }
 
+    SECTION("Query with missing comma") {
+        const auto query = "stmt s stmt b; Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
+
     SECTION("Query with missing semi-colon") {
         const auto query = "stmt s Select s";
         const auto output = qps.parse(query);
@@ -249,6 +267,13 @@ TEST_CASE("Test QPS - Syntax") {
 
     SECTION("Query with additional comma") {
         const auto query = "stmt s,; Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
+
+    SECTION("Query with additional semi-colon") {
+        const auto query = "read r;; print p; Select p";
         const auto output = qps.parse(query);
 
         REQUIRE(is_syntax_error(output));
