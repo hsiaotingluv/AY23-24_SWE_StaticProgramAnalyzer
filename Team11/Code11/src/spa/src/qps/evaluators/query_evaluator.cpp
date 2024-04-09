@@ -34,7 +34,7 @@ auto QueryEvaluator::evaluate_query(const Query& query_obj) -> OutputTable {
             evaluator = std::visit(such_that_clause_evaluator_selector(read_facade, is_negated), relationship);
         } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
             const auto syntactic_pattern = pattern_clause->syntactic_pattern;
-            evaluator = std::visit(pattern_clause_evaluator_selector(read_facade, is_negated),syntactic_pattern);
+            evaluator = std::visit(pattern_clause_evaluator_selector(read_facade, is_negated), syntactic_pattern);
         } else if (const auto with_clause = std::dynamic_pointer_cast<qps::WithClause>(clause)) {
             evaluator = std::make_shared<WithEvaluator>(read_facade, with_clause->ref1, with_clause->ref2,
                                                         with_clause->is_negated_clause());
