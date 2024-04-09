@@ -43,3 +43,13 @@ stmt s1; assign a1; Select <a1, s1> such that Affects(s1, a1)
 stmt s1, s2, s3, s4; assign a1, a2, a3, a4; Select <a1, s1> such that Affects(s1, a1) and Affects(a2, s2) and Affects(s3, s4) and Affects(a3, a4)
 10 5,13 3,18 18,31 26,31 31,42 38,42 42,7 18,8 18
 5000
+10 - invalid affects since Affects does not hold for any read statements 
+
+read r; stmt s; Select <s, r, s, r> such that Affects(s, r)
+none
+5000
+11 - invalid affects since Affects does not hold for any read statements 
+
+stmt s1, s2, s3, s4; assign a1, a2, a3, a4; read r; Select <a1, a2, a3, a4, s1, s2, s3, s4> such that Affects(s1, a1) and Affects(a2, s2) and Affects(s3, s4) and Affects(a3, a4) and Affects(s1, r)
+none
+5000
