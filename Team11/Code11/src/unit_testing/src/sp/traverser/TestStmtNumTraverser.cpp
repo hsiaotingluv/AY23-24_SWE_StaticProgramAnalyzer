@@ -3,7 +3,7 @@
 #include "catch.hpp"
 
 #include "common/ast/statement_ast.hpp"
-#include "sp/cfg/cfg_builder.hpp"
+#include "sp/cfg/program_cfgs.hpp"
 #include "sp/main.hpp"
 #include "sp/parser/program_parser.hpp"
 #include "sp/tokeniser/tokeniser.hpp"

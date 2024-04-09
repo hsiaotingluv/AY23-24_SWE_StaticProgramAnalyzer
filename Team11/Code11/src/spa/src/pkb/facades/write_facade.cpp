@@ -70,6 +70,10 @@ void WriteFacade::add_stmt_no_proc_called_mapping(const std::string& stmt_no, co
     pkb->add_stmt_no_proc_called_mapping(stmt_no, proc_called);
 }
 
+void WriteFacade::add_proc_to_stmt_no_mapping(const std::string& procedure, const std::string& stmt_no) {
+    pkb->add_proc_to_stmt_no_mapping(procedure, stmt_no);
+}
+
 void WriteFacade::finalise_pkb(const std::vector<std::string>& procedure_order) {
     pkb->finalise_pkb(procedure_order);
 }
