@@ -1,0 +1,6 @@
+procedure Example {
+  read read;
+  read print;
+  print = 5;
+  print read;
+}
