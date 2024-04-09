@@ -1,0 +1,25 @@
+1 - valid long synonym
+print print; 
+Select print 
+4
+5000
+2 - valid long synonym with invalid comma
+print print, ; 
+Select print 
+SyntaxError
+5000
+3 - valid long synonym with pattern
+assign printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint;
+Select printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint pattern printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint(_, _)
+3
+5000
+4 - valid synonym
+read read; print print; 
+Select read
+1, 2
+5000
+5 - valid multiple unused variable declaration
+assign a, a1, a2, a3, a4, a5; print p1, p2, p3, p4, p5; read r1, r2, r3, r4, r5; stmt s1, s2, s3, s4, s5; if ifs1, ifs2, ifs3, ifs4, ifs5; while w1, w2, w3, w4, w5; read r;
+Select r
+1, 2
+5000
