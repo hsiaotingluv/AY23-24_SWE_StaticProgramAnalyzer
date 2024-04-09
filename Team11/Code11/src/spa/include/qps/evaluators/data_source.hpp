@@ -23,7 +23,7 @@ class DataSource {
                   }
 
                   const auto& table = std::get<Table>(output_table);
-                  const auto results = table.get_column_value(synonym);
+                  auto results = table.get_column_value(synonym);
 
                   if (results.empty()) {
 #ifdef DEBUG
@@ -35,12 +35,14 @@ class DataSource {
                   std::cerr << "[Hit]" << std::endl;
 #endif
                   return results;
-              }){};
+              }) {
+    }
 
     DataSource(const std::shared_ptr<pkb::ReadFacade>& read_facade)
         : getter_func([read_facade](const std::shared_ptr<Synonym>& synonym) -> std::unordered_set<std::string> {
               return synonym->scan(read_facade);
-          }){};
+          }) {
+    }
 
     [[nodiscard]] auto get_data(const std::shared_ptr<Synonym>& synonym) const -> std::unordered_set<std::string> {
         return getter_func(synonym);

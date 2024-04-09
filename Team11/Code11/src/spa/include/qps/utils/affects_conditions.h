@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "pkb/facades/read_facade.h"
 
@@ -15,9 +16,8 @@ class AffectsConditions {
     std::function<bool(const std::string&)> intermediate_node_cond;
 
   public:
-    explicit AffectsConditions(const std::string& start_node, const std::shared_ptr<pkb::ReadFacade>& read_facade) {
-        this->start_node = start_node;
-        this->read_facade = read_facade;
+    explicit AffectsConditions(std::string start_node, std::shared_ptr<pkb::ReadFacade> read_facade)
+        : start_node(std::move(start_node)), read_facade(std::move(read_facade)) {
 
         this->start_node_cond = [this](const std::string& start_node) {
             auto is_assign = this->read_facade->has_assign_statement(start_node);
