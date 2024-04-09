@@ -130,7 +130,7 @@ auto build_synonyms(std::vector<Token>::const_iterator it, const std::vector<Tok
 
         const auto synonym = *it;
         if (!is_string(synonym)) {
-            break;
+            return std::nullopt;
         }
         it = std::next(it);
         synonyms.emplace_back(std::make_shared<SynonymType>(IDENT{synonym.content}));
