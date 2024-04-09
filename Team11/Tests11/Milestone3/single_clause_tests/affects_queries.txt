@@ -1,0 +1,45 @@
+1 - valid affects in different nesting level
+
+Select BOOLEAN such that Affects(5, 10)
+TRUE
+5000
+2 - valid affects in different nesting level
+
+Select BOOLEAN such that Affects(3, 13)
+TRUE
+5000
+3 - valid affects in loops
+
+Select BOOLEAN such that Affects(18, 18)
+TRUE
+5000
+4 - valid affects with wildcard
+
+stmt s; Select s such that Affects(s, 6)
+none
+5000
+5 - valid affects with stmt synonym
+
+stmt s; Select s such that Affects(s, 31)
+26, 31
+5000
+6 - valid affects with assign synonym (should be the same as testcase 5)
+
+assign a; Select a such that Affects(a, 31)
+26, 31
+5000
+7 - valid affects with RHS stmt synonym
+
+stmt s; Select s such that Affects(18, s)
+7, 8, 18
+5000
+8 - valid affects with both synonyms
+
+stmt s1; assign a1; Select <a1, s1> such that Affects(s1, a1)
+10 5,13 3,18 18,31 26,31 31,42 38,42 42,7 18,8 18
+5000
+9 - valid multiple affects with both synonyms
+
+stmt s1, s2, s3, s4; assign a1, a2, a3, a4; Select <a1, s1> such that Affects(s1, a1) and Affects(a2, s2) and Affects(s3, s4) and Affects(a3, a4)
+10 5,13 3,18 18,31 26,31 31,42 38,42 42,7 18,8 18
+5000
