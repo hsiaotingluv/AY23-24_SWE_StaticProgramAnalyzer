@@ -598,9 +598,11 @@ static auto subtract_impl(std::vector<std::vector<std::string>>&& table1_content
         if (!all_same) {
             continue;
         }
-        // All common columns are equal -> advance both pointers
+
+        // All common columns are equal -> advance table1's pointer
+        // Table1 is superset of table2 i.e. table1 may have repeated row (sort of)
+        // So we keep table2's pointer behind
         curr_row1++;
-        curr_row2++;
     }
 
     // Add all remaining rows from table1
