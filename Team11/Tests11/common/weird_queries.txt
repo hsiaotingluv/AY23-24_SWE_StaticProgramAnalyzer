@@ -1,0 +1,40 @@
+1 - valid synonym as designEntity
+print print; 
+Select print 
+4
+5000
+2 - invalid declaration with extra comma
+read read; print print, ; 
+Select print 
+SyntaxError
+5000
+3 - invalid declaration with extra semicolon
+read read;; print print; 
+Select print 
+SyntaxError
+5000
+4 - valid long synonym with pattern
+assign printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint;
+Select printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint pattern printprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprintprint(_, _)
+3
+5000
+5 - valid synonym as designEntity
+read read; print print; 
+Select read
+1, 2
+5000
+6 - valid multiple unused variable declaration
+assign a, a1, a2, a3, a4, a5; print p1, p2, p3, p4, p5; read r1, r2, r3, r4, r5; stmt s1, s2, s3, s4, s5; if ifs1, ifs2, ifs3, ifs4, ifs5; while w1, w2, w3, w4, w5; read r;
+Select r
+1, 2
+5000
+7 - invalid declaration with no synonym
+read ; print ; 
+Select print 
+SyntaxError
+5000
+8 - valid declaration with repeating types of synonyms
+read r1; print p1; read r2; print p2; read r3; print p3; read r4; print p4; 
+Select p1 
+4
+5000

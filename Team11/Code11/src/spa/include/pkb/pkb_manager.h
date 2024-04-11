@@ -15,6 +15,7 @@
 #include "pkb/stores/pattern_matching_store/assignment_store.h"
 #include "pkb/stores/pattern_matching_store/if_var_store.h"
 #include "pkb/stores/pattern_matching_store/while_var_store.h"
+#include "pkb/stores/proc_to_stmt_nos_store.h"
 #include "pkb/stores/statement_store.h"
 #include "pkb/stores/uses_store/procedure_uses_store.h"
 #include "pkb/stores/uses_store/statement_uses_store.h"
@@ -431,6 +432,15 @@ class PkbManager {
 
     std::unordered_set<std::tuple<std::string, std::string>> get_all_while_stmt_var_pairs() const;
 
+    // Read operations for procedure to statement number store
+    std::unordered_map<std::string, std::unordered_set<std::string>> get_all_proc_to_stmts_nos_map() const;
+
+    std::unordered_set<std::string> get_all_stmts_nos_by_proc(const std::string& proc_name) const;
+
+    std::string get_proc_name_by_stmt_no(const std::string& stmt_no) const;
+
+    bool are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const;
+
     // Write APIs
     void add_procedure(std::string procedure);
 
@@ -464,6 +474,8 @@ class PkbManager {
 
     void add_while_var(const std::string& statement_number, const std::string& variable);
 
+    void add_proc_to_stmt_no_mapping(const std::string& procedure, const std::string& stmt_no);
+
     void finalise_pkb(const std::vector<std::string>& procedure_order);
 
   private:
@@ -484,6 +496,7 @@ class PkbManager {
     std::shared_ptr<IfVarStore> if_var_store;
     std::shared_ptr<WhileVarStore> while_var_store;
     std::shared_ptr<StmtNoToProcCalledStore> stmt_no_to_proc_called_store;
+    std::shared_ptr<ProcToStmtNosStore> proc_to_stmt_nos_store;
 
     template <class DirectStore, class StarStore, class OrderingStrategy>
     void populate_star_from_direct(std::shared_ptr<DirectStore> direct_store, std::shared_ptr<StarStore> star_store,

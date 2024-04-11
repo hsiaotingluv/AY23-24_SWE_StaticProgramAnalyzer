@@ -59,6 +59,6 @@ class ProgramCfgs {
     /**
      * @brief Construct a string representation of the Control Flow Graph.
      */
-    friend auto operator<<(std::ostream& os, const ProgramCfgs& cfg_builder) -> std::ostream&;
+    friend auto operator<<(std::ostream& os, const ProgramCfgs& program_cfgs) -> std::ostream&;
 };
 } // namespace sp
