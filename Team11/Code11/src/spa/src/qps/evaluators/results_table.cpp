@@ -850,7 +850,7 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
                       reference);
 }
 
-void print(const Table& table) {
+static void print(const Table& table) {
     for (const auto& col : table.get_column()) {
         std::cout << col->get_name() << "\t";
     }
@@ -858,4 +858,13 @@ void print(const Table& table) {
 
     detail::print(table.get_records());
 }
+
+void print(const OutputTable& output_table) {
+    if (std::holds_alternative<UnitTable>(output_table)) {
+        std::cout << "UnitTable" << std::endl;
+    } else if (std::holds_alternative<Table>(output_table)) {
+        print(std::get<Table>(output_table));
+    }
+}
+
 } // namespace qps
