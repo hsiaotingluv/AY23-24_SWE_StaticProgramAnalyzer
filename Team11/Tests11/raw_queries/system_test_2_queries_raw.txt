@@ -1,0 +1,6 @@
+procedure p; Select BOOLEAN such that not Calls*(p,"MegaStress") and not Affects(p,_)
+procedure p; procedure q; Select p.procName such that not Calls*(p,q) and not Affects(_,q)
+procedure p; Select p.procName such that not Calls*(p,"TeraStress") and not Affects(p,_)
+procedure p; procedure q; Select p.procName such that not Calls*(p,q) and not Affects(p,_)
+procedure p; procedure q; Select q.procName such that not Calls*(p,q) and not Affects(q,_)
+procedure p; Select BOOLEAN such that not Calls*(p,_) and not Affects(_,p)
