@@ -6,6 +6,7 @@
 #include "qps/parser/analysers/semantic_analyser.hpp"
 
 #include <memory>
+#include <ostream>
 #include <variant>
 #include <vector>
 
@@ -30,17 +31,14 @@ auto QueryEvaluator::evaluate_query(const Query& query_obj) -> OutputTable {
         const auto data_source = DataSource{read_facade, curr_table};
         if (const auto such_that_clause = std::dynamic_pointer_cast<qps::SuchThatClause>(clause)) {
             const auto relationship = such_that_clause->rel_ref;
-            evaluator =
-                std::visit(such_that_clause_evaluator_selector(data_source, read_facade, clause->is_negated_clause()),
-                           relationship);
+            evaluator = std::visit(such_that_clause_evaluator_selector(data_source, read_facade, false), relationship);
         } else if (const auto pattern_clause = std::dynamic_pointer_cast<qps::PatternClause>(clause)) {
             const auto syntactic_pattern = pattern_clause->syntactic_pattern;
             evaluator =
-                std::visit(pattern_clause_evaluator_selector(data_source, read_facade, clause->is_negated_clause()),
-                           syntactic_pattern);
+                std::visit(pattern_clause_evaluator_selector(data_source, read_facade, false), syntactic_pattern);
         } else if (const auto with_clause = std::dynamic_pointer_cast<qps::WithClause>(clause)) {
-            evaluator = std::make_shared<WithEvaluator>(data_source, read_facade, with_clause->ref1, with_clause->ref2,
-                                                        with_clause->is_negated_clause());
+            evaluator =
+                std::make_shared<WithEvaluator>(data_source, read_facade, with_clause->ref1, with_clause->ref2, false);
         }
 
         if (evaluator == nullptr) {
@@ -52,14 +50,21 @@ auto QueryEvaluator::evaluate_query(const Query& query_obj) -> OutputTable {
         }
 
         auto next_table = evaluator->evaluate();
-        if (is_empty(next_table)) {
-#ifdef DEBUG
-            std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
-#endif
-            return project_to_table(read_facade, next_table, reference);
-        }
 
-        curr_table = join(std::move(curr_table), std::move(next_table));
+        if (clause->is_negated_clause()) {
+            if (is_empty(next_table)) {
+                continue;
+            }
+            curr_table = subtract(std::move(curr_table), std::move(next_table), read_facade);
+        } else {
+            if (is_empty(next_table)) {
+#ifdef DEBUG
+                std::cerr << "Failed to evaluate clause: " << *clause << std::endl;
+#endif
+                return project_to_table(read_facade, next_table, reference);
+            }
+            curr_table = join(std::move(curr_table), std::move(next_table));
+        }
         if (is_empty(curr_table)) {
 #ifdef DEBUG
             std::cerr << "Conflict detected for clause: " << *clause << std::endl;

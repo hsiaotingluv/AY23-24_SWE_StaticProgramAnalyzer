@@ -579,9 +579,11 @@ static auto subtract_impl(std::vector<std::vector<std::string>>&& table1_content
         if (!all_same) {
             continue;
         }
-        // All common columns are equal -> advance both pointers
+
+        // All common columns are equal -> advance table1's pointer
+        // Table1 is superset of table2 i.e. table1 may have repeated row (sort of)
+        // So we keep table2's pointer behind
         curr_row1++;
-        curr_row2++;
     }
 
     // Add all remaining rows from table1
@@ -838,7 +840,7 @@ auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& t
                       reference);
 }
 
-void print(const Table& table) {
+static void print(const Table& table) {
     for (const auto& col : table.get_column()) {
         std::cout << col->get_name() << "\t";
     }
@@ -846,4 +848,13 @@ void print(const Table& table) {
 
     detail::print(table.get_records());
 }
+
+void print(const OutputTable& output_table) {
+    if (std::holds_alternative<UnitTable>(output_table)) {
+        std::cout << "UnitTable" << std::endl;
+    } else if (std::holds_alternative<Table>(output_table)) {
+        print(std::get<Table>(output_table));
+    }
+}
+
 } // namespace qps
