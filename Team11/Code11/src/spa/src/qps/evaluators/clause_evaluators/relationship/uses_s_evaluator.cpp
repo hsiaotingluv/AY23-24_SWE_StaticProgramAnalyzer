@@ -17,7 +17,7 @@ auto UsesSEvaluator::evaluate_positive() const -> OutputTable {
 auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym,
                                  const std::shared_ptr<VarSynonym>& var_synonym) const -> OutputTable {
     auto table = Table{{stmt_synonym, var_synonym}};
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
 
     const auto all_stmt_var_use_pairs = read_facade->get_all_statements_and_var_use_pairs();
     for (const auto& pair : all_stmt_var_use_pairs) {
@@ -33,7 +33,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
 auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym,
                                  const QuotedIdent& quoted_ident) const -> OutputTable {
     auto table = Table{{stmt_synonym}};
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
 
     const auto statements = read_facade->get_statements_that_use_var(quoted_ident.get_value());
 
@@ -49,7 +49,7 @@ auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synony
 auto UsesSEvaluator::eval_uses_s(const std::shared_ptr<StmtSynonym>& stmt_synonym, const WildCard&) const
     -> OutputTable {
     auto table = Table{{stmt_synonym}};
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
 
     const auto all_using_stmts = read_facade->get_all_statements_that_use();
     for (const auto& stmt_candidate : all_using_stmts) {

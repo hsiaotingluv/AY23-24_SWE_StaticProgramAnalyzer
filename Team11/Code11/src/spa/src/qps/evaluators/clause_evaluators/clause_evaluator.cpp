@@ -13,7 +13,7 @@ auto qps::ClauseEvaluator::negate_result(qps::OutputTable output_table) const ->
                                      // table. cross join all these tables.
                                      auto curr_table = OutputTable{UnitTable{}};
                                      for (const auto& synonym : column_synonyms) {
-                                         const auto all_stored_synonyms = synonym->scan(read_facade);
+                                         const auto all_stored_synonyms = get_data(synonym);
                                          auto new_table = Table{{synonym}};
                                          for (const auto& stored_syn : all_stored_synonyms) {
                                              new_table.add_row({stored_syn});

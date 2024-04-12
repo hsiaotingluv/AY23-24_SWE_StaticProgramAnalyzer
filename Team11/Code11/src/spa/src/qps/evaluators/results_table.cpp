@@ -10,7 +10,6 @@
 #include <memory>
 #include <numeric>
 #include <set>
-#include <sstream>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
@@ -526,18 +525,6 @@ auto cross_join_with_conflict_checks(Table&& table1, Table&& table2) -> OutputTa
     return join(std::move(table1), std::move(table2), double_pointer_merge, nested_loop_join_records);
 }
 
-auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
-    auto table = Table{};
-    for (const auto& synonym : synonyms) {
-        auto curr_table = Table{{synonym}};
-        for (const auto& result : synonym->scan(read_facade)) {
-            curr_table.add_row({result});
-        }
-        table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
-    }
-    return table;
-}
-
 /**
  * @brief Build full synonym table from the given elements
  *
@@ -548,14 +535,8 @@ auto build_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade
 static auto build_full_table(const Synonyms& synonyms, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table {
     auto table = Table{};
     auto unique_synonyms = std::unordered_set<std::shared_ptr<Synonym>>{synonyms.begin(), synonyms.end()};
-
-    // Build mappers
     for (const auto& synonym : unique_synonyms) {
-        auto curr_table = Table{{synonym}};
-        for (const auto& result : synonym->scan(read_facade)) {
-            curr_table.add_row({result});
-        }
-        table = std::get<Table>(detail::cross_join(std::move(table), std::move(curr_table)));
+        table = std::get<Table>(detail::cross_join(std::move(table), build_table(synonym, read_facade)));
     }
     return table;
 }
@@ -670,6 +651,15 @@ auto is_unit(const OutputTable& table) -> bool {
 
 auto is_empty(const OutputTable& table) -> bool {
     return std::holds_alternative<Table>(table) && std::get<Table>(table).empty();
+}
+
+auto build_table(const std::shared_ptr<Synonym>& synonym, const std::shared_ptr<pkb::ReadFacade>& read_facade)
+    -> Table {
+    auto curr_table = Table{{synonym}};
+    for (const auto& result : synonym->scan(read_facade)) {
+        curr_table.add_row({result});
+    }
+    return curr_table;
 }
 
 auto subtract(OutputTable&& table1, OutputTable&& table2, const std::shared_ptr<pkb::ReadFacade>& read_facade)

@@ -19,8 +19,8 @@ auto ModifiesSEvaluator::evaluate_positive() const -> OutputTable {
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
                                          const std::shared_ptr<qps::VarSynonym>& var_syn) const -> OutputTable {
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
-    const auto relevant_variables = var_syn->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
+    const auto relevant_variables = get_data(var_syn);
 
     const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
     const auto var_vec = std::vector<std::string>{relevant_variables.begin(), relevant_variables.end()};
@@ -41,7 +41,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym,
                                          const QuotedIdent& identifier) const -> OutputTable {
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
     const auto relevant_stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
 
     const auto stmts = read_facade->get_statements_that_modify_var(identifier.get_value());
@@ -58,7 +58,7 @@ auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>
 
 auto ModifiesSEvaluator::eval_modifies_s(const std::shared_ptr<qps::StmtSynonym>& stmt_synonym, const WildCard&) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_synonym->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_synonym);
     const auto stmt_vec = std::vector<std::string>{relevant_stmts.begin(), relevant_stmts.end()};
 
     const auto statements = read_facade->get_all_statements_that_modify();

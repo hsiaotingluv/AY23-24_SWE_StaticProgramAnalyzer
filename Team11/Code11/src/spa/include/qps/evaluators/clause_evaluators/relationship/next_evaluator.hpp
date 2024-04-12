@@ -49,8 +49,8 @@ class NextEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_next(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    NextEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, Next next, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), next(std::move(next)) {
+    NextEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, Next next, bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), next(std::move(next)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

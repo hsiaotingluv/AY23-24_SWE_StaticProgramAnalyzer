@@ -47,8 +47,9 @@ class FollowsTEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_follows_t(const qps::WildCard&, const qps::WildCard&) const -> OutputTable;
 
   public:
-    FollowsTEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, FollowsT follows_t, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), follows_t(std::move(follows_t)) {
+    FollowsTEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, FollowsT follows_t,
+                      bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), follows_t(std::move(follows_t)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

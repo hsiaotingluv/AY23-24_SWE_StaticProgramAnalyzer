@@ -4,6 +4,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/clause_evaluators/clause_evaluator.hpp"
+#include "qps/evaluators/data_source.hpp"
 #include "qps/parser/entities/syntactic_pattern.hpp"
 
 namespace qps {
@@ -22,8 +23,9 @@ class PatternWhileEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_pattern_while(const qps::WildCard&) const -> OutputTable;
 
   public:
-    PatternWhileEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, PatternWhile pattern, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), pattern(std::move(pattern)) {
+    PatternWhileEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, PatternWhile pattern,
+                          bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), pattern(std::move(pattern)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

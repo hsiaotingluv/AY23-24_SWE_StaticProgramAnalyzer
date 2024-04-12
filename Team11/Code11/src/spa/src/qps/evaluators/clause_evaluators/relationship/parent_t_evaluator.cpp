@@ -18,8 +18,8 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_sy
     if (stmt_syn_1 == stmt_syn_2) {
         return Table{};
     }
-    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts_1 = get_data(stmt_syn_1);
+    const auto relevant_stmts_2 = get_data(stmt_syn_2);
 
     auto table = Table{{stmt_syn_1, stmt_syn_2}};
     // TODO: Improve pkb API: Get all parent-star-child pairs
@@ -42,7 +42,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_sy
 
 auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const Integer& stmt_num_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto ancestors = read_facade->get_parent_star_of(stmt_num_2.value);
     for (const auto& ancestor : ancestors) {
@@ -56,7 +56,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_sy
 
 auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto all_parents = read_facade->get_all_parent_star_keys();
     for (const auto& parent_name : all_parents) {
@@ -70,7 +70,7 @@ auto ParentTEvaluator::eval_parent_t(const std::shared_ptr<StmtSynonym>& stmt_sy
 
 auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table({stmt_syn_2});
     const auto all_descendants_of_stmt = read_facade->get_children_star_of(stmt_num_1.value);
     for (const auto& descendant : all_descendants_of_stmt) {
@@ -98,7 +98,7 @@ auto ParentTEvaluator::eval_parent_t(const Integer& stmt_num_1, const WildCard&)
 
 auto ParentTEvaluator::eval_parent_t(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table({stmt_syn_2});
     const auto all_descendants = read_facade->get_all_parent_star_values();
     for (const auto& descendant_name : all_descendants) {

@@ -19,8 +19,8 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
         return Table{};
     }
 
-    const auto relevant_stmts_1 = stmt_syn_1->scan(read_facade);
-    const auto relevant_stmts_2 = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts_1 = get_data(stmt_syn_1);
+    const auto relevant_stmts_2 = get_data(stmt_syn_2);
 
     auto table = Table{{stmt_syn_1, stmt_syn_2}};
     const auto all_next_keys = read_facade->get_all_next_keys();
@@ -43,7 +43,7 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1,
 
 auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const qps::Integer& stmt_num_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto stmt_candidates = read_facade->get_previous_of(stmt_num_2.value);
     for (const auto& candidate : stmt_candidates) {
@@ -56,7 +56,7 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, co
 }
 
 auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, const WildCard&) const -> OutputTable {
-    const auto relevant_stmts = stmt_syn_1->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_1);
     auto table = Table{{stmt_syn_1}};
     const auto all_next_keys = read_facade->get_all_next_keys();
     for (const auto& stmt : all_next_keys) {
@@ -71,7 +71,7 @@ auto NextEvaluator::eval_next(const std::shared_ptr<StmtSynonym>& stmt_syn_1, co
 
 auto NextEvaluator::eval_next(const Integer& stmt_num_1, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const
     -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table{{stmt_syn_2}};
     const auto stmt_candidates = read_facade->get_next_of(stmt_num_1.value);
     for (const auto& candidate : stmt_candidates) {
@@ -98,7 +98,7 @@ auto NextEvaluator::eval_next(const Integer& stmt_num_1, const WildCard&) const 
 }
 
 auto NextEvaluator::eval_next(const WildCard&, const std::shared_ptr<StmtSynonym>& stmt_syn_2) const -> OutputTable {
-    const auto relevant_stmts = stmt_syn_2->scan(read_facade);
+    const auto relevant_stmts = get_data(stmt_syn_2);
     auto table = Table{{stmt_syn_2}};
     const auto all_next_values = read_facade->get_all_next_values();
     for (const auto& stmt : all_next_values) {

@@ -4,6 +4,7 @@
 
 #include "pkb/facades/read_facade.h"
 #include "qps/evaluators/clause_evaluators/clause_evaluator.hpp"
+#include "qps/evaluators/data_source.hpp"
 #include "qps/parser/entities/relationship.hpp"
 
 namespace qps {
@@ -36,8 +37,8 @@ class UsesPEvaluator : public ClauseEvaluator {
     [[nodiscard]] auto eval_uses_p(const qps::QuotedIdent& quoted_proc, const qps::WildCard&) const -> OutputTable;
 
   public:
-    UsesPEvaluator(std::shared_ptr<pkb::ReadFacade> read_facade, UsesP uses_p, bool is_negated)
-        : ClauseEvaluator(std::move(read_facade), is_negated), uses_p(std::move(uses_p)) {
+    UsesPEvaluator(DataSource data_source, std::shared_ptr<pkb::ReadFacade> read_facade, UsesP uses_p, bool is_negated)
+        : ClauseEvaluator(std::move(data_source), std::move(read_facade), is_negated), uses_p(std::move(uses_p)) {
     }
 
     [[nodiscard]] auto evaluate_positive() const -> OutputTable override;

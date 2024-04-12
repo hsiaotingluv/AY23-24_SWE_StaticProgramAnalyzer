@@ -394,3 +394,35 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
         require_equal(evaluator.evaluate(query), std::vector<std::string>{procedure_name});
     }
 }
+
+TEST_CASE("Read Facade Caching") {
+    SECTION("Follows(S1, 2) and Follows*(S1, S2)") {
+        const auto& [read_facade, write_facade] = pkb::PkbManager::create_facades();
+
+        // Populate pkb::PkbManager
+        auto all_statements_numbers = std::vector<int>(1000);
+        std::iota(all_statements_numbers.begin(), all_statements_numbers.end(), 0);
+
+        for (int i = 0; i < all_statements_numbers.size() - 1; i++) {
+            write_facade->add_statement(std::to_string(all_statements_numbers[i]), StatementType::Assign);
+            write_facade->add_follows(std::to_string(all_statements_numbers[i]),
+                                      std::to_string(all_statements_numbers[i + 1]));
+        }
+        write_facade->add_statement(std::to_string(all_statements_numbers.at(all_statements_numbers.size() - 1)),
+                                    StatementType::Assign);
+        write_facade->finalise_pkb();
+
+        auto evaluator = QueryEvaluator{read_facade};
+        const auto query = Query{
+            std::vector<Elem>{std::make_shared<AnyStmtSynonym>("s1")},
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s1"), Integer{"1"}}, false),
+                std::make_shared<SuchThatClause>(
+                    FollowsT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
+            },
+        };
+
+        const auto results = evaluator.evaluate(query);
+        require_equal(results, std::vector<std::string>{"0"});
+    }
+}
