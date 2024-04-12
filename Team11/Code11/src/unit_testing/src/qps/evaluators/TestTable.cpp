@@ -188,6 +188,20 @@ TEST_CASE("Test Subtract Table") {
                     row[2]); // Our subtraction disallows x _ "v"+x e.g. 1 _ v1 cannot appear in the table
         }
     };
+
+    SECTION("Some common synonym - Repeated entry") {
+        auto table1 = Table{{std::make_shared<ProcSynonym>("p"), std::make_shared<ProcSynonym>("q"),
+                             std::make_shared<ProcSynonym>("z")}};
+
+        table1.add_row({"a", "b", "c"});
+        table1.add_row({"b", "b", "c"});
+
+        auto table2 = Table{{std::make_shared<ProcSynonym>("q"), std::make_shared<ProcSynonym>("z")}};
+        table2.add_row({"b", "c"});
+
+        const auto table = subtract(std::move(table1), std::move(table2), read_facade);
+        REQUIRE(is_empty(table));
+    }
 }
 
 #ifdef ENABLE_BENCHMARK
