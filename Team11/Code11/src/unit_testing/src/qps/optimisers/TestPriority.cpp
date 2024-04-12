@@ -30,7 +30,6 @@ TEST_CASE("Test PriorityOptimiser - Prioritise positive clauses") {
         REQUIRE(results.size() == 1);
 
         const auto query1 = results[0];
-        std::cout << query1 << std::endl;
         REQUIRE(std::holds_alternative<std::vector<Elem>>(query1.reference));
         const auto reference2 = std::get<std::vector<Elem>>(query1.reference);
         REQUIRE(reference2.size() == 1);
