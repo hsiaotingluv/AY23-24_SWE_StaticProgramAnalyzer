@@ -73,7 +73,7 @@ auto project_to_table(const std::shared_ptr<pkb::ReadFacade>& read_facade, Outpu
                       const Reference& reference, bool should_transform = false) -> OutputTable;
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
-void print(const Table& table);
+void print(const OutputTable& table);
 
 class AttributeExtractor {
     std::shared_ptr<pkb::ReadFacade> read_facade;
