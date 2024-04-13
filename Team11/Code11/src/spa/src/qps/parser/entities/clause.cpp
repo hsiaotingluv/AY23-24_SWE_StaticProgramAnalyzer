@@ -13,8 +13,12 @@ auto SuchThatClause::representation() const -> std::string {
     return ss.str();
 }
 
+auto SuchThatClause::is_equal_modulo_negation(const SuchThatClause& other) const -> bool {
+    return rel_ref == other.rel_ref;
+}
+
 auto SuchThatClause::operator==(const SuchThatClause& other) const -> bool {
-    return rel_ref == other.rel_ref && is_negated_clause() == other.is_negated_clause();
+    return is_equal_modulo_negation(other) && is_negated_clause() == other.is_negated_clause();
 }
 
 auto PatternClause::representation() const -> std::string {
@@ -26,8 +30,12 @@ auto PatternClause::representation() const -> std::string {
     return ss.str();
 }
 
+auto PatternClause::is_equal_modulo_negation(const PatternClause& other) const -> bool {
+    return syntactic_pattern == other.syntactic_pattern;
+}
+
 auto PatternClause::operator==(const PatternClause& other) const -> bool {
-    return syntactic_pattern == other.syntactic_pattern && is_negated_clause() == other.is_negated_clause();
+    return is_equal_modulo_negation(other) && is_negated_clause() == other.is_negated_clause();
 }
 
 auto WithClause::representation() const -> std::string {
@@ -39,7 +47,11 @@ auto WithClause::representation() const -> std::string {
     return ss.str();
 }
 
+auto WithClause::is_equal_modulo_negation(const WithClause& other) const -> bool {
+    return ref1 == other.ref1 && ref2 == other.ref2;
+}
+
 auto WithClause::operator==(const WithClause& other) const -> bool {
-    return ref1 == other.ref1 && ref2 == other.ref2 && is_negated_clause() == other.is_negated_clause();
+    return is_equal_modulo_negation(other) && is_negated_clause() == other.is_negated_clause();
 }
 } // namespace qps
