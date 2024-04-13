@@ -29,6 +29,8 @@ class Clause {
 
     [[nodiscard]] virtual auto is_equal(const Clause& other) const -> bool = 0;
 
+    [[nodiscard]] virtual auto is_equal_ignoring_negation(const Clause& other) const -> bool = 0;
+
     [[nodiscard]] auto is_negated_clause() const -> bool {
         return is_negated;
     }
@@ -41,6 +43,15 @@ struct SuchThatClause final : public Clause {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const SuchThatClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(SuchThatClause)) {
+            return false;
+        }
+        return is_equal_ignoring_negation(dynamic_cast<const SuchThatClause&>(other));
+    }
 
     auto operator==(const SuchThatClause& other) const -> bool;
 
@@ -60,6 +71,15 @@ struct PatternClause final : public Clause {
     }
 
     [[nodiscard]] auto representation() const -> std::string override;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const PatternClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(PatternClause)) {
+            return false;
+        }
+        return is_equal_ignoring_negation(dynamic_cast<const PatternClause&>(other));
+    }
 
     auto operator==(const PatternClause& other) const -> bool;
 
@@ -81,6 +101,15 @@ struct WithClause final : public Clause {
 
     [[nodiscard]] auto representation() const -> std::string override;
 
+    [[nodiscard]] auto is_equal_ignoring_negation(const WithClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(WithClause)) {
+            return false;
+        }
+        return is_equal_ignoring_negation(dynamic_cast<const WithClause&>(other));
+    }
+
     auto operator==(const WithClause& other) const -> bool;
 
     [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
@@ -88,6 +117,31 @@ struct WithClause final : public Clause {
             return false;
         }
         return *this == dynamic_cast<const WithClause&>(other);
+    }
+};
+
+struct ContradictionClause final : public Clause {
+    ContradictionClause() : Clause(false) {
+    }
+
+    [[nodiscard]] auto representation() const -> std::string override;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const ContradictionClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal_ignoring_negation(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(ContradictionClause)) {
+            return false;
+        }
+        return is_equal_ignoring_negation(dynamic_cast<const ContradictionClause&>(other));
+    }
+
+    auto operator==(const ContradictionClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(ContradictionClause)) {
+            return false;
+        }
+        return *this == dynamic_cast<const ContradictionClause&>(other);
     }
 };
 
