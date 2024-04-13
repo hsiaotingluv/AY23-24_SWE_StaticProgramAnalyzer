@@ -3,10 +3,10 @@
 #include "qps/evaluators/clause_evaluators/such_that_clause_evaluator_selector.hpp"
 #include "qps/evaluators/clause_evaluators/with_evaluator.hpp"
 #include "qps/evaluators/results_table.hpp"
+#include "qps/optimisers/default.hpp"
 #include "qps/parser/analysers/semantic_analyser.hpp"
 
 #include <memory>
-#include <ostream>
 #include <variant>
 #include <vector>
 
@@ -79,6 +79,10 @@ auto QueryEvaluator::evaluate_query(const Query& query_obj) -> OutputTable {
 auto QueryEvaluator::evaluate(const qps::Query& query_obj) -> std::vector<std::string> {
     // Step 1: optimise query
     const auto optimised_queries = optimise(query_obj);
+    if (has_contradiction(optimised_queries)) {
+        auto table = OutputTable{Table{}};
+        return project(read_facade, table, query_obj.reference);
+    }
 
     // Step 2: evaluate optimised queries
     auto curr_table = OutputTable{UnitTable{}};

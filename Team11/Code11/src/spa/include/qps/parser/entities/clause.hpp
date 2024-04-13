@@ -120,4 +120,29 @@ struct WithClause final : public Clause {
     }
 };
 
+struct ContradictionClause final : public Clause {
+    ContradictionClause() : Clause(false) {
+    }
+
+    [[nodiscard]] auto representation() const -> std::string override;
+
+    [[nodiscard]] auto is_equal_modulo_negation(const ContradictionClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal_modulo_negation(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(ContradictionClause)) {
+            return false;
+        }
+        return is_equal_modulo_negation(dynamic_cast<const ContradictionClause&>(other));
+    }
+
+    auto operator==(const ContradictionClause& other) const -> bool;
+
+    [[nodiscard]] auto is_equal(const Clause& other) const -> bool override {
+        if (typeid(other) != typeid(ContradictionClause)) {
+            return false;
+        }
+        return *this == dynamic_cast<const ContradictionClause&>(other);
+    }
+};
+
 } // namespace qps

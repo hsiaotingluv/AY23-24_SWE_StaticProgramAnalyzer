@@ -54,4 +54,17 @@ auto WithClause::is_equal_modulo_negation(const WithClause& other) const -> bool
 auto WithClause::operator==(const WithClause& other) const -> bool {
     return is_equal_modulo_negation(other) && is_negated_clause() == other.is_negated_clause();
 }
+
+auto ContradictionClause::representation() const -> std::string {
+    return "Contradiction()";
+}
+
+auto ContradictionClause::is_equal_modulo_negation(const ContradictionClause& other) const -> bool {
+    return true;
+}
+
+auto ContradictionClause::operator==(const ContradictionClause& other) const -> bool {
+    return is_equal_modulo_negation(other) && is_negated_clause() == other.is_negated_clause();
+}
+
 } // namespace qps
