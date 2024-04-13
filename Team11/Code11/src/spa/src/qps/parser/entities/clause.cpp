@@ -59,7 +59,7 @@ auto ContradictionClause::representation() const -> std::string {
     return "Contradiction()";
 }
 
-auto ContradictionClause::is_equal_modulo_negation(const ContradictionClause& other) const -> bool {
+auto ContradictionClause::is_equal_modulo_negation(const ContradictionClause&) const -> bool {
     return true;
 }
 
