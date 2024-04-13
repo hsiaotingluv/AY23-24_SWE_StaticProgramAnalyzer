@@ -87,6 +87,23 @@ struct is_type_list_empty<TypeList<>> : std::true_type {};
 template <typename T>
 static constexpr bool is_typelist_empty_v = is_type_list_empty<T>::value;
 
+// Check if a TypeList contains a type
+template <typename T, typename U>
+struct is_member_of;
+
+template <typename Elem>
+struct is_member_of<Elem, TypeList<>> {
+    static constexpr bool value = false;
+};
+
+template <typename Elem, typename Head, typename... Tails>
+struct is_member_of<Elem, TypeList<Head, Tails...>> {
+    static constexpr bool value = std::is_same_v<Elem, Head> || is_member_of<Elem, TypeList<Tails...>>::value;
+};
+
+template <typename Elem, typename List>
+static constexpr bool is_member_v = is_member_of<Elem, List>::value;
+
 // Check if all elements of a TypeList satisfy a condition
 template <typename T, template <typename> typename Func>
 struct all_of;
