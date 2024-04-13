@@ -5,15 +5,16 @@
 #include "qps/optimisers/grouping.hpp"
 #include "qps/optimisers/priority.hpp"
 #include "qps/optimisers/redundancy.hpp"
+#include "qps/optimisers/subsumption_rewrite.hpp"
 
 #include <memory>
 #include <vector>
 
 namespace qps {
 class DefaultOptimiser : public Optimiser {
-    const std::array<std::shared_ptr<Optimiser>, 3> optimisers = {std::make_shared<RedundancyOptimiser>(),
-                                                                  std::make_shared<GroupingOptimiser>(),
-                                                                  std::make_shared<PriorityOptimiser>()};
+    const std::array<std::shared_ptr<Optimiser>, 4> optimisers = {
+        std::make_shared<RedundancyOptimiser>(), std::make_shared<SubsumptionRewriteOptimiser>(),
+        std::make_shared<GroupingOptimiser>(), std::make_shared<PriorityOptimiser>()};
 
     [[nodiscard]] auto optimise(const Query& query) const -> std::vector<Query> override {
         auto optimised_queries = std::vector<Query>{query};

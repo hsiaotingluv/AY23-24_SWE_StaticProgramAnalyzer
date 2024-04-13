@@ -1,5 +1,6 @@
 #pragma once
 #include "qps/parser/analysers/semantic_analyser_helper.hpp"
+#include "qps/parser/entities/attribute.hpp"
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
@@ -12,6 +13,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <variant>
 
 namespace qps ::detail {
 inline auto validate_pattern(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>&,
@@ -93,6 +95,9 @@ static inline auto visit_with_clause(const Synonyms& declarations,
     }
     const auto& [ref1, ref2] = maybe_valid_combi.value();
 
+    if (std::holds_alternative<AttrRef>(ref2) && !std::holds_alternative<AttrRef>(ref1)) {
+        return std::make_shared<WithClause>(ref2, ref1, with.is_negated);
+    }
     return std::make_shared<WithClause>(ref1, ref2, with.is_negated);
 }
 
