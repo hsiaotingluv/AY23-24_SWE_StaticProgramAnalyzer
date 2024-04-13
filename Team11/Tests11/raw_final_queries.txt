@@ -1,0 +1,42 @@
+Parameters : Tests11/generated_source.txt Tests11/generated_queries.txt /home/lauwsj/PycharmProjects/23s2-cp-spa-team-11/Team11/out.xml
+Beginning to parse Simple Program.
+End of parsing Simple Program.
+Team11
+Beginning to evaluate Query File.
+1 - generated TC 1
+assign pattern; stmt s1, s2; Select s1 such that not Affects(s1, _) and not Affects(s1, s2) pattern pattern("y", _)
+
+
+5000
+Evaluating query 1 - generated TC 1
+_ is an Unnamedvar 
+The happen is 2
+The happen is 2
+_ is an Unnamedvar 
+No ReturnBoolean, ReturnTuple=1 
+The final tag string is ReturnTuple="1" Affects="2" UnnamedVar="2" Pattern="2" SuchThat="1" CondNum="8" RelNum="2" 
+Query:
+	Reference:
+		AnyStmtSynonym(s1)
+
+	Clauses:
+		NotSuchThat(Affects(AnyStmtSynonym(s1), _))
+		NotSuchThat(Affects(AnyStmtSynonym(s1), AnyStmtSynonym(s2)))
+		Pattern(Assign(AssignSynonym(pattern), "y", _))
+
+Query:
+	Reference:
+		AnyStmtSynonym(s1)
+
+	Clauses:
+		Pattern(Assign(AssignSynonym(pattern), "y", _))
+		NotSuchThat(Affects(AnyStmtSynonym(s1), AnyStmtSynonym(s2)))
+
+Your answer: 83 82 81 79 78 77 75 73 72 71 36 1 8 35 34 14 33 25 2 24 23 26 21 85 22 84 30 58 18 11 39 31 45 57 12 27 10 44 29 15 74 13 20 32 16 28 41 17 40 4 42 49 47 43 63 37 46 48 61 51 52 53 54 67 50 59 60 55 3 62 7 65 70 66 68 
+Correct answer: 
+Missing: 
+Additional: 1 10 11 12 13 14 15 16 17 18 2 20 21 22 23 24 25 26 27 28 29 3 30 31 32 33 34 35 36 37 39 4 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 57 58 59 60 61 62 63 65 66 67 68 7 70 71 72 73 74 75 77 78 79 8 81 82 83 84 85 
+End of evaluating Query File.
+AutoTester Completed !
+Query file  does not exist. Trying Tests11/generated_queries.txt
+[/home/lauwsj/PycharmProjects/23s2-cp-spa-team-11/Team11/Tests11/generated_source] Failed test cases: 1 (0/1)
