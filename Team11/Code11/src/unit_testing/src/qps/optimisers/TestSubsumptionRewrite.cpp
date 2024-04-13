@@ -92,6 +92,26 @@ TEST_CASE("Test SubsumptionRewrite - Remove subsumed clause") {
         REQUIRE(result.clauses.size() == 1);
     }
 
+    SECTION("SubsumptionRewrite - 1 subsumed clause [negated clause]") {
+        const auto query = Query{
+            std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Follows{WildCard{}, WildCard{}}, true),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}, true),
+            },
+        };
+
+        const auto results = optimiser->optimise(std::vector<Query>{query});
+        REQUIRE(results.size() == 1);
+
+        const auto result = results[0];
+        REQUIRE(std::holds_alternative<std::vector<Elem>>(query.reference));
+        REQUIRE(std::holds_alternative<std::vector<Elem>>(result.reference));
+        REQUIRE(std::get<std::vector<Elem>>(query.reference) == std::get<std::vector<Elem>>(result.reference));
+        REQUIRE(result.clauses.size() == 1);
+        REQUIRE(*result.clauses[0] == *query.clauses[0]);
+    }
+
     SECTION("SubsumptionRewrite - Many clauses with no Subsumption relationship") {
         const auto query =
             Query{std::vector<Elem>{std::make_shared<ProcSynonym>("p1")},
