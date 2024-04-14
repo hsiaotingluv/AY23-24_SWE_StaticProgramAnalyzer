@@ -59,13 +59,3 @@ jobs:
         run: |
           cd Team11/Code11/build/src/integration_testing
           ./integration_testing
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Run System Testing on Push
-        run: |
-          chmod +x ./.github/scripts/run_sys_test.sh
-          ./.github/scripts/run_sys_test.sh

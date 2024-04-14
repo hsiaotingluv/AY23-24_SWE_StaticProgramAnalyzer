@@ -1,0 +1,42 @@
+name: "MacOS: Test"
+
+on: [ push ]
+
+jobs:
+  run-testing:
+    name: Run Testing
+    runs-on: macos-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Check out Git repo
+        uses: actions/checkout@v3
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          create-symlink: true
+
+      - uses: lukka/get-cmake@latest
+      - name: Setup Clang
+        run: brew install llvm
+
+      - name: Build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/Team11/Code11/CMakeLists.txt'
+          cmakeAppendedArgs: '-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/Team11/Code11/build'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run System Testing on Push
+        run: |
+          chmod +x ./.github/scripts/run_sys_test.sh
+          ./.github/scripts/run_sys_test.sh
