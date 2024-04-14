@@ -233,6 +233,10 @@ inline auto parse_attr_name(std::vector<Token>::const_iterator, const std::vecto
     return std::nullopt;
 }
 
+static auto is_string_or_attr_name(const Token& token) -> bool {
+    return is_string(token) || token.T == TokenType::AttrName;
+}
+
 template <typename Head, typename... Tails>
 auto parse_attr_name(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                      TypeList<Head, Tails...>)
@@ -241,7 +245,7 @@ auto parse_attr_name(std::vector<Token>::const_iterator it, const std::vector<To
         return std::nullopt;
     }
     const auto maybe_keyword = *it;
-    if (maybe_keyword.T != tokenizer::TokenType::AttrName || maybe_keyword.content != Head::keyword) {
+    if ((!is_string_or_attr_name(maybe_keyword)) || maybe_keyword.content != Head::keyword) {
         return parse_attr_name(it, end, TypeList<Tails...>{});
     }
     it = std::next(it);

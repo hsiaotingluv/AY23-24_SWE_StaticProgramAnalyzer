@@ -1109,4 +1109,32 @@ TEST_CASE("Query - Select negated clause") {
             PatternAssign{std::make_shared<AssignSynonym>(IDENT{"a"}), QuotedIdent{"x"}, WildCard{}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
+
+    SECTION("Query - Select with name collisions - value") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"value\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - stmt#") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"stmt#\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(!output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - varName") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"varName\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - procName") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"procName\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+    }
 }
