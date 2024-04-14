@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   run-testing:
-    name: Run Testing
+    name: Run System Testing
     runs-on: macos-latest
     strategy:
       fail-fast: true
