@@ -13,6 +13,13 @@ static auto subsumes(const T& relationship1, const U& relationship2) -> bool {
     return type_subsume(relationship1, relationship2) && args_subsume(relationship1, relationship2);
 }
 
+static auto subsumes(const Relationship& relationship1, const Relationship& relationship2) -> bool {
+    return std::visit(overloaded{[](const auto& relationship1, const auto& relationship2) -> bool {
+                          return subsumes(relationship1, relationship2);
+                      }},
+                      relationship1, relationship2);
+}
+
 auto SubsumptionRewriteOptimiser::optimise(const Query& query) const -> std::vector<Query> {
     auto clauses = query.clauses;
     const auto mid_it = std::partition(clauses.begin(), clauses.end(), [](const auto& clause) {
@@ -37,11 +44,8 @@ auto SubsumptionRewriteOptimiser::optimise(const Query& query) const -> std::vec
             const auto& relationship1 = clause1->rel_ref;
             const auto& relationship2 = clause2->rel_ref;
 
-            const auto does_subsume =
-                std::visit(overloaded{[](const auto& relationship1, const auto& relationship2) -> bool {
-                               return subsumes(relationship1, relationship2);
-                           }},
-                           relationship1, relationship2);
+            const auto does_subsume = !clause1->is_negated_clause() ? subsumes(relationship1, relationship2)
+                                                                    : subsumes(relationship2, relationship1);
             if (does_subsume) {
                 discarded_clauses.insert(clause2);
             }

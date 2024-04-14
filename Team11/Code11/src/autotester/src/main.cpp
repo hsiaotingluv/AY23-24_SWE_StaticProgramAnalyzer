@@ -123,18 +123,26 @@ void measure_evaluation(const std::vector<Query>& query_objects, const std::uniq
 }
 
 auto main(int argc, char** argv) -> int {
-    if (argc != 3) {
+    if (argc != 2 && argc != 3) {
         std::cerr << message() << std::endl;
         return 1;
     }
 
+    const auto source_path = std::string{argv[1]};
+    // Replace _source.txt with _queries.txt
+    const auto query_path =
+        argc == 3 ? std::string{argv[2]} : source_path.substr(0, source_path.find_last_of('_')) + "_queries.txt";
+
+    if (argc == 2) {
+        std::cout << "Query deduced to be: " << query_path << std::endl;
+    }
     auto wrapper = std::unique_ptr<AbstractWrapper>(WrapperFactory::createWrapper());
 
     std::cout << "Parsing source file..." << std::endl;
-    measure_parse(wrapper, argv[1], 0);
+    measure_parse(wrapper, source_path, 0);
     std::cout << std::endl;
 
     std::cout << "Evaluating queries..." << std::endl;
-    const auto objs = read_query_file(argv[2]);
+    const auto objs = read_query_file(query_path);
     measure_evaluation(objs, wrapper);
 }
