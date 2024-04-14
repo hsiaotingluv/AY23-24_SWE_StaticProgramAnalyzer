@@ -15,7 +15,15 @@ class AttrNameTokeniser final : public Tokenizer {
 
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
-        return tokenize_string(input, T::keyword, TokenType::AttrName);
+        return tokenize_string(input, T::keyword, TokenType::String);
+    }
+};
+
+template <>
+class AttrNameTokeniser<qps::StmtNum> final : public Tokenizer {
+  public:
+    [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
+        return tokenize_string(input, qps::StmtNum::keyword, TokenType::AttrName);
     }
 };
 
