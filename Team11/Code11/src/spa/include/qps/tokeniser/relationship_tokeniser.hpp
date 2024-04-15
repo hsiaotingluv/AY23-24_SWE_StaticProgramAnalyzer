@@ -15,7 +15,7 @@ class RelationshipTokeniser final : public Tokenizer {
 
   public:
     [[nodiscard]] auto tokenize(const TokeniserInput& input) const -> TokeniserOutput override {
-        return tokenize_string(input, T::keyword, TokenType::Relationship);
+        return tokenize_string(input, T::keyword, TokenType::String);
     }
 };
 

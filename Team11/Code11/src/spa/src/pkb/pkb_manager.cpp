@@ -1,4 +1,5 @@
 #include "pkb/pkb_manager.h"
+#include "common/utils/algo.h"
 #include "pkb/facades/read_facade.h"
 #include "pkb/facades/write_facade.h"
 
@@ -20,7 +21,8 @@ PkbManager::PkbManager()
       assignment_store(std::make_shared<AssignmentStore>()), next_store(std::make_shared<NextStore>()),
       direct_calls_store(std::make_shared<DirectCallsStore>()), calls_star_store(std::make_shared<CallsStarStore>()),
       if_var_store(std::make_shared<IfVarStore>()), while_var_store(std::make_shared<WhileVarStore>()),
-      stmt_no_to_proc_called_store(std::make_shared<StmtNoToProcCalledStore>()) {
+      stmt_no_to_proc_called_store(std::make_shared<StmtNoToProcCalledStore>()),
+      proc_to_stmt_nos_store(std::make_shared<ProcToStmtNosStore>()) {
 }
 
 auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std::shared_ptr<WriteFacade>> {
@@ -29,7 +31,7 @@ auto PkbManager::create_facades() -> std::tuple<std::shared_ptr<ReadFacade>, std
     auto write_facade = std::make_shared<WriteFacade>(pkb);
 
     return {std::move(read_facade), std::move(write_facade)};
-};
+}
 
 // ReadFacade APIs
 std::unordered_set<std::string> PkbManager::get_entities() const {
@@ -204,12 +206,12 @@ bool PkbManager::contains_statement_modify_var_value(const std::string& variable
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_modify() const {
     return statement_modifies_store->get_all_keys();
-};
+}
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_modify(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_modify();
     return filter_by_statement_type(stmts_pool, statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_modify_pairs() const {
     auto pairs = statement_modifies_store->get_all_pairs();
@@ -332,12 +334,12 @@ bool PkbManager::contains_procedure_use_var_value(const std::string& variable) c
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_use() const {
     return statement_uses_store->get_all_keys();
-};
+}
 
 std::unordered_set<std::string> PkbManager::get_all_statements_that_use(const StatementType& statement_type) const {
     auto stmts_pool = get_all_statements_that_use();
     return filter_by_statement_type(stmts_pool, statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_statements_and_var_use_pairs() const {
     auto pairs = statement_uses_store->get_all_pairs();
@@ -794,6 +796,34 @@ std::unordered_set<std::tuple<std::string, std::string>> PkbManager::get_all_whi
     return get_tuple_list_from_entity_string_pairs(pairs);
 }
 
+std::unordered_map<std::string, std::unordered_set<std::string>> PkbManager::get_all_proc_to_stmts_nos_map() const {
+    auto temp = proc_to_stmt_nos_store->get_all();
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> result;
+
+    for (const auto& [p, stmt_nos] : temp) {
+        result[p.get_name()] = stmt_nos;
+    }
+
+    return result;
+}
+
+std::unordered_set<std::string> PkbManager::get_all_stmts_nos_by_proc(const std::string& proc_name) const {
+    auto p = Procedure(proc_name);
+    return proc_to_stmt_nos_store->get_vals_by_key(p);
+}
+
+std::string PkbManager::get_proc_name_by_stmt_no(const std::string& stmt_no) const {
+    auto p = proc_to_stmt_nos_store->get_key_by_val(stmt_no);
+    return p.get_name();
+}
+
+bool PkbManager::are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const {
+    auto p1 = proc_to_stmt_nos_store->get_key_by_val(stmt_no_1);
+    auto p2 = proc_to_stmt_nos_store->get_key_by_val(stmt_no_2);
+    return p1 == p2;
+}
+
 // WriteFacade APIs
 void PkbManager::add_procedure(std::string procedure) {
     Procedure p = Procedure(std::move(procedure));
@@ -915,30 +945,18 @@ void PkbManager::populate_star_from_direct(std::shared_ptr<DirectStore> direct_s
     }
 }
 
-struct OrderingBySecondElement {
-    template <class T>
-    auto operator()(const T& a, const T& b) const -> bool {
-        return stoi(std::get<1>(a)) < stoi(std::get<1>(b));
-    }
-};
+void PkbManager::add_proc_to_stmt_no_mapping(const std::string& procedure, const std::string& stmt_no) {
+    auto p = Procedure(procedure);
+    proc_to_stmt_nos_store->add(p, stmt_no);
+}
 
-class OrderingByIndexMap {
-    std::unordered_map<std::string, unsigned long> order_map;
+void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_string_order) {
+    std::vector<Procedure> procedure_order;
+    std::transform(procedure_string_order.begin(), procedure_string_order.end(), std::back_inserter(procedure_order),
+                   [](const std::string& s) {
+                       return Procedure(s);
+                   });
 
-  public:
-    explicit OrderingByIndexMap(const std::vector<std::string>& order) {
-        for (unsigned long i = 0; i < order.size(); i++) {
-            order_map.insert({order[i], i});
-        }
-    };
-
-    template <class T>
-    auto operator()(const T& a, const T& b) const -> bool {
-        return order_map.at(std::get<1>(a).get_name()) > order_map.at(std::get<1>(b).get_name());
-    }
-};
-
-void PkbManager::finalise_pkb(const std::vector<std::string>& procedure_order) {
     populate_star_from_direct(direct_follows_store, follows_star_store, OrderingBySecondElement{});
     populate_star_from_direct(direct_parent_store, parent_star_store, OrderingBySecondElement{});
     populate_star_from_direct(direct_calls_store, calls_star_store, OrderingByIndexMap{procedure_order});

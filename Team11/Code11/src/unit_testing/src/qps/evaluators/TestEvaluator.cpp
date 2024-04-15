@@ -32,9 +32,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<VarSynonym>("v"),
-            },
             std::make_shared<VarSynonym>("v"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -53,9 +50,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -74,9 +68,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ConstSynonym>("c"),
-            },
             std::make_shared<ConstSynonym>("c"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -95,9 +86,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AssignSynonym>("a"),
-            },
             std::make_shared<AssignSynonym>("a"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -116,9 +104,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<IfSynonym>("i"),
-            },
             std::make_shared<IfSynonym>("i"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -137,9 +122,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<WhileSynonym>("w"),
-            },
             std::make_shared<WhileSynonym>("w"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -158,9 +140,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<CallSynonym>("c"),
-            },
             std::make_shared<CallSynonym>("c"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -179,9 +158,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<PrintSynonym>("p"),
-            },
             std::make_shared<PrintSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -200,9 +176,6 @@ TEST_CASE("Test Evaluator Entities") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::make_shared<ReadSynonym>("r"),
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -225,9 +198,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -248,9 +218,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), StmtNum{}, AttrRef::Type::Integer}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -275,12 +242,9 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ReadSynonym>("r"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<ReadSynonym>("r"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<ReadSynonym>("r"), WildCard{}}, false),
             },
         };
 
@@ -305,9 +269,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<PrintSynonym>("pn"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<PrintSynonym>("pn"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -328,9 +289,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<PrintSynonym>("pn"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<PrintSynonym>("pn"), StmtNum{}, AttrRef::Type::Integer}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -355,12 +313,9 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<PrintSynonym>("pn"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<PrintSynonym>("pn"), VarName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<PrintSynonym>("pn"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<PrintSynonym>("pn"), WildCard{}}, false),
             },
         };
 
@@ -385,9 +340,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<CallSynonym>("c"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<CallSynonym>("c"), ProcName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -409,9 +361,6 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<CallSynonym>("c"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<CallSynonym>("c"), StmtNum{}, AttrRef::Type::Integer}},
             std::vector<std::shared_ptr<Clause>>{},
         };
@@ -436,15 +385,44 @@ TEST_CASE("Test Evaluator Clauses - Select by Attribute Reference") {
 
         auto evaluator = QueryEvaluator{read_facade};
         const auto query = Query{
-            Synonyms{
-                std::make_shared<CallSynonym>("c"),
-            },
             std::vector<Elem>{AttrRef{std::make_shared<CallSynonym>("c"), ProcName{}, AttrRef::Type::Name}},
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<CallSynonym>("c"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<CallSynonym>("c"), WildCard{}}, false),
             },
         };
 
         require_equal(evaluator.evaluate(query), std::vector<std::string>{procedure_name});
+    }
+}
+
+TEST_CASE("Read Facade Caching") {
+    SECTION("Follows(S1, 2) and Follows*(S1, S2)") {
+        const auto& [read_facade, write_facade] = pkb::PkbManager::create_facades();
+
+        // Populate pkb::PkbManager
+        auto all_statements_numbers = std::vector<int>(1000);
+        std::iota(all_statements_numbers.begin(), all_statements_numbers.end(), 0);
+
+        for (int i = 0; i < all_statements_numbers.size() - 1; i++) {
+            write_facade->add_statement(std::to_string(all_statements_numbers[i]), StatementType::Assign);
+            write_facade->add_follows(std::to_string(all_statements_numbers[i]),
+                                      std::to_string(all_statements_numbers[i + 1]));
+        }
+        write_facade->add_statement(std::to_string(all_statements_numbers.at(all_statements_numbers.size() - 1)),
+                                    StatementType::Assign);
+        write_facade->finalise_pkb();
+
+        auto evaluator = QueryEvaluator{read_facade};
+        const auto query = Query{
+            std::vector<Elem>{std::make_shared<AnyStmtSynonym>("s1")},
+            std::vector<std::shared_ptr<Clause>>{
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s1"), Integer{"1"}}, false),
+                std::make_shared<SuchThatClause>(
+                    FollowsT{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
+            },
+        };
+
+        const auto results = evaluator.evaluate(query);
+        require_equal(results, std::vector<std::string>{"0"});
     }
 }

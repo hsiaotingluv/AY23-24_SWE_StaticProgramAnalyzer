@@ -1,0 +1,18 @@
+// ai-gen start(copilot, 1, e)
+// prompt: used copilot - Additional comments: generate far far more test cases similar to the ones given
+if ifs; Select ifs pattern ifs("x", "x")
+if ifs; Select ifs pattern ifs("x", _)
+if ifs; Select ifs pattern ifs(_, "x")
+assign a; Select a pattern a ("x", "x", "x")
+assign a; Select a pattern a ("x", "x", _)
+assign a; Select a pattern a ("x", _, "x")
+assign a; Select a pattern a ("x", _, _)
+assign a; Select a pattern a (_, "x", "x")
+assign a; Select a pattern a (_, "x", _)
+assign a; Select a pattern a (_, _, "x")
+assign a; Select a pattern a (_, _, _)
+while w; Select w pattern w("x", "x")
+while w; Select w pattern w("x", _)
+while w; Select w pattern w(_, "x")
+while w; Select w pattern w(_, _)
+// ai-gen end

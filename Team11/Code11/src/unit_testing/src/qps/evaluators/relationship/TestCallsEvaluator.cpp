@@ -32,14 +32,10 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(p, q)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-                std::make_shared<ProcSynonym>("q"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Calls{std::make_shared<ProcSynonym>("p"), std::make_shared<ProcSynonym>("q")}),
+                    Calls{std::make_shared<ProcSynonym>("p"), std::make_shared<ProcSynonym>("q")}, false),
             },
         };
 
@@ -48,14 +44,10 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select q such that Calls(p, q)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-                std::make_shared<ProcSynonym>("q"),
-            },
             std::make_shared<ProcSynonym>("q"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Calls{std::make_shared<ProcSynonym>("p"), std::make_shared<ProcSynonym>("q")}),
+                    Calls{std::make_shared<ProcSynonym>("p"), std::make_shared<ProcSynonym>("q")}, false),
             },
         };
 
@@ -64,12 +56,10 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(p, \"q\") - Should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{std::make_shared<ProcSynonym>("p"), QuotedIdent("proc3")}),
+                std::make_shared<SuchThatClause>(Calls{std::make_shared<ProcSynonym>("p"), QuotedIdent("proc3")},
+                                                 false),
             },
         };
 
@@ -78,12 +68,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(p, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{std::make_shared<ProcSynonym>("p"), WildCard()}),
+                std::make_shared<SuchThatClause>(Calls{std::make_shared<ProcSynonym>("p"), WildCard()}, false),
             },
         };
 
@@ -92,12 +79,10 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select q such that Calls(\"p\", q) - Should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("q"),
-            },
             std::make_shared<ProcSynonym>("q"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), std::make_shared<ProcSynonym>("q")}),
+                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), std::make_shared<ProcSynonym>("q")},
+                                                 false),
             },
         };
 
@@ -106,12 +91,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(\"p\", \"q\") returns all procedures if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), QuotedIdent("proc2")}),
+                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), QuotedIdent("proc2")}, false),
             },
         };
 
@@ -120,12 +102,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(\"p\", \"q\") returns no procedures if false") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), QuotedIdent("proc3")}),
+                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), QuotedIdent("proc3")}, false),
             },
         };
 
@@ -134,12 +113,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(\"p\", _) returns all procedures if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), WildCard()}),
+                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc1"), WildCard()}, false),
             },
         };
 
@@ -148,12 +124,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(\"p\", _) returns no procedures if false") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc3"), WildCard()}),
+                std::make_shared<SuchThatClause>(Calls{QuotedIdent("proc3"), WildCard()}, false),
             },
         };
 
@@ -162,12 +135,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select q such that Calls(_, q)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("q"),
-            },
             std::make_shared<ProcSynonym>("q"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{WildCard(), std::make_shared<ProcSynonym>("q")}),
+                std::make_shared<SuchThatClause>(Calls{WildCard(), std::make_shared<ProcSynonym>("q")}, false),
             },
         };
 
@@ -176,12 +146,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(_, \"q\") returns all procedures if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{WildCard(), QuotedIdent("proc2")}),
+                std::make_shared<SuchThatClause>(Calls{WildCard(), QuotedIdent("proc2")}, false),
             },
         };
 
@@ -190,12 +157,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(_, \"q\") returns no procedures if false") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{WildCard(), QuotedIdent("proc1")}),
+                std::make_shared<SuchThatClause>(Calls{WildCard(), QuotedIdent("proc1")}, false),
             },
         };
 
@@ -204,12 +168,9 @@ TEST_CASE("Test Evaluator Calls") {
 
     SECTION("Evaluate - Select p such that Calls(_, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<ProcSynonym>("p"),
-            },
             std::make_shared<ProcSynonym>("p"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Calls{WildCard(), WildCard()}),
+                std::make_shared<SuchThatClause>(Calls{WildCard(), WildCard()}, false),
             },
         };
 

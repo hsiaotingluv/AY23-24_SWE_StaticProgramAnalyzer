@@ -4,8 +4,6 @@
 #include "sp/parser/expr_parser.hpp"
 #include "sp/parser/parser.hpp"
 
-using namespace tokenizer;
-
 namespace sp {
 /*
  *

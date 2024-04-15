@@ -3,7 +3,8 @@
 #include "common/ast/factor_ast.hpp"
 #include "common/ast/statement_ast.hpp"
 #include "sp/parser/statement_keyword_const.hpp"
-#include "sp/parser/statement_list_parser.hpp"
+
+using namespace tokenizer;
 
 namespace sp {
 auto StatementParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end)

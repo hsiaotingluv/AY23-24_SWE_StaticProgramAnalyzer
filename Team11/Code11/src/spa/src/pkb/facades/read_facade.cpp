@@ -227,11 +227,11 @@ bool ReadFacade::contains_procedure_use_var_value(const std::string& variable) c
 
 std::unordered_set<std::string> ReadFacade::get_all_statements_that_use() const {
     return pkb->get_all_statements_that_use();
-};
+}
 
 std::unordered_set<std::string> ReadFacade::get_all_statements_that_use(const StatementType& statement_type) const {
     return pkb->get_all_statements_that_use(statement_type);
-};
+}
 
 std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_statements_and_var_use_pairs() const {
     return pkb->get_all_statements_and_var_use_pairs();
@@ -631,5 +631,21 @@ std::unordered_set<std::string> ReadFacade::get_vars_in_while(const std::string&
 
 std::unordered_set<std::tuple<std::string, std::string>> ReadFacade::get_all_while_stmt_var_pairs() const {
     return pkb->get_all_while_stmt_var_pairs();
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> ReadFacade::get_all_proc_to_stmts_nos_map() const {
+    return pkb->get_all_proc_to_stmts_nos_map();
+}
+
+std::unordered_set<std::string> ReadFacade::get_all_stmts_nos_by_proc(const std::string& proc_name) const {
+    return pkb->get_all_stmts_nos_by_proc(proc_name);
+}
+
+std::string ReadFacade::get_proc_name_by_stmt_no(const std::string& stmt_no) const {
+    return pkb->get_proc_name_by_stmt_no(stmt_no);
+}
+
+bool ReadFacade::are_stmt_nos_in_same_proc(const std::string& stmt_no_1, const std::string& stmt_no_2) const {
+    return pkb->are_stmt_nos_in_same_proc(stmt_no_1, stmt_no_2);
 }
 } // namespace pkb

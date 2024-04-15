@@ -2,7 +2,7 @@
 
 #include "common/cfg/cfg.hpp"
 #include "pkb/facades/write_facade.h"
-#include "sp/cfg/cfg_builder.hpp"
+#include "sp/cfg/program_cfgs.hpp"
 
 namespace sp {
 
@@ -18,7 +18,9 @@ class NextTraverser {
     auto traverse_procedure(const std::shared_ptr<ProcedureCfg>& cfg) -> void;
 
   public:
-    explicit NextTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)){};
+    explicit NextTraverser(std::shared_ptr<pkb::WriteFacade> write_facade) : write_facade(std::move(write_facade)) {
+    }
+
     auto traverse(const ProcMap& cfgs) -> void;
 };
 } // namespace sp

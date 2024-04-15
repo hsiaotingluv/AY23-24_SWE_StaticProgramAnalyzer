@@ -6,7 +6,16 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT WIN32)
     message(STATUS "Building SPA with UBSan")
     target_compile_options(spa PRIVATE -fsanitize=undefined)
     target_link_options(spa PRIVATE -fsanitize=undefined)
-    target_compile_options(spa PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(spa PRIVATE
+        -Wall
+        -Wextra-semi
+        -Wextra
+        -Wpedantic
+    )
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        target_compile_options(spa PRIVATE -Wheader-hygiene)
+    endif()
 
     if(ADDRESS_SANITIZER)
         message(STATUS "Building SPA with ASan")

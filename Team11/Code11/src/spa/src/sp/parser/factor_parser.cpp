@@ -1,5 +1,7 @@
 #include "sp/parser/factor_parser.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 auto FactorParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end) -> std::shared_ptr<AstNode> {
     check_has_token(token_start, token_end);

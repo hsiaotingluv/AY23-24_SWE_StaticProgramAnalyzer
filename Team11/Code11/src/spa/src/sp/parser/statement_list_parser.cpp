@@ -1,6 +1,8 @@
 #include "sp/parser/statement_list_parser.hpp"
 #include "common/ast/statement_list_ast.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 /*
  * Note that for a list of statements to be valid, by the end of the parsing

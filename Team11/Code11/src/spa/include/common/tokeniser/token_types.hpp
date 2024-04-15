@@ -41,9 +41,6 @@ enum class TokenType {
     Dot,
     SingleEqual,
 
-    // QPS Relationship Keyword Token
-    Relationship,
-
     // QPS AttrName Keyword Token
     AttrName,
 

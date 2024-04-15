@@ -75,6 +75,26 @@ TEST_CASE("Test Declaration Parser") {
         REQUIRE(result.empty());
         REQUIRE(std::distance(tokens.cbegin(), rest) == 0);
     }
+
+    SECTION("Declaration with extra comma") {
+        const auto query = "procedure p,;";
+        auto tokens = runner.apply_tokeniser(query);
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
+        const auto& [result, rest] = output;
+        REQUIRE(result.empty());
+    }
+
+    SECTION("Declaration with extra semi-colon") {
+        const auto query = "procedure p;;";
+        auto tokens = runner.apply_tokeniser(query);
+        const auto output =
+            untyped::detail::parse_declarations(tokens.begin(), tokens.end(), untyped::DefaultSupportedSynonyms{});
+        const auto& [result, rest] = output;
+
+        REQUIRE(result.size() == 1);
+        REQUIRE(std::distance(rest, tokens.cend()) == 1);
+    }
 }
 
 TEST_CASE("Test QPS - Basic Functionality") {
@@ -86,12 +106,12 @@ TEST_CASE("Test QPS - Basic Functionality") {
         REQUIRE(output.has_value());
         const auto result = output.value();
 
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
     SECTION("Query with stmt-stmt relationship - Follows*") {
@@ -100,15 +120,11 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
     }
 
     SECTION("Query with stmt-stmt relationship - Parent*") {
@@ -117,15 +133,11 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            ParentT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
     }
 
     SECTION("Query with stmt-ent relationship") {
@@ -134,13 +146,11 @@ TEST_CASE("Test QPS - Basic Functionality") {
         const auto result = to_query(qps.parse(query));
 
         REQUIRE(result.has_value());
-        REQUIRE(result->declared.size() == 1);
-        require_value<AnyStmtSynonym>(result->declared[0], "s");
         require_value<AnyStmtSynonym>(result->reference, "s");
 
         REQUIRE(result->clauses.size() == 1);
-        const auto reference_clause =
-            std::make_shared<SuchThatClause>(UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), QuotedIdent{"v"}});
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), QuotedIdent{"v"}}, false);
     }
 
     SECTION("Query with stmt-ent relationship") {
@@ -149,15 +159,11 @@ TEST_CASE("Test QPS - Basic Functionality") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<VarSynonym>(result.declared[1], "v");
         require_value<VarSynonym>(result.reference, "v");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause =
-            std::make_shared<SuchThatClause>(UsesS{Integer{"1"}, std::make_shared<VarSynonym>(IDENT{"v"})});
+            std::make_shared<SuchThatClause>(UsesS{Integer{"1"}, std::make_shared<VarSynonym>(IDENT{"v"})}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -168,14 +174,11 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AssignSynonym>(result.declared[0], "a");
         require_value<AssignSynonym>(result.reference, "a");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<PatternClause>(
-            PatternAssign{std::make_shared<AssignSynonym>(IDENT{"a"}), WildCard{}, PartialMatch{"count 1 + "}});
+            PatternAssign{std::make_shared<AssignSynonym>(IDENT{"a"}), WildCard{}, PartialMatch{"count 1 + "}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -185,15 +188,13 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-
-        require_value<AssignSynonym>(result.declared[0], "newa");
         require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
-        const auto reference_clause = std::make_shared<PatternClause>(PatternAssign{
-            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "}});
+        const auto reference_clause =
+            std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>(IDENT{"newa"}),
+                                                          QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "}},
+                                            false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -203,15 +204,11 @@ Select a pattern a ( _ , _"count + 1"_))";
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-
-        require_value<WhileSynonym>(result.declared[0], "newa");
         require_value<WhileSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<PatternClause>(
-            PatternWhile{std::make_shared<WhileSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}});
+            PatternWhile{std::make_shared<WhileSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -254,8 +251,29 @@ TEST_CASE("Test QPS - Syntax") {
         REQUIRE(is_syntax_error(output));
     }
 
+    SECTION("Query with missing comma") {
+        const auto query = "stmt s stmt b; Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
+
     SECTION("Query with missing semi-colon") {
         const auto query = "stmt s Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
+
+    SECTION("Query with additional comma") {
+        const auto query = "stmt s,; Select s";
+        const auto output = qps.parse(query);
+
+        REQUIRE(is_syntax_error(output));
+    }
+
+    SECTION("Query with additional semi-colon") {
+        const auto query = "read r;; print p; Select p";
         const auto output = qps.parse(query);
 
         REQUIRE(is_syntax_error(output));
@@ -327,14 +345,11 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<ProcSynonym>(result.declared[0], "p");
-
         require_value<ProcSynonym>(result.reference, "p");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            Calls{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}});
+            Calls{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -345,14 +360,11 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<ProcSynonym>(result.declared[0], "p");
-
         require_value<ProcSynonym>(result.reference, "p");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            CallsT{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}});
+            CallsT{ProcedureRef{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"q"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -363,14 +375,11 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
-        const auto reference_clause =
-            std::make_shared<SuchThatClause>(Next{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}});
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            Next{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -381,14 +390,11 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            NextT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}});
+            NextT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -399,14 +405,11 @@ TEST_CASE("Test QPS - advanced Relationships") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            Affects{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}});
+            Affects{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"1"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 }
@@ -438,16 +441,11 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -457,17 +455,12 @@ TEST_CASE("Test QPS - Select multiple synonyms") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
         require_value<ProcSynonym>(result.reference, "p");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 }
@@ -481,20 +474,15 @@ TEST_CASE("Test QPS - 'and' connectives") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<ProcSynonym>(result.declared[0], "p");
-        require_value<AnyStmtSynonym>(result.declared[1], "s");
-
         require_value<AnyStmtSynonym>(result.reference, "s");
 
         REQUIRE(result.clauses.size() == 2);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
 
         const auto reference_clause2 = std::make_shared<SuchThatClause>(
-            ModifiesP{ProcedureRefNoWildcard{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"v"}});
+            ModifiesP{ProcedureRefNoWildcard{std::make_shared<ProcSynonym>(IDENT{"p"})}, QuotedIdent{"v"}}, false);
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
 
@@ -505,18 +493,17 @@ TEST_CASE("Test QPS - 'and' connectives") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AssignSynonym>(result.declared[0], "newa");
-
         require_value<AssignSynonym>(result.reference, "newa");
 
         REQUIRE(result.clauses.size() == 2);
-        const auto reference_clause = std::make_shared<PatternClause>(PatternAssign{
-            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "}});
+        const auto reference_clause =
+            std::make_shared<PatternClause>(PatternAssign{std::make_shared<AssignSynonym>(IDENT{"newa"}),
+                                                          QuotedIdent{"normSq"}, PartialMatch{"cenX cenX * "}},
+                                            false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
-        const auto reference_clause2 = std::make_shared<PatternClause>(PatternAssign{
-            std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX "}});
+        const auto reference_clause2 = std::make_shared<PatternClause>(
+            PatternAssign{std::make_shared<AssignSynonym>(IDENT{"newa"}), QuotedIdent{"normSq"}, PartialMatch{"cenX "}},
+            false);
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
 }
@@ -530,14 +517,11 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_boolean(result.reference);
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -547,12 +531,10 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 0);
         require_boolean(result.reference);
 
         REQUIRE(result.clauses.size() == 1);
-        const auto reference_clause = std::make_shared<SuchThatClause>(FollowsT{WildCard{}, Integer{"13"}});
+        const auto reference_clause = std::make_shared<SuchThatClause>(FollowsT{WildCard{}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 
@@ -562,17 +544,15 @@ TEST_CASE("Test QPS - BOOLEAN") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 2);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value<AnyStmtSynonym>(result.reference, "BOOLEAN");
 
         REQUIRE(result.clauses.size() == 2);
         const auto reference_clause = std::make_shared<SuchThatClause>(
-            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}});
+            FollowsT{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
 
-        const auto reference_clause2 = std::make_shared<SuchThatClause>(ModifiesS{Integer{"1"}, QuotedIdent{"v"}});
+        const auto reference_clause2 =
+            std::make_shared<SuchThatClause>(ModifiesS{Integer{"1"}, QuotedIdent{"v"}}, false);
         REQUIRE(*(result.clauses[1]) == *reference_clause2);
     }
 
@@ -600,14 +580,11 @@ TEST_CASE("Test QPS - Pattern If") {
 
         REQUIRE(output.has_value());
         const auto result = output.value();
-
-        REQUIRE(result.declared.size() == 1);
-        require_value<IfSynonym>(result.declared[0], "ifs");
         require_value<IfSynonym>(result.reference, "ifs");
 
         REQUIRE(result.clauses.size() == 1);
         const auto reference_clause = std::make_shared<PatternClause>(
-            PatternIf{std::make_shared<IfSynonym>(IDENT{"ifs"}), QuotedIdent{"normSq"}});
+            PatternIf{std::make_shared<IfSynonym>(IDENT{"ifs"}), QuotedIdent{"normSq"}}, false);
         REQUIRE(*(result.clauses[0]) == *reference_clause);
     }
 }
@@ -622,15 +599,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ProcSynonym>(result.declared[0], "p");
             require_value<ProcSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
                 AttrRef{std::make_shared<ProcSynonym>(IDENT{"p"}), ProcName{}, AttrRef::Type::Name},
-                QuotedIdent{"main"});
+                QuotedIdent{"main"}, false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -640,15 +614,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<CallSynonym>(result.declared[0], "c");
             require_value<CallSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
                 AttrRef{std::make_shared<CallSynonym>(IDENT{"c"}), ProcName{}, AttrRef::Type::Name},
-                QuotedIdent{"main"});
+                QuotedIdent{"main"}, false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -716,14 +687,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<VarSynonym>(result.declared[0], "v");
             require_value<VarSynonym>(result.reference, "v");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<VarSynonym>(IDENT{"v"}), VarName{}, AttrRef::Type::Name}, QuotedIdent{"main"});
+                AttrRef{std::make_shared<VarSynonym>(IDENT{"v"}), VarName{}, AttrRef::Type::Name}, QuotedIdent{"main"},
+                false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -733,15 +702,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ReadSynonym>(result.declared[0], "r");
             require_value<ReadSynonym>(result.reference, "r");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), VarName{}, AttrRef::Type::Name},
-                QuotedIdent{"main"});
+                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), VarName{}, AttrRef::Type::Name}, QuotedIdent{"main"},
+                false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -751,15 +717,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<PrintSynonym>(result.declared[0], "p");
             require_value<PrintSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
                 AttrRef{std::make_shared<PrintSynonym>(IDENT{"p"}), VarName{}, AttrRef::Type::Name},
-                QuotedIdent{"main"});
+                QuotedIdent{"main"}, false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -820,14 +783,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<ConstSynonym>(result.declared[0], "c");
             require_value<ConstSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<ConstSynonym>(IDENT{"c"}), Value{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<ConstSynonym>(IDENT{"c"}), Value{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
 
@@ -902,14 +863,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-            require_value<AnyStmtSynonym>(result.declared[0], "s");
             require_value<AnyStmtSynonym>(result.reference, "s");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -920,15 +879,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<ReadSynonym>(result.declared[0], "r");
             require_value<ReadSynonym>(result.reference, "r");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<ReadSynonym>(IDENT{"r"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -939,15 +895,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<PrintSynonym>(result.declared[0], "p");
             require_value<PrintSynonym>(result.reference, "p");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<PrintSynonym>(IDENT{"p"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<PrintSynonym>(IDENT{"p"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -958,15 +911,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<CallSynonym>(result.declared[0], "c");
             require_value<CallSynonym>(result.reference, "c");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<CallSynonym>(IDENT{"c"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<CallSynonym>(IDENT{"c"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -977,15 +927,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<WhileSynonym>(result.declared[0], "w");
             require_value<WhileSynonym>(result.reference, "w");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<WhileSynonym>(IDENT{"w"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<WhileSynonym>(IDENT{"w"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -996,15 +943,12 @@ TEST_CASE("Test QPS - With") {
 
             REQUIRE(output.has_value());
             const auto result = output.value();
-
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<IfSynonym>(result.declared[0], "i");
             require_value<IfSynonym>(result.reference, "i");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<IfSynonym>(IDENT{"i"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<IfSynonym>(IDENT{"i"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -1016,14 +960,12 @@ TEST_CASE("Test QPS - With") {
             REQUIRE(output.has_value());
             const auto result = output.value();
 
-            REQUIRE(result.declared.size() == 1);
-
-            require_value<AssignSynonym>(result.declared[0], "a");
             require_value<AssignSynonym>(result.reference, "a");
 
             REQUIRE(result.clauses.size() == 1);
             const auto reference_clause = std::make_shared<WithClause>(
-                AttrRef{std::make_shared<AssignSynonym>(IDENT{"a"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"});
+                AttrRef{std::make_shared<AssignSynonym>(IDENT{"a"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"1"},
+                false);
 
             REQUIRE(*(result.clauses[0]) == *reference_clause);
         }
@@ -1061,8 +1003,6 @@ TEST_CASE("Test QPS - Select attrRef") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 1);
-        require_value<AnyStmtSynonym>(result.declared[0], "s");
         require_value(result.reference,
                       AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer});
     }
@@ -1074,10 +1014,6 @@ TEST_CASE("Test QPS - Select attrRef") {
         REQUIRE(output.has_value());
 
         const auto result = output.value();
-        REQUIRE(result.declared.size() == 2);
-        require_value<AssignSynonym>(result.declared[0], "a1");
-        require_value<VarSynonym>(result.declared[1], "a2");
-
         require_value(result.reference,
                       AttrRef{std::make_shared<AssignSynonym>(IDENT{"a1"}), StmtNum{}, AttrRef::Type::Integer});
         require_value<VarSynonym>(result.reference, "a2");
@@ -1087,5 +1023,118 @@ TEST_CASE("Test QPS - Select attrRef") {
         const auto query = "assign a1; Select<a1.stmt #>";
         const auto output = qps.parse(query);
         REQUIRE(is_syntax_error(output));
+    }
+}
+
+TEST_CASE("Test QPS - Weird synonym names") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query - Select Uses") {
+        const auto query = "stmt Uses; Select Uses such that Uses(Uses, \"v\")";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        require_value<AnyStmtSynonym>(result.reference, "Uses");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            UsesS{std::make_shared<AnyStmtSynonym>(IDENT{"Uses"}), QuotedIdent{"v"}}, false);
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query - Select Pattern") {
+        const auto query = "stmt Parent; stmt Follows; Select Parent such that Follows (Parent, Follows)";
+
+        const auto output = to_query(qps.parse(query));
+        REQUIRE(output.has_value());
+
+        const auto result = output.value();
+        require_value<AnyStmtSynonym>(result.reference, "Parent");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause =
+            std::make_shared<SuchThatClause>(Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"Parent"})},
+                                                     StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"Follows"})}},
+                                             false);
+    }
+}
+
+TEST_CASE("Query - Select negated clause") {
+    const auto qps = qps::DefaultParser{};
+
+    SECTION("Query - Select negated Such That clause") {
+        const auto query = "stmt s; Select s such that not Follows(s, 13)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<SuchThatClause>(
+            Follows{StmtRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"})}, Integer{"13"}}, true);
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query - Select negated With clause") {
+        const auto query = "stmt s; Select s with not s.stmt# = 13";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        require_value<AnyStmtSynonym>(result.reference, "s");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<WithClause>(
+            AttrRef{std::make_shared<AnyStmtSynonym>(IDENT{"s"}), StmtNum{}, AttrRef::Type::Integer}, Integer{"13"},
+            true);
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query - Select negated Pattern clause") {
+        const auto query = "assign a; Select a pattern a (\"x\", _)";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+        const auto result = output.value();
+
+        require_value<AssignSynonym>(result.reference, "a");
+
+        REQUIRE(result.clauses.size() == 1);
+        const auto reference_clause = std::make_shared<PatternClause>(
+            PatternAssign{std::make_shared<AssignSynonym>(IDENT{"a"}), QuotedIdent{"x"}, WildCard{}}, false);
+        REQUIRE(*(result.clauses[0]) == *reference_clause);
+    }
+
+    SECTION("Query - Select with name collisions - value") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"value\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - stmt#") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"stmt#\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(!output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - varName") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"varName\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
+    }
+
+    SECTION("Query - Select with name collisions - procName") {
+        const auto query = "stmt s; Select s such that Modifies(s, \"procName\")";
+        const auto output = to_query(qps.parse(query));
+
+        REQUIRE(output.has_value());
     }
 }

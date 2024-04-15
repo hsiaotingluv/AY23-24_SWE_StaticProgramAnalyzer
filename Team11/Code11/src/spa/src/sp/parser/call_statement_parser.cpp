@@ -1,6 +1,8 @@
 #include "common/ast/statement_ast.hpp"
 #include "sp/parser/statement_parser.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 
 // call: 'call' proc_name';'

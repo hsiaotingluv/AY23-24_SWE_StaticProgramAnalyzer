@@ -1,6 +1,8 @@
 #include "sp/parser/name_parser.hpp"
 #include "common/ast/factor_ast.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 
 auto NameParser::parse(Iterator& token_start, const Iterator& token_end) -> std::shared_ptr<AstNode> {

@@ -19,7 +19,7 @@ template <typename UntypedReference, typename Head, typename... Tails>
 auto parse_many(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end,
                 TypeList<Head, Tails...>)
     -> std::optional<std::tuple<UntypedReference, std::vector<Token>::const_iterator>>;
-}; // namespace qps::untyped::detail
+} // namespace qps::untyped::detail
 
 namespace qps::untyped {
 class SelectSynonymStrategy {

@@ -1,5 +1,6 @@
 #pragma once
 #include "qps/parser/analysers/semantic_analyser_helper.hpp"
+#include "qps/parser/entities/attribute.hpp"
 #include "qps/parser/entities/clause.hpp"
 #include "qps/parser/entities/relationship.hpp"
 #include "qps/parser/entities/synonym.hpp"
@@ -12,6 +13,7 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <variant>
 
 namespace qps ::detail {
 inline auto validate_pattern(const Synonyms&, const std::unordered_map<std::string, std::shared_ptr<Synonym>>&,
@@ -59,7 +61,7 @@ static auto visit_such_that_clause(const Synonyms& declarations,
         return std::nullopt;
     }
 
-    return std::make_shared<SuchThatClause>(maybe_rel_ref.value());
+    return std::make_shared<SuchThatClause>(maybe_rel_ref.value(), such_that.is_negated);
 }
 
 template <typename PatternAnalysersList>
@@ -71,12 +73,12 @@ static auto visit_pattern_clause(const Synonyms& declarations,
     if (!maybe_syntactic_pattern.has_value()) {
         return std::nullopt;
     }
-    return std::make_shared<PatternClause>(maybe_syntactic_pattern.value());
+    return std::make_shared<PatternClause>(maybe_syntactic_pattern.value(), pattern.is_negated);
 }
 
-static auto visit_with_clause(const Synonyms& declarations,
-                              const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
-                              const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
+static inline auto visit_with_clause(const Synonyms& declarations,
+                                     const std::unordered_map<std::string, std::shared_ptr<Synonym>>& mapping,
+                                     const untyped::UntypedWithClause& with) -> std::optional<std::shared_ptr<Clause>> {
     const auto& maybe_ref1 = validate_ref(declarations, mapping, with.ref1);
     if (!maybe_ref1.has_value()) {
         return std::nullopt;
@@ -93,7 +95,10 @@ static auto visit_with_clause(const Synonyms& declarations,
     }
     const auto& [ref1, ref2] = maybe_valid_combi.value();
 
-    return std::make_shared<WithClause>(ref1, ref2);
+    if (std::holds_alternative<AttrRef>(ref2) && !std::holds_alternative<AttrRef>(ref1)) {
+        return std::make_shared<WithClause>(ref2, ref1, with.is_negated);
+    }
+    return std::make_shared<WithClause>(ref1, ref2, with.is_negated);
 }
 
 template <typename RelationshipAnalysersList, typename PatternAnalysersList>
@@ -108,6 +113,6 @@ auto untyped_clause_visitor(const Synonyms& declarations,
                       [&declarations, &mapping](const untyped::UntypedWithClause& with) {
                           return visit_with_clause(declarations, mapping, with);
                       }};
-};
+}
 
 } // namespace qps::detail

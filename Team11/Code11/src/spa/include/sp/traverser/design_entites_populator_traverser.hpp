@@ -11,7 +11,8 @@ class DesignEntitiesPopulatorTraverser : public Traverser {
 
   public:
     explicit DesignEntitiesPopulatorTraverser(std::shared_ptr<pkb::WriteFacade> write_facade)
-        : write_facade(std::move(write_facade)){};
+        : write_facade(std::move(write_facade)) {
+    }
 
     auto traverse(std::shared_ptr<AstNode> node, const std::vector<std::string>&) -> std::shared_ptr<AstNode> override;
 };

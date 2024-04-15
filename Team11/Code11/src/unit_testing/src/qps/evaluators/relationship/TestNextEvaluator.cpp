@@ -47,14 +47,10 @@ TEST_CASE("Test Evaluator Next") {
     auto evaluator = QueryEvaluator{read_facade};
     SECTION("Evaluate - Select s1 such that Next (s1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -63,14 +59,10 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select if1 such that Next (if1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<IfSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<IfSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<IfSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Next{std::make_shared<IfSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -79,14 +71,10 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s2 such that Next (if1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<IfSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<IfSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Next{std::make_shared<IfSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -95,14 +83,10 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s1 such that Next (s1, while2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<WhileSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}),
+                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}, false),
             },
         };
 
@@ -111,14 +95,10 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select while2 such that Next (s1, while2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<WhileSynonym>("s2"),
-            },
             std::make_shared<WhileSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}),
+                    Next{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<WhileSynonym>("s2")}, false),
             },
         };
 
@@ -127,12 +107,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s2 such that Next (1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}),
+                std::make_shared<SuchThatClause>(Next{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -141,12 +118,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s1 such that Next (s1, 4)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), Integer{"4"}}),
+                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), Integer{"4"}}, false),
             },
         };
 
@@ -155,12 +129,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s1 such that Next (s1, 1)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), Integer{"1"}}),
+                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), Integer{"1"}}, false),
             },
         };
 
@@ -169,12 +140,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (1, 2) - returns all statements if true") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"2"}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"2"}}, false),
             },
         };
 
@@ -183,12 +151,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (1, 6) - returns empty if false, should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"6"}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"6"}}, false),
             },
         };
 
@@ -197,12 +162,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"1"}, WildCard{}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"1"}, WildCard{}}, false),
             },
         };
 
@@ -211,12 +173,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (_, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{WildCard{}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(Next{WildCard{}, Integer{"3"}}, false),
             },
         };
 
@@ -225,12 +184,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s2 such that Next (_, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}),
+                std::make_shared<SuchThatClause>(Next{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -239,12 +195,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (_, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{WildCard{}, WildCard{}}),
+                std::make_shared<SuchThatClause>(Next{WildCard{}, WildCard{}}, false),
             },
         };
 
@@ -253,12 +206,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s1 such that Next (s1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Next{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, false),
             },
         };
 
@@ -267,12 +217,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (2, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"2"}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"2"}, Integer{"3"}}, false),
             },
         };
 
@@ -282,12 +229,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (1, 4) - should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"4"}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"1"}, Integer{"4"}}, false),
             },
         };
 
@@ -297,12 +241,9 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s2 such that Next (4, 4) - should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Next{Integer{"4"}, Integer{"4"}}),
+                std::make_shared<SuchThatClause>(Next{Integer{"4"}, Integer{"4"}}, false),
             },
         };
 
@@ -312,13 +253,10 @@ TEST_CASE("Test Evaluator Next") {
 
     SECTION("Evaluate - Select s such that Next (s, s) - should not be transitive") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s"),
-            },
             std::make_shared<AnyStmtSynonym>("s"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Next{std::make_shared<AnyStmtSynonym>("s"), std::make_shared<AnyStmtSynonym>("s")}),
+                    Next{std::make_shared<AnyStmtSynonym>("s"), std::make_shared<AnyStmtSynonym>("s")}, false),
             },
         };
 

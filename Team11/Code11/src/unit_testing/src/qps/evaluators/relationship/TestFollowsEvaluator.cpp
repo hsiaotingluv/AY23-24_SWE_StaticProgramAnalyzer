@@ -29,14 +29,10 @@ TEST_CASE("Test Evaluator Follows") {
     auto evaluator = QueryEvaluator{read_facade};
     SECTION("Evaluate - Select s1 such that Follows (s1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Follows{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Follows{std::make_shared<AnyStmtSynonym>("s1"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -45,12 +41,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (1, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -59,12 +52,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (s2, 2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s2"), Integer{"2"}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s2"), Integer{"2"}}, false),
             },
         };
 
@@ -73,12 +63,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (s2, 10)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s2"), Integer{"10"}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s2"), Integer{"10"}}, false),
             },
         };
 
@@ -87,12 +74,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (1, 2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, Integer{"2"}}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, Integer{"2"}}, false),
             },
         };
 
@@ -101,12 +85,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, WildCard{}}, false),
             },
         };
 
@@ -115,12 +96,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (_, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{WildCard{}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(Follows{WildCard{}, Integer{"3"}}, false),
             },
         };
 
@@ -129,12 +107,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (_, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}),
+                std::make_shared<SuchThatClause>(Follows{WildCard{}, std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -143,12 +118,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (_, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{WildCard{}, WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{WildCard{}, WildCard{}}, false),
             },
         };
 
@@ -157,12 +129,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s1 such that Follows (s1, _)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s1"),
-            },
             std::make_shared<AnyStmtSynonym>("s1"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}),
+                std::make_shared<SuchThatClause>(Follows{std::make_shared<AnyStmtSynonym>("s1"), WildCard{}}, false),
             },
         };
 
@@ -171,12 +140,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (1, 3)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, Integer{"3"}}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"1"}, Integer{"3"}}, false),
             },
         };
 
@@ -186,12 +152,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (2, 10)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"2"}, Integer{"10"}}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"2"}, Integer{"10"}}, false),
             },
         };
 
@@ -201,12 +164,9 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (2, 2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
-                std::make_shared<SuchThatClause>(Follows{Integer{"2"}, Integer{"2"}}),
+                std::make_shared<SuchThatClause>(Follows{Integer{"2"}, Integer{"2"}}, false),
             },
         };
 
@@ -216,13 +176,10 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select s2 such that Follows (s2, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<AnyStmtSynonym>("s2"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Follows{std::make_shared<AnyStmtSynonym>("s2"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Follows{std::make_shared<AnyStmtSynonym>("s2"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -232,14 +189,10 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select w such that Follows (w, s2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<WhileSynonym>("w"),
-                std::make_shared<AnyStmtSynonym>("s2"),
-            },
             std::make_shared<WhileSynonym>("w"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Follows{std::make_shared<WhileSynonym>("w"), std::make_shared<AnyStmtSynonym>("s2")}),
+                    Follows{std::make_shared<WhileSynonym>("w"), std::make_shared<AnyStmtSynonym>("s2")}, false),
             },
         };
 
@@ -249,14 +202,10 @@ TEST_CASE("Test Evaluator Follows") {
 
     SECTION("Evaluate - Select w such that Follows (w1, w2)") {
         const auto query = Query{
-            Synonyms{
-                std::make_shared<WhileSynonym>("w1"),
-                std::make_shared<AnyStmtSynonym>("w2"),
-            },
             std::make_shared<WhileSynonym>("w1"),
             std::vector<std::shared_ptr<Clause>>{
                 std::make_shared<SuchThatClause>(
-                    Follows{std::make_shared<WhileSynonym>("w1"), std::make_shared<WhileSynonym>("w2")}),
+                    Follows{std::make_shared<WhileSynonym>("w1"), std::make_shared<WhileSynonym>("w2")}, false),
             },
         };
 

@@ -155,6 +155,6 @@ auto untyped_relationship_visitor(const Synonyms& declarations,
 
             return validate_ent_ent<EntEntList>(declarations, mapping, keyword, ref, ent_ref);
         }};
-};
+}
 
 } // namespace qps::detail

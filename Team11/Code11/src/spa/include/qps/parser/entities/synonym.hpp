@@ -13,10 +13,16 @@
 
 namespace qps {
 
+// Forward declaration of Table to prevent circular dependency
+class Table;
+
 class Synonym : public Ref {
     IDENT name;
 
     [[nodiscard]] virtual auto representation() const -> std::string = 0;
+
+    [[nodiscard]] virtual auto scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const
+        -> std::unordered_set<std::string> = 0;
 
   public:
     virtual ~Synonym() = default;
@@ -33,14 +39,16 @@ class Synonym : public Ref {
 
     [[nodiscard]] auto get_name_string() const -> std::string;
 
-    [[nodiscard]] virtual auto scan(const std::shared_ptr<pkb::ReadFacade>& read_facade) const
-        -> std::unordered_set<std::string> = 0;
-
     auto operator==(const Synonym& rhs) const noexcept -> bool;
 
     friend auto operator<<(std::ostream& os, const Synonym& synonym) -> std::ostream&;
 
     auto operator<(const Synonym& rhs) const noexcept -> bool;
+
+    // Establish friends
+    friend class DataSource;
+    friend auto build_table(const std::shared_ptr<Synonym>& synonym,
+                            const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table;
 };
 
 // StmtSynonym := AnyStmtSynonym | ReadSynonym | PrintSynonym | CallSynonym | WhileSynonym | IfSynonym |

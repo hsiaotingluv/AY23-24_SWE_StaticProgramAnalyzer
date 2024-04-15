@@ -4,6 +4,8 @@
 #include "qps/parser/analysers/semantic_analyser.hpp"
 #include "qps/parser/entities/synonym.hpp"
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -15,14 +17,25 @@ class Table {
     std::vector<std::shared_ptr<Synonym>> record_type;
     std::vector<std::vector<std::string>> record_value;
 
+    std::unordered_map<std::string, std::unordered_set<std::string>> synonym_to_values;
+
   public:
     Table() = default;
 
     Table(const std::vector<std::shared_ptr<Synonym>>& column_keys) : record_type(column_keys) {
+#ifdef DEBUG
+        auto name_set = std::unordered_set<std::shared_ptr<Synonym>>(column_keys.begin(), column_keys.end());
+        if (name_set.size() != column_keys.size()) {
+            throw std::invalid_argument("Duplicate column names are not allowed");
+        }
+#endif
     }
 
     auto add_row(const std::vector<std::string>& record) -> void {
         record_value.push_back(record);
+        for (size_t i = 0; i < record.size(); ++i) {
+            synonym_to_values[record_type[i]->get_name_string()].insert(record[i]);
+        }
     }
 
     [[nodiscard]] auto get_column() const -> std::vector<std::shared_ptr<Synonym>> {
@@ -44,6 +57,14 @@ class Table {
     [[nodiscard]] auto empty() const -> bool {
         return record_type.empty() || record_value.empty();
     }
+
+    [[nodiscard]] auto get_column_value(const std::shared_ptr<Synonym>& synonym) const
+        -> std::unordered_set<std::string> {
+        if (synonym_to_values.find(synonym->get_name_string()) == synonym_to_values.end()) {
+            return {};
+        }
+        return synonym_to_values.at(synonym->get_name_string());
+    }
 };
 
 using OutputTable = std::variant<Table, UnitTable>;
@@ -61,10 +82,13 @@ void reorder(std::vector<T>& v, std::vector<int> const& order) {
     v = v_copy;
 }
 
+auto subtract(OutputTable&& table1, OutputTable&& table2, const std::shared_ptr<pkb::ReadFacade>& read_facade) -> Table;
 auto join(OutputTable&& table1, OutputTable&& table2) -> OutputTable;
+auto project_to_table(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table,
+                      const Reference& reference, bool should_transform = false) -> OutputTable;
 auto project(const std::shared_ptr<pkb::ReadFacade>& read_facade, OutputTable& table, const Reference& reference)
     -> std::vector<std::string>;
-void print(const Table& table);
+void print(const OutputTable& table);
 
 class AttributeExtractor {
     std::shared_ptr<pkb::ReadFacade> read_facade;

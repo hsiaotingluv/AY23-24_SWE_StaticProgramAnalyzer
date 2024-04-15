@@ -1,0 +1,3 @@
+Select BOOLEAN such that not Affects(_, _) and not Affects(_, _) and not Affects(_, _) and not Affects(_, _) and not Affects(_, _) and not Affects(_, _)
+stmt s1, s2, s3, s4; Select <s1, s2, s3, s4> such that not Affects(s1, _) and not Affects(s2, _) and not Affects(s3, _) and not Affects(s4, _) with s1.stmt# = s2.stmt# and s3.stmt# = s4.stmt#
+assign a1, a2, a3, a4; stmt s1, s2, s3, s4; Select <a1, a2, a3, a4, s1, s2, s3, s4> such that not Affects(a1, a2) and not Affects(a2, a4) and not Affects(s1, a1) and not Affects(s3, s4) and not Affects(a3, s4) and not Affects(_, _) and not Affects(_, s4) and not Affects(a3, _)

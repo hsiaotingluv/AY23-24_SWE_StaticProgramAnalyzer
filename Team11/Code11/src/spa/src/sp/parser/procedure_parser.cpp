@@ -2,6 +2,8 @@
 #include "common/ast/procedure_ast.hpp"
 #include "sp/parser/statement_keyword_const.hpp"
 
+using namespace tokenizer;
+
 namespace sp {
 auto ProcedureParser::parse(Parser::Iterator& token_start, const Parser::Iterator& token_end)
     -> std::shared_ptr<AstNode> {

@@ -87,7 +87,7 @@ auto parse_expression_spec(std::vector<Token>::const_iterator it, const std::vec
         // Default: error
         return std::nullopt;
     }
-};
+}
 
 auto constant(std::vector<Token>::const_iterator it, const std::vector<Token>::const_iterator& end)
     -> std::optional<std::tuple<Expression, std::vector<Token>::const_iterator>> {

@@ -32,6 +32,6 @@ class SemanticValidator {
      */
     auto get_call_graph() const -> const CallGraph& {
         return dependency_graph;
-    };
+    }
 };
 } // namespace sp
